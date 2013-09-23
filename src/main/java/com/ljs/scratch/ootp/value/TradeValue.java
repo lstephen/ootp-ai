@@ -129,6 +129,15 @@ public class TradeValue {
             - getAgingFactor(p);
     }
 
+    public Function<Player, Integer> getOverall() {
+        return new Function<Player, Integer>() {
+            @Override
+            public Integer apply(Player input) {
+                return getOverall(input);
+            }
+        };
+    }
+
     public Integer getOverallNow(Player p) {
         return playerValue.getNowValue(p) - getAgingFactor(p);
     }

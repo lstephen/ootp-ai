@@ -52,10 +52,10 @@ public class DefenseSelection {
 
                 DefensiveRatings ratings = ps.get(idx).getDefensiveRatings();
 
-                if (p != Position.FIRST_BASE
+                /*if (p != Position.FIRST_BASE
                     && ratings.getPositionScore(p) <= 0) {
                     continue;
-                }
+                }*/
                 defense.put(ps.get(idx), p);
                 idx++;
             }

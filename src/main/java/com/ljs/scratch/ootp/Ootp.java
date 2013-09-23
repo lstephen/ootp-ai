@@ -11,6 +11,7 @@ import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
 import com.ljs.scratch.ootp.core.Team;
 import com.ljs.scratch.ootp.core.TeamId;
+import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.regression.BattingRegression;
@@ -294,6 +295,13 @@ public class Ootp {
         generic.setCustomValueFunction(tv.getTradeTargetValue());
 
         generic.setReverse(false);
+
+        LOG.info("Draft...");
+        generic.setTitle("Draft");
+        generic.setPlayers(site.getDraft().extract());
+        generic.print(out);
+
+        DraftReport.create(site, tv).print(out);
 
         if (def.getName().equals("BTH")) {
             LOG.info("40 man roster reports...");

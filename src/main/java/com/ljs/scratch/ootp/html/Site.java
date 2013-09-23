@@ -66,6 +66,10 @@ public class Site {
         return PageFactory.create(def.getSiteRoot(), url);
     }
 
+    public PlayerList getDraft() {
+        return PlayerList.draft(this);
+    }
+
     public PlayerList getFreeAgents() {
         return PlayerList.freeAgents(this);
     }

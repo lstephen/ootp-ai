@@ -58,6 +58,10 @@ public final class PlayerList {
         return new PlayerList(site, "waiver.html");
     }
 
+    public static PlayerList draft(Site site) {
+        return new PlayerList(site, "rookies.html");
+    }
+
     public static PlayerList from(Site site, Page page) {
         return new PlayerList(site, page);
     }
