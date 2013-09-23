@@ -41,6 +41,7 @@ public final class HitterSelectionFactory {
 
     public static HitterSelectionFactory using(
         final Function<Player, ? extends Number> value) {
+
         return new HitterSelectionFactory(new Function<Player, Double>() {
             @Override
             public Double apply(Player p) {

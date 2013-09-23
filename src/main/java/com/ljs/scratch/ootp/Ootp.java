@@ -19,6 +19,7 @@ import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
+import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.RosterSelection;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
@@ -213,8 +214,8 @@ public class Ootp {
 
         Roster newRoster =
             isExpandedRosters
-            ? selection.selectedExpanded(changes)
-            : selection.select(changes);
+            ? selection.select(Mode.EXPANDED, changes)
+            : selection.select(Mode.REGULAR_SEASON, changes);
 
         selection.printBattingSelectionTable(out, changes);
         selection.printPitchingSelectionTable(out, changes);
