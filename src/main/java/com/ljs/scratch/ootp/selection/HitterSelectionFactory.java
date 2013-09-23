@@ -21,6 +21,7 @@ public final class HitterSelectionFactory {
             .ordering(byOverall())
             .slots(mode.getHittingSlots())
             .size(mode.getHittingSlots().size())
+            .fillToSize(Slot.H)
             .build();
     }
 

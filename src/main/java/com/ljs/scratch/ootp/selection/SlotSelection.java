@@ -1,8 +1,3 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   SlotSelection.java
-
 package com.ljs.scratch.ootp.selection;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -13,61 +8,28 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.builder.ValidatingBuilder;
 import com.ljs.scratch.ootp.core.Player;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
-// Referenced classes of package com.ljs.scratch.ootp.selection:
-//            Slot, Selection
+public final class SlotSelection implements Selection {
 
-public final class SlotSelection
-    implements Selection
-{
-    public static final class Builder
-        implements com.ljs.scratch.builder.Builder
-    {
+    @NotNull
+    private Multiset<Slot> slots;
 
-        public Builder ordering(Ordering ordering)
-        {
-            ((SlotSelection)_flddelegate.getBuilding()).ordering = ordering;
-            return this;
-        }
+    @NotNull @Min(0)
+    private Integer size;
 
-        public Builder slots(Multiset slots)
-        {
-            ((SlotSelection)_flddelegate.getBuilding()).slots = slots;
-            return this;
-        }
+    @NotNull
+    private Ordering<Player> ordering;
 
-        public Builder size(Integer size)
-        {
-            ((SlotSelection)_flddelegate.getBuilding()).size = size;
-            return this;
-        }
+    private Slot fillToSize;
 
-        public SlotSelection build()
-        {
-            return (SlotSelection)_flddelegate.build();
-        }
-
-        private static Builder create()
-        {
-            return new Builder();
-        }
-
-        private final ValidatingBuilder _flddelegate = ValidatingBuilder.build(SlotSelection.create());
-
-
-        private Builder()
-        {
-        }
-    }
-
-
-    private SlotSelection()
-    {
-    }
+    private SlotSelection() { }
 
     @Override
-    public ImmutableMultimap<Slot, Player> select(Iterable<Player> forced, Iterable<Player> available)
-    {
+    public ImmutableMultimap<Slot, Player> select(
+        Iterable<Player> forced, Iterable<Player> available) {
+
         Multimap<Slot, Player> selected = ArrayListMultimap.create();
         Multiset<Slot> remainingSlots = HashMultiset.create(slots);
 
@@ -80,9 +42,21 @@ public final class SlotSelection
         for (Player p : ordering.sortedCopy(available)) {
 
             for (Slot st : Slot.getPlayerSlots(p)) {
-                if(remainingSlots.contains(st) && !selected.containsValue(p) && selected.size() < size.intValue()) {
+                if (remainingSlots.contains(st)
+                    && !selected.containsValue(p)
+                    && selected.size() < size.intValue()) {
+
                     selected.put(st, p);
                     remainingSlots.remove(st);
+                }
+            }
+        }
+
+        while (fillToSize != null && selected.size() < size) {
+            for (Player p : ordering.sortedCopy(available)) {
+                if (!selected.containsValue(p)) {
+                    selected.put(fillToSize, p);
+                    break;
                 }
             }
         }
@@ -90,21 +64,50 @@ public final class SlotSelection
         return ImmutableMultimap.copyOf(selected);
     }
 
-    private static SlotSelection create()
-    {
+    private static SlotSelection create() {
         return new SlotSelection();
     }
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return Builder.create();
     }
 
-    private Multiset slots;
-    private Integer size;
-    private Ordering<Player> ordering;
+    public static final class Builder
+        implements com.ljs.scratch.builder.Builder<SlotSelection> {
 
+        private final ValidatingBuilder<SlotSelection> delegate =
+            ValidatingBuilder.build(SlotSelection.create());
 
+        private Builder() { }
 
+        public Builder ordering(Ordering<Player> ordering) {
+            delegate.getBuilding().ordering = ordering;
+            return this;
+        }
 
+        public Builder slots(Multiset<Slot> slots) {
+            delegate.getBuilding().slots = slots;
+            return this;
+        }
+
+        public Builder size(Integer size) {
+            delegate.getBuilding().size = size;
+            return this;
+        }
+
+        public Builder fillToSize(Slot slot) {
+            delegate.getBuilding().fillToSize = slot;
+            return this;
+        }
+
+        @Override
+        public SlotSelection build() {
+            return delegate.build();
+        }
+
+        private static Builder create() {
+            return new Builder();
+        }
+
+    }
 }

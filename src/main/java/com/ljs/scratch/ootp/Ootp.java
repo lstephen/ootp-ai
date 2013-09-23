@@ -105,10 +105,10 @@ public class Ootp {
             //( TWML
             //, CBL
             //, HFTC
-            ( LBB
-            , BTH
+            //, LBB
+            //, BTH
             //, SAVOY
-            //( TFMS
+            ( TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -212,10 +212,13 @@ public class Ootp {
 
         LOG.log(Level.INFO, "Selecting new rosters...");
 
-        Roster newRoster =
-            isExpandedRosters
-            ? selection.select(Mode.EXPANDED, changes)
-            : selection.select(Mode.REGULAR_SEASON, changes);
+        Mode mode = isExpandedRosters ? Mode.EXPANDED : Mode.REGULAR_SEASON;
+
+        if (def.getName().equals("TWML")) {
+            mode = Mode.PLAYOFFS;
+        }
+
+        Roster newRoster = selection.select(mode, changes);
 
         selection.printBattingSelectionTable(out, changes);
         selection.printPitchingSelectionTable(out, changes);
@@ -262,7 +265,8 @@ public class Ootp {
 
         Rotation rotation =
             RotationSelection
-                .regularSeason(
+                .forMode(
+                    mode,
                     pitchingRegression.predict(team),
                     site.getPitcherSelectionMethod())
                 .select(newRoster.getPlayers(Status.ML));

@@ -16,9 +16,11 @@ public final class PitcherSelectionFactory {
 
     private final Function<Player, Double> value;
 
-    private PitcherOverall overall;
+    private final PitcherOverall overall;
 
-    private PitcherSelectionFactory(Function<Player, Double> value, PitcherOverall overall) {
+    private PitcherSelectionFactory(
+        Function<Player, Double> value, PitcherOverall overall) {
+
         this.value = value;
         this.overall = overall;
     }
@@ -29,6 +31,7 @@ public final class PitcherSelectionFactory {
             .ordering(byOverall())
             .slots(mode.getPitchingSlots())
             .size(mode.getPitchingSlots().size())
+            .fillToSize(Slot.P)
             .build();
     }
 
