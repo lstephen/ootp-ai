@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-site</actionName>
+            <displayName>site</displayName>
+            <goals>
+                <goal>site:site</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-clean site</actionName>
+            <displayName>clean site</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>site:site</goal>
+            </goals>
+        </action>
+    </actions>

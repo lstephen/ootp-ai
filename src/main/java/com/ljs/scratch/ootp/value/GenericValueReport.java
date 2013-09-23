@@ -1,0 +1,233 @@
+package com.ljs.scratch.ootp.value;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.regression.BattingRegression;
+import com.ljs.scratch.ootp.regression.PitchingRegression;
+import com.ljs.scratch.ootp.regression.Predictions;
+import com.ljs.scratch.ootp.report.SalaryRegression;
+import com.ljs.scratch.ootp.selection.Selections;
+import com.ljs.scratch.ootp.selection.Slot;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ *
+ * @author lstephen
+ */
+public class GenericValueReport {
+
+    private String title;
+
+    private ImmutableSet<Player> players;
+
+    private Integer limit;
+
+    private final PlayerValue playerValue;
+
+    private final ReplacementValue replacementValue;
+
+    private final ReplacementValue futureReplacementValue;
+
+    private Function<Player, Integer> custom;
+
+    private boolean reverse;
+
+    private final BattingRegression batting;
+
+    private final PitchingRegression pitching;
+
+    private final SalaryRegression salary;
+
+    private final Predictions now;
+
+    public GenericValueReport(
+        Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryRegression salary) {
+
+        this.batting = batting;
+        this.pitching = pitching;
+        this.salary = salary;
+
+        now =
+            Predictions
+                .predict(ps)
+                .using(batting, pitching, predictions.getPitcherOverall());
+
+        Predictions future =
+            Predictions
+                .predictFuture(ps)
+                .using(batting, pitching, predictions.getPitcherOverall());
+
+        this.playerValue = new PlayerValue(predictions, batting, pitching);
+        this.replacementValue = new ReplacementValue(
+            now,
+            new Function<Player, Integer>() {
+                public Integer apply(Player p) {
+                    return playerValue.getNowValue(p);
+                }},
+            new Function<Player, Integer>() {
+                public Integer apply(Player p) {
+                    return playerValue.getNowAbility(p);
+                }}
+            );
+
+
+        this.futureReplacementValue =
+            new ReplacementValue(
+                future,
+                new Function<Player, Integer>() {
+                    public Integer apply(Player p) {
+                        return playerValue.getFutureValue(p);
+                    }
+                },
+                new Function<Player, Integer>() {
+                    public Integer apply(Player p) {
+                        return playerValue.getFutureAbility(p);
+                    }
+                }
+            );
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPlayers(Iterable<Player> players) {
+        this.players = ImmutableSet.copyOf(players);
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public void setReverse(boolean reverse) {
+        this.reverse = reverse;
+    }
+
+    public Integer getValue(Player p) {
+        return Math.max(
+            replacementValue.getValueVsReplacement(p),
+            futureReplacementValue.getValueVsReplacement(p));
+    }
+
+    public Integer getOverallValue(Player p) {
+        return Math.max(
+            playerValue.getNowValue(p),
+            playerValue.getFutureValue(p));
+    }
+
+    public void setCustomValueFunction(Function<Player, Integer> custom) {
+        this.custom = custom;
+    }
+
+    public void print(OutputStream out) {
+        print(new PrintWriter(out));
+    }
+
+    public void print(PrintWriter w) {
+        w.println();
+        w.println(String.format("**%-16s** | %7s %7s %7s ", title, "OVR", "vL/vR", "vRpl"));
+
+        Iterable<Player> ps = Ordering
+            .natural()
+            .reverse()
+            .onResultOf(new Function<Player, Integer>() {
+                public Integer apply(Player p) {
+                    return custom == null ? getValue(p) : custom.apply(p);
+                }
+            })
+            .compound(Player.byAge())
+            .sortedCopy(players);
+
+        if (reverse) {
+            ps = ImmutableList.copyOf(ps).reverse();
+        }
+
+        if (limit != null) {
+            ps = Iterables.limit(ps, limit);
+        }
+
+        for (Player p : ps) {
+            w.println(
+                String.format(
+                    "%2s %-15s %2d| %3d/%3d %3d/%3d %3d/%3d | %3d | %8s | %-13s |%s%13s | %13s | %s",
+                    p.getPosition(),
+                    StringUtils.abbreviate(p.getShortName(), 15),
+                    p.getAge(),
+                    playerValue.getNowValue(p),
+                    playerValue.getFutureValue(p),
+                    getNowVsLeft(p),
+                    getNowVsRight(p),
+                    replacementValue.getValueVsReplacement(p),
+                    futureReplacementValue.getValueVsReplacement(p),
+                    custom == null ? getValue(p) : custom.apply(p),
+                    Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
+                    Joiner.on(',').join(Slot.getPlayerSlots(p)),
+                    p.getRosterStatus(),
+                    StringUtils.abbreviate(p.getSalary(), 13),
+                    salary.predict(p) > 0 ? String.format("$%,d", salary.predict(p)) : "",
+                    p.getTeam() == null ? "" : p.getTeam()));
+        }
+
+        w.flush();
+    }
+
+    private Integer getNowVsLeft(Player p) {
+        if (now.containsPlayer(p)) {
+            if (Selections.isHitter(p)) {
+                return now.getAllBatting().getSplits(p).getVsLeft().getWobaPlus();
+            } else {
+                return now
+                    .getPitcherOverall()
+                    .getPlus(now.getAllPitching().getSplits(p).getVsLeft());
+            }
+        } else {
+            if (Selections.isHitter(p)) {
+                return batting.predict(p.getBattingRatings().getVsLeft()).getWobaPlus();
+            } else  {
+                return now.getPitcherOverall().getPlus(pitching.predict(p.getPitchingRatings().getVsLeft()));
+            }
+        }
+    }
+
+    private Integer getNowVsRight(Player p) {
+        if (now.containsPlayer(p)) {
+            if (Selections.isHitter(p)) {
+                return now.getAllBatting().getSplits(p).getVsRight().getWobaPlus();
+            } else {
+                return now
+                    .getPitcherOverall()
+                    .getPlus(now.getAllPitching().getSplits(p).getVsRight());
+            }
+        } else {
+            if (Selections.isHitter(p)) {
+                return batting.predict(p.getBattingRatings().getVsRight()).getWobaPlus();
+            } else  {
+                return now.getPitcherOverall().getPlus(pitching.predict(p.getPitchingRatings().getVsRight()));
+            }
+        }
+    }
+
+
+
+    public void printReplacementLevelReport(OutputStream out) {
+        printReplacementLevelReport(new PrintWriter(out));
+    }
+
+    public void printReplacementLevelReport(PrintWriter w) {
+        w.println();
+        w.println("Replacement Level");
+        w.print("Current:");
+        replacementValue.print(w);
+        w.print("Future: ");
+        futureReplacementValue.print(w);
+        w.flush();
+    }
+
+}
