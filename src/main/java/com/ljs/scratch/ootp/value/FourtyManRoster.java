@@ -8,10 +8,10 @@ import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
 import com.ljs.scratch.ootp.regression.Predictions;
-import com.ljs.scratch.ootp.selection.Mode;
-import com.ljs.scratch.ootp.selection.pitcher.PitcherSelection;
-import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
+import com.ljs.scratch.ootp.selection.Mode;
+import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
+import com.ljs.scratch.ootp.selection.Selections;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -73,11 +73,14 @@ public class FourtyManRoster {
                     Selections.onlyHitters(roster.getAllPlayers()))
                 .values());
 
-        fourtyMan.addAll(PitcherSelection
-            .using(predictions)
-            .selectExpandedMajorLeagueSquad(
-                Selections.onlyPitchers(roster.getAllPlayers()))
-            .values());
+        fourtyMan.addAll(
+            Selections
+                .select(
+                    PitcherSelectionFactory
+                        .using(predictions)
+                        .create(Mode.EXPANDED),
+                    Selections.onlyPitchers(roster.getAllPlayers()))
+                .values());
 
         return ImmutableSet.copyOf(fourtyMan);
     }
@@ -94,11 +97,14 @@ public class FourtyManRoster {
                     Selections.onlyHitters(roster.getAllPlayers()))
                 .values());
 
-        ml.addAll(PitcherSelection
-            .using(predictions)
-            .selectMajorLeagueSquad(
-                Selections.onlyPitchers(roster.getAllPlayers()))
-            .values());
+        ml.addAll(
+            Selections
+                .select(
+                    PitcherSelectionFactory
+                        .using(predictions)
+                        .create(Mode.REGULAR_SEASON),
+                    Selections.onlyPitchers(roster.getAllPlayers()))
+                .values());
 
         return ImmutableSet.copyOf(ml);
     }

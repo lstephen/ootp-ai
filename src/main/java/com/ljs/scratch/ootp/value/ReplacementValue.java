@@ -7,12 +7,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.regression.Predictions;
+import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import com.ljs.scratch.ootp.selection.Mode;
-import com.ljs.scratch.ootp.selection.pitcher.PitcherSelection;
+import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
 import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
-import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -77,11 +77,14 @@ public class ReplacementValue {
                 break;
             case SP:
             case MR:
-                PitcherSelection pitcherSelection = PitcherSelection.using(predictions, selectionValue);
+                Selection pitcherSelection = PitcherSelectionFactory
+                    .using(selectionValue, predictions.getPitcherOverall())
+                    .create(Mode.REGULAR_SEASON);
 
-                ImmutableMultimap<Slot, Player> pitchingSelection =
-                    pitcherSelection
-                        .selectMajorLeagueSquad(Selections.onlyPitchers(predictions.getAllPlayers()));
+                ImmutableMultimap<Slot, Player> pitchingSelection = Selections
+                    .select(
+                        pitcherSelection,
+                        Selections.onlyPitchers(predictions.getAllPlayers()));
 
                 switch (s) {
                     case SP:

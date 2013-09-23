@@ -14,14 +14,11 @@ import java.util.Set;
 // Referenced classes of package com.ljs.scratch.ootp.selection:
 //            Selection
 
-public final class Selections
-{
+public final class Selections {
 
-    private Selections()
-    {
-    }
+    private Selections() { }
 
-    public static ImmutableMultimap select(Selection selection, Iterable available)
+    public static ImmutableMultimap<Slot, Player> select(Selection selection, Iterable available)
     {
         return selection.select(ImmutableSet.<Player>of(), available);
     }

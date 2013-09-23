@@ -2,7 +2,6 @@
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) 
 // Source File Name:   Lineup.java
-
 package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.collect.ImmutableList;
@@ -13,127 +12,105 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-public class Lineup
-{
-    public static final class Entry
-    {
+public class Lineup {
+    private Defense defense;
 
-        public String getPosition()
-        {
+    private List order;
+
+    public static final class Entry {
+
+        public String getPosition() {
             return position;
         }
 
-        public String getShortName()
-        {
+        public String getShortName() {
             return name;
         }
 
-        public String format(String fmt)
-        {
-            return String.format(fmt, new Object[] {
+        public String format(String fmt) {
+            return String.format(fmt, new Object[]{
                 position, name
             });
         }
-
         private final String position;
+
         private final String name;
 
-        public Entry(String position, String name)
-        {
+        public Entry(String position, String name) {
             this.position = position;
             this.name = name;
         }
     }
 
-    public static enum VsHand
-    {
+    public static enum VsHand {
 
         VS_LHP {
-
-                BattingStats getStats(TeamStats predictions, Player p)
-                {
-                    return (BattingStats)predictions.getSplits(p).getVsLeft();
-                }
-
-                BattingRatings getRatings(Player p)
-                {
-                    return (BattingRatings)p.getBattingRatings().getVsLeft();
-                }
-
+            BattingStats getStats(TeamStats predictions, Player p) {
+                return (BattingStats) predictions.getSplits(p).getVsLeft();
             }
-        ,
+
+            BattingRatings getRatings(Player p) {
+                return (BattingRatings) p.getBattingRatings().getVsLeft();
+            }
+        },
         VS_RHP {
-
-                BattingStats getStats(TeamStats predictions, Player p)
-                {
-                    return (BattingStats)predictions.getSplits(p).getVsRight();
-                }
-
-                BattingRatings getRatings(Player p)
-                {
-                    return (BattingRatings)p.getBattingRatings().getVsRight();
-                }
-
+            BattingStats getStats(TeamStats predictions, Player p) {
+                return (BattingStats) predictions.getSplits(p).getVsRight();
             }
-;
+
+            BattingRatings getRatings(Player p) {
+                return (BattingRatings) p.getBattingRatings().getVsRight();
+            }
+        };
+
         abstract BattingStats getStats(TeamStats teamstats, Player player);
 
         abstract BattingRatings getRatings(Player player);
-
     }
 
-
-    public Lineup()
-    {
+    public Lineup() {
     }
 
-    public void setOrder(Iterable ps)
-    {
+    public void setOrder(Iterable ps) {
         order = ImmutableList.copyOf(ps);
     }
 
-    public void setDefense(Map defense)
-    {
+    public void setDefense(Defense defense) {
         this.defense = defense;
     }
 
-    public Entry getEntry(int entry)
-    {
-        if(entry >= order.size())
-        {
+    public Entry getEntry(int entry) {
+        if (entry >= order.size()) {
             return new Entry("P", "");
-        } else
-        {
-            Player p = (Player)order.get(entry);
-            return new Entry(defense.containsKey(p) ? ((Position)defense.get(p)).getAbbreviation() : "DH", p.getShortName());
+        } else {
+            Player p = (Player) order.get(entry);
+            return new Entry(
+                defense.contains(p) ? ((Position) defense.getPosition(p))
+                .getAbbreviation() : "DH", p.getShortName());
         }
     }
 
-    public void print(OutputStream out)
-    {
+    public void print(OutputStream out) {
         print(new PrintWriter(out));
     }
 
-    public void print(PrintWriter w)
-    {
+    public void print(PrintWriter w) {
         int idx = 1;
-        for(Iterator i$ = order.iterator(); i$.hasNext();)
-        {
-            Player p = (Player)i$.next();
-            String pos = defense.containsKey(p) ? ((Position)defense.get(p)).getAbbreviation() : "DH";
-            w.println(String.format("%d. %2s %-15s", new Object[] {
+        for (Iterator i$ = order.iterator(); i$.hasNext();) {
+            Player p = (Player) i$.next();
+            String pos = defense.contains(p) ? ((Position) defense.getPosition(p))
+                .getAbbreviation() : "DH";
+            w.println(String.format("%d. %2s %-15s", new Object[]{
                 Integer.valueOf(idx), pos, p.getShortName()
             }));
             idx++;
         }
 
-        if(idx < 10)
+        if (idx < 10) {
             w.println("9.  P");
+        }
         w.flush();
     }
 
-    private Map defense;
-    private List order;
 }

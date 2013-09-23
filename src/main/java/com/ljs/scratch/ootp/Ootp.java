@@ -102,11 +102,11 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            ( TWML
+            //( TWML
             //, CBL
             //, HFTC
-            //, LBB
-            //, BTH
+            ( LBB
+            , BTH
             //, SAVOY
             //( TFMS
             )) {

@@ -5,6 +5,9 @@ import java.io.PrintWriter;
 
 public class AllLineups {
 
+    private static final Integer LINEUP_SIZE = 9;
+    private static final String LINEUP_ENTRY_FORMAT = "%2s %-15s";
+
     private Lineup vsRhp;
     private Lineup vsRhpPlusDh;
     private Lineup vsLhp;
@@ -41,15 +44,15 @@ public class AllLineups {
                 "vsLHP+DH"
         ));
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < LINEUP_SIZE; i++) {
             w.println(
                 String.format(
                     "%d. %-19s %-19s %-19s %-19s",
                     Integer.valueOf(i + 1),
-                    vsRhp.getEntry(i).format("%2s %-15s"),
-                    vsRhpPlusDh.getEntry(i).format("%2s %-15s"),
-                    vsLhp.getEntry(i).format("%2s %-15s"),
-                    vsLhpPlusDh.getEntry(i).format("%2s %-15s")
+                    vsRhp.getEntry(i).format(LINEUP_ENTRY_FORMAT),
+                    vsRhpPlusDh.getEntry(i).format(LINEUP_ENTRY_FORMAT),
+                    vsLhp.getEntry(i).format(LINEUP_ENTRY_FORMAT),
+                    vsLhpPlusDh.getEntry(i).format(LINEUP_ENTRY_FORMAT)
                 ));
         }
 
