@@ -1,6 +1,8 @@
 package com.ljs.scratch.ootp.ratings;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 
@@ -10,11 +12,11 @@ import com.ljs.scratch.ootp.site.Version;
  */
 public final class PlayerRatings {
 
-    private Splits<BattingRatings> batting;
+    private final Splits<BattingRatings> batting;
 
-    private DefensiveRatings defensive;
+    private final DefensiveRatings defensive;
 
-    private Splits<PitchingRatings> pitching;
+    private final Splits<PitchingRatings> pitching;
 
     private BattingRatings battingPotential;
 
@@ -26,19 +28,20 @@ public final class PlayerRatings {
     @JsonIgnore
     private SiteDefinition site;
 
-    private PlayerRatings() { /* JAXB */ }
-
+    @JsonCreator
     private PlayerRatings(
-        Splits<BattingRatings> batting,
-        DefensiveRatings defensive,
-        Splits<PitchingRatings> pitching,
-        SiteDefinition site) {
+        @JsonProperty("batting") Splits<BattingRatings> batting,
+        @JsonProperty("defensive") DefensiveRatings defensive,
+        @JsonProperty("pitching") Splits<PitchingRatings> pitching) {
 
         this.batting = batting;
         this.defensive = defensive;
         this.pitching = pitching;
-        this.siteType = site.getType();
+    }
+
+    public void setSite(SiteDefinition site) {
         this.site = site;
+        this.siteType = site.getType();
     }
 
     public DefensiveRatings getDefensive() { return defensive; }
@@ -177,7 +180,9 @@ public final class PlayerRatings {
         Splits<PitchingRatings> pitching,
         SiteDefinition site) {
 
-        return new PlayerRatings(batting, defensive, pitching, site);
+        PlayerRatings pr = new PlayerRatings(batting, defensive, pitching);
+        pr.setSite(site);
+        return pr;
     }
 
 }

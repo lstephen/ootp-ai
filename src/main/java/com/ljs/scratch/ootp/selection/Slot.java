@@ -44,7 +44,7 @@ public enum Slot {
     }
 
     public static Slot getPrimarySlot(Player p) {
-        return getPlayerSlots(p).get(0);
+        return p.getSlots().get(0);
     }
 
     public static ImmutableList<Slot> getPlayerSlots(Player p) {

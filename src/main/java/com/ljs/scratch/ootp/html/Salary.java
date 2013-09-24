@@ -1,12 +1,14 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.core.TeamId;
 import com.ljs.scratch.ootp.html.page.Page;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,6 +22,9 @@ public class Salary {
     private Site site;
 
     private Page page;
+
+    private static final Map<String, Integer> CURRENT_SALARY_CACHE =
+        Maps.newHashMap();
 
     public Salary(Site site, TeamId team) {
         this.site = site;
@@ -59,7 +64,13 @@ public class Salary {
         return null;
     }
 
-    public Integer getCurrentSalary(Player p) {
+    public Integer getCurrentSalary(final Player p) {
+        String key = site.getName() + p.getId();
+
+        if (CURRENT_SALARY_CACHE.containsKey(key)) {
+            return CURRENT_SALARY_CACHE.get(key);
+        }
+
         Document doc = page.load();
 
         for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
@@ -69,7 +80,11 @@ public class Salary {
 
                 if (salary.startsWith("$")) {
                     try {
-                        return NumberFormat.getIntegerInstance().parse(salary.substring(1)).intValue();
+                        Integer result = NumberFormat.getIntegerInstance().parse(salary.substring(1)).intValue();
+
+                        CURRENT_SALARY_CACHE.put(key, result);
+
+                        return result;
                     } catch (ParseException e) {
                         throw Throwables.propagate(e);
                     }

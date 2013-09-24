@@ -12,7 +12,6 @@ import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.selection.Selections;
-import com.ljs.scratch.ootp.selection.Slot;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import org.apache.commons.lang3.StringUtils;
@@ -168,7 +167,7 @@ public class GenericValueReport {
                     futureReplacementValue.getValueVsReplacement(p),
                     custom == null ? getValue(p) : custom.apply(p),
                     Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
-                    Joiner.on(',').join(Slot.getPlayerSlots(p)),
+                    Joiner.on(',').join(p.getSlots()),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 13),
                     salary.predict(p) > 0 ? String.format("$%,d", salary.predict(p)) : "",

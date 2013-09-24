@@ -129,6 +129,12 @@ public class TradeValue {
             - getAgingFactor(p);
     }
 
+    public Integer getOverallWithoutAging(Player p) {
+        return Math.max(
+            playerValue.getNowValue(p),
+            playerValue.getFutureValue(p));
+    }
+
     public Function<Player, Integer> getOverall() {
         return new Function<Player, Integer>() {
             @Override

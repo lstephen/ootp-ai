@@ -21,7 +21,14 @@ public final class SiteDefinition {
 
     private final int nTeams;
 
-    private SiteDefinition(Version type, String name, String siteRoot, TeamId team, String league, int nTeams) {
+    private SiteDefinition(
+        Version type,
+        String name,
+        String siteRoot,
+        TeamId team,
+        String league,
+        int nTeams) {
+
         this.type = type;
         this.name = name;
         this.siteRoot = siteRoot;

@@ -1,15 +1,20 @@
 package com.ljs.scratch.ootp.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
+import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.site.SiteDefinition;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -23,9 +28,9 @@ public final class Player {
 
     private static final Integer MAX_SURNAME_LENGTH = 12;
 
-    private PlayerId id;
+    private final PlayerId id;
 
-    private String name;
+    private final String name;
 
     private int age;
 
@@ -33,7 +38,7 @@ public final class Player {
 
     private String salary;
 
-    private PlayerRatings ratings;
+    private final PlayerRatings ratings;
 
     @JsonIgnore
     private Optional<Boolean> on40Man = Optional.absent();
@@ -47,7 +52,8 @@ public final class Player {
     @JsonIgnore
     private Optional<Boolean> clearedWaivers = Optional.absent();
 
-    private Player() { /* JAXB */ }
+    @JsonIgnore
+    private ImmutableList<Slot> slots;
 
     private Player(PlayerId id, String name, PlayerRatings ratings) {
         this.id = id;
@@ -59,6 +65,10 @@ public final class Player {
 
     public boolean hasId(PlayerId id) {
         return this.id.equals(id);
+    }
+
+    public void setSite(SiteDefinition site) {
+        ratings.setSite(site);
     }
 
     public String getName() { return name; }
@@ -113,6 +123,13 @@ public final class Player {
 
     public void setClearedWaivers(Boolean clearedWaivers) {
         this.clearedWaivers = Optional.of(clearedWaivers);
+    }
+
+    public ImmutableList<Slot> getSlots() {
+        if (slots == null) {
+            slots = Slot.getPlayerSlots(this);
+        }
+        return slots;
     }
 
     public String getRosterStatus() {
@@ -190,8 +207,11 @@ public final class Player {
         return ToStringBuilder.reflectionToString(this);
     }
 
+    @JsonCreator
     public static Player create(
-        PlayerId id, String name, PlayerRatings ratings) {
+        @JsonProperty("id") PlayerId id,
+        @JsonProperty("name") String name,
+        @JsonProperty("ratings") PlayerRatings ratings) {
 
         return new Player(id, name, ratings);
     }

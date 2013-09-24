@@ -34,6 +34,7 @@ import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.GenericValueReport;
+import com.ljs.scratch.ootp.value.Trade;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,7 +61,6 @@ public class Ootp {
     private static final SiteDefinition TWML =
         SiteDefinition.ootp6(
            "TWML", "http://www.darowski.com/twml/OOTP6Reports/", new TeamId("22"), "Splendid Splinter", 24);
-        //SiteDefinition.ootp6(
         //    "TWML", "http://www.darowski.com/twml/2033/", new TeamId("22"), "Splendid Splinter", 24);
 
     // WCH, TF
@@ -104,12 +104,12 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            //, CBL
-            //, HFTC
-            //, LBB
-            //, BTH
-            //, SAVOY
-            ( TFMS
+            ( CBL
+            , HFTC
+            , LBB
+            , BTH
+            , SAVOY
+            , TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -430,19 +430,47 @@ public class Ootp {
             .onResultOf(tv.getTradeBaitValue(site, salaryRegression))
             .sortedCopy(newRoster.getAllPlayers());
 
-        for (final Player bait : Iterables.limit(topBait, 10)) {
+        /*for (final Player bait : Iterables.limit(topBait, 10)) {
             LOG.log(Level.INFO, "Trade target for {0}...", bait.getShortName());
 
+            final int expectedReturn = tv.getExpectedReturn(bait);
+            final int requiredValue = tv.getRequiredValue(bait);
+
             generic.setTitle(bait.getShortName());
-            generic.setLimit(10);
-            generic.setPlayers(Iterables.filter(all, new Predicate<Player>() {
-                public boolean apply(Player p) {
-                    return
-                        tv.getExpectedReturn(bait) > generic.getOverallValue(p)
-                     && (int) (tv.getRequiredValue(bait) * 1.1) < tv.getTradeTargetValue(p);
-                }
-            }));
+            generic.setLimit(11);
+            generic.setPlayers(
+                Iterables.concat(
+                    ImmutableSet.of(bait),
+                    Iterables.limit(
+                        Iterables.filter(all, new Predicate<Player>() {
+                                @Override
+                                public boolean apply(Player p) {
+                                    return
+                                        expectedReturn > generic.getOverallValue(p)
+                                     && (int) (requiredValue * 1.1) < tv.getTradeTargetValue(p);
+                                }
+                            }),
+                        10)));
             generic.print(out);
+        }*/
+
+        LOG.log(Level.INFO, "Top Trades...");
+
+        int idx = 1;
+        for (Trade trade
+            : Iterables.limit(
+                Trade.getTopTrades(
+                    tv,
+                    site,
+                    salaryRegression,
+                    Iterables.limit(topBait, newRoster.size() / 10),
+                    all),
+                20)) {
+
+            generic.setTitle("#" + idx + "-" + trade.getValue(tv, site, salaryRegression));
+            generic.setPlayers(trade);
+            generic.print(out);
+            idx++;
         }
 
         LOG.log(Level.INFO, "Done.");

@@ -7,11 +7,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.PlayerId;
+import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.util.Jackson;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -59,15 +58,14 @@ public final class DraftClass {
         return dc;
     }
 
-    @JsonCreator
-    public static DraftClass fromMap(Map<PlayerId, Player> ps) {
-        return create(ps.values());
-    }
-
-    public static DraftClass load(File f) {
+    public static DraftClass load(File f, SiteDefinition site) {
         if (f.exists()) {
             try {
-                return Jackson.getMapper().readValue(f, DraftClass.class);
+                DraftClass dc = Jackson.getMapper().readValue(f, DraftClass.class);
+
+                for (Player p : dc.getPlayers()) {
+                    p.setSite(site);
+                }
             } catch (IOException e) {
                 throw Throwables.propagate(e);
             }

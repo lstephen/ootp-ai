@@ -23,7 +23,6 @@ public final class Jackson {
             .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
 
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        mapper.enableDefaultTyping();
 
         return mapper;
     }

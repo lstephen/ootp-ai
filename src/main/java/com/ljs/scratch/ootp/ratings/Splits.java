@@ -1,6 +1,8 @@
 package com.ljs.scratch.ootp.ratings;
 
-import javax.xml.bind.annotation.XmlElement;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -9,15 +11,17 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class Splits<T> {
 
-    @XmlElement
-    private T vsLeft;
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+    private final T vsLeft;
 
-    @XmlElement
-    private T vsRight;
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+    private final T vsRight;
 
-    protected Splits() { /* JAXB */ }
+    @JsonCreator
+    protected Splits(
+        @JsonProperty("vsLeft") T vsLeft,
+        @JsonProperty("vsRight") T vsRight) {
 
-    protected Splits(T vsLeft, T vsRight) {
         this.vsLeft = vsLeft;
         this.vsRight = vsRight;
     }

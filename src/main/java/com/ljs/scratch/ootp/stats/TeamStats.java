@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * TODO: Two maps should be unnecessary. Probably need a custom serializer
- * to use with just one though.
+ * to use with just one though. Jackson needs to serialize the key to a String.
  * @author lstephen
  */
 public final class TeamStats<S extends Stats<S>> {

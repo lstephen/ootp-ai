@@ -80,7 +80,7 @@ public class FreeAgentAcquisition {
         Set<Slot> needed = RosterReport.create(roster).getNeededSlots();
 
         for (Player r : byValue(value).reverse().sortedCopy(roster)) {
-            if (!Slot.getPlayerSlots(fa).contains(Slot.getPrimarySlot(r)) && !surplus.contains(Slot.getPrimarySlot(r))) {
+            if (!fa.getSlots().contains(Slot.getPrimarySlot(r)) && !surplus.contains(Slot.getPrimarySlot(r))) {
                 continue;
             }
             Set<Slot> needsFulfilled = Sets.intersection(ImmutableSet.copyOf(Slot.getPlayerSlots(r)), needed);
@@ -102,7 +102,7 @@ public class FreeAgentAcquisition {
         Set<Slot> needed = RosterReport.create(roster).getNeededSlots();
 
         for (Player r : byValue(value).reverse().sortedCopy(roster)) {
-            if (!Sets.intersection(ImmutableSet.copyOf(Slot.getPlayerSlots(r)), needed).isEmpty()) {
+            if (!Sets.intersection(ImmutableSet.copyOf(r.getSlots()), needed).isEmpty()) {
                 continue;
             }
 
@@ -122,7 +122,7 @@ public class FreeAgentAcquisition {
                 continue;
             }
 
-            for (Slot s : Slot.getPlayerSlots(p)) {
+            for (Slot s : p.getSlots()) {
                 if (remaining.contains(s)) {
                     targets.add(p);
                     remaining.remove(s);

@@ -28,16 +28,28 @@ public class ReplacementValue {
 
     private final Function<Player, Integer> selectionValue;
 
+    private final Selection hitterSelection;
+
+    private final Selection pitcherSelection;
+
     public ReplacementValue(Predictions ps, Function<Player, Integer> value, Function<Player, Integer> selectionValue) {
         this.predictions = ps;
         this.value = value;
         this.selectionValue = selectionValue;
+
+        hitterSelection = HitterSelectionFactory
+            .using(selectionValue)
+            .create(Mode.REGULAR_SEASON);
+
+        pitcherSelection = PitcherSelectionFactory
+            .using(selectionValue, predictions.getPitcherOverall())
+            .create(Mode.REGULAR_SEASON);
     }
 
     public Integer getValueVsReplacement(Player p) {
         List<Integer> values = Lists.newArrayList();
 
-        for (Slot s : Slot.getPlayerSlots(p)) {
+        for (Slot s : p.getSlots()) {
             values.add(value.apply(p) - getReplacementLevel(s));
         }
 
@@ -64,10 +76,6 @@ public class ReplacementValue {
             case IF:
             case OF:
             case H:
-                Selection hitterSelection = HitterSelectionFactory
-                    .using(selectionValue)
-                    .create(Mode.REGULAR_SEASON);
-
                 slotSelections = Selections
                     .select(
                         hitterSelection,
@@ -77,10 +85,6 @@ public class ReplacementValue {
                 break;
             case SP:
             case MR:
-                Selection pitcherSelection = PitcherSelectionFactory
-                    .using(selectionValue, predictions.getPitcherOverall())
-                    .create(Mode.REGULAR_SEASON);
-
                 ImmutableMultimap<Slot, Player> pitchingSelection = Selections
                     .select(
                         pitcherSelection,

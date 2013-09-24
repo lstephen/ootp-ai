@@ -37,11 +37,11 @@ public class MinorLeagues {
     public void assignTo(Roster roster) {
         Document doc = page.load();
 
-        LOG.info("Getting AAA players...");
+        LOG.fine("Getting AAA players...");
         assignTo(roster, doc.select("tr:has(td:contains(AAA Team)) + tr"), Roster.Status.AAA);
-        LOG.info("Getting AA players...");
+        LOG.fine("Getting AA players...");
         assignTo(roster, doc.select("tr:has(td:contains(AAA Team)) ~ tr:has(td:contains(AA Team)) + tr"), Roster.Status.AA);
-        LOG.info("Getting A players...");
+        LOG.fine("Getting A players...");
         assignTo(roster, doc.select("tr:has(td:contains(AAA Team)) ~ tr:has(td:contains(AA Team)) ~ tr:has(td:contains(A Team)) + tr"), Roster.Status.A);
     }
 

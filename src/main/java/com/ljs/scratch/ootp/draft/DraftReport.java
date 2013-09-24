@@ -13,7 +13,7 @@ import java.io.PrintWriter;
  *
  * @author lstephen
  */
-public class DraftReport {
+public final class DraftReport {
 
     private final Site site;
 
@@ -21,14 +21,14 @@ public class DraftReport {
 
     private DraftClass current;
 
-
     private DraftReport(Site site, TradeValue value) {
         this.site = site;
         this.value = value;
     }
 
     private void loadDraftClasses() {
-        current = DraftClass.load(getDraftClassFile(site.getDate().getYear()));
+        current = DraftClass.load(
+            getDraftClassFile(site.getDate().getYear()), site.getDefinition());
 
         for (Player p : site.getDraft().extract()) {
             current.addIfNotPresent(p);
@@ -87,6 +87,10 @@ public class DraftReport {
         int n = site.getNumberOfTeams() / 3;
 
         RoundValue rv = getValueOfPicks(n);
+        if (rv == null) {
+            return;
+        }
+
         rv.print(w, "1E");
 
         idx += n;

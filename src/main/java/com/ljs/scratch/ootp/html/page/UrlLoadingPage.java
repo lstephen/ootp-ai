@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.html.page;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.jsoup.nodes.Document;
 
 /**
@@ -20,6 +21,11 @@ public final class UrlLoadingPage implements Page {
     @Override
     public Document load() {
         return loader.load(url);
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.reflectionToString(this);
     }
 
     public static Loading using(final PageLoader loader) {
