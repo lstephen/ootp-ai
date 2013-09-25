@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.config.Changes;
+import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
@@ -33,6 +35,7 @@ import com.ljs.scratch.ootp.stats.SplitPercentages;
 import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
+import com.ljs.scratch.ootp.value.FreeAgents;
 import com.ljs.scratch.ootp.value.GenericValueReport;
 import com.ljs.scratch.ootp.value.Trade;
 import com.ljs.scratch.ootp.value.TradeValue;
@@ -54,8 +57,6 @@ import org.joda.time.DateTimeConstants;
 public class Ootp {
 
     private static final Logger LOG = Logger.getLogger(Ootp.class.getName());
-
-    private static final String OUT_DIR = "C:/ootp/";
 
     // PAM, MWF
     private static final SiteDefinition TWML =
@@ -104,16 +105,16 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            ( CBL
-            , HFTC
-            , LBB
-            , BTH
-            , SAVOY
-            , TFMS
+            //( CBL
+            //, HFTC
+            //( LBB
+            ( BTH
+            //, SAVOY
+            //, TFMS
             )) {
             try (
                 FileOutputStream out =
-                    new FileOutputStream(new File(OUT_DIR + def.getName() + ".txt"), false)) {
+                    new FileOutputStream(new File(Directories.OUT + def.getName() + ".txt"), false)) {
                 run(def, out);
             }
         }
@@ -144,11 +145,9 @@ public class Ootp {
 
         Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
 
-        File changes = new File(OUT_DIR, def.getName() + ".changes.txt");
+        Changes changes = Changes.load(site);
 
-        if (changes.exists()) {
-            team.processManualChanges(changes, site);
-        }
+        team.processManualChanges(changes, site);
 
         final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
@@ -160,6 +159,10 @@ public class Ootp {
 
         Set<Player> released = Sets.newHashSet();
 
+        FreeAgents fas = FreeAgents.create(site, changes, tv.getTradeTargetValue());
+
+        Iterable<Player> topFaTargets = fas.getTopTargets();
+
         if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
             && !battingRegression.isEmpty()
             && !battingRegression.isEmpty()) {
@@ -168,8 +171,7 @@ public class Ootp {
 
             if (oldRoster.size() > 110) {
                 for (int i = 0; i < 2; i++) {
-                    Optional<Player> release = FreeAgentAcquisition.getPlayerToRelease(
-                        team, tv.getTradeTargetValue());
+                    Optional<Player> release = fas.getPlayerToRelease(team);
 
                     if (release.isPresent()) {
                         team.remove(release.get());
@@ -177,28 +179,24 @@ public class Ootp {
                     }
                 }
             } else {
-                Set<Player> fas = Sets.newHashSet(site.getFreeAgents().extract());
-
-                fa = FreeAgentAcquisition
-                    .getTopAcquisition(team, fas, tv.getTradeTargetValue());
+                fa = fas.getTopAcquisition(team);
 
                 if (fa.isPresent()) {
-                    fas.remove(fa.get().getFreeAgent());
+                    fas.skip(fa.get().getFreeAgent());
 
                     if (oldRoster.size() > 90) {
                         team.remove(fa.get().getRelease());
                     }
                 }
 
-                nfa = FreeAgentAcquisition
-                    .getNeedAcquisition(team, fas, tv.getTradeTargetValue());
+                nfa = fas.getNeedAcquisition(team);
 
                 if (nfa.isPresent()) {
                     if (oldRoster.size() > 90) {
                         team.remove(nfa.get().getRelease());
                     }
 
-                    fas.remove(nfa.get().getFreeAgent());
+                    fas.skip(nfa.get().getFreeAgent());
                 }
             }
         }
@@ -347,9 +345,7 @@ public class Ootp {
 
         LOG.info("FA report...");
         generic.setTitle("Top Targets");
-        generic.setPlayers(
-            FreeAgentAcquisition.getTopTargets(
-                site.getFreeAgents().extract(), tv.getTradeTargetValue()));
+        generic.setPlayers(topFaTargets);
         generic.print(out);
 
         generic.setTitle("Free Agents");
@@ -406,14 +402,6 @@ public class Ootp {
         generic.setLimit(50);
         generic.print(out);*/
 
-        LOG.log(Level.INFO, "Minor league non-prospects...");
-        generic.setTitle("ML non-prospects");
-        generic.setPlayers(Iterables.filter(minorLeaguers, new Predicate<Player>() {
-            public boolean apply(Player p) {
-                return p.getAge() > 25;
-            }
-        }));
-        generic.print(out);
 
         LOG.log(Level.INFO, "Trade Bait report...");
         generic.setCustomValueFunction(tv.getTradeBaitValue(site, salaryRegression));
@@ -430,30 +418,6 @@ public class Ootp {
             .onResultOf(tv.getTradeBaitValue(site, salaryRegression))
             .sortedCopy(newRoster.getAllPlayers());
 
-        /*for (final Player bait : Iterables.limit(topBait, 10)) {
-            LOG.log(Level.INFO, "Trade target for {0}...", bait.getShortName());
-
-            final int expectedReturn = tv.getExpectedReturn(bait);
-            final int requiredValue = tv.getRequiredValue(bait);
-
-            generic.setTitle(bait.getShortName());
-            generic.setLimit(11);
-            generic.setPlayers(
-                Iterables.concat(
-                    ImmutableSet.of(bait),
-                    Iterables.limit(
-                        Iterables.filter(all, new Predicate<Player>() {
-                                @Override
-                                public boolean apply(Player p) {
-                                    return
-                                        expectedReturn > generic.getOverallValue(p)
-                                     && (int) (requiredValue * 1.1) < tv.getTradeTargetValue(p);
-                                }
-                            }),
-                        10)));
-            generic.print(out);
-        }*/
-
         LOG.log(Level.INFO, "Top Trades...");
 
         int idx = 1;
@@ -468,6 +432,39 @@ public class Ootp {
                 20)) {
 
             generic.setTitle("#" + idx + "-" + trade.getValue(tv, site, salaryRegression));
+            generic.setPlayers(trade);
+            generic.print(out);
+            idx++;
+        }
+
+        LOG.log(Level.INFO, "Minor league non-prospects...");
+        generic.setTitle("ML non-prospects");
+        generic.setLimit(50);
+        generic.setPlayers(Iterables.filter(minorLeaguers, new Predicate<Player>() {
+            public boolean apply(Player p) {
+                return p.getAge() > 25;
+            }
+        }));
+        generic.print(out);
+
+        LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
+
+        idx = 1;
+        for (Trade trade
+            : Iterables.limit(
+                Trade.getTopTrades(
+                    tv,
+                    site,
+                    salaryRegression,
+                    Iterables.limit(topBait, newRoster.size() / 10),
+                    Iterables.filter(minorLeaguers, new Predicate<Player>() {
+                        public boolean apply(Player p) {
+                            return p.getAge() > 25;
+                        }
+                    })),
+                20)) {
+
+            generic.setTitle("NP-ML #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
             generic.setPlayers(trade);
             generic.print(out);
             idx++;

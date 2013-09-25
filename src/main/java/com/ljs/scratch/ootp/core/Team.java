@@ -1,18 +1,13 @@
 package com.ljs.scratch.ootp.core;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
+import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
-import java.io.File;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -66,25 +61,16 @@ public class Team implements Iterable<Player> {
         return injured;
     }
 
-    public void processManualChanges(File file, Site site) {
-        try {
-            for (String s : Files.readLines(file, Charsets.UTF_8)) {
-                if (s.isEmpty()) {
-                    continue;
-                }
+    public void processManualChanges(Changes changes, Site site) {
 
-                PlayerId id = new PlayerId(StringUtils.substringAfter(s, ","));
+        for (Player p : changes.get(Changes.ChangeType.ACQUISITION)) {
+            players.add(p);
+        }
 
-                if (s.charAt(0) == 'a') {
-                    players.add(site.getPlayer(id).extract());
-                }
-
-                if (s.charAt(0) == 'r' && containsPlayer(id)) {
-                    players.remove(getPlayer(id));
-                }
+        for (Player p : changes.get(Changes.ChangeType.RELEASE)) {
+            if (containsPlayer(p.getId())) {
+                players.remove(p);
             }
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
         }
     }
 

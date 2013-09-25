@@ -1,16 +1,13 @@
 package com.ljs.scratch.ootp.selection;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.google.common.io.Files;
+import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
 import com.ljs.scratch.ootp.core.Team;
@@ -20,14 +17,11 @@ import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 
 public final class RosterSelection {
 
@@ -65,14 +59,14 @@ public final class RosterSelection {
         this.previous = previous;
     }
 
-    public Roster select(Mode mode, File changes) {
+    public Roster select(Mode mode, Changes changes) {
         return select(
             changes,
             hitterSelectionFactory.create(mode),
             pitcherSelectionFactory.create(mode));
     }
 
-    private Roster select(File changes, Selection hitting, Selection pitching) {
+    private Roster select(Changes changes, Selection hitting, Selection pitching) {
         Roster roster = new Roster(team);
         Iterable forced = getForced(changes);
         assignToDisabledList(roster, team.getInjuries());
@@ -159,27 +153,13 @@ public final class RosterSelection {
 
     }
 
-    private Iterable getForced(File changes) {
-        Set forced = Sets.newHashSet();
-        if (changes != null && changes.exists()) {
-            try {
-                Iterator i$ = Files.readLines(changes, Charsets.UTF_8)
-                    .iterator();
-                do {
-                    if (!i$.hasNext()) {
-                        break;
-                    }
-                    String s = (String) i$.next();
-                    PlayerId id = new PlayerId(StringUtils
-                        .substringAfter(s, ","));
-                    if (s.charAt(0) == 'm' && team.containsPlayer(id)) {
-                        forced.add(team.getPlayer(id));
-                    }
-                } while (true);
-            } catch (IOException e) {
-                throw Throwables.propagate(e);
-            }
+    private Iterable<Player> getForced(Changes changes) {
+        Set<Player> forced = Sets.newHashSet();
+
+        for (Player p : changes.get(Changes.ChangeType.FORCE_ML)) {
+            forced.add(p);
         }
+
         if (previous != null) {
             Iterator i$ = previous.getPlayers(
                 com.ljs.scratch.ootp.core.Roster.Status.ML).iterator();
@@ -198,11 +178,11 @@ public final class RosterSelection {
         return forced;
     }
 
-    public void printBattingSelectionTable(OutputStream out, File changes) {
+    public void printBattingSelectionTable(OutputStream out, Changes changes) {
         printBattingSelectionTable(new PrintWriter(out), changes);
     }
 
-    public void printBattingSelectionTable(PrintWriter w, File changes) {
+    public void printBattingSelectionTable(PrintWriter w, Changes changes) {
         w.println();
         Roster roster = select(Mode.REGULAR_SEASON, changes);
         Player p;
@@ -228,11 +208,11 @@ public final class RosterSelection {
         w.flush();
     }
 
-    public void printPitchingSelectionTable(OutputStream out, File changes) {
+    public void printPitchingSelectionTable(OutputStream out, Changes changes) {
         printPitchingSelectionTable(new PrintWriter(out), changes);
     }
 
-    public void printPitchingSelectionTable(PrintWriter w, File changes) {
+    public void printPitchingSelectionTable(PrintWriter w, Changes changes) {
         w.println();
         Roster roster = select(Mode.REGULAR_SEASON, changes);
         Player p;
