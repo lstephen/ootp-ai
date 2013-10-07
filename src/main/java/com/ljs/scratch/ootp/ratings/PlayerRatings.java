@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
+import com.ljs.scratch.ootp.stats.SplitPercentages;
 
 /**
  *
@@ -28,6 +29,9 @@ public final class PlayerRatings {
     @JsonIgnore
     private SiteDefinition site;
 
+    @JsonIgnore
+    private static SplitPercentages splitPercentages;
+
     @JsonCreator
     private PlayerRatings(
         @JsonProperty("batting") Splits<BattingRatings> batting,
@@ -37,6 +41,10 @@ public final class PlayerRatings {
         this.batting = batting;
         this.defensive = defensive;
         this.pitching = pitching;
+    }
+
+    public static void setPercentages(SplitPercentages splitPercentages) {
+        PlayerRatings.splitPercentages = splitPercentages;
     }
 
     public void setSite(SiteDefinition site) {
@@ -152,24 +160,30 @@ public final class PlayerRatings {
     }
 
     public static BattingRatings getOverallBatting(Splits<BattingRatings> splits) {
+        Integer vR = (int) (splitPercentages.getVsRhpPercentage() * 100);
+        Integer vL = (int) (splitPercentages.getVsLhpPercentage() * 100);
+
         BattingRatings ovr = RatingsBuilder
             .batting()
-            .contact((70 * splits.getVsRight().getContact() + 30 * splits.getVsLeft().getContact()) / 100)
-            .gap((70 * splits.getVsRight().getGap() + 30 * splits.getVsLeft().getGap()) / 100)
-            .power((70 * splits.getVsRight().getPower() + 30 * splits.getVsLeft().getPower()) / 100)
-            .eye((70 * splits.getVsRight().getEye() + 30 * splits.getVsLeft().getEye()) / 100)
+            .contact((vR * splits.getVsRight().getContact() + vL * splits.getVsLeft().getContact()) / 100)
+            .gap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 100)
+            .power((vR * splits.getVsRight().getPower() + vL * splits.getVsLeft().getPower()) / 100)
+            .eye((vR * splits.getVsRight().getEye() + vL * splits.getVsLeft().getEye()) / 100)
             .build();
 
         return ovr;
     }
 
     public static PitchingRatings getOverallPitching(Splits<PitchingRatings> splits) {
+        Integer vR = (int) (splitPercentages.getVsRhbPercentage() * 100);
+        Integer vL = (int) (splitPercentages.getVsLhbPercentage() * 100);
+
         PitchingRatings ovr = new PitchingRatings();
-        ovr.setStuff((70 * splits.getVsRight().getStuff() + 30 * splits.getVsLeft().getStuff()) / 100);
-        ovr.setControl((70 * splits.getVsRight().getControl() + 30 * splits.getVsLeft().getControl()) / 100);
-        ovr.setMovement((70 * splits.getVsRight().getMovement() + 30 * splits.getVsLeft().getMovement()) / 100);
-        ovr.setHits((70 * splits.getVsRight().getHits() + 30 * splits.getVsLeft().getHits()) / 100);
-        ovr.setGap((70 * splits.getVsRight().getGap() + 30 * splits.getVsLeft().getGap()) / 100);
+        ovr.setStuff((vR * splits.getVsRight().getStuff() + vL * splits.getVsLeft().getStuff()) / 100);
+        ovr.setControl((vR * splits.getVsRight().getControl() + vL * splits.getVsLeft().getControl()) / 100);
+        ovr.setMovement((vR * splits.getVsRight().getMovement() + vL * splits.getVsLeft().getMovement()) / 100);
+        ovr.setHits((vR * splits.getVsRight().getHits() + vL * splits.getVsLeft().getHits()) / 100);
+        ovr.setGap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 100);
 
         return ovr;
     }

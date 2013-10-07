@@ -16,6 +16,7 @@ import com.ljs.scratch.ootp.core.TeamId;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
@@ -104,13 +105,13 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            //( TWML
-            //( CBL
-            //, HFTC
-            //( LBB
-            ( BTH
-            //, SAVOY
-            //, TFMS
+            ( TWML
+            , CBL
+            , HFTC
+            , LBB
+            , BTH
+            , SAVOY
+            //( TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -142,6 +143,7 @@ public class Ootp {
         pcts.print(out);
 
         SplitStats.setPercentages(pcts);
+        PlayerRatings.setPercentages(pcts);
 
         Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
 
@@ -213,9 +215,9 @@ public class Ootp {
 
         Mode mode = isExpandedRosters ? Mode.EXPANDED : Mode.REGULAR_SEASON;
 
-        if (def.getName().equals("TWML")) {
-            mode = Mode.PLAYOFFS;
-        }
+        //if (def.getName().equals("TWML")) {
+        //    mode = Mode.PLAYOFFS;
+        //}
 
         Roster newRoster = selection.select(mode, changes);
 

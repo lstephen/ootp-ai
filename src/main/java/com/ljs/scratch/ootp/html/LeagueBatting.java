@@ -39,7 +39,7 @@ public class LeagueBatting {
 
     private Map<Integer, BattingStats> historical = Maps.newHashMap();
 
-    private LeagueBatting() { /* JAXB */ }
+    private LeagueBatting() { }
 
     public LeagueBatting(Site site, String league) {
         page = site.getPage("leagueb.html");

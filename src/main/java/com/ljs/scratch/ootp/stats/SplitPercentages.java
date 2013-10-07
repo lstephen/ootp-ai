@@ -41,19 +41,19 @@ public final class SplitPercentages {
             .multiply(0.1);
     }
 
-    private double getVsLhbPercentage() {
+    public double getVsLhbPercentage() {
         return (double) vsLhb / (vsLhb + vsRhb);
     }
 
-    private double getVsRhbPercentage() {
+    public double getVsRhbPercentage() {
         return (double) vsRhb / (vsLhb + vsRhb);
     }
 
-    private double getVsLhpPercentage() {
+    public double getVsLhpPercentage() {
         return (double) vsLhp / (vsLhp + vsRhp);
     }
 
-    private double getVsRhpPercentage() {
+    public double getVsRhpPercentage() {
         return (double) vsRhp / (vsLhp + vsRhp);
     }
 
