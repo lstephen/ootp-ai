@@ -44,7 +44,7 @@ public final class SlotSelection implements Selection {
             for (Slot st : Slot.getPlayerSlots(p)) {
                 if (remainingSlots.contains(st)
                     && !selected.containsValue(p)
-                    && selected.size() < size.intValue()) {
+                    && selected.size() < size) {
 
                     selected.put(st, p);
                     remainingSlots.remove(st);
@@ -52,11 +52,13 @@ public final class SlotSelection implements Selection {
             }
         }
 
-        while (fillToSize != null && selected.size() < size) {
+        if (fillToSize != null) {
             for (Player p : ordering.sortedCopy(available)) {
-                if (!selected.containsValue(p)) {
+                if (p.getSlots().contains(fillToSize)
+                    && !selected.containsValue(p)
+                    && selected.size() < size) {
+
                     selected.put(fillToSize, p);
-                    break;
                 }
             }
         }

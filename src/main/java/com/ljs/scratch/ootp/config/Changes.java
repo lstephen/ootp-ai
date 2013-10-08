@@ -8,6 +8,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
+import com.ljs.scratch.ootp.html.PlayerList;
 import com.ljs.scratch.ootp.html.Site;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Changes {
 
     public static enum ChangeType {
-        ACQUISITION('a'), RELEASE('r'), FORCE_ML('m'), DONT_ACQUIRE('d');
+        ACQUISITION('a'), RELEASE('r'), FORCE_ML('m'), DONT_ACQUIRE('d'), PICKED('p');
 
         private final Character code;
 
@@ -61,6 +62,8 @@ public final class Changes {
             return changes;
         }
 
+        Iterable<Player> draftList = null;
+
         try {
             for (String line : Files.readLines(src, Charsets.UTF_8)) {
                 if (Strings.isNullOrEmpty(line)) {
@@ -71,12 +74,24 @@ public final class Changes {
                     continue;
                 }
 
-                PlayerId id =
-                    new PlayerId(StringUtils.substringAfter(line, ","));
+                ChangeType type = ChangeType.valueOf(line.charAt(0));
 
-                changes.add(
-                    ChangeType.valueOf(line.charAt(0)),
-                    site.getPlayer(id).extract());
+                String raw = StringUtils.substringAfter(line, ",");
+
+                if (type == ChangeType.PICKED) {
+                    if (draftList == null) {
+                        draftList = PlayerList.draft(site).extract();
+                    }
+                    for (Player p : draftList) {
+                        if (p.getShortName().equals(raw)) {
+                            changes.add(type, p);
+                        }
+                    }
+                } else {
+                    PlayerId id = new PlayerId(raw);
+
+                    changes.add(type, site.getPlayer(id).extract());
+                }
             }
 
             return changes;

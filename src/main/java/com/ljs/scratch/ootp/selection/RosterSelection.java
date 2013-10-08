@@ -13,6 +13,7 @@ import com.ljs.scratch.ootp.core.Roster.Status;
 import com.ljs.scratch.ootp.core.Team;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
+import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -31,24 +32,18 @@ public final class RosterSelection {
 
     private final PitcherSelectionFactory pitcherSelectionFactory;
 
-    private final PitcherOverall method;
-
-    private final TeamStats<BattingStats> batting;
-
-    private final TeamStats<PitchingStats> pitching;
+    private final Predictions predictions;
 
     private Roster previous;
 
     private RosterSelection(
-        Team team, TeamStats batting, TeamStats pitching, PitcherOverall pitcherSelectionMethod) {
+        Team team, Predictions predictions) {
 
         this.team = team;
-        this.batting = batting;
-        this.pitching = pitching;
-        this.method = pitcherSelectionMethod;
+        this.predictions = predictions;
 
-        hitterSelectionFactory = HitterSelectionFactory.using(batting);
-        pitcherSelectionFactory = PitcherSelectionFactory.using(pitching, pitcherSelectionMethod);
+        hitterSelectionFactory = HitterSelectionFactory.using(predictions);
+        pitcherSelectionFactory = PitcherSelectionFactory.using(predictions);
     }
 
     public void remove(Player p) {
@@ -57,6 +52,14 @@ public final class RosterSelection {
 
     public void setPrevious(Roster previous) {
         this.previous = previous;
+    }
+
+    private Iterable<Player> getAvailableHitters(Roster roster) {
+        return Selections.onlyHitters(Selections.onlyOn40Man(roster.getUnassigned()));
+    }
+
+    private Iterable<Player> getAvailablePitchers(Roster roster) {
+        return Selections.onlyPitchers(Selections.onlyOn40Man(roster.getUnassigned()));
     }
 
     public Roster select(Mode mode, Changes changes) {
@@ -70,13 +73,21 @@ public final class RosterSelection {
         Roster roster = new Roster(team);
         Iterable forced = getForced(changes);
         assignToDisabledList(roster, team.getInjuries());
-        roster.assign(com.ljs.scratch.ootp.core.Roster.Status.ML, hitting
-            .select(Selections.onlyHitters(forced), Selections.onlyHitters(
-            Selections.onlyOn40Man(roster.getUnassigned()))).values());
-        roster.assign(com.ljs.scratch.ootp.core.Roster.Status.ML, pitching
-            .select(Selections.onlyPitchers(forced), Selections.onlyPitchers(
-            Selections.onlyOn40Man(roster.getUnassigned()))).values());
+
+        roster.assign(
+            Roster.Status.ML,
+            hitting.select(
+                Selections.onlyHitters(forced),
+                getAvailableHitters(roster)).values());
+
+        roster.assign(
+            Roster.Status.ML,
+            pitching.select(
+                Selections.onlyPitchers(forced),
+                getAvailablePitchers(roster)).values());
+
         assignMinors(roster);
+
         return roster;
     }
 
@@ -185,6 +196,8 @@ public final class RosterSelection {
     public void printBattingSelectionTable(PrintWriter w, Changes changes) {
         w.println();
         Roster roster = select(Mode.REGULAR_SEASON, changes);
+        TeamStats<BattingStats> batting = predictions.getAllBatting();
+
         Player p;
         for (Iterator i$ = hitterSelectionFactory.byOverall().sortedCopy(
             Selections.onlyHitters(batting.getPlayers())).iterator(); i$
@@ -215,6 +228,9 @@ public final class RosterSelection {
     public void printPitchingSelectionTable(PrintWriter w, Changes changes) {
         w.println();
         Roster roster = select(Mode.REGULAR_SEASON, changes);
+        TeamStats<PitchingStats> pitching = predictions.getAllPitching();
+        PitcherOverall method = predictions.getPitcherOverall();
+
         Player p;
         for (Iterator i$ = pitcherSelectionFactory.byOverall().sortedCopy(Selections
             .onlyPitchers(pitching.getPlayers())).iterator(); i$.hasNext(); w
@@ -239,14 +255,22 @@ public final class RosterSelection {
 
     public static RosterSelection ootp6(Team team, BattingRegression batting,
         PitchingRegression pitching) {
-        return new RosterSelection(team, batting.predict(team), pitching
-            .predict(team), PitcherOverall.FIP);
+
+        return new RosterSelection(
+            team,
+            Predictions
+                .predict(team)
+                .using(batting, pitching, PitcherOverall.FIP));
     }
 
     public static RosterSelection ootp5(Team team, BattingRegression batting,
         PitchingRegression pitching) {
-        return new RosterSelection(team, batting.predict(team), pitching
-            .predict(team), PitcherOverall.WOBA_AGAINST);
+
+        return new RosterSelection(
+            team,
+            Predictions
+                .predict(team)
+                .using(batting, pitching, PitcherOverall.WOBA_AGAINST));
     }
     
 

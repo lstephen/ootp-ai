@@ -87,7 +87,7 @@ public class Ootp {
 
     // WTT, TTSt
     private static final SiteDefinition SAVOY =
-        SiteDefinition.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", new TeamId("24"), "UBA", 24);
+        SiteDefinition.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", new TeamId("26"), "UBA", 26);
 
     // CIN, TTSn
     private static final SiteDefinition LBB =
@@ -105,12 +105,12 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            ( TWML
-            , CBL
-            , HFTC
-            , LBB
-            , BTH
-            , SAVOY
+            //( TWML
+            //, CBL
+            //( HFTC
+            //, LBB
+            //( BTH
+            ( SAVOY
             //( TFMS
             )) {
             try (
@@ -296,9 +296,14 @@ public class Ootp {
 
         generic.setReverse(false);
 
+        ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
         LOG.info("Draft...");
-        generic.setTitle("Draft");
-        generic.setPlayers(site.getDraft().extract());
+        generic.setTitle("Drafted");
+        generic.setPlayers(drafted);
+        generic.print(out);
+
+        generic.setTitle("Remaining");
+        generic.setPlayers(Sets.difference(ImmutableSet.copyOf(site.getDraft().extract()), drafted));
         generic.print(out);
 
         DraftReport.create(site, tv).print(out);
@@ -404,7 +409,6 @@ public class Ootp {
         generic.setLimit(50);
         generic.print(out);*/
 
-
         LOG.log(Level.INFO, "Trade Bait report...");
         generic.setCustomValueFunction(tv.getTradeBaitValue(site, salaryRegression));
         generic.setTitle("Trade Bait");
@@ -419,6 +423,7 @@ public class Ootp {
             .reverse()
             .onResultOf(tv.getTradeBaitValue(site, salaryRegression))
             .sortedCopy(newRoster.getAllPlayers());
+
 
         LOG.log(Level.INFO, "Top Trades...");
 
