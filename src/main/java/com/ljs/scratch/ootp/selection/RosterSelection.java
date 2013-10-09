@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.selection;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
@@ -18,6 +19,7 @@ import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
+import com.ljs.scratch.ootp.value.FourtyManRoster;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -55,7 +57,28 @@ public final class RosterSelection {
     }
 
     private Iterable<Player> getAvailableHitters(Roster roster) {
-        return Selections.onlyHitters(Selections.onlyOn40Man(roster.getUnassigned()));
+        Set<Player> available =
+            Sets.newHashSet(
+                Selections.onlyHitters(
+                    Selections.onlyOn40Man(roster.getUnassigned())));
+
+        if (previous != null) {
+            FourtyManRoster fourtyMan = new FourtyManRoster(previous, predictions);
+
+            Set<Player> toRemove = Sets.newHashSet();
+
+            for (Player p : available) {
+                if (p.getClearedWaivers().or(Boolean.FALSE)
+                    && Iterables.contains(fourtyMan.getPlayersToRemove(), p)) {
+
+                    toRemove.add(p);
+                }
+            }
+
+            available.removeAll(toRemove);
+        }
+
+        return available;
     }
 
     private Iterable<Player> getAvailablePitchers(Roster roster) {
@@ -71,7 +94,7 @@ public final class RosterSelection {
 
     private Roster select(Changes changes, Selection hitting, Selection pitching) {
         Roster roster = new Roster(team);
-        Iterable forced = getForced(changes);
+        Iterable<Player> forced = getForced(changes);
         assignToDisabledList(roster, team.getInjuries());
 
         roster.assign(

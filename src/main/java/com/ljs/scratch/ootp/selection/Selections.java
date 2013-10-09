@@ -33,8 +33,7 @@ public final class Selections {
         return onlyHitters(((Iterable) (players)));
     }
 
-    public static ImmutableSet onlyHitters(Iterable ps)
-    {
+    public static ImmutableSet<Player> onlyHitters(Iterable<Player> ps) {
         return ImmutableSet.copyOf(Iterables.filter(ps, IS_HITTER));
     }
 
@@ -63,20 +62,17 @@ public final class Selections {
         return p.hasPitchingRatings();
     }
 
-    public static ImmutableSet onlyOn40Man(Iterable ps)
-    {
+    public static ImmutableSet<Player> onlyOn40Man(Iterable<Player> ps) {
         return ImmutableSet.copyOf(Iterables.filter(ps, IS_ON_40_MAN));
     }
 
-    private static final Predicate IS_HITTER = new Predicate<Player>() {
+    private static final Predicate<Player> IS_HITTER =
+        new Predicate<Player>() {
+            @Override
+            public boolean apply(Player p) {
+                return Selections.isHitter(p);
+            }};
 
-        public boolean apply(Player p)
-        {
-            return Selections.isHitter(p);
-        }
-
-    }
-;
     private static final Predicate IS_PITCHER = new Predicate<Player>() {
 
         public boolean apply(Player p)
@@ -86,14 +82,11 @@ public final class Selections {
 
     }
 ;
-    private static final Predicate IS_ON_40_MAN = new Predicate<Player>() {
-
-        public boolean apply(Player p)
-        {
-            return ((Boolean)p.getOn40Man().or(Boolean.TRUE)).booleanValue();
-        }
-
-    }
-;
+    private static final Predicate<Player> IS_ON_40_MAN =
+        new Predicate<Player>() {
+            @Override
+            public boolean apply(Player p) {
+                return p.getOn40Man().or(Boolean.TRUE);
+            }};
 
 }
