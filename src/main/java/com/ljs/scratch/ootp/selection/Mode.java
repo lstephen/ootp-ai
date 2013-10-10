@@ -35,7 +35,7 @@ public enum Mode {
                     Slot.C,
                     Slot.SS, Slot.IF,
                     Slot.CF, Slot.OF,
-                    Slot.H, Slot.H));
+                    Slot.H));
 
             return ImmutableMultiset.copyOf(expanded);
         }
@@ -46,7 +46,7 @@ public enum Mode {
                 HashMultiset.create(REGULAR_SEASON.getPitchingSlots());
 
             expanded.addAll(
-                ImmutableMultiset.of(Slot.SP, Slot.MR, Slot.P, Slot.P));
+                ImmutableMultiset.of(Slot.SP, Slot.MR, Slot.P));
 
             return ImmutableMultiset.copyOf(expanded);
         }

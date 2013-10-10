@@ -203,10 +203,10 @@ public class Ootp {
             }
         }
 
-        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
+        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
 
         if (site.getType() == Version.OOTP5) {
-            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression);
+            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
         }
 
         selection.setPrevious(oldRoster);
@@ -311,7 +311,7 @@ public class Ootp {
         if (def.getName().equals("BTH")) {
             LOG.info("40 man roster reports...");
 
-            FourtyManRoster fourtyMan = new FourtyManRoster(newRoster, ps);
+            FourtyManRoster fourtyMan = new FourtyManRoster(newRoster, ps, tv.getTradeTargetValue());
 
             fourtyMan.printReport(out);
 
@@ -321,12 +321,10 @@ public class Ootp {
 
             generic.setTitle("-40");
             generic.setPlayers(fourtyMan.getPlayersToRemove());
-            generic.setLimit(fourtyMan.getNumberToRemove());
             generic.setReverse(true);
             generic.print(out);
 
             generic.setReverse(false);
-            generic.setLimit(200);
         }
 
         LOG.info("Extensions report...");

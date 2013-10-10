@@ -101,7 +101,7 @@ public final class Player {
         this.on40Man = Optional.of(on40Man);
     }
 
-    private Optional<Boolean> getRuleFiveEligible() {
+    public Optional<Boolean> getRuleFiveEligible() {
         return ruleFiveEligible;
     }
 

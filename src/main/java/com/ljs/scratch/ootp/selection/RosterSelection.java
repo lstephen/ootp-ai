@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.selection;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -36,13 +37,16 @@ public final class RosterSelection {
 
     private final Predictions predictions;
 
+    private final Function<Player, Integer> value;
+
     private Roster previous;
 
     private RosterSelection(
-        Team team, Predictions predictions) {
+        Team team, Predictions predictions, Function<Player, Integer> value) {
 
         this.team = team;
         this.predictions = predictions;
+        this.value = value;
 
         hitterSelectionFactory = HitterSelectionFactory.using(predictions);
         pitcherSelectionFactory = PitcherSelectionFactory.using(predictions);
@@ -63,7 +67,8 @@ public final class RosterSelection {
                     Selections.onlyOn40Man(roster.getUnassigned())));
 
         if (previous != null) {
-            FourtyManRoster fourtyMan = new FourtyManRoster(previous, predictions);
+            FourtyManRoster fourtyMan =
+                new FourtyManRoster(previous, predictions, value);
 
             Set<Player> toRemove = Sets.newHashSet();
 
@@ -277,23 +282,25 @@ public final class RosterSelection {
     }
 
     public static RosterSelection ootp6(Team team, BattingRegression batting,
-        PitchingRegression pitching) {
+        PitchingRegression pitching, Function<Player, Integer> value) {
 
         return new RosterSelection(
             team,
             Predictions
                 .predict(team)
-                .using(batting, pitching, PitcherOverall.FIP));
+                .using(batting, pitching, PitcherOverall.FIP),
+            value);
     }
 
     public static RosterSelection ootp5(Team team, BattingRegression batting,
-        PitchingRegression pitching) {
+        PitchingRegression pitching, Function<Player, Integer> value) {
 
         return new RosterSelection(
             team,
             Predictions
                 .predict(team)
-                .using(batting, pitching, PitcherOverall.WOBA_AGAINST));
+                .using(batting, pitching, PitcherOverall.WOBA_AGAINST),
+            value);
     }
     
 

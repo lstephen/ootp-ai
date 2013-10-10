@@ -1,8 +1,10 @@
 package com.ljs.scratch.ootp.value;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.Roster;
@@ -26,9 +28,12 @@ public class FourtyManRoster {
 
     private final Predictions predictions;
 
-    public FourtyManRoster(Roster roster, Predictions ps) {
+    private final Function<Player, Integer> value;
+
+    public FourtyManRoster(Roster roster, Predictions ps, Function<Player, Integer> value) {
         this.roster = roster;
         this.predictions = ps;
+        this.value = value;
     }
 
     public void printReport(OutputStream out) {
@@ -82,6 +87,18 @@ public class FourtyManRoster {
                     Selections.onlyPitchers(roster.getAllPlayers()))
                 .values());
 
+        Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
+
+        for (Player p : Ordering.natural().reverse().onResultOf(value).sortedCopy(roster.getAllPlayers())) {
+            if (!fourtyMan.contains(p) && p.getRuleFiveEligible().or(Boolean.TRUE)) {
+                fourtyMan.add(p);
+            }
+
+            if (fourtyMan.size() >= sizeWillBe) {
+                break;
+            }
+        }
+
         return ImmutableSet.copyOf(fourtyMan);
     }
 
@@ -110,9 +127,17 @@ public class FourtyManRoster {
     }
 
     public Iterable<Player> getPlayersToRemove() {
-        return Sets.difference(
-            Selections.onlyOn40Man(roster.getAllPlayers()),
-            getDesired40ManRoster());
+        return
+            Iterables.limit(
+                Ordering
+                    .natural()
+                    .onResultOf(value)
+                    .sortedCopy(
+                        ImmutableSet.copyOf(
+                            Sets.difference(
+                                Selections.onlyOn40Man(roster.getAllPlayers()),
+                                getDesired40ManRoster())))
+                , getNumberToRemove());
     }
 
     public Iterable<Player> getPlayersToAdd() {
@@ -128,7 +153,8 @@ public class FourtyManRoster {
                 public boolean apply(Player p) {
                     return p.getAge() > 25
                         || roster.getStatus(p) == Status.ML
-                        || ml.contains(p);
+                        || ml.contains(p)
+                        || p.getRuleFiveEligible().or(Boolean.FALSE);
                 }
             });
     }

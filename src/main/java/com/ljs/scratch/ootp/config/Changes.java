@@ -62,9 +62,9 @@ public final class Changes {
             return changes;
         }
 
-        Iterable<Player> draftList = null;
-
         try {
+            Iterable<Player> draftList = null;
+
             for (String line : Files.readLines(src, Charsets.UTF_8)) {
                 if (Strings.isNullOrEmpty(line)) {
                     continue;
@@ -78,7 +78,7 @@ public final class Changes {
 
                 String raw = StringUtils.substringAfter(line, ",");
 
-                if (type == ChangeType.PICKED) {
+                if (type == ChangeType.PICKED && raw.charAt(0) != 'p') {
                     if (draftList == null) {
                         draftList = PlayerList.draft(site).extract();
                     }
