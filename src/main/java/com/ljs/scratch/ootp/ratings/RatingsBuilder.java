@@ -1,7 +1,5 @@
 package com.ljs.scratch.ootp.ratings;
 
-import com.ljs.scratch.ootp.ratings.BattingRatings;
-
 /**
  *
  * @author lstephen

@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
-import com.ljs.scratch.ootp.core.Team;
+import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.stats.Stats;
 import com.ljs.scratch.ootp.stats.TeamStats;

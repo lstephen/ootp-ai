@@ -4,7 +4,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
-import com.ljs.scratch.ootp.core.TeamId;
+import com.ljs.scratch.ootp.team.TeamId;
 import com.ljs.scratch.ootp.html.page.Page;
 import java.text.NumberFormat;
 import java.text.ParseException;

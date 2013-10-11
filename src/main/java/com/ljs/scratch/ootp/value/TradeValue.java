@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
 import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.Team;
+import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;

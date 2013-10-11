@@ -11,8 +11,6 @@ import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
-import com.ljs.scratch.ootp.core.Team;
-import com.ljs.scratch.ootp.core.TeamId;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
@@ -31,9 +29,12 @@ import com.ljs.scratch.ootp.selection.lineup.LineupSelection;
 import com.ljs.scratch.ootp.selection.rotation.Rotation;
 import com.ljs.scratch.ootp.selection.rotation.RotationSelection;
 import com.ljs.scratch.ootp.site.SiteDefinition;
+import com.ljs.scratch.ootp.site.SiteDefinitionFactory;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.SplitPercentages;
 import com.ljs.scratch.ootp.stats.SplitStats;
+import com.ljs.scratch.ootp.team.Team;
+import com.ljs.scratch.ootp.team.TeamId;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.FreeAgents;
@@ -61,18 +62,18 @@ public class Ootp {
 
     // PAM, MWF
     private static final SiteDefinition TWML =
-        SiteDefinition.ootp6(
+        SiteDefinitionFactory.ootp6(
            "TWML", "http://www.darowski.com/twml/OOTP6Reports/", new TeamId("22"), "Splendid Splinter", 24);
         //    "TWML", "http://www.darowski.com/twml/2033/", new TeamId("22"), "Splendid Splinter", 24);
 
     // WCH, TF
     private static final SiteDefinition CBL =
-        SiteDefinition.ootp5(
+        SiteDefinitionFactory.ootp5(
             "CBL", "http://www.thecblonline.com/files/", new TeamId("24"), "National", 24);
 
     // DET, TF
     private static final SiteDefinition HFTC =
-        SiteDefinition.ootp5(
+        SiteDefinitionFactory.ootp5(
             "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", new TeamId("8"), "American", 32);
 
     //private static final SiteDefinition TWIB =
@@ -83,21 +84,21 @@ public class Ootp {
 
     // CHC, TTS?
     private static final SiteDefinition BTH =
-        SiteDefinition.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", new TeamId("20"), "National", 30);
+        SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", new TeamId("20"), "National", 30);
 
     // WTT, TTSt
     private static final SiteDefinition SAVOY =
-        SiteDefinition.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", new TeamId("26"), "UBA", 26);
+        SiteDefinitionFactory.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", new TeamId("26"), "UBA", 26);
 
     // CIN, TTSn
     private static final SiteDefinition LBB =
-        SiteDefinition.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
+        SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
 
     //private static final SiteDefinition GABL =
     //    SiteDefinition.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", new TeamId("10"), "American", 30);
 
     private static final SiteDefinition TFMS =
-        SiteDefinition.ootp5("TFMS", "tfms5-2004/", new TeamId("3"), "League 2", 16);
+        SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", new TeamId("3"), "League 2", 16);
 
     public static void main(String[] args) throws IOException {
         new Ootp().run();
@@ -106,11 +107,11 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            //, CBL
+            //( CBL
             //( HFTC
             //, LBB
-            ( BTH
-            //( SAVOY
+            //( BTH
+            ( SAVOY
             //( TFMS
             )) {
             try (

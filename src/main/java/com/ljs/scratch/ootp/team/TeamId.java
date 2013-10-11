@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.core;
+package com.ljs.scratch.ootp.team;
 
 import com.ljs.scratch.util.Wrapped;
 

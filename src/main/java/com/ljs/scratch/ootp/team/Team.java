@@ -1,7 +1,9 @@
-package com.ljs.scratch.ootp.core;
+package com.ljs.scratch.ootp.team;
 
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
+import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;

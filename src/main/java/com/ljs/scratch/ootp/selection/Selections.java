@@ -5,6 +5,7 @@
 
 package com.ljs.scratch.ootp.selection;
 
+import com.ljs.scratch.ootp.team.Team;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.ljs.scratch.ootp.core.*;

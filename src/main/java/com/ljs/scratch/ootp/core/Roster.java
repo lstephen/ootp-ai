@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.core;
 
+import com.ljs.scratch.ootp.team.Team;
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;

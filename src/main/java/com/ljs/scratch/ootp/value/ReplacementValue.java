@@ -66,7 +66,7 @@ public class ReplacementValue {
         w.println();
     }
 
-    private Integer getReplacementLevel(Slot s) {
+    private Integer getReplacementLevel(final Slot s) {
         Iterable<Player> slotSelections;
 
         switch (s) {
@@ -122,6 +122,9 @@ public class ReplacementValue {
                 new Function<Player, Integer>() {
                     @Override
                     public Integer apply(Player p) {
+                        if (s == Slot.MR && Slot.getPrimarySlot(p) == Slot.SP) {
+                            return (int) (PlayerValue.MR_CONSTANT * value.apply(p));
+                        }
                         return value.apply(p);
                     }
                 }));

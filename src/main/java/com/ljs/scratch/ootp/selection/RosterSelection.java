@@ -12,7 +12,7 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
-import com.ljs.scratch.ootp.core.Team;
+import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
