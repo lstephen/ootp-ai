@@ -66,12 +66,14 @@ public final class DraftClass {
                 for (Player p : dc.getPlayers()) {
                     p.setSite(site);
                 }
+
+                return dc;
             } catch (IOException e) {
                 throw Throwables.propagate(e);
             }
+        } else {
+            return create(ImmutableSet.<Player>of());
         }
-
-        return create(ImmutableSet.<Player>of());
     }
 
 }

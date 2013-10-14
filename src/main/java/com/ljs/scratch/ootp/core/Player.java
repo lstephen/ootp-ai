@@ -53,6 +53,9 @@ public final class Player {
     private Optional<Boolean> clearedWaivers = Optional.absent();
 
     @JsonIgnore
+    private Optional<Integer> yearsOfProService = Optional.absent();
+
+    @JsonIgnore
     private ImmutableList<Slot> slots;
 
     private Player(PlayerId id, String name, PlayerRatings ratings) {
@@ -123,6 +126,14 @@ public final class Player {
 
     public void setClearedWaivers(Boolean clearedWaivers) {
         this.clearedWaivers = Optional.of(clearedWaivers);
+    }
+
+    public Optional<Integer> getYearsOfProService() {
+        return yearsOfProService;
+    }
+
+    public void setYearsOfProService(Integer years) {
+        this.yearsOfProService = Optional.of(years);
     }
 
     public ImmutableList<Slot> getSlots() {

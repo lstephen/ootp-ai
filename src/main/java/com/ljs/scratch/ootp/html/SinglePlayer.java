@@ -159,6 +159,10 @@ public class SinglePlayer {
             player.setClearedWaivers(doc.html().contains("Waivers cleared"));
         }
 
+        if (doc.html().contains("Years of Pro Service")) {
+            player.setYearsOfProService(getYearsOfProService(doc));
+        }
+
         player.setSalary(site.getSalary(player));
 
         return player;
@@ -217,20 +221,30 @@ public class SinglePlayer {
     }
 
     private Boolean isRuleFiveEligible(Document doc) {
+        return extractContractText(doc, "Rule 5 Draft Eligibility :").contains("Eligible");
+    }
+
+    private Integer getYearsOfProService(Document doc) {
+        String raw = extractContractText(doc, "Years of Pro Service :");
+
+        return Integer.parseInt(StringUtils.substringBefore(raw, " "));
+    }
+
+    private String extractContractText(Document doc, String title) {
         String titles = doc.select("td.s4:contains(Contract)").html();
 
         String[] splitTitles = StringUtils.splitByWholeSeparatorPreserveAllTokens(titles, "<br />");
 
-        int rule5StatusIdx = -1;
+        int idx = -1;
 
         for (int i = 0; i < splitTitles.length; i++) {
-            if (splitTitles[i].equals("Rule 5 Draft Eligibility :")) {
-                rule5StatusIdx = i;
+            if (splitTitles[i].equals(title)) {
+                idx = i;
                 break;
             }
         }
 
-        if (rule5StatusIdx < 0) {
+        if (idx < 0) {
             return null;
         }
 
@@ -238,9 +252,7 @@ public class SinglePlayer {
 
         String[] split = StringUtils.splitByWholeSeparatorPreserveAllTokens(raw, "<br />");
 
-        String rule5Status = split[rule5StatusIdx];
-
-        return rule5Status.contains("Eligible");
+        return split[idx];
     }
 
     private Integer getOotp5Potential(Elements els, int idx) {

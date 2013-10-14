@@ -89,8 +89,8 @@ public class FourtyManRoster {
 
         Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
 
-        for (Player p : Ordering.natural().reverse().onResultOf(value).sortedCopy(roster.getAllPlayers())) {
-            if (!fourtyMan.contains(p) && p.getRuleFiveEligible().or(Boolean.TRUE)) {
+        for (Player p : Ordering.natural().reverse().onResultOf(value).compound(Player.byAge()).sortedCopy(roster.getAllPlayers())) {
+            if (!fourtyMan.contains(p) && p.getYearsOfProService().or(0) >= 3) {
                 fourtyMan.add(p);
             }
 

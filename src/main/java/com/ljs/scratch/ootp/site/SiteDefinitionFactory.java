@@ -11,24 +11,24 @@ public final class SiteDefinitionFactory {
 
     private SiteDefinitionFactory() { }
 
-   public static SiteDefinition ootp5(
-       String name,
-       String siteRoot,
-       TeamId team,
-       String league,
-       int nTeams) {
+    public static SiteDefinition ootp5(
+        String name,
+        String siteRoot,
+        TeamId team,
+        String league,
+        int nTeams) {
 
-       return SiteDefinitionImpl.ootp5(name, siteRoot, team, league, nTeams);
-   }
+        return SiteDefinitionImpl.ootp5(name, siteRoot, team, league, nTeams);
+    }
 
-   public static SiteDefinition ootp6(
-       String name,
-       String siteRoot,
-       TeamId team,
-       String league,
-       int nTeams) {
+    public static SiteDefinition ootp6(
+        String name,
+        String siteRoot,
+        TeamId team,
+        String league,
+        int nTeams) {
 
-       return SiteDefinitionImpl.ootp6(name, siteRoot, team, league, nTeams);
-   }
+        return SiteDefinitionImpl.ootp6(name, siteRoot, team, league, nTeams);
+    }
 
 }

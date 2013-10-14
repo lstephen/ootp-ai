@@ -309,6 +309,15 @@ public class Ootp {
 
         DraftReport.create(site, tv).print(out);
 
+        LOG.info("Extensions report...");
+        generic.setTitle("Extensions");
+        generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()));
+        generic.print(out);
+
+        LOG.info("Salary report...");
+        SalaryReport salary = new SalaryReport(team, site);
+        salary.print(out);
+
         if (def.getName().equals("BTH")) {
             LOG.info("40 man roster reports...");
 
@@ -327,15 +336,6 @@ public class Ootp {
 
             generic.setReverse(false);
         }
-
-        LOG.info("Extensions report...");
-        generic.setTitle("Extensions");
-        generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()));
-        generic.print(out);
-
-        LOG.info("Salary report...");
-        SalaryReport salary = new SalaryReport(team, site);
-        salary.print(out);
 
         if (battingRegression.isEmpty() || pitchingRegression.isEmpty()) {
             return;
