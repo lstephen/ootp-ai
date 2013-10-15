@@ -25,6 +25,10 @@ public class Team implements Iterable<Player> {
         this.players = Sets.newHashSet(players);
     }
 
+    public boolean containsPlayer(Player p) {
+        return players.contains(p);
+    }
+
     public boolean containsPlayer(PlayerId id) {
         for (Player p : players) {
             if (p.hasId(id)) {
@@ -70,9 +74,7 @@ public class Team implements Iterable<Player> {
         }
 
         for (Player p : changes.get(Changes.ChangeType.RELEASE)) {
-            if (containsPlayer(p.getId())) {
-                players.remove(p);
-            }
+            remove(p);
         }
     }
 

@@ -82,7 +82,7 @@ public class Ootp {
     //private static final SiteDefinition NTBL =
     //    SiteDefinition.ootp6("NTBL", "http://ntbl.twib.us/reports/", new TeamId("2"), "American", 16);
 
-    // CHC, TTS?
+    // CHC, TTSn
     private static final SiteDefinition BTH =
         SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", new TeamId("20"), "National", 30);
 
@@ -107,11 +107,11 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            //( CBL
+            ( CBL
             //( HFTC
             //, LBB
-            //( BTH
-            ( SAVOY
+            //, BTH
+            //( SAVOY
             //( TFMS
             )) {
             try (
@@ -146,12 +146,12 @@ public class Ootp {
         SplitStats.setPercentages(pcts);
         PlayerRatings.setPercentages(pcts);
 
-        Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
 
         Changes changes = Changes.load(site);
 
         team.processManualChanges(changes, site);
 
+        Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
         boolean isExpandedRosters =
@@ -258,7 +258,7 @@ public class Ootp {
         LOG.log(Level.INFO, "Choosing lineups...");
 
         AllLineups lineups =
-            new LineupSelection(battingRegression.predict(team))
+            new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
                 .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         lineups.print(out);
@@ -321,7 +321,12 @@ public class Ootp {
         if (def.getName().equals("BTH")) {
             LOG.info("40 man roster reports...");
 
-            FourtyManRoster fourtyMan = new FourtyManRoster(newRoster, ps, tv.getTradeTargetValue());
+            FourtyManRoster fourtyMan = new FourtyManRoster(
+                newRoster,
+                Predictions
+                    .predict(newRoster.getAllPlayers())
+                    .using(battingRegression, pitchingRegression, ps.getPitcherOverall()),
+                tv.getTradeTargetValue());
 
             fourtyMan.printReport(out);
 
@@ -346,6 +351,20 @@ public class Ootp {
             generic.setTitle("Waivers");
             generic.setPlayers(site.getWaiverWire().extract());
             generic.print(out);
+
+            if (site.getDate().getMonthOfYear() < DateTimeConstants.APRIL) {
+                LOG.info("Rule 5...");
+                generic.setTitle("Rule 5");
+                generic.setPlayers(
+                    Iterables.filter(
+                        site.getRuleFiveDraft().extract(),
+                        new Predicate<Player>() {
+                            public boolean apply(Player p) {
+                                return tv.getCurrentValueVsReplacement(p) >= 0;
+                            }
+                        }));
+                generic.print(out);
+            }
         }
 
 
@@ -369,6 +388,7 @@ public class Ootp {
                     FreeAgentAcquisition.Meta.getRelease()),
                 released));
         generic.setLimit(200);
+        generic.setMultiplier(1.1);
         generic.print(out);
 
         Set<Player> all = Sets.newHashSet();
@@ -377,6 +397,7 @@ public class Ootp {
 
         LOG.log(Level.INFO, "Team reports...");
         generic.setLimit(50);
+        generic.setMultiplier(0.91);
 
         for (int i = 1; i <= site.getNumberOfTeams(); i++) {
         //for (int i = 1; i <= 1; i++) {
@@ -413,6 +434,7 @@ public class Ootp {
         generic.setTitle("Trade Bait");
         generic.setPlayers(newRoster.getAllPlayers());
         generic.setLimit(200);
+        generic.clearMultiplier();
         generic.print(out);
 
         generic.setCustomValueFunction(tv.getTradeTargetValue());
@@ -445,6 +467,7 @@ public class Ootp {
 
         LOG.log(Level.INFO, "Minor league non-prospects...");
         generic.setTitle("ML non-prospects");
+        generic.setMultiplier(0.91);
         generic.setLimit(50);
         generic.setPlayers(Iterables.filter(minorLeaguers, new Predicate<Player>() {
             public boolean apply(Player p) {
@@ -452,6 +475,8 @@ public class Ootp {
             }
         }));
         generic.print(out);
+
+        generic.clearMultiplier();
 
         LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
 

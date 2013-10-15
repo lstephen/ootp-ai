@@ -12,7 +12,6 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.Roster;
 import com.ljs.scratch.ootp.core.Roster.Status;
-import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
@@ -20,6 +19,7 @@ import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
+import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -200,19 +200,14 @@ public final class RosterSelection {
         }
 
         if (previous != null) {
-            Iterator i$ = previous.getPlayers(
-                com.ljs.scratch.ootp.core.Roster.Status.ML).iterator();
-            do {
-                if (!i$.hasNext()) {
-                    break;
-                }
-                Player p = (Player) i$.next();
-                if (((Boolean) p.getOutOfOptions().or(Boolean.FALSE))
-                    .booleanValue() && !((Boolean) p.getClearedWaivers().or(
-                    Boolean.TRUE)).booleanValue()) {
+            for (Player p : previous.getPlayers(Status.ML)) {
+                if (team.containsPlayer(p)
+                    && p.getOutOfOptions().or(Boolean.FALSE)
+                    && !p.getClearedWaivers().or(Boolean.FALSE)) {
+
                     forced.add(p);
                 }
-            } while (true);
+            }
         }
         return forced;
     }

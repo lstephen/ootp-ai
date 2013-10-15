@@ -2,6 +2,7 @@ package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -45,6 +46,8 @@ public class GenericValueReport {
     private final SalaryRegression salary;
 
     private final Predictions now;
+
+    private Optional<Double> multiplier = Optional.absent();
 
     public GenericValueReport(
         Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryRegression salary) {
@@ -125,6 +128,14 @@ public class GenericValueReport {
         this.custom = custom;
     }
 
+    public void setMultiplier(Double multiplier) {
+        this.multiplier = Optional.of(multiplier);
+    }
+
+    public void clearMultiplier() {
+        this.multiplier = Optional.absent();
+    }
+
     public void print(OutputStream out) {
         print(new PrintWriter(out));
     }
@@ -153,9 +164,18 @@ public class GenericValueReport {
         }
 
         for (Player p : ps) {
+            Integer value = custom == null ? getValue(p) : custom.apply(p);
+
+            String mv = "";
+
+            if (multiplier.isPresent()) {
+                mv = String.format(" (%3.0f)", multiplier.get() * value);
+            }
+
+
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d %3d/%3d %3d/%3d | %3d | %8s | %-13s |%s%13s | %13s | %s",
+                    "%2s %-15s %2d| %3d/%3d %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s%13s | %13s | %s",
                     p.getPosition(),
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
@@ -165,7 +185,8 @@ public class GenericValueReport {
                     getNowVsRight(p),
                     replacementValue.getValueVsReplacement(p),
                     futureReplacementValue.getValueVsReplacement(p),
-                    custom == null ? getValue(p) : custom.apply(p),
+                    value,
+                    mv,
                     Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
                     Joiner.on(',').join(p.getSlots()),
                     p.getRosterStatus(),

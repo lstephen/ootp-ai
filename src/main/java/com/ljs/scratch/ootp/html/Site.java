@@ -8,13 +8,13 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.core.Roster;
-import com.ljs.scratch.ootp.team.Team;
-import com.ljs.scratch.ootp.team.TeamId;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
+import com.ljs.scratch.ootp.team.Team;
+import com.ljs.scratch.ootp.team.TeamId;
 import java.util.Arrays;
 import java.util.Set;
 import org.joda.time.LocalDate;
@@ -88,6 +88,10 @@ public class Site {
 
     public MinorLeagues getMinorLeagues(TeamId id) {
         return new MinorLeagues(this, id);
+    }
+
+    public PlayerList getRuleFiveDraft() {
+        return PlayerList.ruleFiveDraft(this);
     }
 
     public Salary getSalary() {

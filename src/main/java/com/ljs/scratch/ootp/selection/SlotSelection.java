@@ -34,9 +34,13 @@ public final class SlotSelection implements Selection {
         Multiset<Slot> remainingSlots = HashMultiset.create(slots);
 
         for (Player p : forced) {
-            Slot slot = Slot.getPrimarySlot(p);
-            selected.put(slot, p);
-            remainingSlots.remove(slot);
+            for (Slot s : Slot.getPlayerSlots(p)) {
+                if (remainingSlots.contains(s)) {
+                    selected.put(s, p);
+                    remainingSlots.remove(s);
+                    break;
+                }
+            }
         }
 
         for (Player p : ordering.sortedCopy(available)) {
