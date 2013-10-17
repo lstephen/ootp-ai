@@ -9,6 +9,7 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.report.RosterReport;
+import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Slot;
 import java.util.Set;
 
@@ -24,9 +25,12 @@ public final class FreeAgents {
 
     private final Function<Player, Integer> value;
 
-    private FreeAgents(Iterable<Player> fas, Function<Player, Integer> value) {
+    private TradeValue tv;
+
+    private FreeAgents(Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
         this.fas = fas;
         this.value = value;
+        this.tv = tv;
     }
 
     public void skip(Player p) {
@@ -120,13 +124,16 @@ public final class FreeAgents {
         return Optional.absent();
     }
 
-    public Iterable<Player> getTopTargets() {
+    public Iterable<Player> getTopTargets(Mode mode) {
         Set<Player> targets = Sets.newHashSet();
 
         Set<Slot> remaining = Sets.newHashSet(Slot.values());
 
         for (Player p : byValue(value).sortedCopy(fas)) {
             if (skipPlayer(p)) {
+                continue;
+            }
+            if (mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
                 continue;
             }
 
@@ -163,16 +170,16 @@ public final class FreeAgents {
         return false;
     }
 
-    public static FreeAgents create(Site site, Changes changes, Function<Player, Integer> value) {
-        FreeAgents fas = create(site.getFreeAgents().extract(), value);
+    public static FreeAgents create(Site site, Changes changes, Function<Player, Integer> value, TradeValue tv) {
+        FreeAgents fas = create(site.getFreeAgents().extract(), value, tv);
 
         fas.skip(changes.get(Changes.ChangeType.DONT_ACQUIRE));
 
         return fas;
     }
 
-    public static FreeAgents create(Iterable<Player> fas, Function<Player, Integer> value) {
-        return new FreeAgents(fas, value);
+    public static FreeAgents create(Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
+        return new FreeAgents(fas, value, tv);
     }
 
 }

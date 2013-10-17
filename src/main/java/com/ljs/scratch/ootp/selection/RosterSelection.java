@@ -21,6 +21,7 @@ import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
 import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
+import com.ljs.scratch.ootp.value.PlayerValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -254,23 +255,27 @@ public final class RosterSelection {
         TeamStats<PitchingStats> pitching = predictions.getAllPitching();
         PitcherOverall method = predictions.getPitcherOverall();
 
-        Player p;
-        for (Iterator i$ = pitcherSelectionFactory.byOverall().sortedCopy(Selections
-            .onlyPitchers(pitching.getPlayers())).iterator(); i$.hasNext(); w
-            .println(String.format(
-            "%-2s %-15s%s %3s %2d | %3d %3d | %3d %3s | %s", new Object[]{
-            p.getPosition(), p.getShortName(), p.getRosterStatus(), roster
-            .getStatus(p) != null ? roster.getStatus(p) : "", Integer.valueOf(p
-            .getAge()), method.getPlus((PitchingStats) pitching
-            .getSplits(p).getVsLeft()), method.getPlus(
-            (PitchingStats) pitching.getSplits(p).getVsRight()), 
-            method.getPlus((PitchingStats) pitching.getOverall(p)), p
-            .getPosition().equals("MR") ? Integer.toString(
-            (int) (0.86499999999999999D * (double) method.getPlus(
-            (PitchingStats) pitching.getOverall(p)).intValue())) : "", Joiner
-            .on(',').join(Slot.getPlayerSlots(p))
-        }))) {
-            p = (Player) i$.next();
+        for (Player p : pitcherSelectionFactory
+            .byOverall()
+            .sortedCopy(Selections.onlyPitchers(pitching.getPlayers()))) {
+
+            w.println(
+                String.format(
+                    "%-2s %-15s%s %3s %2d | %3d %3d | %3d %3s | %2.2f | %s",
+                    p.getPosition(),
+                    p.getShortName(),
+                    p.getRosterStatus(),
+                    roster.getStatus(p) == null ? "" : roster.getStatus(p),
+                    Integer.valueOf(p.getAge()),
+                    method.getPlus(pitching.getSplits(p).getVsLeft()),
+                    method.getPlus(pitching.getSplits(p).getVsRight()),
+                    method.getPlus(pitching.getOverall(p)),
+                    p.getPosition().equals("MR")
+                        ? (int) (PlayerValue.MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
+                        : "",
+                    pitching.getOverall(p).getFip(),
+                    Joiner.on(',').join(Slot.getPlayerSlots(p))
+                ));
         }
 
         w.flush();

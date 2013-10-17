@@ -5,7 +5,17 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 
 public enum Mode {
+    PRESEASON {
+        @Override
+        public ImmutableMultiset<Slot> getHittingSlots() {
+            return REGULAR_SEASON.getHittingSlots();
+        }
 
+        @Override
+        public ImmutableMultiset<Slot> getPitchingSlots() {
+            return REGULAR_SEASON.getPitchingSlots();
+        }
+    },
     REGULAR_SEASON {
         @Override
         public ImmutableMultiset<Slot> getHittingSlots() {

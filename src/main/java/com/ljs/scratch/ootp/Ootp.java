@@ -107,10 +107,10 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            ( CBL
+            //( CBL
             //( HFTC
             //, LBB
-            //, BTH
+            ( BTH
             //( SAVOY
             //( TFMS
             )) {
@@ -157,16 +157,28 @@ public class Ootp {
         boolean isExpandedRosters =
             site.getDate().getMonthOfYear() == DateTimeConstants.SEPTEMBER;
 
+        int month = site.getDate().getMonthOfYear();
+
+        Mode mode = Mode.REGULAR_SEASON;
+
+        if (month < DateTimeConstants.APRIL) {
+            mode = Mode.PRESEASON;
+        } else if (isExpandedRosters) {
+            mode = Mode.EXPANDED;
+        }
+
         Optional<FreeAgentAcquisition> fa = Optional.absent();
         Optional<FreeAgentAcquisition> nfa = Optional.absent();
 
         Set<Player> released = Sets.newHashSet();
 
-        FreeAgents fas = FreeAgents.create(site, changes, tv.getTradeTargetValue());
 
-        Iterable<Player> topFaTargets = fas.getTopTargets();
+        FreeAgents fas = FreeAgents.create(site, changes, tv.getTradeTargetValue(), tv);
+
+        Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
         if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
+            && site.getDate().getMonthOfYear() > DateTimeConstants.MARCH
             && !battingRegression.isEmpty()
             && !battingRegression.isEmpty()) {
 
@@ -213,8 +225,6 @@ public class Ootp {
         selection.setPrevious(oldRoster);
 
         LOG.log(Level.INFO, "Selecting new rosters...");
-
-        Mode mode = isExpandedRosters ? Mode.EXPANDED : Mode.REGULAR_SEASON;
 
         //if (def.getName().equals("TWML")) {
         //    mode = Mode.PLAYOFFS;

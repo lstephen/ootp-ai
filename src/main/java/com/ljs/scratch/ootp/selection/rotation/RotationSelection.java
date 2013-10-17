@@ -108,6 +108,7 @@ public final class RotationSelection {
 
     public static RotationSelection forMode(Mode mode, TeamStats<PitchingStats> pitching, PitcherOverall method) {
         switch (mode) {
+            case PRESEASON:
             case REGULAR_SEASON:
             case EXPANDED:
                 return regularSeason(pitching, method);

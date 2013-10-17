@@ -5,10 +5,10 @@
 
 package com.ljs.scratch.ootp.selection;
 
-import com.ljs.scratch.ootp.team.Team;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import com.ljs.scratch.ootp.core.*;
+import com.ljs.scratch.ootp.team.Team;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -48,8 +48,7 @@ public final class Selections {
         return onlyPitchers(((Iterable) (players)));
     }
 
-    public static ImmutableSet onlyPitchers(Iterable ps)
-    {
+    public static ImmutableSet<Player> onlyPitchers(Iterable<Player> ps) {
         return ImmutableSet.copyOf(Iterables.filter(ps, IS_PITCHER));
     }
 
@@ -74,15 +73,12 @@ public final class Selections {
                 return Selections.isHitter(p);
             }};
 
-    private static final Predicate IS_PITCHER = new Predicate<Player>() {
+    private static final Predicate<Player> IS_PITCHER =
+        new Predicate<Player>() {
+            public boolean apply(Player p) {
+                return Selections.isPitcher(p);
+            }};
 
-        public boolean apply(Player p)
-        {
-            return Selections.isPitcher(p);
-        }
-
-    }
-;
     private static final Predicate<Player> IS_ON_40_MAN =
         new Predicate<Player>() {
             @Override

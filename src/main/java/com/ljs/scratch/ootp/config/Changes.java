@@ -53,6 +53,14 @@ public final class Changes {
         changes.put(type, p);
     }
 
+    private void add(ChangeType type, String name, Iterable<Player> ps) {
+        for (Player p : ps) {
+            if (p.getShortName().equals(name.trim())) {
+                add(type, p);
+            }
+        }
+    }
+
     public static Changes load(Site site) {
         Changes changes = new Changes();
 
@@ -64,6 +72,8 @@ public final class Changes {
 
         try {
             Iterable<Player> draftList = null;
+            Iterable<Player> faList = null;
+            Iterable<Player> team = null;
 
             for (String line : Files.readLines(src, Charsets.UTF_8)) {
                 if (Strings.isNullOrEmpty(line)) {
@@ -78,19 +88,35 @@ public final class Changes {
 
                 String raw = StringUtils.substringAfter(line, ",");
 
-                if (type == ChangeType.PICKED && raw.charAt(0) != 'p') {
-                    if (draftList == null) {
-                        draftList = PlayerList.draft(site).extract();
-                    }
-                    for (Player p : draftList) {
-                        if (p.getShortName().equals(raw)) {
-                            changes.add(type, p);
-                        }
-                    }
-                } else {
+                if (raw.charAt(0) == 'p') {
                     PlayerId id = new PlayerId(raw);
 
                     changes.add(type, site.getPlayer(id).extract());
+                } else {
+                    switch (type) {
+                        case PICKED:
+                            if (draftList == null) {
+                                draftList = PlayerList.draft(site).extract();
+                            }
+                            changes.add(type, raw, draftList);
+                            break;
+                        case DONT_ACQUIRE:
+                            if (faList == null) {
+                                faList = PlayerList.freeAgents(site).extract();
+                            }
+                            changes.add(type, raw, faList);
+                            break;
+                        case RELEASE:
+                        case FORCE_ML:
+                            if (team == null) {
+                                team = site.getSingleTeam().extractPlayers();
+                            }
+                            changes.add(type, raw, team);
+                            break;
+
+                        default:
+                            // do nothing
+                    }
                 }
             }
 
