@@ -106,11 +106,11 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            //( TWML
+            ( TWML
             //( CBL
-            //( HFTC
+            //, HFTC
             //, LBB
-            ( BTH
+            , BTH
             //( SAVOY
             //( TFMS
             )) {
@@ -146,11 +146,12 @@ public class Ootp {
         SplitStats.setPercentages(pcts);
         PlayerRatings.setPercentages(pcts);
 
-
+        LOG.info("Loading manual changes...");
         Changes changes = Changes.load(site);
 
         team.processManualChanges(changes, site);
 
+        LOG.info("Setting up Predictions...");
         Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
@@ -172,9 +173,9 @@ public class Ootp {
 
         Set<Player> released = Sets.newHashSet();
 
-
         FreeAgents fas = FreeAgents.create(site, changes, tv.getTradeTargetValue(), tv);
 
+        LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
         if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
@@ -272,6 +273,9 @@ public class Ootp {
                 .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         lineups.print(out);
+
+        //LOG.log(Level.INFO, "New lineups test...");
+        //new LineupScoreSelection(pcts, ps, out).select(changes.get(ChangeType.FORCE_ML), Selections.onlyHitters(newRoster.getAllPlayers()));
 
         LOG.log(Level.INFO, "Choosing rotation...");
 

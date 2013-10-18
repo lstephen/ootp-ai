@@ -29,6 +29,10 @@ public enum PitcherOverall {
         public Integer getPlus(PitchingStats stats) {
             return stats.getFipPlus();
         }
+
+        public Double getEraEstimate(PitchingStats stats) {
+            return stats.getFip();
+        }
     }, WOBA_AGAINST {
         public Double get(
             TeamStats<PitchingStats> predictions, Player p) {
@@ -43,6 +47,12 @@ public enum PitcherOverall {
         public Integer getPlus(PitchingStats stats) {
             return stats.getWobaPlusAgainst();
         }
+
+        public Double getEraEstimate(PitchingStats stats) {
+            double wobaa = stats.getWobaAgainst();
+
+            return Math.pow(wobaa / (1 - wobaa), 1.5) * 12;
+        }
     };
 
     public abstract Double get(
@@ -56,6 +66,8 @@ public enum PitcherOverall {
     }
 
     public abstract Integer getPlus(PitchingStats stats);
+
+    public abstract Double getEraEstimate(PitchingStats stats);
 
     public Ordering<Player> byWeightedRating() {
         return Ordering

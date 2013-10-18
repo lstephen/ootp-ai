@@ -261,7 +261,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %3d %3d | %3d %3s | %2.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %3d %3d | %3d %3s | %5.2f | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -273,7 +273,7 @@ public final class RosterSelection {
                     p.getPosition().equals("MR")
                         ? (int) (PlayerValue.MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
                         : "",
-                    pitching.getOverall(p).getFip(),
+                    method.getEraEstimate(pitching.getOverall(p)),
                     Joiner.on(',').join(Slot.getPlayerSlots(p))
                 ));
         }

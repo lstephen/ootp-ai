@@ -1,72 +1,79 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   Lineup.java
 package com.ljs.scratch.ootp.selection.lineup;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.ratings.*;
-import com.ljs.scratch.ootp.stats.*;
+import com.ljs.scratch.ootp.ratings.BattingRatings;
+import com.ljs.scratch.ootp.ratings.Position;
+import com.ljs.scratch.ootp.stats.BattingStats;
+import com.ljs.scratch.ootp.stats.TeamStats;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
-public class Lineup {
-    private Defense defense;
+public class Lineup implements Iterable<Lineup.Entry> {
 
-    private List order;
+    private Defense defense;
+    private List<Player> order;
 
     public static final class Entry {
 
+        private final Position position;
+        private final Player player;
+
+        public Entry(Position position, Player player) {
+            this.position = position;
+            this.player = player;
+        }
+
+        public Player getPlayer() {
+            return player;
+        }
+
         public String getPosition() {
+            return position.getAbbreviation();
+        }
+
+        public Position getPositionEnum() {
             return position;
         }
 
         public String getShortName() {
-            return name;
+            return player == null ? "" : player.getShortName();
         }
 
         public String format(String fmt) {
-            return String.format(fmt, new Object[]{
-                position, name
-            });
+            return String.format(fmt, getPosition(), getShortName());
         }
-        private final String position;
 
-        private final String name;
-
-        public Entry(String position, String name) {
-            this.position = position;
-            this.name = name;
-        }
     }
 
     public static enum VsHand {
 
         VS_LHP {
-            BattingStats getStats(TeamStats predictions, Player p) {
+            public BattingStats getStats(TeamStats predictions, Player p) {
                 return (BattingStats) predictions.getSplits(p).getVsLeft();
             }
 
-            BattingRatings getRatings(Player p) {
+            public BattingRatings getRatings(Player p) {
                 return (BattingRatings) p.getBattingRatings().getVsLeft();
             }
         },
         VS_RHP {
-            BattingStats getStats(TeamStats predictions, Player p) {
+            public BattingStats getStats(TeamStats predictions, Player p) {
                 return (BattingStats) predictions.getSplits(p).getVsRight();
             }
 
-            BattingRatings getRatings(Player p) {
+            public BattingRatings getRatings(Player p) {
                 return (BattingRatings) p.getBattingRatings().getVsRight();
             }
         };
 
-        abstract BattingStats getStats(TeamStats teamstats, Player player);
+        public abstract BattingStats getStats(TeamStats teamstats, Player player);
 
-        abstract BattingRatings getRatings(Player player);
+        public abstract BattingRatings getRatings(Player player);
     }
 
     public Lineup() {
@@ -82,13 +89,27 @@ public class Lineup {
 
     public Entry getEntry(int entry) {
         if (entry >= order.size()) {
-            return new Entry("P", "");
+            return new Entry(Position.PITCHER, null);
         } else {
-            Player p = (Player) order.get(entry);
+            Player p = order.get(entry);
             return new Entry(
-                defense.contains(p) ? ((Position) defense.getPosition(p))
-                .getAbbreviation() : "DH", p.getShortName());
+                defense.contains(p)
+                    ? defense.getPosition(p)
+                    : Position.DESIGNATED_HITTER,
+                p);
         }
+    }
+
+    public Iterator<Entry> iterator() {
+        return Lists
+            .transform(
+                ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9),
+                new Function<Integer, Entry>() {
+                    public Entry apply(Integer i) {
+                        return getEntry(i);
+                    }
+                })
+            .iterator();
     }
 
     public void print(OutputStream out) {
