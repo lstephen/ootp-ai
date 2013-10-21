@@ -71,6 +71,22 @@ public class AllLineups implements Iterable<Lineup> {
         return players;
     }
 
+    /**
+     * Get {@link Player}s that are in all lineups.
+     *
+     * @return
+     */
+    public Iterable<Player> getCommonPlayers() {
+
+        Set<Player> result = Sets.newHashSet(getAllPlayers());
+
+        for (Lineup l : this) {
+            result = Sets.intersection(result, l.playerSet());
+        }
+
+        return result;
+    }
+
     public void print(OutputStream out) {
         print(new PrintWriter(out));
     }

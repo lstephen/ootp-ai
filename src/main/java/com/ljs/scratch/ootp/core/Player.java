@@ -56,6 +56,9 @@ public final class Player {
     private Optional<Integer> yearsOfProService = Optional.absent();
 
     @JsonIgnore
+    private Optional<Integer> teamTopProspectPosition = Optional.absent();
+
+    @JsonIgnore
     private ImmutableList<Slot> slots;
 
     private Player(PlayerId id, String name, PlayerRatings ratings) {
@@ -136,6 +139,14 @@ public final class Player {
         this.yearsOfProService = Optional.of(years);
     }
 
+    public Optional<Integer> getTeamTopProspectPosition() {
+        return teamTopProspectPosition;
+    }
+
+    public void setTeamTopProspectPosition(Integer position) {
+        this.teamTopProspectPosition = Optional.of(position);
+    }
+
     public ImmutableList<Slot> getSlots() {
         if (slots == null) {
             slots = Slot.getPlayerSlots(this);
@@ -145,6 +156,13 @@ public final class Player {
 
     public String getRosterStatus() {
         StringBuilder str = new StringBuilder();
+
+        Optional<Integer> pos = getTeamTopProspectPosition();
+        if (pos.isPresent()) {
+            str.append(pos.get() >= 10 ? "T" : pos.get());
+        } else {
+            str.append(" ");
+        }
 
         if (getOn40Man().isPresent()) {
             str.append(getOn40Man().get() ? "*" : " ");

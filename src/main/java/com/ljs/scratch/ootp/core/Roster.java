@@ -1,6 +1,5 @@
 package com.ljs.scratch.ootp.core;
 
-import com.ljs.scratch.ootp.team.Team;
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -8,6 +7,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.team.Team;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -28,6 +28,8 @@ public class Roster {
 
     private final Multimap<Status, Player> assignments =
         ArrayListMultimap.create();
+
+    private Integer targetMaximum = 110;
 
     public Roster(Team team) {
         this.team = team;
@@ -101,6 +103,10 @@ public class Roster {
         return changes;
     }
 
+    public void setTargetMaximum(Integer max) {
+        this.targetMaximum = max;
+    }
+
     public void print(OutputStream out) {
         print(new PrintWriter(out));
     }
@@ -138,7 +144,7 @@ public class Roster {
             w.println();
         }
 
-        w.println("Total:" + assignments.size() + " (target 90-110)");
+        w.println("Total:" + assignments.size() + " (target 90-" + targetMaximum + ")");
 
         w.flush();
     }

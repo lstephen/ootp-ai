@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.html;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.core.Player;
@@ -162,6 +163,14 @@ public class SinglePlayer {
         if (doc.html().contains("Years of Pro Service")) {
             player.setYearsOfProService(getYearsOfProService(doc));
         }
+
+        Optional<Integer> teamTopProspectPosition =
+            site.getTeamTopProspectPosition(id);
+
+        if (teamTopProspectPosition.isPresent()) {
+            player.setTeamTopProspectPosition(teamTopProspectPosition.get());
+        }
+
 
         player.setSalary(site.getSalary(player));
 

@@ -24,6 +24,7 @@ import com.ljs.scratch.ootp.report.SalaryReport;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.RosterSelection;
 import com.ljs.scratch.ootp.selection.Selections;
+import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
 import com.ljs.scratch.ootp.selection.lineup.LineupSelection;
 import com.ljs.scratch.ootp.selection.rotation.Rotation;
@@ -106,13 +107,13 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            ( TWML
+            //( TWML
             //( CBL
             //, HFTC
             //, LBB
-            , BTH
+            ( BTH
             //( SAVOY
-            //( TFMS
+            //, TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -178,6 +179,12 @@ public class Ootp {
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
+        Integer maxRosterSize = 110;
+
+        if (site.getName().equals("LBB")) {
+            maxRosterSize = 100;
+        }
+
         if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
             && site.getDate().getMonthOfYear() > DateTimeConstants.MARCH
             && !battingRegression.isEmpty()
@@ -185,7 +192,7 @@ public class Ootp {
 
             LOG.info("Determining FA acquisition...");
 
-            if (oldRoster.size() > 110) {
+            if (oldRoster.size() > maxRosterSize) {
                 for (int i = 0; i < 2; i++) {
                     Optional<Player> release = fas.getPlayerToRelease(team);
 
@@ -233,6 +240,8 @@ public class Ootp {
 
         Roster newRoster = selection.select(mode, changes);
 
+        newRoster.setTargetMaximum(maxRosterSize);
+
         selection.printBattingSelectionTable(out, changes);
         selection.printPitchingSelectionTable(out, changes);
 
@@ -242,7 +251,7 @@ public class Ootp {
 
         newRoster.getChangesFrom(oldRoster).print(out);
 
-        if (fa.isPresent() && newRoster.size() < 110) {
+        if (fa.isPresent() && newRoster.size() < maxRosterSize) {
             Player player = fa.get().getFreeAgent();
             out.write(
                 String.format(
@@ -254,7 +263,7 @@ public class Ootp {
                 .getBytes());
         }
 
-        if (nfa.isPresent() && newRoster.size() < 110) {
+        if (nfa.isPresent() && newRoster.size() < maxRosterSize) {
             Player player = nfa.get().getFreeAgent();
             out.write(
                 String.format(
@@ -311,15 +320,20 @@ public class Ootp {
 
         generic.setReverse(false);
 
-        ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
         LOG.info("Draft...");
-        generic.setTitle("Drafted");
-        generic.setPlayers(drafted);
-        generic.print(out);
+        ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
+        Iterable<Player> remaining = Sets.difference(ImmutableSet.copyOf(site.getDraft().extract()), drafted);
 
-        generic.setTitle("Remaining");
-        generic.setPlayers(Sets.difference(ImmutableSet.copyOf(site.getDraft().extract()), drafted));
-        generic.print(out);
+
+        if (!Iterables.isEmpty(remaining)) {
+            generic.setTitle("Drafted");
+            generic.setPlayers(drafted);
+            generic.print(out);
+
+            generic.setTitle("Remaining");
+            generic.setPlayers(remaining);
+            generic.print(out);
+        }
 
         DraftReport.create(site, tv).print(out);
 
@@ -428,6 +442,25 @@ public class Ootp {
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.A));
 
             generic.setPlayers(r.getAllPlayers());
+            generic.print(out);
+        }
+
+        generic.setLimit(20);
+
+        for (final Slot s : Slot.values()) {
+            if (s == Slot.P) {
+                continue;
+            }
+
+            LOG.log(Level.INFO, "Slot Report: {0}...", s.name());
+
+            generic.setTitle("Top: " + s.name());
+            generic.setPlayers(Iterables.filter(all, new Predicate<Player>() {
+                public boolean apply(Player p) {
+                    return Slot.getPrimarySlot(p) == s;
+                }
+            }));
+
             generic.print(out);
         }
 

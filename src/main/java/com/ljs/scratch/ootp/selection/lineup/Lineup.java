@@ -2,6 +2,7 @@ package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
@@ -12,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class Lineup implements Iterable<Lineup.Entry> {
 
@@ -110,6 +112,10 @@ public class Lineup implements Iterable<Lineup.Entry> {
                     }
                 })
             .iterator();
+    }
+
+    public Set<Player> playerSet() {
+        return ImmutableSet.copyOf(order);
     }
 
     public void print(OutputStream out) {

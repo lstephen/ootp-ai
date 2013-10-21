@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.selection;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
@@ -12,6 +13,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.ratings.Position;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
 import com.ljs.scratch.ootp.selection.lineup.Lineup;
@@ -19,6 +21,7 @@ import com.ljs.scratch.ootp.selection.lineup.LineupSelection;
 import com.ljs.scratch.ootp.stats.SplitPercentages;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.paukov.combinatorics.Factory;
@@ -31,11 +34,7 @@ import org.paukov.combinatorics.ICombinatoricsVector;
  */
 public class LineupScoreSelection implements Selection {
 
-    private static final Double DH_NON_DH_FACTOR = 0.1;
-
     private static final Integer NO_DEFENSE_PENALTY = 100000;
-
-    private boolean dh = false;
 
     private final SplitPercentages splitPercentages;
 
@@ -64,36 +63,66 @@ public class LineupScoreSelection implements Selection {
 
         AllLineups selection = lineupSelection.select(all);
 
-        final AtomicInteger count = new AtomicInteger(0);
+        AllLineups selected = selection;
 
-        Iterable<Set<Player>> allPossible = getAllPossible(forced, selection.getAllPlayers());
+        if (Iterables.size(selected.getAllPlayers()) > slots) {
+            writePlayers(out, "Common", selection.getCommonPlayers());
+            writePlayers(out, "Others", Sets.difference(
+                ImmutableSet.copyOf(selection.getAllPlayers()),
+                ImmutableSet.copyOf(selection.getCommonPlayers())));
 
-        final Integer size = Iterables.size(allPossible);
+            Iterable<Set<Player>> allPossible =
+                getAllPossible(
+                Iterables.concat(forced, selection.getCommonPlayers()),
+                selection.getAllPlayers());
 
-        Iterable<AllLineups> allLineups = Optional.presentInstances(
-            Iterables.transform(
+            final Integer size = Iterables.size(allPossible);
+
+            final AtomicInteger count = new AtomicInteger(0);
+
+            Iterable<Optional<AllLineups>> allLineups =
+                Iterables.transform(
                 allPossible,
                 new Function<Set<Player>, Optional<AllLineups>>() {
-                    public Optional<AllLineups> apply(Set<Player> ps) {
-                        Integer current = count.incrementAndGet();
-
-                        System.out.println(String.format("%d/%d", current, size));
+                    public Optional<AllLineups> apply(final Set<Player> ps) {
+                        Integer current = count.getAndIncrement();
                         try {
+                            System.out.println(String.format("%d/%d", current, size));
                             return Optional.of(lineupSelection.select(ps));
                         } catch (IllegalStateException e) {
                             return Optional.absent();
                         }
-                    }
-                }));
+                    }});
 
-         AllLineups selected = Ordering
-            .natural()
-            .onResultOf(new Function<AllLineups, Integer>() {
-                public Integer apply(AllLineups lineups) {
-                    return score(lineups);
-                }
-            })
-            .max(allLineups);
+
+            //System.out.println("Found lineups:" + Iterables.size(allLineups));
+            System.out.println("*HERE*");
+
+            final AtomicInteger max = new AtomicInteger(Integer.MIN_VALUE);
+
+            selected = Ordering
+                .natural()
+                .onResultOf(new Function<Optional<AllLineups>, Integer>() {
+                    public Integer apply(Optional<AllLineups> lineups) {
+                        Integer score = score(lineups);
+
+                        if (score > max.get()) {
+                            try {
+                                out.write(String.format("%n---%n%d%n---%n", score).getBytes(Charsets.UTF_8));
+                                lineups.get().print(out);
+                                out.flush();
+                            } catch (IOException e) {
+                                throw Throwables.propagate(e);
+                            }
+                            max.set(score);
+                        }
+
+                        return score;
+                    }
+                })
+                .max(allLineups)
+                .get();
+        }
 
          Multimap<Slot, Player> result = HashMultimap.create();
 
@@ -111,6 +140,23 @@ public class LineupScoreSelection implements Selection {
          return ImmutableMultimap.copyOf(result);
     }
 
+    private void writePlayers(OutputStream out, String title, Iterable<Player> ps) {
+        PrintWriter w = new PrintWriter(out);
+
+        w.println();
+        w.println("---");
+        w.println(title);
+        w.println("---");
+
+        for (Player p : ps) {
+            w.println(String.format("%s %s", p.getPosition(), p.getShortName()));
+        }
+
+        w.flush();
+
+
+    }
+
     private Iterable<Set<Player>> getAllPossible(
         Iterable<Player> forced, Iterable<Player> available) {
 
@@ -125,7 +171,7 @@ public class LineupScoreSelection implements Selection {
         Set<Set<Player>> result = Sets.newHashSet();
 
         for (ICombinatoricsVector<Player> ps : gen) {
-            result.add(Sets.newHashSet(ps));
+            result.add(ImmutableSet.copyOf(Iterables.concat(forced, Sets.newHashSet(ps))));
         }
 
         return result;
@@ -133,18 +179,31 @@ public class LineupScoreSelection implements Selection {
 
 
 
-    private Integer score(AllLineups lineups) {
+    private Integer score(Optional<AllLineups> lineupsO) {
+        if (!lineupsO.isPresent()) {
+            return Integer.MIN_VALUE;
+        }
+
+        AllLineups lineups = lineupsO.get();
+
+        Integer vsRhp = score(lineups.getVsRhp(), Lineup.VsHand.VS_RHP);
+        Integer vsRhpDh = score(lineups.getVsRhpPlusDh(), Lineup.VsHand.VS_RHP);
+        Integer vsLhp = score(lineups.getVsLhp(), Lineup.VsHand.VS_LHP);
+        Integer vsLhpDh = score(lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP);
+
+        System.out.println(String.format("%.3f/%.3f", splitPercentages.getVsLhpPercentage(), splitPercentages.getVsRhpPercentage()));
+
+        System.out.println(String.format("%d/%d/%d/%d", vsRhp, vsRhpDh, vsLhp, vsLhpDh));
+
         Double dhScore =
-            (splitPercentages.getVsRhpPercentage() * score(lineups.getVsRhpPlusDh(), Lineup.VsHand.VS_RHP)
-            + splitPercentages.getVsLhpPercentage() * score(lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP));
+            splitPercentages.getVsRhpPercentage() * vsRhpDh
+            + splitPercentages.getVsLhpPercentage() * vsLhpDh;
 
         Double nonDhScore =
-            splitPercentages.getVsRhpPercentage() * score(lineups.getVsRhp(), Lineup.VsHand.VS_RHP)
-            + splitPercentages.getVsLhpPercentage() * score(lineups.getVsLhp(), Lineup.VsHand.VS_LHP);
+            splitPercentages.getVsRhpPercentage() * vsRhp
+            + splitPercentages.getVsLhpPercentage() * vsLhp;
 
-        return (int) (dh
-            ? dhScore + DH_NON_DH_FACTOR * nonDhScore
-            : nonDhScore + DH_NON_DH_FACTOR * dhScore);
+        return (int) (dhScore + nonDhScore);
     }
 
     private Integer score(Lineup lineup, Lineup.VsHand hand) {
@@ -154,7 +213,7 @@ public class LineupScoreSelection implements Selection {
             if (entry.getPlayer() != null) {
                 score += hand.getStats(predictions.getAllBatting(), entry.getPlayer()).getWobaPlus();
 
-                if (entry.getPlayer().getDefensiveRatings().getPositionScore(entry.getPositionEnum()) == 0) {
+                if (entry.getPositionEnum() != Position.DESIGNATED_HITTER && entry.getPositionEnum() != Position.FIRST_BASE && entry.getPlayer().getDefensiveRatings().getPositionScore(entry.getPositionEnum()) == 0) {
                     score -= NO_DEFENSE_PENALTY;
                 };
             }

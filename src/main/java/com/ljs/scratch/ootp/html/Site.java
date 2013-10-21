@@ -1,6 +1,7 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -128,6 +129,17 @@ public class Site {
         return 0;
     }
 
+    public Optional<Integer> getTeamTopProspectPosition(PlayerId id) {
+        for (int i = 1; i <= getNumberOfTeams(); i++) {
+            Optional<Integer> pos = getTopProspects(i).getPosition(id);
+
+            if (pos.isPresent()) {
+                return pos;
+            }
+        }
+        return Optional.absent();
+    }
+
     public SingleTeam getSingleTeam() {
         return getSingleTeam(team);
     }
@@ -158,6 +170,14 @@ public class Site {
 
     public TeamRatings getTeamRatings(TeamId id) {
         return new TeamRatings(this, id);
+    }
+
+    public TopProspects getTopProspects(Integer teamId) {
+        return getTopProspects(new TeamId(teamId.toString()));
+    }
+
+    public TopProspects getTopProspects(TeamId id) {
+        return TopProspects.of(this, id);
     }
 
     public SinglePlayer getPlayer(PlayerId id) {
