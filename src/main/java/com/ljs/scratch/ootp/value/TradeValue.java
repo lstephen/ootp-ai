@@ -2,12 +2,12 @@ package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
 import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.report.SalaryRegression;
+import com.ljs.scratch.ootp.team.Team;
 
 /**
  *
@@ -146,6 +146,14 @@ public class TradeValue {
 
     public Integer getOverallNow(Player p) {
         return playerValue.getNowValue(p) - getAgingFactor(p);
+    }
+
+    public Function<Player, Integer> getOverallNow() {
+        return new Function<Player, Integer>() {
+            public Integer apply(Player p) {
+                return getOverallNow(p);
+            }
+        };
     }
 
     public Integer getCurrentValueVsReplacement(Player p) {

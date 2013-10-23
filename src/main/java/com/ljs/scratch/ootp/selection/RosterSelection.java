@@ -226,7 +226,7 @@ public final class RosterSelection {
         for (Iterator i$ = hitterSelectionFactory.byOverall().sortedCopy(
             Selections.onlyHitters(batting.getPlayers())).iterator(); i$
             .hasNext(); w.println(String.format(
-            "%-2s %-15s%s %3s %2d | %15s %3d | %15s %3d | %3d | %8s | %s",
+            "%-2s %-15s%s %3s %2d | %14s %3d | %14s %3d | %3d | %8s | %s",
             new Object[]{
             p.getPosition(), p.getShortName(), p.getRosterStatus(), roster
             .getStatus(p) != null ? roster.getStatus(p) : "", Integer.valueOf(p
@@ -302,6 +302,5 @@ public final class RosterSelection {
                 .using(batting, pitching, PitcherOverall.WOBA_AGAINST),
             value);
     }
-    
 
 }

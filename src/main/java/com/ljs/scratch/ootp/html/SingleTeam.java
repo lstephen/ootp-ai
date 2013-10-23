@@ -1,14 +1,15 @@
 package com.ljs.scratch.ootp.html;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.core.Roster;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.team.TeamId;
-import com.ljs.scratch.ootp.html.page.Page;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -41,7 +42,10 @@ public class SingleTeam {
     public String extractTeamName() {
         Document doc = page.load();
 
-        return StringUtils.substringBefore(doc.select("title").text(), "Clubhouse").trim();
+        return CharMatcher.WHITESPACE.trimAndCollapseFrom(
+            StringUtils.substringBefore(
+                doc.select("title").text(), "Clubhouse"),
+            ' ');
     }
 
     public Roster extractRoster() {

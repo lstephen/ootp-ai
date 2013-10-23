@@ -1,25 +1,50 @@
 package com.ljs.scratch.ootp.report;
 
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.value.TradeValue;
+import com.ljs.scratch.ootp.html.Standings;
+import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
+import com.ljs.scratch.ootp.selection.Mode;
+import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
+import com.ljs.scratch.ootp.selection.Selection;
+import com.ljs.scratch.ootp.selection.SelectionFactory;
+import com.ljs.scratch.ootp.selection.Selections;
+import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.selection.SlotSelection;
+import com.ljs.scratch.ootp.stats.PitchingStats;
+import com.ljs.scratch.ootp.team.TeamId;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
  *
  * @author lstephen
  */
-public class TeamReport {
+public final class TeamReport {
 
-    private Site site;
+    private final Site site;
 
-    private TradeValue value;
+    private final Function<Player, Integer> value;
 
+    private final PitchingStats leaguePitching;
 
+    private final DescriptiveStatistics mlHitting = new DescriptiveStatistics();
+
+    private final DescriptiveStatistics mlPitching = new DescriptiveStatistics();
+
+    private TeamReport(Site site, Function<Player, Integer> value) {
+        this.site = site;
+        this.value = value;
+        this.leaguePitching = site.getLeaguePitching().extractTotal();
+    }
 
     public void print(OutputStream out) {
         print(new PrintWriter(out));
@@ -30,54 +55,277 @@ public class TeamReport {
         Set<TeamScore> scores = Sets.newHashSet();
 
         for (int i = 1; i <= site.getNumberOfTeams(); i++) {
-            Iterable<Player> players = site.getSingleTeam(i).extractPlayers();
-
-            TeamScore score = calculate(site.getSingleTeam(i).extractTeamName(), players);
-
-
-
+            scores.add(
+                calculate(
+                new TeamId(Integer.toString(i)),
+                site.getSingleTeam(i).extractPlayers()));
         }
 
         scores = normalize(scores);
 
+        double rpg = site.getPitcherSelectionMethod().getEraEstimate(leaguePitching);
 
+        w.println();
+        w.println(String.format("%-20s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", "Team", " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", rpg));
 
+        Standings standings = site.getStandings();
 
+        for (TeamScore s : TeamScore.byWinningPercentage(rpg).sortedCopy(scores)) {
+            Integer ws = standings.extractWins(s.getId());
+            Integer ls = standings.extractLosses(s.getId());
 
+            Long eosWs = ws + Math.round(s.getExpectedWinningPercentage(rpg) * (162 - ws - ls));
+            Long eosLs = 162 - eosWs;
+
+            w.println(
+                String.format(
+                    "%-20s | %5.1f %5.1f %5.1f | %5.1f %5.1f %5.1f | %s %.3f | %3d-%3d %.3f | %3d-%3d %.3f ",
+                    StringUtils.abbreviate(site.getSingleTeam(s.getId()).extractTeamName(), 20),
+                    s.getBatting(),
+                    s.getLineup(),
+                    s.getOverallBatting(),
+                    s.getPitching(),
+                    s.getRotation(),
+                    s.getOverallPitching(),
+                    s.getExpectedReocrd(rpg),
+                    s.getExpectedWinningPercentage(rpg),
+                    ws,
+                    ls,
+                    (double) ws / (ws + ls),
+                    eosWs,
+                    eosLs,
+                    (double) eosWs / (eosWs + eosLs)
+                    ));
+        }
+
+        w.println(String.format("%-20s | %11s %5.1f | %11s %5.1f |", "", "", mlHitting.getMean(), "", mlPitching.getMean()));
+
+        w.flush();
     }
 
     private Set<TeamScore> normalize(Iterable<TeamScore> scores) {
-        return ImmutableSet.copyOf(scores);
-    }
+        Double battingAverage = getBattingAverage(scores);
+        Double lineupAverage = getLineupAverage(scores);
+        Double pitchingAverage = getPitchingAverage(scores);
+        Double rotationAverage = getRotationAverage(scores);
 
-    public TeamScore calculate(String name, Iterable<Player> players) {
-        TeamScore ts = new TeamScore(name);
+        Set<TeamScore> normalized = Sets.newHashSet();
 
-        ts.calculateBatting(players);
-        ts.calculatePitching(players);
-
-        return ts;
-    }
-
-    private class TeamScore {
-
-        private final String teamName;
-
-        private Integer batting;
-
-        private Integer pitching;
-
-        private TeamScore(String teamName) {
-            this.teamName = teamName;
+        for (TeamScore s : scores) {
+            normalized.add(
+                TeamScore.create(
+                    s.getId(),
+                    normalize(s.getBatting(), battingAverage),
+                    normalize(s.getLineup(), lineupAverage),
+                    normalize(s.getPitching(), pitchingAverage),
+                    normalize(s.getRotation(), rotationAverage)));
         }
 
-        private void calculateBatting(Iterable<Player> players) {
-            //for (Player p : value.getOverallNow(p))
+        return normalized;
+    }
 
+    private Double normalize(Double value, Double average) {
+        return value * 100 / average;
+    }
+
+    private Double getBattingAverage(Iterable<TeamScore> scores) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (TeamScore s : scores) {
+            stats.addValue(s.getBatting());
         }
 
-        private void calculatePitching(Iterable<Player> players) {
+        return stats.getMean();
 
+    }
+
+    private Double getLineupAverage(Iterable<TeamScore> scores) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (TeamScore s : scores) {
+            stats.addValue(s.getLineup());
+        }
+        return stats.getMean();
+    }
+
+    private Double getPitchingAverage(Iterable<TeamScore> scores) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (TeamScore s : scores) {
+            stats.addValue(s.getPitching());
+        }
+        return stats.getMean();
+    }
+
+    private Double getRotationAverage(Iterable<TeamScore> scores) {
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (TeamScore s : scores) {
+            stats.addValue(s.getRotation());
+        }
+        return stats.getMean();
+    }
+
+    private TeamScore calculate(TeamId id, Iterable<Player> players) {
+        return TeamScore.create(
+            id,
+            calculateBatting(players),
+            calculateLineup(players),
+            calculatePitching(players),
+            calculateRotation(players));
+    }
+
+    private Double calculateBatting(Iterable<Player> players) {
+        // TODO:
+        // Try using SlotSelection to select just 9 players
+        return calculateScore(
+            HitterSelectionFactory.using(value),
+            Selections.onlyHitters(players));
+    }
+
+    private Double calculateLineup(Iterable<Player> players) {
+        return calculateScore(
+            SlotSelection
+                .builder()
+                .ordering(Ordering.natural().reverse().onResultOf(value))
+                .slots(ImmutableMultiset.of(Slot.C, Slot.SS, Slot.IF, Slot.IF, Slot.CF, Slot.OF, Slot.OF, Slot.H, Slot.H))
+                .size(9)
+                .fillToSize(Slot.H)
+                .build(),
+            Selections.onlyHitters(players));
+    }
+
+    private Double calculatePitching(Iterable<Player> players) {
+        return calculateScore(
+            PitcherSelectionFactory.using(value, site.getPitcherSelectionMethod()),
+            Selections.onlyPitchers(players));
+    }
+
+    private Double calculateRotation(Iterable<Player> players) {
+        return calculateScore(
+            SlotSelection
+                .builder()
+                .ordering(Ordering.natural().reverse().onResultOf(value))
+                .slots(ImmutableMultiset.of(Slot.SP, Slot.SP, Slot.SP, Slot.SP, Slot.MR, Slot.MR, Slot.MR))
+                .size(7)
+                .fillToSize(Slot.P)
+                .build(),
+            Selections.onlyPitchers(players));
+    }
+
+    private Double calculateScore(
+        SelectionFactory selection, Iterable<Player> players) {
+
+        return calculateScore(selection.create(Mode.REGULAR_SEASON), players);
+    }
+
+    private Double calculateScore(Selection selection, Iterable<Player> players) {
+        Iterable<Player> ml = selection
+            .select(ImmutableSet.<Player>of(), players)
+            .values();
+
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+
+        for (Player p : ml) {
+            stats.addValue(value.apply(p));
+            addToAverages(p);
+        }
+
+        return stats.getMean();
+    }
+
+    private void addToAverages(Player p) {
+        if (Selections.isHitter(p)) {
+            mlHitting.addValue(value.apply(p));
+        }
+
+        if (Selections.isPitcher(p)) {
+            mlPitching.addValue(value.apply(p));
+        }
+    }
+
+    public static TeamReport create(Site site, Function<Player, Integer> value) {
+        return new TeamReport(site, value);
+    }
+
+    private static final class TeamScore {
+
+        private final TeamId id;
+
+        private final Double batting;
+
+        private final Double lineup;
+
+        private final Double pitching;
+
+        private final Double rotation;
+
+        private TeamScore(TeamId id, Double batting, Double lineup, Double pitching, Double rotation) {
+            this.id = id;
+            this.batting = batting;
+            this.lineup = lineup;
+            this.pitching = pitching;
+            this.rotation = rotation;
+        }
+
+        public TeamId getId() {
+            return id;
+        }
+
+        public Double getBatting() {
+            return batting;
+        }
+
+        public Double getLineup() {
+            return lineup;
+        }
+
+        public Double getPitching() {
+            return pitching;
+        }
+
+        public Double getRotation() {
+            return rotation;
+        }
+
+        public Double getOverallBatting() {
+            return batting + lineup - 100;
+        }
+
+        public Double getOverallPitching() {
+            return pitching + rotation - 100;
+        }
+
+        /**
+         * Assumption - normalized to an average of 100
+         * @return
+         */
+        public Double getExpectedWinningPercentage(double rpg) {
+            int averageRuns = (int) (rpg * 162);
+
+            double rs = getOverallBatting() * averageRuns / 100;
+            double ra = (100.0 / getOverallPitching() * 100) * averageRuns / 100;
+
+            return 1.0 / (1.0 + Math.pow(ra / rs, 2));
+        }
+
+        public String getExpectedReocrd(double rpg) {
+            Long wins = Math.round(162 * getExpectedWinningPercentage(rpg));
+
+            return String.format("%3d-%3d", wins, 162-wins);
+        }
+
+        public static TeamScore create(
+            TeamId id, Double batting, Double lineup, Double pitching, Double rotation) {
+
+            return new TeamScore(id, batting, lineup, pitching, rotation);
+        }
+
+        public static Ordering<TeamScore> byWinningPercentage(final double rpg) {
+            return Ordering
+                .natural()
+                .reverse()
+                .onResultOf(new Function<TeamScore, Double>() {
+                    public Double apply(TeamScore score) {
+                        return score.getExpectedWinningPercentage(rpg);
+                    }
+                });
         }
 
     }

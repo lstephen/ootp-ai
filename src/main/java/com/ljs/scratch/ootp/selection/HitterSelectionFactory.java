@@ -7,7 +7,7 @@ import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
 
-public final class HitterSelectionFactory {
+public final class HitterSelectionFactory implements SelectionFactory {
 
     private final Function<Player, Double> value;
 

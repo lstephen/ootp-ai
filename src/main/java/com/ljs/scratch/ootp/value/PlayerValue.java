@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.value;
 
+import com.google.common.base.Function;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
@@ -40,12 +41,29 @@ public class PlayerValue {
         this.pitching = pitching;
     }
 
+    public Function<Player, Integer> getNowValue() {
+        return new Function<Player, Integer>() {
+            public Integer apply(Player p) {
+                return getNowValue(p);
+            }
+        };
+    }
+
     public Integer getNowValue(Player p) {
         Slot st = Slot.getPrimarySlot(p);
 
         return st == Slot.MR
             ? (int) (MR_CONSTANT * getNowAbility(p))
             : getNowAbility(p);
+    }
+
+    public Function<Player, Integer> getNowAbility() {
+        return new Function<Player, Integer>() {
+            @Override
+            public Integer apply(Player p) {
+                return getNowAbility(p);
+            }
+        };
     }
 
     public Integer getNowAbility(Player p) {
@@ -77,12 +95,29 @@ public class PlayerValue {
         }
     }
 
+    public Function<Player, Integer> getFutureValue() {
+        return new Function<Player, Integer>() {
+            public Integer apply(Player p) {
+                return getFutureValue(p);
+            }
+        };
+    }
+
     public Integer getFutureValue(Player p) {
         Slot st = Slot.getPrimarySlot(p);
 
         return st == Slot.MR
             ? (int) (MR_CONSTANT * getFutureAbility(p))
             : getFutureAbility(p);
+    }
+
+    public Function<Player, Integer> getFutureAbility() {
+        return new Function<Player, Integer>() {
+            @Override
+            public Integer apply(Player p) {
+                return getFutureAbility(p);
+            }
+        };
     }
 
     public Integer getFutureAbility(Player p) {

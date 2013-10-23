@@ -21,6 +21,7 @@ import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
+import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.RosterSelection;
 import com.ljs.scratch.ootp.selection.Selections;
@@ -40,6 +41,7 @@ import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.FreeAgents;
 import com.ljs.scratch.ootp.value.GenericValueReport;
+import com.ljs.scratch.ootp.value.PlayerValue;
 import com.ljs.scratch.ootp.value.Trade;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
@@ -108,12 +110,12 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            //( CBL
-            //, HFTC
+            ( CBL
+            //( HFTC
             //, LBB
-            ( BTH
+            //( BTH
             //( SAVOY
-            //, TFMS
+            //( TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -445,7 +447,23 @@ public class Ootp {
             generic.print(out);
         }
 
-        generic.setLimit(20);
+        LOG.info("Team Report...");
+        TeamReport
+            .create(
+                site,
+                new PlayerValue(ps, battingRegression, pitchingRegression)
+                    .getNowValue())
+            .print(out);
+
+        LOG.info("Team Futures Report...");
+        TeamReport
+            .create(
+                site,
+                new PlayerValue(ps, battingRegression, pitchingRegression)
+                    .getFutureValue())
+            .print(out);
+
+        generic.setLimit(10);
 
         for (final Slot s : Slot.values()) {
             if (s == Slot.P) {

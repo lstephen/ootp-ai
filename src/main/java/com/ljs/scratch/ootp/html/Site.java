@@ -152,6 +152,10 @@ public class Site {
         return getSingleTeam(new TeamId(Integer.toString(teamId)));
     }
 
+    public Standings getStandings() {
+        return Standings.create(this);
+    }
+
     public TeamBatting getTeamBatting() {
         return new TeamBatting(this, team);
     }

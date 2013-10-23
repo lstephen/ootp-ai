@@ -12,7 +12,7 @@ import com.ljs.scratch.ootp.stats.TeamStats;
  *
  * @author lstephen
  */
-public final class PitcherSelectionFactory {
+public final class PitcherSelectionFactory implements SelectionFactory {
 
     private final Function<Player, Double> value;
 
