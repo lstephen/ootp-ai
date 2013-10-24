@@ -160,6 +160,10 @@ public class TradeValue {
         return replacementValue.getValueVsReplacement(p);
     }
 
+    public Integer getFutureValueVsReplacement(Player p) {
+        return futureReplacementValue.getValueVsReplacement(p);
+    }
+
     public Integer getExpectedReturn(Player p) {
         return getOverall(p);
     }

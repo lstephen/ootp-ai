@@ -95,7 +95,8 @@ public class Ootp {
 
     // CIN, TTSn
     private static final SiteDefinition LBB =
-        SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
+        //SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
+        SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.x10.mx/lgreport/Leaguesite/", new TeamId("21"), "NL", 30);
 
     //private static final SiteDefinition GABL =
     //    SiteDefinition.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", new TeamId("10"), "American", 30);
@@ -110,9 +111,9 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            ( CBL
-            //( HFTC
-            //, LBB
+            //( CBL
+            ( HFTC
+            //( LBB
             //( BTH
             //( SAVOY
             //( TFMS
@@ -128,7 +129,7 @@ public class Ootp {
     private void run(SiteDefinition def, OutputStream out) throws IOException {
         LOG.log(Level.INFO, "Running for {0}...", def.getName());
 
-        Site site = new Site(def);
+        final Site site = new Site(def);
 
         LOG.log(Level.INFO, "Extracting current roster and team...");
 
@@ -137,10 +138,10 @@ public class Ootp {
 
         LOG.log(Level.INFO, "Running regressions...");
 
-        BattingRegression battingRegression = BattingRegression.run(site);
+        final BattingRegression battingRegression = BattingRegression.run(site);
         battingRegression.printCorrelations(out);
 
-        PitchingRegression pitchingRegression = PitchingRegression.run(site);
+        final PitchingRegression pitchingRegression = PitchingRegression.run(site);
         pitchingRegression.printCorrelations(out);
 
         SplitPercentages pcts = SplitPercentages.create(site);
@@ -155,7 +156,7 @@ public class Ootp {
         team.processManualChanges(changes, site);
 
         LOG.info("Setting up Predictions...");
-        Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
+        final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
         boolean isExpandedRosters =
@@ -447,21 +448,41 @@ public class Ootp {
             generic.print(out);
         }
 
-        LOG.info("Team Report...");
+        LOG.info("Team Now Report...");
         TeamReport
             .create(
+                "Now",
                 site,
                 new PlayerValue(ps, battingRegression, pitchingRegression)
                     .getNowValue())
             .print(out);
 
-        LOG.info("Team Futures Report...");
+        LOG.info("Team Medium Term Report...");
         TeamReport
             .create(
+                "Medium Term",
                 site,
                 new PlayerValue(ps, battingRegression, pitchingRegression)
                     .getFutureValue())
             .print(out);
+
+        /*LOG.info("Team Long Term Report...");
+        TeamReport
+            .create(
+                "Long Term",
+                site,
+                new Function<Player, Integer>() {
+                    @Override
+                    public Integer apply(Player p) {
+                        if (p.getAge() > 27) {
+                            return 0;
+                        } else {
+                            return new PlayerValue(ps, battingRegression, pitchingRegression)
+                                .getFutureValue(p);
+                        }
+                    }
+                })
+            .print(out);*/
 
         generic.setLimit(10);
 
@@ -530,41 +551,91 @@ public class Ootp {
             idx++;
         }
 
-        LOG.log(Level.INFO, "Minor league non-prospects...");
-        generic.setTitle("ML non-prospects");
+        /*ImmutableSet<Player> belowReplacementBait =
+            ImmutableSet.copyOf(
+                Iterables.filter(
+                    Iterables.limit(topBait, newRoster.size() / 10),
+                    new Predicate<Player>() {
+                        @Override
+                        public boolean apply(Player p) {
+                            return tv.getCurrentValueVsReplacement(p) < 0
+                                && tv.getFutureValueVsReplacement(p) < 0;
+                        }
+                    }));*/
+
+        LOG.log(Level.INFO, "Non Top 10 prospects...");
+        ImmutableSet<Player> nonTopTens =
+            ImmutableSet.copyOf(
+                Iterables.filter(
+                    all,
+                    new Predicate<Player>() {
+                        public boolean apply(Player p) {
+                            return !p.getTeamTopProspectPosition().isPresent()
+                                && p.getAge() <= 25
+                                && site.getCurrentSalary(p) == 0;
+                        }
+                    }));
+
+        generic.setTitle("Non Top 10 prospects");
         generic.setMultiplier(0.91);
         generic.setLimit(50);
-        generic.setPlayers(Iterables.filter(minorLeaguers, new Predicate<Player>() {
-            public boolean apply(Player p) {
-                return p.getAge() > 25;
-            }
-        }));
+        generic.setPlayers(nonTopTens);
         generic.print(out);
 
-        generic.clearMultiplier();
-
-        LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
-
-        idx = 1;
+        /*idx = 1;
         for (Trade trade
             : Iterables.limit(
                 Trade.getTopTrades(
                     tv,
                     site,
                     salaryRegression,
-                    Iterables.limit(topBait, newRoster.size() / 10),
-                    Iterables.filter(minorLeaguers, new Predicate<Player>() {
+                    belowReplacementBait,
+                    nonTopTens),
+                20)) {
+
+            generic.setTitle("NTT #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
+            generic.setPlayers(trade);
+            generic.print(out);
+            idx++;
+        }*/
+
+
+        LOG.log(Level.INFO, "Minor league non-prospects...");
+
+        ImmutableSet<Player> mlNonProspects =
+            ImmutableSet.copyOf(
+                Iterables.filter(
+                    minorLeaguers,
+                    new Predicate<Player>() {
                         public boolean apply(Player p) {
                             return p.getAge() > 25;
                         }
-                    })),
+                    }));
+
+        generic.setTitle("ML non-prospects");
+        generic.setPlayers(mlNonProspects);
+        generic.print(out);
+
+        generic.clearMultiplier();
+
+        LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
+
+        /*idx = 1;
+        for (Trade trade
+            : Iterables.limit(
+                Trade.getTopTrades(
+                    tv,
+                    site,
+                    salaryRegression,
+                    belowReplacementBait,
+                    mlNonProspects),
                 20)) {
 
             generic.setTitle("NP-ML #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
             generic.setPlayers(trade);
             generic.print(out);
             idx++;
-        }
+        }*/
 
         LOG.log(Level.INFO, "Done.");
     }

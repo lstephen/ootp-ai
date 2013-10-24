@@ -30,6 +30,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  */
 public final class TeamReport {
 
+    private final String title;
+
     private final Site site;
 
     private final Function<Player, Integer> value;
@@ -40,7 +42,8 @@ public final class TeamReport {
 
     private final DescriptiveStatistics mlPitching = new DescriptiveStatistics();
 
-    private TeamReport(Site site, Function<Player, Integer> value) {
+    private TeamReport(String title, Site site, Function<Player, Integer> value) {
+        this.title = title;
         this.site = site;
         this.value = value;
         this.leaguePitching = site.getLeaguePitching().extractTotal();
@@ -66,7 +69,7 @@ public final class TeamReport {
         double rpg = site.getPitcherSelectionMethod().getEraEstimate(leaguePitching);
 
         w.println();
-        w.println(String.format("%-20s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", "Team", " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", rpg));
+        w.println(String.format("%-20s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", rpg));
 
         Standings standings = site.getStandings();
 
@@ -240,8 +243,8 @@ public final class TeamReport {
         }
     }
 
-    public static TeamReport create(Site site, Function<Player, Integer> value) {
-        return new TeamReport(site, value);
+    public static TeamReport create(String title, Site site, Function<Player, Integer> value) {
+        return new TeamReport(title, site, value);
     }
 
     private static final class TeamScore {
