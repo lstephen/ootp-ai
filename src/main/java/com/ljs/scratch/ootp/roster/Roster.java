@@ -165,5 +165,9 @@ public final class Roster {
         return new Roster(source, available);
     }
 
+    public static Roster create(Team team) {
+        return create(team, team);
+    }
+
 
 }

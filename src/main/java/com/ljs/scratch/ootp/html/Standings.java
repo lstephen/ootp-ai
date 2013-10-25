@@ -1,7 +1,7 @@
 package com.ljs.scratch.ootp.html;
 
 import com.ljs.scratch.ootp.html.page.Page;
-import com.ljs.scratch.ootp.team.TeamId;
+import com.ljs.scratch.ootp.roster.TeamId;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 

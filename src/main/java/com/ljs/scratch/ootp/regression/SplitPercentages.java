@@ -1,8 +1,12 @@
-package com.ljs.scratch.ootp.stats;
+package com.ljs.scratch.ootp.regression;
 
 import com.google.common.base.Charsets;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.regression.History;
+import com.ljs.scratch.ootp.stats.BattingStats;
+import com.ljs.scratch.ootp.stats.PitchingStats;
+import com.ljs.scratch.ootp.stats.SplitStats;
+import com.ljs.scratch.ootp.stats.Stats;
+import com.ljs.scratch.ootp.stats.TeamStats;
 import java.io.IOException;
 import java.io.OutputStream;
 

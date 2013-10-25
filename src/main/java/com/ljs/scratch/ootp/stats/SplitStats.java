@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.stats;
 
+import com.ljs.scratch.ootp.regression.SplitPercentages;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ljs.scratch.ootp.ratings.Splits;

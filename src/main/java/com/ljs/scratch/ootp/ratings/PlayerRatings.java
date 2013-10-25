@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.ratings;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ljs.scratch.ootp.stats.SplitPercentages;
+import com.ljs.scratch.ootp.regression.SplitPercentages;
 
 /**
  *

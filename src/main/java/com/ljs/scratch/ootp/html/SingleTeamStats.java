@@ -9,7 +9,7 @@ import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.stats.Stats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import com.ljs.scratch.ootp.team.Team;
+import com.ljs.scratch.ootp.roster.Team;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;

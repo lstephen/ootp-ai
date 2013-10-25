@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.team;
+package com.ljs.scratch.ootp.roster;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -6,7 +6,6 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
-import com.ljs.scratch.ootp.roster.Roster;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -22,10 +21,6 @@ public final class Team implements Iterable<Player>, PlayerSource {
 
     private Team(Iterable<Player> players) {
         this.players = Sets.newHashSet(players);
-    }
-
-    public Roster createBlankRoster() {
-        return Roster.create(this, this);
     }
 
     public boolean containsPlayer(Player p) {

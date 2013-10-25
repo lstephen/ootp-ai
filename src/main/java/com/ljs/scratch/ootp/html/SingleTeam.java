@@ -8,8 +8,8 @@ import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
-import com.ljs.scratch.ootp.team.Team;
-import com.ljs.scratch.ootp.team.TeamId;
+import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.roster.TeamId;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -53,7 +53,7 @@ public class SingleTeam {
 
         Team team = site.getTeamRatings(teamId).extractTeam();
 
-        Roster roster = team.createBlankRoster();
+        Roster roster = Roster.create(team);
 
         Elements activeRoster =
             doc.select("tr:has(td:contains(Active Roster)) + tr");

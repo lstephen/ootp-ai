@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.html;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.team.TeamId;
+import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.util.ElementsUtil;
 import org.jsoup.nodes.Document;

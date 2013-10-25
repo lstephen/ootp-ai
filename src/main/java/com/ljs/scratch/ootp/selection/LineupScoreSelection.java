@@ -18,7 +18,7 @@ import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
 import com.ljs.scratch.ootp.selection.lineup.Lineup;
 import com.ljs.scratch.ootp.selection.lineup.LineupSelection;
-import com.ljs.scratch.ootp.stats.SplitPercentages;
+import com.ljs.scratch.ootp.regression.SplitPercentages;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;

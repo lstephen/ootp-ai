@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.selection;
+package com.ljs.scratch.ootp.roster;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -14,20 +14,25 @@ import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.roster.Roster;
-import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
+import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
+import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
+import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
+import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.Selections;
+import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.PlayerValue;
 import java.io.OutputStream;
@@ -107,7 +112,7 @@ public final class RosterSelection {
     }
 
     private Roster select(Changes changes, Selection hitting, Selection pitching) {
-        Roster roster = team.createBlankRoster();
+        Roster roster = Roster.create(team);
         Iterable<Player> forced = getForced(changes);
         assignToDisabledList(roster, team.getInjuries());
 

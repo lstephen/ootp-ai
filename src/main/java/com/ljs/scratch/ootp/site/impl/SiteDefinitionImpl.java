@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.site.impl;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
-import com.ljs.scratch.ootp.team.TeamId;
+import com.ljs.scratch.ootp.roster.TeamId;
 
 /**
  *
