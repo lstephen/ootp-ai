@@ -1,6 +1,7 @@
 package com.ljs.scratch.ootp.roster;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -9,7 +10,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.team.Team;
+import com.ljs.scratch.ootp.player.PlayerSource;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
@@ -22,19 +23,27 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author lstephen
  */
-public class Roster {
+public final class Roster {
+
+    private static final Integer DEFAULT_TARGET_MAXIMUM = 110;
 
     public static enum Status { ML, AAA, AA, A, DL }
 
-    private final Team team;
+    private final PlayerSource source;
+
+    private final Iterable<Player> available;
 
     private final Multimap<Status, Player> assignments =
         ArrayListMultimap.create();
 
-    private Integer targetMaximum = 110;
+    private Integer targetMaximum = DEFAULT_TARGET_MAXIMUM;
 
-    public Roster(Team team) {
-        this.team = team;
+    private Roster(PlayerSource source, Iterable<Player> available) {
+        Preconditions.checkNotNull(source);
+        Preconditions.checkNotNull(available);
+
+        this.source = source;
+        this.available = available;
     }
 
     public ImmutableSet<Player> getPlayers(Status status) {
@@ -56,7 +65,7 @@ public class Roster {
     public ImmutableSet<Player> getUnassigned() {
         return ImmutableSet.copyOf(
                 Sets.difference(
-                    ImmutableSet.copyOf(team),
+                    ImmutableSet.copyOf(available),
                     ImmutableSet.copyOf(assignments.values())));
     }
 
@@ -71,7 +80,7 @@ public class Roster {
 
     public void assign(Status status, PlayerId... ids) {
         for (PlayerId id : ids) {
-            assign(status, team.getPlayer(id));
+            assign(status, source.get(id));
         }
     }
 
@@ -132,13 +141,8 @@ public class Roster {
 
         for (int i = 0; i < maxSize; i++) {
             for (Status s : Status.values()) {
-                List<Player> ps = Ordering
-                    .natural()
-                    .onResultOf(new Function<Player, String>() {
-                        public String apply(Player p) {
-                            return p.getShortName();
-                        }
-                    })
+                List<Player> ps = Player
+                    .byShortName()
                     .sortedCopy(assignments.get(s));
 
                 w.print(String.format("%-15s ", i < ps.size() ? ps.get(i).getShortName() : ""));
@@ -154,6 +158,11 @@ public class Roster {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    public static Roster create(
+        PlayerSource source, Iterable<Player> available) {
+        return new Roster(source, available);
     }
 
 

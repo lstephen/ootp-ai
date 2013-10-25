@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.player.PlayerSource;
+import com.ljs.scratch.ootp.roster.Roster;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -12,7 +14,7 @@ import java.util.Set;
  *
  * @author lstephen
  */
-public final class Team implements Iterable<Player> {
+public final class Team implements Iterable<Player>, PlayerSource {
 
     private final Set<Player> players;
 
@@ -20,6 +22,10 @@ public final class Team implements Iterable<Player> {
 
     private Team(Iterable<Player> players) {
         this.players = Sets.newHashSet(players);
+    }
+
+    public Roster createBlankRoster() {
+        return Roster.create(this, this);
     }
 
     public boolean containsPlayer(Player p) {
@@ -35,7 +41,7 @@ public final class Team implements Iterable<Player> {
         return false;
     }
 
-    public Player getPlayer(PlayerId id) {
+    public Player get(PlayerId id) {
         for (Player p : players) {
             if (p.hasId(id)) {
                 return p;

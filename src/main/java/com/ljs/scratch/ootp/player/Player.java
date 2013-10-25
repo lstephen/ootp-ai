@@ -256,6 +256,17 @@ public final class Player {
             });
     }
 
+    public static Ordering<Player> byShortName() {
+        return Ordering
+            .natural()
+            .onResultOf(new Function<Player, String>() {
+                @Override
+                public String apply(Player p) {
+                    return p.getShortName();
+                }
+            });
+    }
+
     public static Ordering<Player> byWeightedBattingRating() {
         return Ordering
             .natural()

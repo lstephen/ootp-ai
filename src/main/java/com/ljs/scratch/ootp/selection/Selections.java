@@ -5,10 +5,10 @@
 
 package com.ljs.scratch.ootp.selection;
 
-import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.player.PlayerId;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.team.Team;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,7 +29,7 @@ public final class Selections {
     {
         Set players = Sets.newHashSet();
         PlayerId id;
-        for(Iterator i$ = ids.iterator(); i$.hasNext(); players.add(t.getPlayer(id)))
+        for(Iterator i$ = ids.iterator(); i$.hasNext(); players.add(t.get(id)))
             id = (PlayerId)i$.next();
 
         return onlyHitters(((Iterable) (players)));
@@ -43,7 +43,7 @@ public final class Selections {
     {
         Set players = Sets.newHashSet();
         PlayerId id;
-        for(Iterator i$ = ids.iterator(); i$.hasNext(); players.add(t.getPlayer(id)))
+        for(Iterator i$ = ids.iterator(); i$.hasNext(); players.add(t.get(id)))
             id = (PlayerId)i$.next();
 
         return onlyPitchers(((Iterable) (players)));

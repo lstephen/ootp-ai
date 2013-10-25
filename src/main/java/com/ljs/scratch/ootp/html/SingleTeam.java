@@ -4,10 +4,10 @@ import com.google.common.base.CharMatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
-import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.team.TeamId;
 import java.util.Set;
@@ -53,7 +53,7 @@ public class SingleTeam {
 
         Team team = site.getTeamRatings(teamId).extractTeam();
 
-        Roster roster = new Roster(team);
+        Roster roster = team.createBlankRoster();
 
         Elements activeRoster =
             doc.select("tr:has(td:contains(Active Roster)) + tr");

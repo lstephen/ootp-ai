@@ -1,15 +1,15 @@
 package com.ljs.scratch.ootp.html;
 
-import com.ljs.scratch.ootp.html.page.Page;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.stats.Stats;
 import com.ljs.scratch.ootp.stats.TeamStats;
+import com.ljs.scratch.ootp.team.Team;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -66,7 +66,7 @@ public abstract class SingleTeamStats<S extends Stats<S>> {
                         .replaceAll(".html", ""));
 
 
-            stats.put(team.getPlayer(id), extractStatsRow(row.children()));
+            stats.put(team.get(id), extractStatsRow(row.children()));
         }
 
         return stats.build();

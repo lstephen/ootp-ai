@@ -8,12 +8,10 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.config.Directories;
-import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.roster.Roster;
-import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
@@ -22,6 +20,8 @@ import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
 import com.ljs.scratch.ootp.report.TeamReport;
+import com.ljs.scratch.ootp.roster.Roster;
+import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.RosterSelection;
 import com.ljs.scratch.ootp.selection.Selections;
@@ -109,11 +109,11 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            ( TWML
+            //( TWML
             //( CBL
             //, HFTC
             //( LBB
-            //( BTH
+            ( BTH
             //, SAVOY
             //, TFMS
             )) {

@@ -10,11 +10,19 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.roster.Roster;
-import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
+import com.ljs.scratch.ootp.roster.Roster;
+import com.ljs.scratch.ootp.roster.Roster;
+import com.ljs.scratch.ootp.roster.Roster.Status;
+import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
+import com.ljs.scratch.ootp.selection.Mode;
+import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
+import com.ljs.scratch.ootp.selection.Selection;
+import com.ljs.scratch.ootp.selection.Selections;
+import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -99,7 +107,7 @@ public final class RosterSelection {
     }
 
     private Roster select(Changes changes, Selection hitting, Selection pitching) {
-        Roster roster = new Roster(team);
+        Roster roster = team.createBlankRoster();
         Iterable<Player> forced = getForced(changes);
         assignToDisabledList(roster, team.getInjuries());
 
