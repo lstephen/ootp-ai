@@ -4,9 +4,9 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
@@ -118,6 +118,8 @@ public class SinglePlayer {
         String name = splitInfo[0];
         Integer age = Integer.valueOf(splitInfo[3]);
 
+         String listedPosition = getListedPosition(splitInfo[8]);
+
         PlayerRatings ratings =
             PlayerRatings.create(
                 extractBattingRatings(),
@@ -133,8 +135,10 @@ public class SinglePlayer {
 
         Player player = Player.create(id, name, ratings);
 
+
         player.setAge(age);
         player.setTeam(team);
+        player.setListedPosition(listedPosition);
 
         if (site.isInjured(player)) {
             player.setTeam("*INJ* " + player.getTeam());
@@ -230,6 +234,32 @@ public class SinglePlayer {
                 .eye(scaleOotp6PotentialRating(unscaled.getEye()))
                 .build();
         }
+    }
+
+    private String getListedPosition(String src) {
+        String p = CharMatcher.WHITESPACE.trimFrom(src);
+
+        ImmutableMap<String, String> ps = ImmutableMap
+            .<String, String>builder()
+            .put("Starting Pitcher", "SP")
+            .put("Reliever", "MR")
+            .put("Closer", "CL")
+            .put("Catcher", "C")
+            .put("First Base", "1B")
+            .put("Second Base", "2B")
+            .put("Third Base", "3B")
+            .put("Shortstop", "SS")
+            .put("Leftfield", "LF")
+            .put("Centerfield", "CF")
+            .put("Rightfield", "RF")
+            .put("Designated Hitter", "DH")
+            .build();
+
+        if (!ps.containsKey(p)) {
+            throw new IllegalStateException("Unknown Position:" + p);
+        }
+
+        return ps.get(p);
     }
 
     private Boolean isRuleFiveEligible(Document doc) {

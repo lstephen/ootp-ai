@@ -41,6 +41,9 @@ public final class Player {
     private final PlayerRatings ratings;
 
     @JsonIgnore
+    private Optional<String> listedPosition = Optional.absent();
+
+    @JsonIgnore
     private Optional<Boolean> on40Man = Optional.absent();
 
     @JsonIgnore
@@ -191,6 +194,14 @@ public final class Player {
         } else {
             return getDefensiveRatings().getPrimaryPosition();
         }
+    }
+
+    public Optional<String> getListedPosition() {
+        return listedPosition;
+    }
+
+    public void setListedPosition(String listedPosition) {
+        this.listedPosition = Optional.of(listedPosition);
     }
 
     public DefensiveRatings getDefensiveRatings() {

@@ -16,14 +16,17 @@ import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
+import com.ljs.scratch.ootp.regression.SplitPercentages;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
 import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
-import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.roster.RosterSelection;
+import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.roster.TeamId;
+import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
@@ -33,10 +36,7 @@ import com.ljs.scratch.ootp.selection.rotation.RotationSelection;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.SiteDefinitionFactory;
 import com.ljs.scratch.ootp.site.Version;
-import com.ljs.scratch.ootp.regression.SplitPercentages;
 import com.ljs.scratch.ootp.stats.SplitStats;
-import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.FreeAgents;
@@ -113,8 +113,8 @@ public class Ootp {
             //( CBL
             //, HFTC
             //( LBB
-            ( BTH
-            //, SAVOY
+            //( BTH
+            ( SAVOY
             //, TFMS
             )) {
             try (
