@@ -1,13 +1,11 @@
 package com.ljs.scratch.ootp.team;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
-import com.ljs.scratch.ootp.ratings.PitchingRatings;
-import com.ljs.scratch.ootp.ratings.Splits;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -47,14 +45,6 @@ public class Team implements Iterable<Player> {
         throw new IllegalStateException();
     }
 
-    public Splits<BattingRatings> getBattingRatings(PlayerId id) {
-        return getPlayer(id).getBattingRatings();
-    }
-
-    public Splits<PitchingRatings> getPitchingRatings(PlayerId id) {
-        return getPlayer(id).getPitchingRatings();
-    }
-
     public void addInjury(Iterable<Player> ps) {
         for (Player p : ps) {
             if (p != null) {
@@ -64,7 +54,7 @@ public class Team implements Iterable<Player> {
     }
 
     public Iterable<Player> getInjuries() {
-        return injured;
+        return ImmutableSet.copyOf(injured);
     }
 
     public void processManualChanges(Changes changes, Site site) {
@@ -85,6 +75,8 @@ public class Team implements Iterable<Player> {
 
 
     @Override
-    public Iterator<Player> iterator() { return players.iterator(); }
+    public Iterator<Player> iterator() {
+        return players.iterator();
+    }
 
 }

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class DefensiveRatings {
 
-    private static ImmutableMap<Position, Integer> MINIMUMS =
+    private static final ImmutableMap<Position, Integer> MINIMUMS =
         ImmutableMap.<Position, Integer>builder()
             .put(Position.SHORTSTOP, 5) // C
             .put(Position.SECOND_BASE, 4) // C
@@ -126,6 +126,7 @@ public class DefensiveRatings {
         return Ordering
             .natural()
             .onResultOf(new Function<Position, Double>() {
+                @Override
                 public Double apply(Position p) {
                     Double score = rs.positionRating.containsKey(p)
                         ? rs.positionRating.get(p)

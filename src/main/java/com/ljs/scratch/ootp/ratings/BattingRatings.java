@@ -1,65 +1,109 @@
 package com.ljs.scratch.ootp.ratings;
 
-import javax.xml.bind.annotation.XmlElement;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
  *
  * @author lstephen
  */
-public class BattingRatings implements BattingRatingsBuilder {
+public final class BattingRatings {
 
-    public static enum BattingRatingsType { CONTACT, GAP, POWER, EYE }
+    private final Integer contact;
 
-    @XmlElement
-    private int contact;
+    private final Integer gap;
 
-    @XmlElement
-    private int gap;
+    private final Integer power;
 
-    @XmlElement
-    private int power;
+    private final Integer eye;
 
-    @XmlElement
-    private int eye;
+    private BattingRatings(Builder builder) {
+        Preconditions.checkNotNull(builder.contact);
+        Preconditions.checkNotNull(builder.gap);
+        Preconditions.checkNotNull(builder.power);
+        Preconditions.checkNotNull(builder.eye);
 
-    public int getContact() {
+        this.contact = builder.contact;
+        this.gap = builder.gap;
+        this.power = builder.power;
+        this.eye = builder.eye;
+    }
+
+    public Integer getContact() {
         return contact;
     }
 
-    public int getGap() {
+    public Integer getGap() {
         return gap;
     }
 
-    public int getPower() {
+    public Integer getPower() {
         return power;
     }
 
-    public int getEye() {
+    public Integer getEye() {
         return eye;
-    }
-
-    public BattingRatingsBuilder contact(Integer contact) {
-        this.contact = contact;
-        return this;
-    }
-
-    public BattingRatingsBuilder gap(Integer gap) {
-        this.gap = gap;
-        return this;
-    }
-
-    public BattingRatingsBuilder power(Integer power) {
-        this.power = power;
-        return this;
-    }
-
-    public BattingRatingsBuilder eye(Integer eye) {
-        this.eye = eye;
-        return this;
     }
 
     public BattingRatings build() {
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return ReflectionToStringBuilder.reflectionToString(this);
+    }
+
+    public static Builder builder() {
+        return Builder.create();
+    }
+
+    @JsonCreator
+    private static BattingRatings build(Builder builder) {
+        return new BattingRatings(builder);
+    }
+
+    public static final class Builder {
+
+        private Integer contact;
+
+        private Integer gap;
+
+        private Integer power;
+
+        private Integer eye;
+
+        private Builder() { }
+
+        public Builder contact(Integer contact) {
+            this.contact = contact;
+            return this;
+        }
+
+        public Builder gap(Integer gap) {
+            this.gap = gap;
+            return this;
+        }
+
+        public Builder power(Integer power) {
+            this.power = power;
+            return this;
+        }
+
+        public Builder eye(Integer eye) {
+            this.eye = eye;
+            return this;
+        }
+
+        public BattingRatings build() {
+            return BattingRatings.build(this);
+        }
+
+        private static Builder create() {
+            return new Builder();
+        }
+
     }
 
 }

@@ -6,7 +6,6 @@ package com.ljs.scratch.ootp.ratings;
  */
 public class PitchingRatings {
 
-    public static enum PitchingRatingsType { HITS, GAP, TRIPLES, STUFF, CONTROL, MOVEMENT }
 
     private int hits;
 

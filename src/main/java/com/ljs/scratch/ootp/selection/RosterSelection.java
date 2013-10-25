@@ -222,24 +222,25 @@ public final class RosterSelection {
         Roster roster = select(Mode.REGULAR_SEASON, changes);
         TeamStats<BattingStats> batting = predictions.getAllBatting();
 
-        Player p;
-        for (Iterator i$ = hitterSelectionFactory.byOverall().sortedCopy(
-            Selections.onlyHitters(batting.getPlayers())).iterator(); i$
-            .hasNext(); w.println(String.format(
-            "%-2s %-15s%s %3s %2d | %14s %3d | %14s %3d | %3d | %8s | %s",
-            new Object[]{
-            p.getPosition(), p.getShortName(), p.getRosterStatus(), roster
-            .getStatus(p) != null ? roster.getStatus(p) : "", Integer.valueOf(p
-            .getAge()), ((BattingStats) batting.getSplits(p).getVsLeft())
-            .getSlashLine(), Integer.valueOf(((BattingStats) batting
-            .getSplits(p).getVsLeft()).getWobaPlus()), ((BattingStats) batting
-            .getSplits(p).getVsRight()).getSlashLine(), Integer.valueOf(
-            ((BattingStats) batting.getSplits(p).getVsRight()).getWobaPlus()), Integer
-            .valueOf(((BattingStats) batting.getOverall(p)).getWobaPlus()),
-            p.getDefensiveRatings().getPositionScores(), Joiner.on(',').join(
-            Slot.getPlayerSlots(p))
-        }))) {
-            p = (Player) i$.next();
+        for (Player p :
+            hitterSelectionFactory.byOverall().sortedCopy(Selections.onlyHitters(batting.getPlayers()))) {
+
+            w.println(
+                String.format(
+                    "%-2s %-15s%s %3s %2d | %14s %3d | %14s %3d | %3d | %8s | %s ",
+                    p.getPosition(),
+                    p.getShortName(),
+                    p.getRosterStatus(),
+                    roster.getStatus(p) != null ? roster.getStatus(p) : "",
+                    p.getAge(),
+                    batting.getSplits(p).getVsLeft().getSlashLine(),
+                    batting.getSplits(p).getVsLeft().getWobaPlus(),
+                    batting.getSplits(p).getVsRight().getSlashLine(),
+                    batting.getSplits(p).getVsRight().getWobaPlus(),
+                    batting.getOverall(p).getWobaPlus(),
+                    p.getDefensiveRatings().getPositionScores(),
+                    Joiner.on(',').join(Slot.getPlayerSlots(p))));
+
         }
 
         w.flush();

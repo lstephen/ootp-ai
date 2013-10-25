@@ -142,7 +142,7 @@ public class GenericValueReport {
 
     public void print(PrintWriter w) {
         w.println();
-        w.println(String.format("**%-16s** | %7s %7s %7s ", title, "OVR", "vL/vR", "vRpl"));
+        w.println(String.format("**%-16s** | %7s %7s %7s ", StringUtils.abbreviate(title, 16), "OVR", "vL/vR", "vRpl"));
 
         Iterable<Player> ps = Ordering
             .natural()

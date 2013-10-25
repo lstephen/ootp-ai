@@ -8,13 +8,10 @@ import com.ljs.scratch.ootp.core.Player;
 import com.ljs.scratch.ootp.core.PlayerId;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
-import com.ljs.scratch.ootp.ratings.BattingRatings.BattingRatingsType;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
-import com.ljs.scratch.ootp.ratings.PitchingRatings.PitchingRatingsType;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.ratings.Position;
-import com.ljs.scratch.ootp.ratings.RatingsBuilder;
 import com.ljs.scratch.ootp.ratings.Splits;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.util.ElementsUtil;
@@ -33,6 +30,10 @@ import org.jsoup.select.Elements;
 public class SinglePlayer {
 
     private static final Logger LOG = Logger.getLogger(SinglePlayer.class.getName());
+
+    private static enum BattingRatingsType { CONTACT, GAP, POWER, EYE }
+
+    private static enum PitchingRatingsType { HITS, GAP, TRIPLES, STUFF, CONTROL, MOVEMENT }
 
     private static final ImmutableMap<String, Integer> OOTP5_POTENTIAL =
         ImmutableMap.of(
@@ -211,19 +212,18 @@ public class SinglePlayer {
         if (site.getType() == Version.OOTP5) {
             Elements els = potential.get(0).children();
 
-            return RatingsBuilder
-                .batting()
+            return BattingRatings
+                .builder()
                 .contact(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.CONTACT)))
                 .gap(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.GAP)))
                 .power(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.POWER)))
                 .eye(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.EYE)))
                 .build();
-
         } else {
             BattingRatings unscaled = extractBattingRatings(potential.get(0));
 
-            return RatingsBuilder
-                .batting()
+            return BattingRatings
+                .builder()
                 .contact(scaleOotp6PotentialRating(unscaled.getContact()))
                 .gap(scaleOotp6PotentialRating(unscaled.getGap()))
                 .power(scaleOotp6PotentialRating(unscaled.getPower()))
@@ -442,8 +442,8 @@ public class SinglePlayer {
 
         Elements line = el.children();
 
-        return RatingsBuilder
-            .batting()
+        return BattingRatings
+            .builder()
             .contact(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.CONTACT)))
             .gap(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.GAP)))
             .power(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.POWER)))

@@ -52,7 +52,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTimeConstants;
 
 /**
@@ -110,13 +109,13 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            //( TWML
+            ( TWML
             //( CBL
-            ( HFTC
+            //, HFTC
             //( LBB
             //( BTH
-            //( SAVOY
-            //( TFMS
+            //, SAVOY
+            //, TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -140,9 +139,11 @@ public class Ootp {
 
         final BattingRegression battingRegression = BattingRegression.run(site);
         battingRegression.printCorrelations(out);
+        //battingRegression.printExpectedValues(out);
 
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
         pitchingRegression.printCorrelations(out);
+        //pitchingRegression.printExpectedValues(out);
 
         SplitPercentages pcts = SplitPercentages.create(site);
         pcts.print(out);
@@ -434,7 +435,7 @@ public class Ootp {
         //for (int i = 1; i <= 1; i++) {
             SingleTeam t = site.getSingleTeam(i);
             LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.extractTeamName(), i, site.getNumberOfTeams() });
-            generic.setTitle(StringUtils.abbreviate(t.extractTeamName(), 15));
+            generic.setTitle(t.extractTeamName());
 
             Roster r = t.extractRoster();
 
@@ -551,7 +552,8 @@ public class Ootp {
             idx++;
         }
 
-        /*ImmutableSet<Player> belowReplacementBait =
+        /*LOG.info("Below Replacement Trades...");
+        ImmutableSet<Player> belowReplacementBait =
             ImmutableSet.copyOf(
                 Iterables.filter(
                     Iterables.limit(topBait, newRoster.size() / 10),
@@ -561,7 +563,24 @@ public class Ootp {
                             return tv.getCurrentValueVsReplacement(p) < 0
                                 && tv.getFutureValueVsReplacement(p) < 0;
                         }
-                    }));*/
+                    }));
+
+        idx = 1;
+        for (Trade trade
+            : Iterables.limit(
+                Trade.getTopTrades(
+                    tv,
+                    site,
+                    salaryRegression,
+                    belowReplacementBait,
+                    all),
+                20)) {
+
+            generic.setTitle("BR #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
+            generic.setPlayers(trade);
+            generic.print(out);
+            idx++;
+        }*/
 
         LOG.log(Level.INFO, "Non Top 10 prospects...");
         ImmutableSet<Player> nonTopTens =

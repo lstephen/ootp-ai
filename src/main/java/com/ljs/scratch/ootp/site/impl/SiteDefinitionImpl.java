@@ -66,6 +66,24 @@ public final class SiteDefinitionImpl implements SiteDefinition {
         }
     }
 
+    @Override
+    public Double getYearlyRatingsIncrease() {
+        if (getName().equals("BTH")) {
+            return 8.0;
+        }
+
+        if (getName().equals("TWML")) {
+            return 1.5;
+        }
+
+        return 1.0;
+    }
+
+    @Override
+    public Boolean isFreezeOneRatings() {
+        return type == Version.OOTP6;
+    }
+
     public static SiteDefinitionImpl ootp5(
         String name,
         String siteRoot,

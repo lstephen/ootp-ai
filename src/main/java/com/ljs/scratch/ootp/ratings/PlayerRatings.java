@@ -3,8 +3,6 @@ package com.ljs.scratch.ootp.ratings;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ljs.scratch.ootp.site.SiteDefinition;
-import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.SplitPercentages;
 
 /**
@@ -12,6 +10,8 @@ import com.ljs.scratch.ootp.stats.SplitPercentages;
  * @author lstephen
  */
 public final class PlayerRatings {
+
+    private static final Integer PEAK_AGE = 27;
 
     private final Splits<BattingRatings> batting;
 
@@ -24,10 +24,7 @@ public final class PlayerRatings {
     private PitchingRatings pitchingPotential;
 
     @JsonIgnore
-    private Version siteType;
-
-    @JsonIgnore
-    private SiteDefinition site;
+    private RatingsDefinition definition;
 
     @JsonIgnore
     private static SplitPercentages splitPercentages;
@@ -47,9 +44,8 @@ public final class PlayerRatings {
         PlayerRatings.splitPercentages = splitPercentages;
     }
 
-    public void setSite(SiteDefinition site) {
-        this.site = site;
-        this.siteType = site.getType();
+    public void setDefinition(RatingsDefinition definition) {
+        this.definition = definition;
     }
 
     public DefensiveRatings getDefensive() { return defensive; }
@@ -64,8 +60,8 @@ public final class PlayerRatings {
 
         BattingRatings ovr = getOverallBatting(getBatting());
 
-        BattingRatings capped = RatingsBuilder
-            .batting()
+        BattingRatings capped = BattingRatings
+            .builder()
             .contact(capPotential(age, ovr.getContact(), battingPotential.getContact()))
             .gap(capPotential(age, ovr.getGap(), battingPotential.getGap()))
             .power(capPotential(age, ovr.getPower(), battingPotential.getPower()))
@@ -74,8 +70,8 @@ public final class PlayerRatings {
 
         BattingRatings curVsLeft = getBatting().getVsLeft();
 
-        BattingRatings potVsLeft = RatingsBuilder
-            .batting()
+        BattingRatings potVsLeft = BattingRatings
+            .builder()
             .contact(cap(age, curVsLeft.getContact(), capped.getContact(), ovr.getContact()))
             .gap(cap(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
             .power(cap(age, curVsLeft.getPower(), capped.getPower(), ovr.getPower()))
@@ -84,8 +80,8 @@ public final class PlayerRatings {
 
         BattingRatings curVsRight = getBatting().getVsRight();
 
-        BattingRatings potVsRight = RatingsBuilder
-            .batting()
+        BattingRatings potVsRight = BattingRatings
+            .builder()
             .contact(cap(age, curVsRight.getContact(), capped.getContact(), ovr.getContact()))
             .gap(cap(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
             .power(cap(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
@@ -131,16 +127,8 @@ public final class PlayerRatings {
     }
 
     private int capPotential(int age, int current, int potential) {
-        double factor = 1;
 
-        if (site.getName().equals("TWML")) {
-            factor = 1.5;
-        }
-        if (site.getName().equals("BTH")) {
-            factor = 8;
-        }
-
-        if (siteType == Version.OOTP6 && current == 1) {
+        if (definition.isFreezeOneRatings() && current == 1) {
             return 1;
         }
 
@@ -148,7 +136,13 @@ public final class PlayerRatings {
             return 0;
         }
 
-        return Math.max(current, Math.min(potential, (int) (current + factor * Math.max(27 - age, 0))));
+        Double factor = definition.getYearlyRatingsIncrease();
+
+        return Math.max(
+            current,
+            Math.min(
+                potential,
+                (int) (current + factor * Math.max(PEAK_AGE - age, 0))));
     }
 
     public void setBattingPotential(BattingRatings ratings) {
@@ -160,30 +154,30 @@ public final class PlayerRatings {
     }
 
     public static BattingRatings getOverallBatting(Splits<BattingRatings> splits) {
-        Integer vR = (int) (splitPercentages.getVsRhpPercentage() * 100);
-        Integer vL = (int) (splitPercentages.getVsLhpPercentage() * 100);
+        Integer vR = (int) Math.round(splitPercentages.getVsRhpPercentage() * 1000);
+        Integer vL = 1000 - vR;
 
-        BattingRatings ovr = RatingsBuilder
-            .batting()
-            .contact((vR * splits.getVsRight().getContact() + vL * splits.getVsLeft().getContact()) / 100)
-            .gap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 100)
-            .power((vR * splits.getVsRight().getPower() + vL * splits.getVsLeft().getPower()) / 100)
-            .eye((vR * splits.getVsRight().getEye() + vL * splits.getVsLeft().getEye()) / 100)
+        BattingRatings ovr = BattingRatings
+            .builder()
+            .contact((vR * splits.getVsRight().getContact() + vL * splits.getVsLeft().getContact()) / 1000)
+            .gap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 1000)
+            .power((vR * splits.getVsRight().getPower() + vL * splits.getVsLeft().getPower()) / 1000)
+            .eye((vR * splits.getVsRight().getEye() + vL * splits.getVsLeft().getEye()) / 1000)
             .build();
 
         return ovr;
     }
 
     public static PitchingRatings getOverallPitching(Splits<PitchingRatings> splits) {
-        Integer vR = (int) (splitPercentages.getVsRhbPercentage() * 100);
-        Integer vL = (int) (splitPercentages.getVsLhbPercentage() * 100);
+        Integer vR = (int) Math.round(splitPercentages.getVsRhbPercentage() * 1000);
+        Integer vL = 1000 - vR;
 
         PitchingRatings ovr = new PitchingRatings();
-        ovr.setStuff((vR * splits.getVsRight().getStuff() + vL * splits.getVsLeft().getStuff()) / 100);
-        ovr.setControl((vR * splits.getVsRight().getControl() + vL * splits.getVsLeft().getControl()) / 100);
-        ovr.setMovement((vR * splits.getVsRight().getMovement() + vL * splits.getVsLeft().getMovement()) / 100);
-        ovr.setHits((vR * splits.getVsRight().getHits() + vL * splits.getVsLeft().getHits()) / 100);
-        ovr.setGap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 100);
+        ovr.setStuff((vR * splits.getVsRight().getStuff() + vL * splits.getVsLeft().getStuff()) / 1000);
+        ovr.setControl((vR * splits.getVsRight().getControl() + vL * splits.getVsLeft().getControl()) / 1000);
+        ovr.setMovement((vR * splits.getVsRight().getMovement() + vL * splits.getVsLeft().getMovement()) / 1000);
+        ovr.setHits((vR * splits.getVsRight().getHits() + vL * splits.getVsLeft().getHits()) / 1000);
+        ovr.setGap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 1000);
 
         return ovr;
     }
@@ -192,10 +186,10 @@ public final class PlayerRatings {
         Splits<BattingRatings> batting,
         DefensiveRatings defensive,
         Splits<PitchingRatings> pitching,
-        SiteDefinition site) {
+        RatingsDefinition definition) {
 
         PlayerRatings pr = new PlayerRatings(batting, defensive, pitching);
-        pr.setSite(site);
+        pr.setDefinition(definition);
         return pr;
     }
 

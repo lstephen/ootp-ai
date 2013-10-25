@@ -74,7 +74,7 @@ public final class Player {
     }
 
     public void setSite(SiteDefinition site) {
-        ratings.setSite(site);
+        ratings.setDefinition(site);
     }
 
     public String getName() { return name; }
