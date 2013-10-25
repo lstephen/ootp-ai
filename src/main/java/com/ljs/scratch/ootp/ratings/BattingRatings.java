@@ -2,6 +2,8 @@ package com.ljs.scratch.ootp.ratings;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 /**
@@ -53,6 +55,40 @@ public final class BattingRatings {
     @Override
     public String toString() {
         return ReflectionToStringBuilder.reflectionToString(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (obj == this) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        BattingRatings rhs = BattingRatings.class.cast(obj);
+
+        return new EqualsBuilder()
+            .append(contact, rhs.contact)
+            .append(gap, rhs.gap)
+            .append(power, rhs.power)
+            .append(eye, rhs.eye)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(contact)
+            .append(gap)
+            .append(power)
+            .append(eye)
+            .toHashCode();
     }
 
     public static Builder builder() {

@@ -4,7 +4,6 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
-import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
@@ -79,18 +78,19 @@ public class SinglePlayer {
 
     private final Site site;
 
-    private final Page page;
-
     public SinglePlayer(Site site, PlayerId id) {
         this.id = id;
         this.site = site;
-        page = site.getPage(id.unwrap() + ".html");
+    }
+
+    private Document loadPage() {
+        return site.getPage(id.unwrap() + ".html").load();
     }
 
     public Player extract() {
         Document doc;
         try {
-            doc = page.load();
+            doc = loadPage();
         } catch (Exception e) {
             Throwable root = Throwables.getRootCause(e);
 
@@ -186,7 +186,7 @@ public class SinglePlayer {
     }
 
     private Splits<BattingRatings> extractBattingRatings() {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         Elements ratings = doc.select("tr:has(td:contains(Batting Ratings)) + tr");
 
@@ -203,7 +203,7 @@ public class SinglePlayer {
     }
 
     private BattingRatings extractBattingPotential() {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         Elements ratingsEls = doc.select("tr:has(td:contains(Batting Ratings)) + tr");
 
@@ -303,7 +303,7 @@ public class SinglePlayer {
     }
 
     private DefensiveRatings extractDefensiveRatings() {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         DefensiveRatings ratings = new DefensiveRatings();
 
@@ -340,7 +340,7 @@ public class SinglePlayer {
     }
 
     private Splits<PitchingRatings> extractPitchingRatings() {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         Elements vsLhb = doc.select("tr.g:has(td:contains(Versus LHB))");
         Elements vsRhb = doc.select("tr.g2:has(td:contains(Versus RHB))");
@@ -390,7 +390,7 @@ public class SinglePlayer {
     }
 
     private PitchingRatings extractPitchingPotential() {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         Elements talent = doc.select("tr.g:has(td:contains(Talent))");
 
