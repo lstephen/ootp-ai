@@ -6,7 +6,7 @@ package com.ljs.scratch.ootp.stats;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 

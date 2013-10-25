@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.html.Salary;
 import com.ljs.scratch.ootp.html.Site;

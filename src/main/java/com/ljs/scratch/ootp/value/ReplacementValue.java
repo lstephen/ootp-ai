@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import com.ljs.scratch.ootp.selection.Mode;

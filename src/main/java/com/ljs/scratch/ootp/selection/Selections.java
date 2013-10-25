@@ -5,9 +5,10 @@
 
 package com.ljs.scratch.ootp.selection;
 
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.PlayerId;
 import com.google.common.base.Predicate;
 import com.google.common.collect.*;
-import com.ljs.scratch.ootp.core.*;
 import com.ljs.scratch.ootp.team.Team;
 import java.util.Iterator;
 import java.util.Set;

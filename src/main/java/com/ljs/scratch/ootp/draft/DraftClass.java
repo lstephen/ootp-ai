@@ -6,7 +6,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.util.Jackson;
 import java.io.File;

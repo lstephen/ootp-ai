@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.selection;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;

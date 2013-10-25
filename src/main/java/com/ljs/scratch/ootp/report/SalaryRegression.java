@@ -1,7 +1,7 @@
 package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Strings;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.OutputStream;

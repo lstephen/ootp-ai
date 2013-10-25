@@ -7,7 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.builder.ValidatingBuilder;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 

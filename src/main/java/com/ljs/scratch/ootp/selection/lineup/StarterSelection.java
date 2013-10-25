@@ -7,7 +7,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.Position;

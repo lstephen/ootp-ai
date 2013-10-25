@@ -3,8 +3,8 @@ package com.ljs.scratch.ootp.stats;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.PlayerId;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.PlayerId;
 import java.util.Map;
 
 /**

@@ -9,9 +9,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
-import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.Roster;
-import com.ljs.scratch.ootp.core.Roster.Status;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.roster.Roster;
+import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
@@ -128,7 +128,7 @@ public final class RosterSelection {
             }
             Player p = (Player) i$.next();
             if (((Boolean) p.getOn40Man().or(Boolean.TRUE)).booleanValue()) {
-                r.assign(com.ljs.scratch.ootp.core.Roster.Status.DL,
+                r.assign(com.ljs.scratch.ootp.roster.Roster.Status.DL,
                     new Player[]{
                     p
                 });
@@ -138,10 +138,10 @@ public final class RosterSelection {
 
     public void assignMinors(Roster roster) {
 
-        com.ljs.scratch.ootp.core.Roster.Status level;
+        com.ljs.scratch.ootp.roster.Roster.Status level;
         for (List<Status> remainingLevels = Lists.newArrayList(
-            new com.ljs.scratch.ootp.core.Roster.Status[]{
-            com.ljs.scratch.ootp.core.Roster.Status.AAA, com.ljs.scratch.ootp.core.Roster.Status.AA, com.ljs.scratch.ootp.core.Roster.Status.A
+            new com.ljs.scratch.ootp.roster.Roster.Status[]{
+            com.ljs.scratch.ootp.roster.Roster.Status.AAA, com.ljs.scratch.ootp.roster.Roster.Status.AA, com.ljs.scratch.ootp.roster.Roster.Status.A
         }); !remainingLevels.isEmpty(); remainingLevels.remove(level)) {
             ImmutableSet<Player> availableHitters = Selections.onlyHitters(roster
                 .getUnassigned());

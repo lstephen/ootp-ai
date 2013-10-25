@@ -1,6 +1,6 @@
 package com.ljs.scratch.ootp.draft;
 
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.PrintWriter;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

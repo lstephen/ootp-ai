@@ -1,7 +1,7 @@
 package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.collect.ImmutableMap;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.Position;
 import static com.ljs.scratch.ootp.ratings.Position.CATCHER;

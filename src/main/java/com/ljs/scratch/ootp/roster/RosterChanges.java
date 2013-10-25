@@ -1,9 +1,10 @@
-package com.ljs.scratch.ootp.core;
+package com.ljs.scratch.ootp.roster;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Roster.Status;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.roster.Roster.Status;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;

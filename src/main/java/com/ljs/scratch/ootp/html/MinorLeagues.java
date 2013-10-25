@@ -1,9 +1,9 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.PlayerId;
-import com.ljs.scratch.ootp.core.Roster;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.team.Team;
 import com.ljs.scratch.ootp.team.TeamId;
 import com.ljs.scratch.ootp.html.page.Page;

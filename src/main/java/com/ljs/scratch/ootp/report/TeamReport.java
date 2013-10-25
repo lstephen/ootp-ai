@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.Standings;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;

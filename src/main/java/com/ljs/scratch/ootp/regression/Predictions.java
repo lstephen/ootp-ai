@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.regression;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;

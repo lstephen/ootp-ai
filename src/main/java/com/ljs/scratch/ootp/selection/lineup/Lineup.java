@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.Position;
 import com.ljs.scratch.ootp.stats.BattingStats;

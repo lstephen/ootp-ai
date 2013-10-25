@@ -3,9 +3,8 @@ package com.ljs.scratch.ootp.team;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
-import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.PlayerId;
-import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.PlayerId;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -13,13 +12,13 @@ import java.util.Set;
  *
  * @author lstephen
  */
-public class Team implements Iterable<Player> {
+public final class Team implements Iterable<Player> {
 
     private final Set<Player> players;
 
     private final Set<Player> injured = Sets.newHashSet();
 
-    public Team(Iterable<Player> players) {
+    private Team(Iterable<Player> players) {
         this.players = Sets.newHashSet(players);
     }
 
@@ -57,7 +56,7 @@ public class Team implements Iterable<Player> {
         return ImmutableSet.copyOf(injured);
     }
 
-    public void processManualChanges(Changes changes, Site site) {
+    public void processManualChanges(Changes changes) {
 
         for (Player p : changes.get(Changes.ChangeType.ACQUISITION)) {
             players.add(p);
@@ -77,6 +76,10 @@ public class Team implements Iterable<Player> {
     @Override
     public Iterator<Player> iterator() {
         return players.iterator();
+    }
+
+    public static Team create(Iterable<Player> players) {
+        return new Team(players);
     }
 
 }

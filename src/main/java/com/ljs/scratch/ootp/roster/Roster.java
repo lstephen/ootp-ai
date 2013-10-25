@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.core;
+package com.ljs.scratch.ootp.roster;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
@@ -7,6 +7,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.team.Team;
 import java.io.OutputStream;
 import java.io.PrintWriter;

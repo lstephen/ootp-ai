@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;

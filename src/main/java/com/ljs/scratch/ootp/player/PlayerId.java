@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.core;
+package com.ljs.scratch.ootp.player;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

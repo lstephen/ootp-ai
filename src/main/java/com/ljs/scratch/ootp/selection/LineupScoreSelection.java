@@ -12,7 +12,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.Position;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;

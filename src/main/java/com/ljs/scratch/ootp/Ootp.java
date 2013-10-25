@@ -8,9 +8,9 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.config.Directories;
-import com.ljs.scratch.ootp.core.Player;
-import com.ljs.scratch.ootp.core.Roster;
-import com.ljs.scratch.ootp.core.Roster.Status;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.roster.Roster;
+import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
@@ -154,7 +154,7 @@ public class Ootp {
         LOG.info("Loading manual changes...");
         Changes changes = Changes.load(site);
 
-        team.processManualChanges(changes, site);
+        team.processManualChanges(changes);
 
         LOG.info("Setting up Predictions...");
         final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());

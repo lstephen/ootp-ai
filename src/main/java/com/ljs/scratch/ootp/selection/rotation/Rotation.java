@@ -7,7 +7,7 @@ package com.ljs.scratch.ootp.selection.rotation;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;

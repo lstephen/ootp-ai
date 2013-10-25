@@ -6,7 +6,7 @@ package com.ljs.scratch.ootp.selection.rotation;
 
 import com.google.common.base.Function;
 import com.google.common.collect.*;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;

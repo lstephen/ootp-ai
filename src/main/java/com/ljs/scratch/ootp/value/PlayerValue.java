@@ -1,7 +1,7 @@
 package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
-import com.ljs.scratch.ootp.core.Player;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
