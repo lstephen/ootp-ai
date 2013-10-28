@@ -5,9 +5,10 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.Standings;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
@@ -17,8 +18,6 @@ import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.stats.PitchingStats;
-import com.ljs.scratch.ootp.roster.TeamId;
-import com.ljs.scratch.ootp.roster.TeamId;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -296,6 +295,15 @@ public final class TeamReport {
             return pitching + rotation - 100;
         }
 
+        private Double combine(Double depth, Double strength) {
+            double a = .5 * strength / 100;
+            double b = .5 * 100 / depth;
+
+            double log5 = (a+b) / (a + b - 2*a*b);
+
+            return 100 * log5 / .5;
+        }
+
         /**
          * Assumption - normalized to an average of 100
          * @return
@@ -333,5 +341,4 @@ public final class TeamReport {
         }
 
     }
-
 }

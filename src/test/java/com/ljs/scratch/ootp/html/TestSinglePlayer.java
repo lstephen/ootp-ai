@@ -1,24 +1,18 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.base.Optional;
-import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
-import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import java.io.IOException;
-import java.io.InputStream;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.easymock.EasyMock;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
-import org.powermock.api.easymock.annotation.Mock;
 import org.powermock.api.extension.listener.AnnotationEnabler;
 import org.powermock.core.classloader.annotations.PowerMockListener;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -45,48 +39,37 @@ public class TestSinglePlayer {
 
     private SinglePlayer singlePlayer;
 
-    @Mock
-    private Site site;
-
-    @Mock
-    private SiteDefinition siteDefinition;
-
-    @Mock
-    private Page page;
+    private final MockSite site = new MockSite();
 
     @Before
     public void setUp() {
-        EasyMock
-            .expect(site.getPage(ID.unwrap() + ".html"))
-            .andStubReturn(page);
+        site.expectGetPage(ID.unwrap() + ".html");
 
-        EasyMock.expect(site.getDefinition()).andStubReturn(siteDefinition);
-
-        singlePlayer = new SinglePlayer(site, ID);
+        singlePlayer = new SinglePlayer(site.mock(), ID);
     }
 
     @Test
     public void testOotp5Hitter() throws IOException {
-        EasyMock.expect(page.load()).andStubReturn(loadPage(OOTP5_HITTER));
+        site.onLoadPage(OOTP5_HITTER);
 
-        EasyMock.expect(site.getType()).andStubReturn(Version.OOTP5);
+        site.type(Version.OOTP5);
 
         EasyMock
-            .expect(site.isInjured(EasyMock.notNull(Player.class)))
+            .expect(site.mock().isInjured(EasyMock.notNull(Player.class)))
             .andStubReturn(false);
 
         EasyMock
-            .expect(site.isFutureFreeAgent(EasyMock.notNull(Player.class)))
+            .expect(site.mock().isFutureFreeAgent(EasyMock.notNull(Player.class)))
             .andStubReturn(false);
 
         EasyMock
             .expect(
-                site.getTeamTopProspectPosition(
+                site.mock().getTeamTopProspectPosition(
                     EasyMock.notNull(PlayerId.class)))
             .andStubReturn(Optional.<Integer>absent());
 
         EasyMock
-            .expect(site.getSalary(EasyMock.notNull(Player.class)))
+            .expect(site.mock().getSalary(EasyMock.notNull(Player.class)))
             .andStubReturn("");
 
         PowerMock.replayAll();
@@ -127,27 +110,27 @@ public class TestSinglePlayer {
 
     @Test
     public void testOotp6Hitter() throws IOException {
-        EasyMock.expect(page.load()).andStubReturn(loadPage(OOTP6_HITTER));
+        site.onLoadPage(OOTP6_HITTER);
 
-        EasyMock.expect(site.getName()).andStubReturn("TWML");
-        EasyMock.expect(site.getType()).andStubReturn(Version.OOTP6);
+        site.name("TWML");
+        site.type(Version.OOTP6);
 
         EasyMock
-            .expect(site.isInjured(EasyMock.notNull(Player.class)))
+            .expect(site.mock().isInjured(EasyMock.notNull(Player.class)))
             .andStubReturn(false);
 
         EasyMock
-            .expect(site.isFutureFreeAgent(EasyMock.notNull(Player.class)))
+            .expect(site.mock().isFutureFreeAgent(EasyMock.notNull(Player.class)))
             .andStubReturn(false);
 
         EasyMock
             .expect(
-                site.getTeamTopProspectPosition(
+                site.mock().getTeamTopProspectPosition(
                     EasyMock.notNull(PlayerId.class)))
             .andStubReturn(Optional.<Integer>absent());
 
         EasyMock
-            .expect(site.getSalary(EasyMock.notNull(Player.class)))
+            .expect(site.mock().getSalary(EasyMock.notNull(Player.class)))
             .andStubReturn("");
 
         PowerMock.replayAll();
@@ -175,32 +158,31 @@ public class TestSinglePlayer {
         Assert.assertEquals(
             expectedRatings,
             extracted.getBattingRatings().getVsLeft());
-
     }
 
     @Test
     public void testOotp6Pitcher() throws IOException {
-        EasyMock.expect(page.load()).andStubReturn(loadPage(OOTP6_PITCHER));
+        site.onLoadPage(OOTP6_PITCHER);
 
-        EasyMock.expect(site.getName()).andStubReturn("TWML");
-        EasyMock.expect(site.getType()).andStubReturn(Version.OOTP6);
+        site.name("TWML");
+        site.type(Version.OOTP6);
 
         EasyMock
-            .expect(site.isInjured(EasyMock.notNull(Player.class)))
+            .expect(site.mock().isInjured(EasyMock.notNull(Player.class)))
             .andStubReturn(false);
 
         EasyMock
-            .expect(site.isFutureFreeAgent(EasyMock.notNull(Player.class)))
+            .expect(site.mock().isFutureFreeAgent(EasyMock.notNull(Player.class)))
             .andStubReturn(false);
 
         EasyMock
             .expect(
-                site.getTeamTopProspectPosition(
+                site.mock().getTeamTopProspectPosition(
                     EasyMock.notNull(PlayerId.class)))
             .andStubReturn(Optional.<Integer>absent());
 
         EasyMock
-            .expect(site.getSalary(EasyMock.notNull(Player.class)))
+            .expect(site.mock().getSalary(EasyMock.notNull(Player.class)))
             .andStubReturn("");
 
         PowerMock.replayAll();
@@ -229,22 +211,6 @@ public class TestSinglePlayer {
             expectedRatings,
             extracted.getBattingRatings().getVsLeft());
 
-    }
-
-    private Document loadPage(String name) throws IOException {
-        InputStream in = getClass().getResourceAsStream(name);
-
-        Assert.assertNotNull(in);
-
-        try {
-            Document doc = Jsoup.parse(in, null, "");
-
-            Assert.assertNotNull(doc);
-
-            return doc;
-        } finally {
-            in.close();
-        }
     }
 
 }

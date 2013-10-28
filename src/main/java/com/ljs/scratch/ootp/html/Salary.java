@@ -1,11 +1,12 @@
 package com.ljs.scratch.ootp.html;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.TeamId;
-import com.ljs.scratch.ootp.html.page.Page;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Map;
@@ -19,20 +20,31 @@ import org.jsoup.nodes.Element;
  */
 public class Salary {
 
-    private Site site;
+    private final TeamId team;
 
-    private Page page;
+    private final Site site;
 
     private static final Map<String, Integer> CURRENT_SALARY_CACHE =
         Maps.newHashMap();
 
     public Salary(Site site, TeamId team) {
+        Preconditions.checkNotNull(site);
+        Preconditions.checkNotNull(team);
+
         this.site = site;
-        page = site.getPage("team" + team.unwrap() + "sa.html");
+        this.team = team;
+    }
+
+    private Page getPage() {
+        return site.getPage("team" + team.unwrap() + "sa.html");
+    }
+
+    private Document loadPage() {
+        return getPage().load();
     }
 
     public String getSalary(Player p) {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
             Element a = el.children().select("a").get(0);
@@ -71,7 +83,7 @@ public class Salary {
             return CURRENT_SALARY_CACHE.get(key);
         }
 
-        Document doc = page.load();
+        Document doc = loadPage();
 
         for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
             Element a = el.children().select("a").get(0);
@@ -96,7 +108,7 @@ public class Salary {
     }
 
     public Integer getNextSalary(Player p) {
-        Document doc = page.load();
+        Document doc = loadPage();
 
         for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
             Element a = el.children().select("a").get(0);
@@ -135,6 +147,6 @@ public class Salary {
     }
 
     public Iterable<Player> getSalariedPlayers() {
-        return PlayerList.from(site, page).extract();
+        return PlayerList.from(site, getPage()).extract();
     }
 }

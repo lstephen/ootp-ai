@@ -111,11 +111,11 @@ public class Ootp {
         for (SiteDefinition def : Arrays.asList
             ( TWML
             //( CBL
-            //, HFTC
+            //( HFTC
             //( LBB
             //( BTH
             //( SAVOY
-            //, TFMS
+            //( TFMS
             )) {
             try (
                 FileOutputStream out =

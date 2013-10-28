@@ -175,7 +175,7 @@ public class GenericValueReport {
 
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s%13s | %13s | (%2s) %s",
+                    "%2s %-15s %2d| %3d/%3d %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s%13s | %13s | %2s %5s | %s",
                     p.getPosition(),
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
@@ -193,6 +193,7 @@ public class GenericValueReport {
                     StringUtils.abbreviate(p.getSalary(), 13),
                     salary.predict(p) > 0 ? String.format("$%,d", salary.predict(p)) : "",
                     p.getListedPosition().or(""),
+                    p.getId().unwrap(),
                     p.getTeam() == null ? "" : p.getTeam()));
         }
 
