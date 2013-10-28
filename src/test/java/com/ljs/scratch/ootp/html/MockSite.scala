@@ -5,33 +5,33 @@ import com.ljs.scratch.ootp.html.page.Page
 import com.ljs.scratch.ootp.site.SiteDefinition
 import com.ljs.scratch.ootp.site.Version
 
-import org.easymock.EasyMock.expect
-
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-import org.powermock.api.easymock.PowerMock._
+import org.mockito.Mockito._
 
-class MockSite {
+import org.scalatest.mock.MockitoSugar
 
-    val site = createMock(classOf[Site])
+class MockSite extends MockitoSugar {
 
-    val page = createMock(classOf[Page])
+    val site = mock[Site]
 
-    expect(site.getDefinition).andStubReturn(createMock(classOf[SiteDefinition]))
+    val page = mock[Page]
 
-    val mock = site
+    when(site.getDefinition).thenReturn(mock[SiteDefinition])
 
-    def name(name: String) = expect(site.getName).andStubReturn(name)
+    val toMock = site
 
-    def version(v: Version) = expect(site.getType).andStubReturn(v)
+    def name(name: String) = when(site.getName).thenReturn(name)
+
+    def version(v: Version) = when(site.getType).thenReturn(v)
     def `type`(v: Version) = version(v)
 
     def expectGetPage(url: String) =
-        expect(site.getPage(url)).andStubReturn(page)
+        when(site.getPage(url)).thenReturn(page)
 
     def onLoadPage(url: String) =
-        expect(page.load).andStubReturn(loadPage(url))
+        when(page.load).thenReturn(loadPage(url))
 
 
     private def loadPage(url: String) : Document = {
@@ -50,7 +50,7 @@ class MockSite {
 
 object MockSite {
 
-    implicit def mockToSite(mock: MockSite) : Site = mock.mock
+    implicit def mockToSite(mock: MockSite) : Site = mock.toMock
 
 }
 

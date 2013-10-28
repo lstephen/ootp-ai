@@ -7,22 +7,15 @@ import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.site.Version;
 import java.io.IOException;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.api.extension.listener.AnnotationEnabler;
-import org.powermock.core.classloader.annotations.PowerMockListener;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
 
 /**
  *
  * @author lstephen
  */
-@RunWith(PowerMockRunner.class)
-@PowerMockListener(AnnotationEnabler.class)
 public class TestSinglePlayer {
 
     private static final PlayerId ID =
@@ -45,7 +38,7 @@ public class TestSinglePlayer {
     public void setUp() {
         site.expectGetPage(ID.unwrap() + ".html");
 
-        singlePlayer = new SinglePlayer(site.mock(), ID);
+        singlePlayer = new SinglePlayer(site.toMock(), ID);
     }
 
     @Test
@@ -54,29 +47,25 @@ public class TestSinglePlayer {
 
         site.type(Version.OOTP5);
 
-        EasyMock
-            .expect(site.mock().isInjured(EasyMock.notNull(Player.class)))
-            .andStubReturn(false);
+        Mockito
+            .when(site.toMock().isInjured(Mockito.notNull(Player.class)))
+            .thenReturn(false);
 
-        EasyMock
-            .expect(site.mock().isFutureFreeAgent(EasyMock.notNull(Player.class)))
-            .andStubReturn(false);
+        Mockito
+            .when(site.toMock().isFutureFreeAgent(Mockito.notNull(Player.class)))
+            .thenReturn(false);
 
-        EasyMock
-            .expect(
-                site.mock().getTeamTopProspectPosition(
-                    EasyMock.notNull(PlayerId.class)))
-            .andStubReturn(Optional.<Integer>absent());
+        Mockito
+            .when(
+                site.toMock().getTeamTopProspectPosition(
+                    Mockito.notNull(PlayerId.class)))
+            .thenReturn(Optional.<Integer>absent());
 
-        EasyMock
-            .expect(site.mock().getSalary(EasyMock.notNull(Player.class)))
-            .andStubReturn("");
-
-        PowerMock.replayAll();
+        Mockito
+            .when(site.toMock().getSalary(Mockito.notNull(Player.class)))
+            .thenReturn("");
 
         Player extracted = singlePlayer.extract();
-
-        PowerMock.verifyAll();
 
         Assert.assertEquals("Andrew Whetzel", extracted.getName());
         Assert.assertEquals(32, extracted.getAge());
@@ -115,29 +104,25 @@ public class TestSinglePlayer {
         site.name("TWML");
         site.type(Version.OOTP6);
 
-        EasyMock
-            .expect(site.mock().isInjured(EasyMock.notNull(Player.class)))
-            .andStubReturn(false);
+        Mockito
+            .when(site.toMock().isInjured(Mockito.notNull(Player.class)))
+            .thenReturn(false);
 
-        EasyMock
-            .expect(site.mock().isFutureFreeAgent(EasyMock.notNull(Player.class)))
-            .andStubReturn(false);
+        Mockito
+            .when(site.toMock().isFutureFreeAgent(Mockito.notNull(Player.class)))
+            .thenReturn(false);
 
-        EasyMock
-            .expect(
-                site.mock().getTeamTopProspectPosition(
-                    EasyMock.notNull(PlayerId.class)))
-            .andStubReturn(Optional.<Integer>absent());
+        Mockito
+            .when(
+                site.toMock().getTeamTopProspectPosition(
+                    Mockito.notNull(PlayerId.class)))
+            .thenReturn(Optional.<Integer>absent());
 
-        EasyMock
-            .expect(site.mock().getSalary(EasyMock.notNull(Player.class)))
-            .andStubReturn("");
-
-        PowerMock.replayAll();
+        Mockito
+            .when(site.toMock().getSalary(Mockito.notNull(Player.class)))
+            .thenReturn("");
 
         Player extracted = singlePlayer.extract();
-
-        PowerMock.verifyAll();
 
         Assert.assertEquals("Victor Plata", extracted.getName());
         Assert.assertEquals(31, extracted.getAge());
@@ -167,29 +152,25 @@ public class TestSinglePlayer {
         site.name("TWML");
         site.type(Version.OOTP6);
 
-        EasyMock
-            .expect(site.mock().isInjured(EasyMock.notNull(Player.class)))
-            .andStubReturn(false);
+        Mockito
+            .when(site.toMock().isInjured(Mockito.notNull(Player.class)))
+            .thenReturn(false);
 
-        EasyMock
-            .expect(site.mock().isFutureFreeAgent(EasyMock.notNull(Player.class)))
-            .andStubReturn(false);
+        Mockito
+            .when(site.toMock().isFutureFreeAgent(Mockito.notNull(Player.class)))
+            .thenReturn(false);
 
-        EasyMock
-            .expect(
-                site.mock().getTeamTopProspectPosition(
-                    EasyMock.notNull(PlayerId.class)))
-            .andStubReturn(Optional.<Integer>absent());
+        Mockito
+            .when(
+                site.toMock().getTeamTopProspectPosition(
+                    Mockito.notNull(PlayerId.class)))
+            .thenReturn(Optional.<Integer>absent());
 
-        EasyMock
-            .expect(site.mock().getSalary(EasyMock.notNull(Player.class)))
-            .andStubReturn("");
-
-        PowerMock.replayAll();
+        Mockito
+            .when(site.toMock().getSalary(Mockito.notNull(Player.class)))
+            .thenReturn("");
 
         Player extracted = singlePlayer.extract();
-
-        PowerMock.verifyAll();
 
         Assert.assertEquals("Isidoro Amell", extracted.getName());
         Assert.assertEquals(30, extracted.getAge());
