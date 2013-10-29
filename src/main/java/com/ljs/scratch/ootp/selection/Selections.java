@@ -12,6 +12,7 @@ import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
 import java.util.Iterator;
 import java.util.Set;
+import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection:
 //            Selection
@@ -71,12 +72,15 @@ public final class Selections {
         new Predicate<Player>() {
             @Override
             public boolean apply(Player p) {
+                Assertions.assertThat(p).isNotNull();
                 return Selections.isHitter(p);
             }};
 
     private static final Predicate<Player> IS_PITCHER =
         new Predicate<Player>() {
+            @Override
             public boolean apply(Player p) {
+                Assertions.assertThat(p).isNotNull();
                 return Selections.isPitcher(p);
             }};
 
@@ -84,6 +88,7 @@ public final class Selections {
         new Predicate<Player>() {
             @Override
             public boolean apply(Player p) {
+                Assertions.assertThat(p).isNotNull();
                 return p.getOn40Man().or(Boolean.TRUE);
             }};
 

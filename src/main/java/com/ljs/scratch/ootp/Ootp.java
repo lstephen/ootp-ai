@@ -128,7 +128,7 @@ public class Ootp {
     private void run(SiteDefinition def, OutputStream out) throws IOException {
         LOG.log(Level.INFO, "Running for {0}...", def.getName());
 
-        final Site site = new Site(def);
+        final Site site = Site.create(def);
 
         LOG.log(Level.INFO, "Extracting current roster and team...");
 
@@ -189,6 +189,17 @@ public class Ootp {
             maxRosterSize = 100;
         }
 
+        if (oldRoster.size() > maxRosterSize) {
+            for (int i = 0; i < 2; i++) {
+                Optional<Player> release = fas.getPlayerToRelease(team);
+
+                if (release.isPresent()) {
+                    team.remove(release.get());
+                    released.add(release.get());
+                }
+            }
+        }
+
         if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
             && site.getDate().getMonthOfYear() > DateTimeConstants.MARCH
             && !battingRegression.isEmpty()
@@ -196,16 +207,7 @@ public class Ootp {
 
             LOG.info("Determining FA acquisition...");
 
-            if (oldRoster.size() > maxRosterSize) {
-                for (int i = 0; i < 2; i++) {
-                    Optional<Player> release = fas.getPlayerToRelease(team);
-
-                    if (release.isPresent()) {
-                        team.remove(release.get());
-                        released.add(release.get());
-                    }
-                }
-            } else {
+            if (oldRoster.size() <= maxRosterSize) {
                 fa = fas.getTopAcquisition(team);
 
                 if (fa.isPresent()) {

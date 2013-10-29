@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
         <action>
-            <actionName>CUSTOM-site</actionName>
-            <displayName>site</displayName>
-            <goals>
-                <goal>site:site</goal>
-            </goals>
-        </action>
-        <action>
-            <actionName>CUSTOM-clean site</actionName>
-            <displayName>clean site</displayName>
+            <actionName>CUSTOM-sonar</actionName>
+            <displayName>sonar</displayName>
             <goals>
                 <goal>clean</goal>
-                <goal>site:site</goal>
+                <goal>install</goal>
+                <goal>sonar:sonar</goal>
             </goals>
+            <properties>
+                <maven.test.failure.ignore>true</maven.test.failure.ignore>
+            </properties>
         </action>
+        
     </actions>

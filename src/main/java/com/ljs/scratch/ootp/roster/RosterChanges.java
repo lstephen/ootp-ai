@@ -8,6 +8,7 @@ import com.ljs.scratch.ootp.roster.Roster.Status;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
+import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -61,6 +62,7 @@ public class RosterChanges {
                 .onResultOf(new Function<RosterChange, Status>() {
                     @Override
                     public Status apply(RosterChange change) {
+                        Assertions.assertThat(change).isNotNull();
                         return change.from;
                     }
                 })
@@ -70,6 +72,7 @@ public class RosterChanges {
                     .onResultOf(new Function<RosterChange, Status>() {
                         @Override
                         public Status apply(RosterChange change) {
+                            Assertions.assertThat(change).isNotNull();
                             return change.to;
                         }
                     }));

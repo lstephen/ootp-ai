@@ -6,16 +6,16 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.html.page.Page;
+import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
-import com.ljs.scratch.ootp.html.page.Page;
-import com.ljs.scratch.ootp.html.page.PageFactory;
+import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
-import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
 import java.util.Arrays;
 import java.util.Set;
 import org.joda.time.LocalDate;
@@ -26,29 +26,26 @@ import org.joda.time.LocalDate;
  */
 public class Site {
 
-    private final SiteDefinition def;
-
-    private final TeamId team;
+    private final SiteDefinition definition;
 
     private ImmutableSet<PlayerId> futureFas;
 
     private ImmutableSet<PlayerId> injured;
 
-    public Site(SiteDefinition def) {
-        this.def = def;
-        this.team = def.getTeam();
+    private Site(SiteDefinition def) {
+        this.definition = def;
     }
 
     public SiteDefinition getDefinition() {
-        return def;
+        return definition;
     }
     
     public String getName() {
-        return def.getName();
+        return definition.getName();
     }
 
     public Version getType() {
-        return def.getType();
+        return definition.getType();
     }
 
     public LocalDate getDate() {
@@ -56,15 +53,15 @@ public class Site {
     }
 
     public PitcherOverall getPitcherSelectionMethod() {
-        return def.getPitcherSelectionMethod();
+        return definition.getPitcherSelectionMethod();
     }
 
     public int getNumberOfTeams() {
-        return def.getNumberOfTeams();
+        return definition.getNumberOfTeams();
     }
 
     public Page getPage(String url) {
-        return PageFactory.create(def.getSiteRoot(), url);
+        return PageFactory.create(definition.getSiteRoot(), url);
     }
 
     public PlayerList getDraft() {
@@ -76,15 +73,15 @@ public class Site {
     }
 
     public LeagueBatting getLeagueBatting() {
-        return new LeagueBatting(this, def.getLeague());
+        return new LeagueBatting(this, definition.getLeague());
     }
 
     public LeaguePitching getLeaguePitching() {
-        return new LeaguePitching(this, def.getLeague());
+        return new LeaguePitching(this, definition.getLeague());
     }
 
     public MinorLeagues getMinorLeagues() {
-        return getMinorLeagues(team);
+        return getMinorLeagues(definition.getTeam());
     }
 
     public MinorLeagues getMinorLeagues(TeamId id) {
@@ -96,7 +93,7 @@ public class Site {
     }
 
     public Salary getSalary() {
-        return getSalary(team);
+        return getSalary(definition.getTeam());
     }
 
     public Salary getSalary(TeamId id) {
@@ -141,7 +138,7 @@ public class Site {
     }
 
     public SingleTeam getSingleTeam() {
-        return getSingleTeam(team);
+        return getSingleTeam(definition.getTeam());
     }
 
     public SingleTeam getSingleTeam(TeamId id) {
@@ -157,15 +154,15 @@ public class Site {
     }
 
     public TeamBatting getTeamBatting() {
-        return new TeamBatting(this, team);
+        return new TeamBatting(this, definition.getTeam());
     }
 
     public TeamPitching getTeamPitching() {
-        return new TeamPitching(this, team);
+        return new TeamPitching(this, definition.getTeam());
     }
 
     public TeamRatings getTeamRatings() {
-        return getTeamRatings(team);
+        return getTeamRatings(definition.getTeam());
     }
 
     public TeamRatings getTeamRatings(Integer teamId) {
@@ -244,6 +241,10 @@ public class Site {
 
     public Roster extractRoster() {
         return getSingleTeam().extractRoster();
+    }
+
+    public static Site create(SiteDefinition definition) {
+        return new Site(definition);
     }
 
 }

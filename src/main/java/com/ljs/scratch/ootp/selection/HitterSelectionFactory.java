@@ -6,6 +6,7 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
+import org.fest.assertions.api.Assertions;
 
 public final class HitterSelectionFactory implements SelectionFactory {
 
@@ -57,6 +58,7 @@ public final class HitterSelectionFactory implements SelectionFactory {
         return new Function<Player, Double>() {
             @Override
             public Double apply(Player p) {
+                Assertions.assertThat(p).isNotNull();
                 return batting.getOverall(p).getWoba();
             }
         };

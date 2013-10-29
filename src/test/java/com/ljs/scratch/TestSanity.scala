@@ -5,14 +5,15 @@
 
 package com.ljs.scratch
 
-import org.junit._
-import Assert._
+import org.fest.assertions.api.Assertions._
+
+import org.junit.Test
 
 class TestSanity {
 
     @Test
-    def example = {
-        assertTrue(true)
+    def sanity : Unit = {
+        assertThat(true).isTrue
     }
 
 }

@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -288,18 +289,18 @@ public final class TeamReport {
         }
 
         public Double getOverallBatting() {
-            return batting + lineup - 100;
+            return combine(batting, lineup);
         }
 
         public Double getOverallPitching() {
-            return pitching + rotation - 100;
+            return combine(pitching, rotation);
         }
 
         private Double combine(Double depth, Double strength) {
-            double a = .5 * strength / 100;
-            double b = .5 * 100 / depth;
+            double a = .5 * depth / 100;
+            double b = .5 * 100 / strength;
 
-            double log5 = (a+b) / (a + b - 2*a*b);
+            double log5 = (a - a*b) / (a + b - 2*a*b);
 
             return 100 * log5 / .5;
         }
@@ -334,11 +335,16 @@ public final class TeamReport {
                 .natural()
                 .reverse()
                 .onResultOf(new Function<TeamScore, Double>() {
+                    @Override
                     public Double apply(TeamScore score) {
+                        Assertions.assertThat(score).isNotNull();
+
                         return score.getExpectedWinningPercentage(rpg);
                     }
                 });
         }
 
     }
+
 }
+

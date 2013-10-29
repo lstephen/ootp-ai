@@ -6,7 +6,8 @@ import com.ljs.scratch.ootp.roster.TeamId
 
 import org.apache.commons.lang3.RandomStringUtils._
 
-import org.junit._
+import org.fest.assertions.api.Assertions._
+
 import org.junit.runner.RunWith
 
 import org.scalatest.FlatSpec
@@ -28,7 +29,7 @@ class TestSalary extends FlatSpec {
 
         val result = salary.getSalary(player)
 
-        assert(result == "$4,200,000  ")
+        assertThat(result).isEqualTo("$4,200,000  ");
     }
 
 }

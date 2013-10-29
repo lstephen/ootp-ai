@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -262,6 +263,8 @@ public final class Player {
             .onResultOf(new Function<Player, Integer>() {
                 @Override
                 public Integer apply(Player p) {
+                    Assertions.assertThat(p).isNotNull();
+
                     return p.getAge();
                 }
             });
@@ -273,6 +276,8 @@ public final class Player {
             .onResultOf(new Function<Player, String>() {
                 @Override
                 public String apply(Player p) {
+                    Assertions.assertThat(p).isNotNull();
+
                     return p.getShortName();
                 }
             });
@@ -283,7 +288,10 @@ public final class Player {
             .natural()
             .reverse()
             .onResultOf(new Function<Player, Double>() {
+                @Override
                 public Double apply(Player p) {
+                    Assertions.assertThat(p).isNotNull();
+
                     BattingRatings ratings =
                         PlayerRatings.getOverallBatting(p.getBattingRatings());
 

@@ -15,7 +15,7 @@ public final class ConstraintViolations {
         return new Function<ConstraintViolation<T>, String>() {
             @Override
             public String apply(ConstraintViolation<T> violation) {
-                return violation.getMessage();
+                return violation == null ? "" : violation.getMessage();
             }};
     }
 

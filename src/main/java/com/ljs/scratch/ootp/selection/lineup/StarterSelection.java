@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection.lineup:
 //            Lineup
@@ -154,15 +155,18 @@ public class StarterSelection {
         return Ordering.natural().reverse().onResultOf(
             new Function<Player, Double>() {
             public Double apply(Player p) {
-                BattingRatings ratings = (BattingRatings) p.getBattingRatings()
-                    .getVsRight();
+                Assertions.assertThat(p).isNotNull();
+
+                BattingRatings ratings = p.getBattingRatings().getVsRight();
+
                 if (vs == Lineup.VsHand.VS_LHP) {
                     ratings = (BattingRatings) p.getBattingRatings().getVsLeft();
                 }
-                return Double.valueOf(0.69999999999999996D * (double) ratings
-                    .getEye() + 0.90000000000000002D * (double) ratings
-                    .getContact() + 1.3D * (double) ratings.getGap() + 2D *
-                    (double) ratings.getPower());
+
+                return Double.valueOf(0.7 * ratings.getEye()
+                    + 0.9 * ratings.getContact()
+                    + 1.3 * ratings.getGap()
+                    + 2.0 * ratings.getPower());
             }
         });
     }

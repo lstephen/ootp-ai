@@ -6,17 +6,19 @@
 package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.collect.ImmutableSet;
+import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection.lineup:
 //            AllLineups, StarterSelection, Lineup, LineupOrdering, 
 //            DefenseSelection
 
-public class LineupSelection
-{
+public class LineupSelection {
 
-    public LineupSelection(TeamStats predictions)
-    {
+    private final TeamStats<BattingStats> predictions;
+
+    public LineupSelection(TeamStats<BattingStats> predictions) {
         this.predictions = predictions;
     }
 
@@ -30,17 +32,21 @@ public class LineupSelection
         return all;
     }
 
-    private Lineup selectWithoutDh(Lineup.VsHand vs, Iterable available)
-    {
+    private Lineup selectWithoutDh(Lineup.VsHand vs, Iterable<Player> available) {
         StarterSelection ss = new StarterSelection(predictions);
-        ImmutableSet withoutDhStarters = ImmutableSet.copyOf((new StarterSelection(predictions)).select(vs, available));
+
+        ImmutableSet withoutDhStarters =
+            ImmutableSet.copyOf(ss.select(vs, available));
+
         return arrange(vs, withoutDhStarters);
     }
 
-    private Lineup selectWithDh(Lineup.VsHand vs, Iterable available)
-    {
+    private Lineup selectWithDh(Lineup.VsHand vs, Iterable<Player> available) {
         StarterSelection ss = new StarterSelection(predictions);
-        ImmutableSet withDhStarters = ImmutableSet.copyOf((new StarterSelection(predictions)).selectWithDh(vs, available));
+
+        ImmutableSet withDhStarters =
+            ImmutableSet.copyOf(ss.selectWithDh(vs, available));
+
         return arrange(vs, withDhStarters);
     }
 
@@ -52,5 +58,4 @@ public class LineupSelection
         return lineup;
     }
 
-    private final TeamStats predictions;
 }

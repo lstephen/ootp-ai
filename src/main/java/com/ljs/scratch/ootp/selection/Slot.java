@@ -18,6 +18,7 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.Position;
 import java.util.List;
+import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection:
 //            Selections
@@ -83,6 +84,8 @@ public enum Slot {
                 new Function<Position, Slot>() {
 
                     public Slot apply(Position p) {
+                        Assertions.assertThat(p).isNotNull();
+
                         switch(p) {
                             case CATCHER:
                                 return Slot.C;

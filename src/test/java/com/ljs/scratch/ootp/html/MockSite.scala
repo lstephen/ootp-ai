@@ -18,9 +18,9 @@ class MockSite extends MockitoSugar {
 
     val page = mock[Page]
 
-    when(site.getDefinition).thenReturn(mock[SiteDefinition])
-
     val toMock = site
+
+    when(site.getDefinition).thenReturn(mock[SiteDefinition])
 
     def name(name: String) = when(site.getName).thenReturn(name)
 

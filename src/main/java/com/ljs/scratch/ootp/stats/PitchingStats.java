@@ -82,7 +82,8 @@ public class PitchingStats implements Stats<PitchingStats> {
         if (atBats - strikeouts - homeRuns == 0) {
             return 0;
         } else {
-            return (hits - homeRuns) / (atBats - strikeouts - homeRuns);
+            return (double) (hits - homeRuns)
+                / (atBats - strikeouts - homeRuns);
         }
     }
 

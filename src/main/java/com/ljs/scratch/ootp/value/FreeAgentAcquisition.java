@@ -2,6 +2,7 @@ package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
 import com.ljs.scratch.ootp.player.Player;
+import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -37,6 +38,7 @@ public class FreeAgentAcquisition {
             return new Function<FreeAgentAcquisition, Player>() {
                 @Override
                 public Player apply(FreeAgentAcquisition faa) {
+                    Assertions.assertThat(faa).isNotNull();
                     return faa.getRelease();
                 }
             };
