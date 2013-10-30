@@ -102,8 +102,6 @@ public class DepthChartSelection {
 
             Long primaryPct = remaining - Math.round(pct * remaining);
 
-            System.out.println("rem:" + remaining + " pct:" + pct + " prim:" + primaryPct);
-
             if (backups.contains(primary)) {
                 dc.addBackup(position, primary, Math.max(primaryPct, 1));
 
