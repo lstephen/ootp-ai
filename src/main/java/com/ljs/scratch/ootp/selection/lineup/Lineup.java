@@ -105,7 +105,7 @@ public class Lineup implements Iterable<Lineup.Entry> {
     public Iterator<Entry> iterator() {
         return Lists
             .transform(
-                ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9),
+                ImmutableList.of(0, 1, 2, 3, 4, 5, 6, 7, 8),
                 new Function<Integer, Entry>() {
                     public Entry apply(Integer i) {
                         return getEntry(i);

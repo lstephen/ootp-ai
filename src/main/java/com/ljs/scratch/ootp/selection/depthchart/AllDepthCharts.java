@@ -1,0 +1,49 @@
+package com.ljs.scratch.ootp.selection.depthchart;
+
+import com.ljs.scratch.ootp.selection.All;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import org.fest.assertions.api.Assertions;
+
+/**
+ *
+ * @author lstephen
+ */
+public final class AllDepthCharts {
+
+    private final All<DepthChart> all;
+
+    private AllDepthCharts(All<DepthChart> all) {
+        Assertions.assertThat(all).isNotNull();
+
+        this.all = all;
+    }
+
+    public static AllDepthCharts create(All<DepthChart> all) {
+        return new AllDepthCharts(all);
+    }
+
+    public void print(OutputStream out) {
+        print(new PrintWriter(out));
+    }
+
+    public void print(PrintWriter w) {
+        w.println();
+        w.println("vs RHP");
+        all.getVsRhp().print(w);
+
+        w.println();
+        w.println("vs RHP+DH");
+        all.getVsRhpPlusDh().print(w);
+
+        w.println();
+        w.println("vs LHP");
+        all.getVsLhp().print(w);
+
+        w.println();
+        w.println("vs LHP+DH");
+        all.getVsLhpPlusDh().print(w);
+
+        w.flush();
+    }
+}

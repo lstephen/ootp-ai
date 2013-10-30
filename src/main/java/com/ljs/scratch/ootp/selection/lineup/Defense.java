@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public final class Defense {
 
-    private ImmutableMap<Player, Position> defense;
+    private final ImmutableMap<Player, Position> defense;
 
     private Defense(Map<Player, Position> defense) {
         this.defense = ImmutableMap.copyOf(defense);
@@ -31,6 +31,16 @@ public final class Defense {
 
     public Position getPosition(Player p) {
         return defense.get(p);
+    }
+
+    public Player getPlayer(Position pos) {
+        for (Map.Entry<Player, Position> entry : defense.entrySet()) {
+            if (entry.getValue().equals(pos)) {
+                return entry.getKey();
+            }
+        }
+
+        throw new IllegalStateException();
     }
 
     public static Defense create(Map<Player, Position> defense) {
@@ -52,7 +62,7 @@ public final class Defense {
         return total;
     }
 
-    private static Double getPositionFactor(Position p) {
+    public static Double getPositionFactor(Position p) {
         switch (p) {
             case CATCHER:
             case SHORTSTOP:

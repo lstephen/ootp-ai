@@ -29,6 +29,8 @@ import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.selection.depthchart.AllDepthCharts;
+import com.ljs.scratch.ootp.selection.depthchart.DepthChartSelection;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
 import com.ljs.scratch.ootp.selection.lineup.LineupSelection;
 import com.ljs.scratch.ootp.selection.rotation.Rotation;
@@ -111,11 +113,11 @@ public class Ootp {
         for (SiteDefinition def : Arrays.asList
             ( TWML
             //( CBL
-            //( HFTC
+            , HFTC
             //( LBB
             //( BTH
             //( SAVOY
-            //( TFMS
+            , TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -288,6 +290,14 @@ public class Ootp {
                 .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         lineups.print(out);
+
+        LOG.log(Level.INFO, "Choosing Depth Charts...");
+
+        AllDepthCharts depthCharts = DepthChartSelection
+            .create(battingRegression.predict(newRoster.getAllPlayers()))
+            .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
+
+        depthCharts.print(out);
 
         //LOG.log(Level.INFO, "New lineups test...");
         //new LineupScoreSelection(pcts, ps, out).select(changes.get(ChangeType.FORCE_ML), Selections.onlyHitters(newRoster.getAllPlayers()));

@@ -1,60 +1,46 @@
 package com.ljs.scratch.ootp.selection.lineup;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.selection.All;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
+import org.fest.assertions.api.Assertions;
 
-public class AllLineups implements Iterable<Lineup> {
+public final class AllLineups implements Iterable<Lineup> {
 
     private static final Integer LINEUP_SIZE = 9;
     private static final String LINEUP_ENTRY_FORMAT = "%2s %-15s";
 
-    private Lineup vsRhp;
-    private Lineup vsRhpPlusDh;
-    private Lineup vsLhp;
-    private Lineup vsLhpPlusDh;
+    private final All<Lineup> all;
 
-    public Lineup getVsRhp() {
-        return vsRhp;
+    private AllLineups(All<Lineup> all) {
+        Assertions.assertThat(all).isNotNull();
+
+        this.all = all;
     }
 
-    public void setVsRhp(Lineup vsRhp) {
-        this.vsRhp = vsRhp;
+    public Lineup getVsRhp() {
+        return all.getVsRhp();
     }
 
     public Lineup getVsRhpPlusDh() {
-        return vsRhpPlusDh;
-    }
-
-    public void setVsRhpPlusDh(Lineup vsRhpPlusDh) {
-        this.vsRhpPlusDh = vsRhpPlusDh;
+        return all.getVsRhpPlusDh();
     }
 
     public Lineup getVsLhp() {
-        return vsLhp;
-    }
-
-    public void setVsLhp(Lineup vsLhp) {
-        this.vsLhp = vsLhp;
+        return all.getVsLhp();
     }
 
     public Lineup getVsLhpPlusDh() {
-        return vsLhpPlusDh;
-    }
-
-    public void setVsLhpPlusDh(Lineup vsLhpPlusDh) {
-        this.vsLhpPlusDh = vsLhpPlusDh;
+        return all.getVsLhpPlusDh();
     }
 
     @Override
     public Iterator<Lineup> iterator() {
-        return ImmutableList
-            .of(vsRhp, vsRhpPlusDh, vsLhp, vsLhpPlusDh)
-            .iterator();
+        return all.iterator();
     }
 
     public Iterable<Player> getAllPlayers() {
@@ -107,14 +93,18 @@ public class AllLineups implements Iterable<Lineup> {
                 String.format(
                     "%d. %-19s %-19s %-19s %-19s",
                     Integer.valueOf(i + 1),
-                    vsRhp.getEntry(i).format(LINEUP_ENTRY_FORMAT),
-                    vsRhpPlusDh.getEntry(i).format(LINEUP_ENTRY_FORMAT),
-                    vsLhp.getEntry(i).format(LINEUP_ENTRY_FORMAT),
-                    vsLhpPlusDh.getEntry(i).format(LINEUP_ENTRY_FORMAT)
+                    all.getVsRhp().getEntry(i).format(LINEUP_ENTRY_FORMAT),
+                    all.getVsRhpPlusDh().getEntry(i).format(LINEUP_ENTRY_FORMAT),
+                    all.getVsLhp().getEntry(i).format(LINEUP_ENTRY_FORMAT),
+                    all.getVsLhpPlusDh().getEntry(i).format(LINEUP_ENTRY_FORMAT)
                 ));
         }
 
         w.flush();
+    }
+
+    public static AllLineups create(All<Lineup> all) {
+        return new AllLineups(all);
     }
 
 }
