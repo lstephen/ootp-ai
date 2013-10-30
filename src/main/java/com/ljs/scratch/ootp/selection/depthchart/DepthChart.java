@@ -1,12 +1,17 @@
 package com.ljs.scratch.ootp.selection.depthchart;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.Position;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,9 +25,7 @@ public class DepthChart {
 
     private final Map<Position, Player> defenders = Maps.newHashMap();
 
-    private final Map<Position, Player> backups = Maps.newHashMap();
-
-    private final Map<Position, Integer> backupPercentage = Maps.newHashMap();
+    private final List<Backup> backups = Lists.newArrayList();
 
     public void setStarter(Position position, Player player) {
         starters.put(position, player);
@@ -40,17 +43,20 @@ public class DepthChart {
         return Optional.fromNullable(defenders.get(position));
     }
 
-    public void setBackup(Position position, Player player, Number pct) {
-        backups.put(position, player);
-        backupPercentage.put(position, pct.intValue());
+    public void addBackup(Position position, Player player, Number pct) {
+        backups.add(Backup.create(position, player, pct.intValue()));
     }
 
-    private Player getBackup(Position position) {
-        return backups.get(position);
-    }
+    private Iterable<Backup> getBackups(Position position) {
+        List<Backup> result = Lists.newArrayList();
 
-    private Integer getBackupPercentage(Position position) {
-        return backupPercentage.get(position);
+        for (Backup bu : backups) {
+            if (bu.position == position) {
+                result.add(bu);
+            }
+        }
+
+        return result;
     }
 
     public void print(PrintWriter w) {
@@ -62,17 +68,49 @@ public class DepthChart {
 
             w.println(
                 String.format(
-                    "%2s: %-15s DR: %-15s BU: %-15s (%2d%%)",
+                    "%2s: %-15s DR: %-15s BU: %s",
                     p.getAbbreviation(),
                     StringUtils.abbreviate(getStarter(p).getShortName(), 15),
                     dr.isPresent() ? StringUtils.abbreviate(dr.get().getShortName(), 15) : "",
-                    StringUtils.abbreviate(getBackup(p).getShortName(), 15),
-                    getBackupPercentage(p)
-                ));
+                    Joiner.on(' ').join(Iterables.transform(getBackups(p), Backup.format()))));
             w.flush();
         }
 
         w.flush();
+    }
+
+    private static class Backup {
+
+        private final Position position;
+
+        private final Player player;
+
+        private final Integer percentage;
+
+        private Backup(Position position, Player player, Integer percentage) {
+            this.position = position;
+            this.player = player;
+            this.percentage = percentage;
+        }
+
+        public static Function<Backup, String> format() {
+            return new Function<Backup, String>() {
+                @Override
+                public String apply(Backup bu) {
+                    return String.format(
+                        "(%2d%%) %-15s",
+                        bu.percentage,
+                        StringUtils.abbreviate(bu.player.getShortName(), 15));
+                }
+            };
+        }
+
+        public static Backup create(
+            Position position, Player player, Integer percentage) {
+
+            return new Backup(position, player, percentage);
+        }
+
     }
 
 }

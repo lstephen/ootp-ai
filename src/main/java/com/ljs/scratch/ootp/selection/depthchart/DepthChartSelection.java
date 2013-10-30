@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
@@ -15,6 +16,10 @@ import com.ljs.scratch.ootp.selection.lineup.Defense;
 import com.ljs.scratch.ootp.selection.lineup.Lineup;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.fest.util.Lists;
 
 /**
  *
@@ -83,9 +88,48 @@ public class DepthChartSelection {
             : Optional.<Player>absent();
     }
 
-    private void selectBackup(DepthChart dc, Position position, Iterable<Player> bench, final Lineup.VsHand vs) {
+    private void selectBackup(DepthChart dc, Position position, Iterable<Player> bench, Lineup.VsHand vs) {
 
-        Double factor = 0.0;
+        Player starter = dc.getStarter(position);
+        Set<Player> backups = ImmutableSet.copyOf(Iterables.limit(selectBackups(position, bench, vs), 3));
+
+        Player primary = starter;
+
+        Long remaining = 100L;
+
+        for (Player backup : backups) {
+            Double pct = calculateBackupPct(position, primary, backup, vs);
+
+            Long primaryPct = remaining - Math.round(pct * remaining);
+
+            System.out.println("rem:" + remaining + " pct:" + pct + " prim:" + primaryPct);
+
+            if (backups.contains(primary)) {
+                dc.addBackup(position, primary, Math.max(primaryPct, 1));
+
+            }
+
+            remaining -= primaryPct;
+            primary = backup;
+        }
+
+        dc.addBackup(position, primary, Math.max(remaining, 1));
+    }
+
+    private Double calculateBackupPct(Position p, Player primary, Player backup, Lineup.VsHand vs) {
+        Double factor = backup.getDefensiveRatings().getPositionScore(p) > 0
+            ? 1.0
+            : 0.5;
+
+        Integer primaryAbility = vs.getStats(predictions, primary).getWobaPlus();
+        Integer backupAbility = vs.getStats(predictions, backup).getWobaPlus();
+
+        Double daysOff = (primaryAbility - backupAbility) / Defense.getPositionFactor(p) + 1;
+
+        return factor * 1 / (daysOff + 1);
+    }
+
+    private Iterable<Player> selectBackups(Position position, Iterable<Player> bench, final Lineup.VsHand vs) {
 
         ImmutableList<Player> sortedBench = Ordering
             .natural()
@@ -99,52 +143,36 @@ public class DepthChartSelection {
 
         Player fallback = sortedBench.get(0);
 
-        Player backup = null;
+        List<Player> backups = Lists.newArrayList();
 
         if (position != Position.DESIGNATED_HITTER || position != Position.FIRST_BASE) {
-            Optional<Player> candidate = selectBackupByPosition(position, sortedBench);
-
-            if (candidate.isPresent()) {
-                backup = candidate.get();
-                factor = 1.0;
-            }
+            Iterables.addAll(backups, selectBackupByPosition(position, sortedBench));
         }
 
-        if (backup == null) {
-            Optional<Player> candidate = selectBackupBySlot(position, sortedBench);
-
-            if (candidate.isPresent()) {
-                backup = candidate.get();
-                factor = 0.5;
-            }
+        if (backups.isEmpty()) {
+            Iterables.addAll(backups, selectBackupBySlot(position, sortedBench));
         }
 
-        if (backup == null) {
-            backup = fallback;
+        if (backups.isEmpty()) {
+            backups.add(fallback);
         }
 
-        Integer starterAbility = vs.getStats(predictions, dc.getStarter(position)).getWobaPlus();
-        Integer backupAbility = vs.getStats(predictions, backup).getWobaPlus();
-
-        Integer diff = starterAbility - backupAbility;
-        Double daysOff = diff / Defense.getPositionFactor(position) + 1;
-
-        Double pct = 100 / (daysOff + 1);
-
-        dc.setBackup(position, backup, Math.max(Math.round(factor * pct), 1));
+        return backups;
     }
 
-    private Optional<Player> selectBackupByPosition(Position position, Iterable<Player> bench) {
+    private Iterable<Player> selectBackupByPosition(Position position, Iterable<Player> bench) {
+        List<Player> result = Lists.newArrayList();
+
         for (Player p : bench) {
             if (p.getDefensiveRatings().getPositionScore(position) > 0) {
-                return Optional.of(p);
+                result.add(p);
             }
         }
 
-        return Optional.absent();
+        return result;
     }
 
-    private Optional<Player> selectBackupBySlot(Position position, Iterable<Player> bench) {
+    private Iterable<Player> selectBackupBySlot(Position position, Iterable<Player> bench) {
         switch (position) {
             case SECOND_BASE:
             case THIRD_BASE:
@@ -158,18 +186,20 @@ public class DepthChartSelection {
             case DESIGNATED_HITTER:
                 return selectBackupBySlot(Slot.H, bench);
             default:
-                return Optional.absent();
+                return Collections.emptySet();
         }
     }
 
-    private Optional<Player> selectBackupBySlot(Slot slot, Iterable<Player> bench) {
+    private Iterable<Player> selectBackupBySlot(Slot slot, Iterable<Player> bench) {
+        List<Player> result = Lists.newArrayList();
+
         for (Player p : bench) {
             if (p.getSlots().contains(slot)) {
-                return Optional.of(p);
+                result.add(p);
             }
         }
 
-        return Optional.absent();
+        return result;
     }
 
     public static DepthChartSelection create(TeamStats<BattingStats> predictions) {
