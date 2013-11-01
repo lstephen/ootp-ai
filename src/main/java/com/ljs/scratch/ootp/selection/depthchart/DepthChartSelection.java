@@ -115,12 +115,13 @@ public class DepthChartSelection {
     }
 
     private Double calculateBackupPct(Position p, Player primary, Player backup, Lineup.VsHand vs) {
-        Double factor = backup.getDefensiveRatings().getPositionScore(p) > 0
-            ? 1.0
-            : 0.5;
+        Double factor = primary.getDefensiveRatings().getPositionScore(p) > 0
+            && backup.getDefensiveRatings().getPositionScore(p) == 0
+            ? 0.5
+            : 1.0;
 
         Integer primaryAbility = vs.getStats(predictions, primary).getWobaPlus();
-        Integer backupAbility = vs.getStats(predictions, backup).getWobaPlus();
+        Integer backupAbility = Math.min(vs.getStats(predictions, backup).getWobaPlus(), primaryAbility);
 
         Double daysOff = (primaryAbility - backupAbility) / Defense.getPositionFactor(p) + 1;
 
@@ -143,7 +144,7 @@ public class DepthChartSelection {
 
         List<Player> backups = Lists.newArrayList();
 
-        if (position != Position.DESIGNATED_HITTER || position != Position.FIRST_BASE) {
+        if (position != Position.DESIGNATED_HITTER && position != Position.FIRST_BASE) {
             Iterables.addAll(backups, selectBackupByPosition(position, sortedBench));
         }
 

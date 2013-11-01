@@ -4,7 +4,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
@@ -13,21 +12,13 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
-import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
-import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
-import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
-import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
-import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.Selections;
-import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
-import com.ljs.scratch.ootp.selection.Slot;
-import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
@@ -55,6 +46,10 @@ public final class RosterSelection {
 
     private Roster previous;
 
+    private BattingRegression batting;
+
+    private PitchingRegression pitching;
+
     private RosterSelection(
         Team team, Predictions predictions, Function<Player, Integer> value) {
 
@@ -75,33 +70,45 @@ public final class RosterSelection {
     }
 
     private Iterable<Player> getAvailableHitters(Roster roster) {
-        Set<Player> available =
-            Sets.newHashSet(
+        Set<Player> available = Sets.newHashSet(
                 Selections.onlyHitters(
                     Selections.onlyOn40Man(roster.getUnassigned())));
 
-        if (previous != null) {
-            FourtyManRoster fourtyMan =
-                new FourtyManRoster(previous, predictions, value);
-
-            Set<Player> toRemove = Sets.newHashSet();
-
-            for (Player p : available) {
-                if (p.getClearedWaivers().or(Boolean.FALSE)
-                    && Iterables.contains(fourtyMan.getPlayersToRemove(), p)) {
-
-                    toRemove.add(p);
-                }
-            }
-
-            available.removeAll(toRemove);
-        }
+        available.removeAll(getToBeRemoved(available));
 
         return available;
     }
 
     private Iterable<Player> getAvailablePitchers(Roster roster) {
-        return Selections.onlyPitchers(Selections.onlyOn40Man(roster.getUnassigned()));
+        Set<Player> available = Sets.newHashSet(Selections.onlyPitchers(Selections.onlyOn40Man(roster.getUnassigned())));
+        available.removeAll(getToBeRemoved(available));
+        return available;
+    }
+
+    private Set<Player> getToBeRemoved(Iterable<Player> available) {
+        Set<Player> toRemove = Sets.newHashSet();
+        if (previous != null) {
+            FourtyManRoster fourtyMan =
+                new FourtyManRoster(
+                    previous,
+                    Predictions
+                        .predict(previous.getAllPlayers())
+                        .using(batting, pitching, predictions.getPitcherOverall()),
+                value);
+
+            ImmutableSet<Player> toRemoveFromFourtyMan =
+                ImmutableSet.copyOf(fourtyMan.getPlayersToRemove());
+
+            for (Player p : available) {
+                if (p.getClearedWaivers().or(Boolean.FALSE)
+                    && toRemoveFromFourtyMan.contains(p)) {
+
+                    toRemove.add(p);
+                }
+            }
+
+        }
+        return toRemove;
     }
 
     public Roster select(Mode mode, Changes changes) {
@@ -298,23 +305,32 @@ public final class RosterSelection {
     public static RosterSelection ootp6(Team team, BattingRegression batting,
         PitchingRegression pitching, Function<Player, Integer> value) {
 
-        return new RosterSelection(
+        RosterSelection selection = new RosterSelection(
             team,
             Predictions
                 .predict(team)
                 .using(batting, pitching, PitcherOverall.FIP),
             value);
+        selection.batting = batting;
+        selection.pitching = pitching;
+
+        return selection;
     }
 
     public static RosterSelection ootp5(Team team, BattingRegression batting,
         PitchingRegression pitching, Function<Player, Integer> value) {
 
-        return new RosterSelection(
+        RosterSelection selection = new RosterSelection(
             team,
             Predictions
                 .predict(team)
                 .using(batting, pitching, PitcherOverall.WOBA_AGAINST),
             value);
+
+        selection.batting = batting;
+        selection.pitching = pitching;
+
+        return selection;
     }
 
 }

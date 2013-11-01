@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import java.util.Map;
+import org.fest.assertions.api.Assertions;
 
 /**
  * TODO: Two maps should be unnecessary. Probably need a custom serializer
@@ -47,6 +48,11 @@ public final class TeamStats<S extends Stats<S>> {
     }
 
     public SplitStats<S> getSplits(Player p) {
+        Assertions
+            .assertThat(stats)
+            .containsKey(p.getId())
+            .describedAs("Expected to find stats for player:" + p);
+
         return stats.get(p.getId());
     }
 

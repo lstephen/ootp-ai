@@ -1,6 +1,7 @@
 package com.ljs.scratch.ootp.selection;
 
 import com.google.common.base.Function;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.Predictions;
@@ -74,7 +75,12 @@ public final class PitcherSelectionFactory implements SelectionFactory {
 
         return new Function<Player, Integer>() {
             public Integer apply(Player p) {
-                return overall.getPlus(pitching, p);
+                try {
+                    return overall.getPlus(pitching, p);
+                } catch (Exception e) {
+                    System.out.println(p);
+                    throw Throwables.propagate(e);
+                }
             }
         };
     }

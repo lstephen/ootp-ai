@@ -22,28 +22,36 @@ import java.util.List;
  */
 public class ReplacementValue {
 
-    private final Predictions predictions;
-
     private final Function<Player, Integer> value;
 
     private final Function<Player, Integer> selectionValue;
 
-    private final Selection hitterSelection;
+    private final ImmutableMultimap<Slot, Player> hitterSlotSelections;
 
-    private final Selection pitcherSelection;
+    private final ImmutableMultimap<Slot, Player> pitcherSlotSelections;
 
     public ReplacementValue(Predictions ps, Function<Player, Integer> value, Function<Player, Integer> selectionValue) {
-        this.predictions = ps;
         this.value = value;
         this.selectionValue = selectionValue;
 
-        hitterSelection = HitterSelectionFactory
+        Selection hitterSelection = HitterSelectionFactory
             .using(selectionValue)
             .create(Mode.REGULAR_SEASON);
 
-        pitcherSelection = PitcherSelectionFactory
-            .using(selectionValue, predictions.getPitcherOverall())
+        Selection pitcherSelection = PitcherSelectionFactory
+            .using(selectionValue, ps.getPitcherOverall())
             .create(Mode.REGULAR_SEASON);
+
+        hitterSlotSelections = Selections
+            .select(
+                hitterSelection,
+                Selections.onlyHitters(ps.getAllPlayers()));
+
+        pitcherSlotSelections = Selections
+            .select(
+                pitcherSelection,
+                Selections.onlyPitchers(ps.getAllPlayers()));
+
     }
 
     public Integer getValueVsReplacement(Player p) {
@@ -76,29 +84,19 @@ public class ReplacementValue {
             case IF:
             case OF:
             case H:
-                slotSelections = Selections
-                    .select(
-                        hitterSelection,
-                        Selections.onlyHitters(predictions.getAllPlayers()))
-                    .get(s);
-
+                slotSelections = hitterSlotSelections.get(s);
                 break;
             case SP:
             case MR:
-                ImmutableMultimap<Slot, Player> pitchingSelection = Selections
-                    .select(
-                        pitcherSelection,
-                        Selections.onlyPitchers(predictions.getAllPlayers()));
-
                 switch (s) {
                     case SP:
-                        slotSelections = pitchingSelection.get(Slot.SP);
+                        slotSelections = pitcherSlotSelections.get(Slot.SP);
                         break;
 
                     case MR:
                         slotSelections = Iterables.concat(
-                            pitchingSelection.get(Slot.MR),
-                            pitchingSelection.get(Slot.P));
+                            pitcherSlotSelections.get(Slot.MR),
+                            pitcherSlotSelections.get(Slot.P));
                         break;
                     default:
                         throw new IllegalStateException();
