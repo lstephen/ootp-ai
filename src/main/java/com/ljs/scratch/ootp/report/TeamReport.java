@@ -5,10 +5,11 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.Standings;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.roster.TeamId;
+import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
@@ -61,7 +62,7 @@ public final class TeamReport {
         for (int i = 1; i <= site.getNumberOfTeams(); i++) {
             scores.add(
                 calculate(
-                new TeamId(Integer.toString(i)),
+                Id.<Team>valueOf(i),
                 site.getSingleTeam(i).extractPlayers()));
         }
 
@@ -166,7 +167,7 @@ public final class TeamReport {
         return stats.getMean();
     }
 
-    private TeamScore calculate(TeamId id, Iterable<Player> players) {
+    private TeamScore calculate(Id<Team> id, Iterable<Player> players) {
         return TeamScore.create(
             id,
             calculateBatting(players),
@@ -250,7 +251,7 @@ public final class TeamReport {
 
     private static final class TeamScore {
 
-        private final TeamId id;
+        private final Id<Team> id;
 
         private final Double batting;
 
@@ -260,7 +261,7 @@ public final class TeamReport {
 
         private final Double rotation;
 
-        private TeamScore(TeamId id, Double batting, Double lineup, Double pitching, Double rotation) {
+        private TeamScore(Id<Team> id, Double batting, Double lineup, Double pitching, Double rotation) {
             this.id = id;
             this.batting = batting;
             this.lineup = lineup;
@@ -268,7 +269,7 @@ public final class TeamReport {
             this.rotation = rotation;
         }
 
-        public TeamId getId() {
+        public Id<Team> getId() {
             return id;
         }
 
@@ -325,7 +326,7 @@ public final class TeamReport {
         }
 
         public static TeamScore create(
-            TeamId id, Double batting, Double lineup, Double pitching, Double rotation) {
+            Id<Team> id, Double batting, Double lineup, Double pitching, Double rotation) {
 
             return new TeamScore(id, batting, lineup, pitching, rotation);
         }

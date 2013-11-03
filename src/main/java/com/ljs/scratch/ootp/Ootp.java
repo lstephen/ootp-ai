@@ -8,6 +8,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.config.Directories;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
@@ -25,7 +26,6 @@ import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.roster.RosterSelection;
 import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
@@ -67,18 +67,18 @@ public class Ootp {
     // PAM, MWF
     private static final SiteDefinition TWML =
         SiteDefinitionFactory.ootp6(
-           "TWML", "http://www.darowski.com/twml/OOTP6Reports/", new TeamId("22"), "Splendid Splinter", 24);
+           "TWML", "http://www.darowski.com/twml/OOTP6Reports/", Id.<Team>valueOf(22), "Splendid Splinter", 24);
         //    "TWML", "http://www.darowski.com/twml/2033/", new TeamId("22"), "Splendid Splinter", 24);
 
     // WCH, TF
     private static final SiteDefinition CBL =
         SiteDefinitionFactory.ootp5(
-            "CBL", "http://www.thecblonline.com/files/", new TeamId("24"), "National", 24);
+            "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(24), "National", 24);
 
     // DET, TF
     private static final SiteDefinition HFTC =
         SiteDefinitionFactory.ootp5(
-            "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", new TeamId("8"), "American", 32);
+            "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(8), "American", 32);
 
     //private static final SiteDefinition TWIB =
     //    SiteDefinition.ootp6("TWIB", "http://twib.us/reports/", new TeamId("16"), "National", 16);
@@ -88,22 +88,25 @@ public class Ootp {
 
     // CHC, TTSn
     private static final SiteDefinition BTH =
-        SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", new TeamId("20"), "National", 30);
+        SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(20), "National", 30);
 
     // WTT, TTSt
     private static final SiteDefinition SAVOY =
-        SiteDefinitionFactory.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", new TeamId("26"), "UBA", 26);
+        SiteDefinitionFactory.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", Id.<Team>valueOf(26), "UBA", 26);
 
     // CIN, TTSn
     private static final SiteDefinition LBB =
         //SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
-        SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.x10.mx/lgreport/Leaguesite/", new TeamId("21"), "NL", 30);
+        SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.x10.mx/lgreport/Leaguesite/", Id.<Team>valueOf(21), "NL", 30);
 
     //private static final SiteDefinition GABL =
     //    SiteDefinition.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", new TeamId("10"), "American", 30);
 
     private static final SiteDefinition TFMS =
-        SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", new TeamId("3"), "League 2", 16);
+        SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
+
+    private static final SiteDefinition PSD =
+        SiteDefinitionFactory.ootpx("PSD", "http://www.redraftleague.com/game/lgreports2/news/html/leagues/league_100_home.html", Id.<Team>valueOf(8), "National", 20);
 
     public static void main(String[] args) throws IOException {
         new Ootp().run();

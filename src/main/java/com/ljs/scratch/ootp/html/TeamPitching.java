@@ -1,8 +1,9 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.collect.ImmutableMap;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.roster.TeamId;
+import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.util.ElementsUtil;
 import org.jsoup.nodes.Document;
@@ -22,8 +23,8 @@ public class TeamPitching extends SingleTeamStats<PitchingStats> {
     private static final int WALKS_IDX = 7;
     private static final int HOMERUN_IDX = 5;
 
-    public TeamPitching(Site site, TeamId team) {
-        super(site.extractTeam(), site.getPage("team" + team.unwrap() + "p.html"));
+    public TeamPitching(Site site, Id<Team> team) {
+        super(site.extractTeam(), site.getPage("team" + team.get() + "p.html"));
     }
 
     @Override

@@ -1,9 +1,10 @@
 package com.ljs.scratch.ootp.site.impl;
 
+import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
-import com.ljs.scratch.ootp.roster.TeamId;
 
 /**
  *
@@ -17,7 +18,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
 
     private final String siteRoot;
 
-    private final TeamId team;
+    private final Id<Team> team;
 
     private final String league;
 
@@ -27,7 +28,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
         Version type,
         String name,
         String siteRoot,
-        TeamId team,
+        Id<Team> team,
         String league,
         int nTeams) {
 
@@ -43,7 +44,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     public String getName() { return name; }
 
     @Override
-    public TeamId getTeam() { return team; }
+    public Id<Team> getTeam() { return team; }
 
     @Override
     public String getSiteRoot() { return siteRoot; }
@@ -87,7 +88,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     public static SiteDefinitionImpl ootp5(
         String name,
         String siteRoot,
-        TeamId team,
+        Id<Team> team,
         String league,
         int nTeams) {
 
@@ -98,12 +99,24 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     public static SiteDefinitionImpl ootp6(
         String name,
         String siteRoot,
-        TeamId team,
+        Id<Team> team,
         String league,
         int nTeams) {
 
         return new SiteDefinitionImpl(
             Version.OOTP6, name, siteRoot, team, league, nTeams);
+    }
+
+    public static SiteDefinitionImpl ootpx(
+        String name,
+        String siteRoot,
+        Id<Team> team,
+        String league,
+        int nTeams) {
+
+        return new SiteDefinitionImpl(
+            Version.OOTPX, name, siteRoot, team, league, nTeams);
+
     }
 
 }

@@ -1,11 +1,11 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.collect.ImmutableSet;
+import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -20,9 +20,9 @@ public class TeamRatings {
 
     private final Page page;
 
-    public TeamRatings(Site site, TeamId team) {
+    public TeamRatings(Site site, Id<Team> team) {
         this.site = site;
-        page = site.getPage("team" + team.unwrap() + "rr.html");
+        page = site.getPage("team" + team.get() + "rr.html");
     }
 
     public Team extractTeam() {

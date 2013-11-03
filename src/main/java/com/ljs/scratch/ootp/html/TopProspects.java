@@ -2,9 +2,10 @@ package com.ljs.scratch.ootp.html;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
-import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.page.Page;
-import com.ljs.scratch.ootp.roster.TeamId;
+import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.roster.Team;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -17,8 +18,8 @@ public final class TopProspects {
 
     private final Page page;
 
-    private TopProspects(Site site, TeamId team) {
-        this.page = site.getPage("team" + team.unwrap() + "pr.html");
+    private TopProspects(Site site, Id<Team> team) {
+        this.page = site.getPage("team" + team.get() + "pr.html");
     }
 
 
@@ -37,12 +38,12 @@ public final class TopProspects {
     }
 
 
-    public static TopProspects of(Site site, TeamId team) {
+    public static TopProspects of(Site site, Id<Team> team) {
         return new TopProspects(site, team);
     }
 
     public static TopProspects of(Site site, Integer teamId) {
-        return of(site, new TeamId(teamId.toString()));
+        return of(site, Id.<Team>valueOf(teamId.toString()));
     }
 
 }

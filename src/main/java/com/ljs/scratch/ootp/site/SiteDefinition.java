@@ -1,8 +1,9 @@
 package com.ljs.scratch.ootp.site;
 
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.ratings.RatingsDefinition;
+import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
-import com.ljs.scratch.ootp.roster.TeamId;
 
 /**
  *
@@ -11,7 +12,7 @@ import com.ljs.scratch.ootp.roster.TeamId;
 public interface SiteDefinition extends RatingsDefinition {
 
     String getName();
-    TeamId getTeam();
+    Id<Team> getTeam();
     String getSiteRoot();
     Version getType();
     String getLeague();

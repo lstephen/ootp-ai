@@ -3,10 +3,11 @@ package com.ljs.scratch.ootp.html;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.roster.TeamId;
+import com.ljs.scratch.ootp.roster.Team;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Map;
@@ -20,14 +21,14 @@ import org.jsoup.nodes.Element;
  */
 public class Salary {
 
-    private final TeamId team;
+    private final Id<Team> team;
 
     private final Site site;
 
     private static final Map<String, Integer> CURRENT_SALARY_CACHE =
         Maps.newHashMap();
 
-    public Salary(Site site, TeamId team) {
+    public Salary(Site site, Id<Team> team) {
         Preconditions.checkNotNull(site);
         Preconditions.checkNotNull(team);
 
@@ -36,7 +37,7 @@ public class Salary {
     }
 
     private Page getPage() {
-        return site.getPage("team" + team.unwrap() + "sa.html");
+        return site.getPage("team" + team.get() + "sa.html");
     }
 
     private Document loadPage() {

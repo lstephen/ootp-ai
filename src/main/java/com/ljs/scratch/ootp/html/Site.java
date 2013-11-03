@@ -6,13 +6,13 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
@@ -84,7 +84,7 @@ public class Site {
         return getMinorLeagues(definition.getTeam());
     }
 
-    public MinorLeagues getMinorLeagues(TeamId id) {
+    public MinorLeagues getMinorLeagues(Id<Team> id) {
         return new MinorLeagues(this, id);
     }
 
@@ -96,12 +96,12 @@ public class Site {
         return getSalary(definition.getTeam());
     }
 
-    public Salary getSalary(TeamId id) {
+    public Salary getSalary(Id<Team> id) {
         return new Salary(this, id);
     }
 
     public Salary getSalary(int teamId) {
-        return getSalary(new TeamId(Integer.toString(teamId)));
+        return getSalary(Id.<Team>valueOf(Integer.toString(teamId)));
     }
 
     public String getSalary(Player p) {
@@ -141,12 +141,12 @@ public class Site {
         return getSingleTeam(definition.getTeam());
     }
 
-    public SingleTeam getSingleTeam(TeamId id) {
+    public SingleTeam getSingleTeam(Id<Team> id) {
         return new SingleTeam(this, id);
     }
 
     public SingleTeam getSingleTeam(int teamId) {
-        return getSingleTeam(new TeamId(Integer.toString(teamId)));
+        return getSingleTeam(Id.<Team>valueOf(teamId));
     }
 
     public Standings getStandings() {
@@ -166,18 +166,18 @@ public class Site {
     }
 
     public TeamRatings getTeamRatings(Integer teamId) {
-        return getTeamRatings(new TeamId(Integer.toString(teamId)));
+        return getTeamRatings(Id.<Team>valueOf(teamId));
     }
 
-    public TeamRatings getTeamRatings(TeamId id) {
+    public TeamRatings getTeamRatings(Id<Team> id) {
         return new TeamRatings(this, id);
     }
 
     public TopProspects getTopProspects(Integer teamId) {
-        return getTopProspects(new TeamId(teamId.toString()));
+        return getTopProspects(Id.<Team>valueOf(teamId));
     }
 
-    public TopProspects getTopProspects(TeamId id) {
+    public TopProspects getTopProspects(Id<Team> id) {
         return TopProspects.of(this, id);
     }
 

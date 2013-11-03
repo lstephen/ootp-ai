@@ -4,12 +4,12 @@ import com.google.common.base.CharMatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -26,17 +26,17 @@ public class SingleTeam {
 
     private final Site site;
 
-    private final TeamId teamId;
+    private final Id<Team> teamId;
 
     private static Cache<String, Set<PlayerId>> injuriesCache =
         CacheBuilder.newBuilder().build();
 
 
-    public SingleTeam(Site site, TeamId team) {
+    public SingleTeam(Site site, Id<Team> team) {
         this.site = site;
         this.teamId = team;
 
-        page = site.getPage("team" + team.unwrap() + ".html");
+        page = site.getPage("team" + team.get() + ".html");
     }
 
     public String extractTeamName() {

@@ -1,12 +1,12 @@
 package com.ljs.scratch.ootp.html;
 
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.roster.TeamId;
-import com.ljs.scratch.ootp.html.page.Page;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.jsoup.nodes.Document;
@@ -28,8 +28,8 @@ public class MinorLeagues {
 
     private final Team team;
 
-    public MinorLeagues(Site site, TeamId team) {
-        this.page = site.getPage("team" + team.unwrap() + "m.html");
+    public MinorLeagues(Site site, Id<Team> team) {
+        this.page = site.getPage("team" + team.get() + "m.html");
         this.site = site;
         this.team = site.getTeamRatings(team).extractTeam();
     }
