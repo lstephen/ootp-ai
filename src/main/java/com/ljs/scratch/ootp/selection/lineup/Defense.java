@@ -56,7 +56,9 @@ public final class Defense {
 
             DefensiveRatings r = ply.getDefensiveRatings();
 
-            total += getPositionFactor(pos) * r.getPositionScore(pos);
+            Double ageScore = (double) (100 - ply.getAge()) / 100000;
+
+            total += getPositionFactor(pos) * (r.getPositionScore(pos) + ageScore);
         }
 
         return total;
