@@ -1,6 +1,10 @@
 package com.ljs.scratch.ootp.site.impl;
 
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.Ootp5;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.Ootp6;
+import com.ljs.scratch.ootp.html.ootpx.OotpX;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
@@ -83,6 +87,20 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     @Override
     public Boolean isFreezeOneRatings() {
         return type == Version.OOTP6;
+    }
+
+    @Override
+    public Site getSite() {
+        switch (type) {
+            case OOTP5:
+                return Ootp5.create(this);
+            case OOTP6:
+                return Ootp6.create(this);
+            case OOTPX:
+                return OotpX.create(this);
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     public static SiteDefinitionImpl ootp5(

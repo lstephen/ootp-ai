@@ -7,7 +7,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.Standings;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.Standings;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;

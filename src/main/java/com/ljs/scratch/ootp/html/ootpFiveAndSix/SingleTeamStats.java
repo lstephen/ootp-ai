@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.html;
+package com.ljs.scratch.ootp.html.ootpFiveAndSix;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

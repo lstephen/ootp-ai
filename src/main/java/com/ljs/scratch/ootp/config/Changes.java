@@ -8,7 +8,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.html.PlayerList;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.PlayerList;
 import com.ljs.scratch.ootp.html.Site;
 import java.io.File;
 import java.io.IOException;

@@ -1,14 +1,21 @@
 package com.ljs.scratch.ootp.html;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.LeagueBatting;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.LeaguePitching;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.MinorLeagues;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.PlayerList;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.Salary;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.SinglePlayer;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.SingleTeam;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.Standings;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamBatting;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamPitching;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamRatings;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
-import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
@@ -16,235 +23,98 @@ import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
-import java.util.Arrays;
-import java.util.Set;
 import org.joda.time.LocalDate;
 
 /**
  *
  * @author lstephen
  */
-public class Site {
+public interface Site {
 
-    private final SiteDefinition definition;
+    Roster extractRoster();
 
-    private ImmutableSet<PlayerId> futureFas;
+    Team extractTeam();
 
-    private ImmutableSet<PlayerId> injured;
+    Integer getCurrentSalary(Player p);
 
-    private Site(SiteDefinition def) {
-        this.definition = def;
-    }
+    LocalDate getDate();
 
-    public SiteDefinition getDefinition() {
-        return definition;
-    }
-    
-    public String getName() {
-        return definition.getName();
-    }
+    SiteDefinition getDefinition();
 
-    public Version getType() {
-        return definition.getType();
-    }
+    PlayerList getDraft();
 
-    public LocalDate getDate() {
-        return getLeagueBatting().extractDate();
-    }
+    PlayerList getFreeAgents();
 
-    public PitcherOverall getPitcherSelectionMethod() {
-        return definition.getPitcherSelectionMethod();
-    }
+    LeagueBatting getLeagueBatting();
 
-    public int getNumberOfTeams() {
-        return definition.getNumberOfTeams();
-    }
+    LeaguePitching getLeaguePitching();
 
-    public Page getPage(String url) {
-        return PageFactory.create(definition.getSiteRoot(), url);
-    }
+    MinorLeagues getMinorLeagues();
 
-    public PlayerList getDraft() {
-        return PlayerList.draft(this);
-    }
+    MinorLeagues getMinorLeagues(
+        Id<Team> id);
 
-    public PlayerList getFreeAgents() {
-        return PlayerList.freeAgents(this);
-    }
+    String getName();
 
-    public LeagueBatting getLeagueBatting() {
-        return new LeagueBatting(this, definition.getLeague());
-    }
+    int getNumberOfTeams();
 
-    public LeaguePitching getLeaguePitching() {
-        return new LeaguePitching(this, definition.getLeague());
-    }
+    Page getPage(String url);
 
-    public MinorLeagues getMinorLeagues() {
-        return getMinorLeagues(definition.getTeam());
-    }
+    PitcherOverall getPitcherSelectionMethod();
 
-    public MinorLeagues getMinorLeagues(Id<Team> id) {
-        return new MinorLeagues(this, id);
-    }
+    SinglePlayer getPlayer(PlayerId id);
 
-    public PlayerList getRuleFiveDraft() {
-        return PlayerList.ruleFiveDraft(this);
-    }
+    Iterable<Player> getPlayers(PlayerId... ids);
 
-    public Salary getSalary() {
-        return getSalary(definition.getTeam());
-    }
+    Iterable<Player> getPlayers(
+        Iterable<PlayerId> ids);
 
-    public Salary getSalary(Id<Team> id) {
-        return new Salary(this, id);
-    }
+    PlayerList getRuleFiveDraft();
 
-    public Salary getSalary(int teamId) {
-        return getSalary(Id.<Team>valueOf(Integer.toString(teamId)));
-    }
+    Salary getSalary();
 
-    public String getSalary(Player p) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            String salary = getSalary(i).getSalary(p);
+    Salary getSalary(
+        Id<Team> id);
 
-            if (salary != null) {
-                return salary;
-            }
-        }
-        return "";
-    }
+    Salary getSalary(int teamId);
 
-    public Integer getCurrentSalary(Player p) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            Integer salary = getSalary(i).getCurrentSalary(p);
+    String getSalary(Player p);
 
-            if (salary != 0) {
-                return salary;
-            }
-        }
-        return 0;
-    }
+    SingleTeam getSingleTeam();
 
-    public Optional<Integer> getTeamTopProspectPosition(PlayerId id) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            Optional<Integer> pos = getTopProspects(i).getPosition(id);
+    SingleTeam getSingleTeam(
+        Id<Team> id);
 
-            if (pos.isPresent()) {
-                return pos;
-            }
-        }
-        return Optional.absent();
-    }
+    SingleTeam getSingleTeam(int teamId);
 
-    public SingleTeam getSingleTeam() {
-        return getSingleTeam(definition.getTeam());
-    }
+    Standings getStandings();
 
-    public SingleTeam getSingleTeam(Id<Team> id) {
-        return new SingleTeam(this, id);
-    }
+    TeamBatting getTeamBatting();
 
-    public SingleTeam getSingleTeam(int teamId) {
-        return getSingleTeam(Id.<Team>valueOf(teamId));
-    }
+    TeamPitching getTeamPitching();
 
-    public Standings getStandings() {
-        return Standings.create(this);
-    }
+    TeamRatings getTeamRatings();
 
-    public TeamBatting getTeamBatting() {
-        return new TeamBatting(this, definition.getTeam());
-    }
+    TeamRatings getTeamRatings(Integer teamId);
 
-    public TeamPitching getTeamPitching() {
-        return new TeamPitching(this, definition.getTeam());
-    }
+    TeamRatings getTeamRatings(
+        Id<Team> id);
 
-    public TeamRatings getTeamRatings() {
-        return getTeamRatings(definition.getTeam());
-    }
+    Optional<Integer> getTeamTopProspectPosition(PlayerId id);
 
-    public TeamRatings getTeamRatings(Integer teamId) {
-        return getTeamRatings(Id.<Team>valueOf(teamId));
-    }
+    TopProspects getTopProspects(Integer teamId);
 
-    public TeamRatings getTeamRatings(Id<Team> id) {
-        return new TeamRatings(this, id);
-    }
+    TopProspects getTopProspects(
+        Id<Team> id);
 
-    public TopProspects getTopProspects(Integer teamId) {
-        return getTopProspects(Id.<Team>valueOf(teamId));
-    }
+    Version getType();
 
-    public TopProspects getTopProspects(Id<Team> id) {
-        return TopProspects.of(this, id);
-    }
+    PlayerList getWaiverWire();
 
-    public SinglePlayer getPlayer(PlayerId id) {
-        return new SinglePlayer(this, id);
-    }
+    boolean isFutureFreeAgent(Player p);
 
-    public PlayerList getWaiverWire() {
-        return PlayerList.waiverWire(this);
-    }
+    Predicate<Player> isFutureFreeAgent();
 
-    public Iterable<Player> getPlayers(PlayerId... ids) {
-        return getPlayers(Arrays.asList(ids));
-    }
-
-    public Iterable<Player> getPlayers(Iterable<PlayerId> ids) {
-        return Iterables.transform(ids, new Function<PlayerId, Player>() {
-            @Override
-            public Player apply(PlayerId id) {
-                return getPlayer(id).extract();
-            }
-        });
-    }
-
-    public boolean isFutureFreeAgent(Player p) {
-        if (futureFas == null) {
-            futureFas =
-                ImmutableSet.copyOf(
-                    PlayerList.futureFreeAgents(this).extractIds());
-        }
-
-        return futureFas.contains(p.getId());
-    }
-
-    public Predicate<Player> isFutureFreeAgent() {
-        return new Predicate<Player>() {
-            @Override
-            public boolean apply(Player p) {
-                return isFutureFreeAgent(p);
-            }
-        };
-    }
-
-    public boolean isInjured(Player p) {
-        if (injured == null) {
-            Set<PlayerId> is = Sets.newHashSet();
-
-            for (int i = 1; i <= getNumberOfTeams(); i++) {
-                Iterables.addAll(is, getSingleTeam(i).extractInjuries());
-            }
-
-            injured = ImmutableSet.copyOf(is);
-        }
-
-        return injured.contains(p.getId());
-    }
-
-    public Team extractTeam() {
-        return getTeamRatings().extractTeam();
-    }
-
-    public Roster extractRoster() {
-        return getSingleTeam().extractRoster();
-    }
-
-    public static Site create(SiteDefinition definition) {
-        return new Site(definition);
-    }
+    boolean isInjured(Player p);
 
 }

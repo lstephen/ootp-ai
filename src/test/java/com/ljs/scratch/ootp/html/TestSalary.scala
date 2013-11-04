@@ -1,8 +1,8 @@
 package com.ljs.scratch.ootp.html
 
+import com.ljs.scratch.ootp.data.Id
 import com.ljs.scratch.ootp.player.Player
 import com.ljs.scratch.ootp.player.PlayerId
-import com.ljs.scratch.ootp.roster.TeamId
 
 import org.apache.commons.lang3.RandomStringUtils._
 
@@ -20,7 +20,7 @@ class TestSalary extends FlatSpec {
         val id = randomAlphanumeric(10)
         val site = new MockSite
 
-        val salary = new Salary(site, new TeamId(id))
+        val salary = new Salary(site, Id.valueOf(id))
 
         site.expectGetPage(f"team$id%ssa.html")
         site.onLoadPage("/com/ljs/scratch/ootp/html/pam_salary_ootp6.html")

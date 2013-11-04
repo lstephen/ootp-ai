@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
-import com.ljs.scratch.ootp.html.Salary;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.Salary;
 import com.ljs.scratch.ootp.html.Site;
 import java.io.OutputStream;
 import java.io.PrintWriter;

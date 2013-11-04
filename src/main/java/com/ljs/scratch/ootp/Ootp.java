@@ -10,8 +10,8 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
-import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.SingleTeam;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
@@ -133,7 +133,7 @@ public class Ootp {
     private void run(SiteDefinition def, OutputStream out) throws IOException {
         LOG.log(Level.INFO, "Running for {0}...", def.getName());
 
-        final Site site = Site.create(def);
+        final Site site = def.getSite();
 
         LOG.log(Level.INFO, "Extracting current roster and team...");
 

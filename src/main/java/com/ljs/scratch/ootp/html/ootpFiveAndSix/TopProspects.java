@@ -1,8 +1,9 @@
-package com.ljs.scratch.ootp.html;
+package com.ljs.scratch.ootp.html.ootpFiveAndSix;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;

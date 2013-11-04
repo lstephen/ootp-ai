@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.html;
 
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.SinglePlayer;
 import com.google.common.base.Optional;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
