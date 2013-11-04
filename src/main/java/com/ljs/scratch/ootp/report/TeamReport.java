@@ -7,7 +7,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.Standings;
+import com.ljs.scratch.ootp.html.Standings;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
@@ -63,7 +63,7 @@ public final class TeamReport {
             scores.add(
                 calculate(
                 Id.<Team>valueOf(i),
-                site.getSingleTeam(i).extractPlayers()));
+                site.getSingleTeam(i).getRoster().getAllPlayers()));
         }
 
         scores = normalize(scores);
@@ -76,8 +76,8 @@ public final class TeamReport {
         Standings standings = site.getStandings();
 
         for (TeamScore s : TeamScore.byWinningPercentage(rpg).sortedCopy(scores)) {
-            Integer ws = standings.extractWins(s.getId());
-            Integer ls = standings.extractLosses(s.getId());
+            Integer ws = standings.getWins(s.getId());
+            Integer ls = standings.getLosses(s.getId());
 
             Long eosWs = ws + Math.round(s.getExpectedWinningPercentage(rpg) * (162 - ws - ls));
             Long eosLs = 162 - eosWs;
@@ -85,7 +85,7 @@ public final class TeamReport {
             w.println(
                 String.format(
                     "%-20s | %5.1f %5.1f %5.1f | %5.1f %5.1f %5.1f | %s %.3f | %3d-%3d %.3f | %3d-%3d %.3f ",
-                    StringUtils.abbreviate(site.getSingleTeam(s.getId()).extractTeamName(), 20),
+                    StringUtils.abbreviate(site.getSingleTeam(s.getId()).getName(), 20),
                     s.getBatting(),
                     s.getLineup(),
                     s.getOverallBatting(),

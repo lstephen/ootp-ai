@@ -73,7 +73,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
 
     @Override
     public Double getYearlyRatingsIncrease() {
-        if (getName().equals("BTH")) {
+        if (getName().equals("BTH") || getName().equals("PSD")) {
             return 8.0;
         }
 

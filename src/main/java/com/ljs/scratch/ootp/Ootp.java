@@ -10,8 +10,8 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
+import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.SingleTeam;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
@@ -118,10 +118,10 @@ public class Ootp {
             //( CBL
             //( HFTC
             //( LBB
-            ( BTH
-            , SAVOY
+            //( BTH
+            //, SAVOY
             //, TFMS
-            //(PSD
+            (PSD
             )) {
             try (
                 FileOutputStream out =
@@ -329,7 +329,7 @@ public class Ootp {
         for (int i = 1; i <= site.getNumberOfTeams(); i++) {
             LOG.log(Level.INFO, "{0}/{1}...", new Object[] { i, site.getNumberOfTeams() });
 
-            salaryRegression.add(site.getSalary(i).getSalariedPlayers());
+            salaryRegression.add(site.getSalariedPlayers(Id.<Team>valueOf(i)));
         }
 
         salaryRegression.printCoefficients(out);
@@ -454,10 +454,10 @@ public class Ootp {
         for (int i = 1; i <= site.getNumberOfTeams(); i++) {
         //for (int i = 1; i <= 1; i++) {
             SingleTeam t = site.getSingleTeam(i);
-            LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.extractTeamName(), i, site.getNumberOfTeams() });
-            generic.setTitle(t.extractTeamName());
+            LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.getName(), i, site.getNumberOfTeams() });
+            generic.setTitle(t.getName());
 
-            Roster r = t.extractRoster();
+            Roster r = t.getRoster();
 
             Iterables.addAll(all, r.getAllPlayers());
 

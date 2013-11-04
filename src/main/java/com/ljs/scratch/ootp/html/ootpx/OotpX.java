@@ -2,14 +2,16 @@ package com.ljs.scratch.ootp.html.ootpx;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.Salary;
+import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.html.Standings;
 import com.ljs.scratch.ootp.html.TeamBatting;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.MinorLeagues;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.Salary;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.SingleTeam;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.Standings;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamRatings;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
@@ -53,7 +55,14 @@ public class OotpX implements Site {
 
     @Override
     public Integer getCurrentSalary(Player p) {
-        throw new UnsupportedOperationException();
+        for (int i = 1; i <= getNumberOfTeams(); i++) {
+            Integer salary = getSalary(i).getCurrentSalary(p);
+
+            if (salary != 0) {
+                return salary;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -70,7 +79,7 @@ public class OotpX implements Site {
 
     @Override
     public Iterable<Player> getDraft() {
-        throw new UnsupportedOperationException();
+        return ImmutableSet.<Player>of();
     }
 
     @Override
@@ -148,18 +157,32 @@ public class OotpX implements Site {
 
     @Override
     public Salary getSalary() {
-        throw new UnsupportedOperationException();
+        return getSalary(definition.getTeam());
     }
 
     @Override
-    public Salary getSalary(
-        Id<Team> id) {
-        throw new UnsupportedOperationException();
+    public Salary getSalary(Id<Team> id) {
+        return new Salary() {
+            public Integer getCurrentSalary(Player p) {
+                return 0;
+            }
+
+            public Integer getNextSalary(Player p) {
+                return 0;
+            }
+        };
+    }
+
+    @Override
+    public Iterable<Player> getSalariedPlayers(Id<Team> id) {
+        return PlayerList
+            .from(this, "teams/team_%s_player_salary_report.html", id.get())
+            .extract();
     }
 
     @Override
     public Salary getSalary(int teamId) {
-        throw new UnsupportedOperationException();
+        return getSalary(Id.<Team>valueOf(teamId));
     }
 
     @Override
@@ -169,23 +192,35 @@ public class OotpX implements Site {
 
     @Override
     public SingleTeam getSingleTeam() {
-        throw new UnsupportedOperationException();
+        return getSingleTeam(definition.getTeam());
     }
 
     @Override
-    public SingleTeam getSingleTeam(
-        Id<Team> id) {
-        throw new UnsupportedOperationException();
+    public SingleTeam getSingleTeam(final Id<Team> id) {
+        return new SingleTeam() {
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public Roster getRoster() {
+                return RosterExtraction.create(OotpX.this).extract(id);
+            }
+        };
     }
 
     @Override
     public SingleTeam getSingleTeam(int teamId) {
-        throw new UnsupportedOperationException();
+        return getSingleTeam(Id.<Team>valueOf(teamId));
     }
 
     @Override
     public Standings getStandings() {
-        throw new UnsupportedOperationException();
+        return new Standings() {
+            public Integer getWins(Id<Team> team) { return 0; }
+            public Integer getLosses(Id<Team> team) { return 0; }
+        };
     }
 
     @Override
@@ -247,7 +282,7 @@ public class OotpX implements Site {
 
     @Override
     public Predicate<Player> isFutureFreeAgent() {
-        throw new UnsupportedOperationException();
+        return Predicates.alwaysFalse();
     }
 
     @Override

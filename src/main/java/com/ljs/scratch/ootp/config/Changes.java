@@ -109,7 +109,7 @@ public final class Changes {
                         case RELEASE:
                         case FORCE_ML:
                             if (team == null) {
-                                team = site.getSingleTeam().extractPlayers();
+                                team = site.getSingleTeam().getRoster().getAllPlayers();
                             }
                             changes.add(type, raw, team);
                             break;

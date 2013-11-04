@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.Salary;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
@@ -20,7 +21,7 @@ import org.jsoup.nodes.Element;
  *
  * @author lstephen
  */
-public class Salary {
+public class SalaryImpl implements Salary {
 
     private final Id<Team> team;
 
@@ -29,7 +30,7 @@ public class Salary {
     private static final Map<String, Integer> CURRENT_SALARY_CACHE =
         Maps.newHashMap();
 
-    public Salary(Site site, Id<Team> team) {
+    public SalaryImpl(Site site, Id<Team> team) {
         Preconditions.checkNotNull(site);
         Preconditions.checkNotNull(team);
 

@@ -50,10 +50,6 @@ public final class BattingRegression {
            Splits<BattingStats> stats = teamStats.getSplits(p);
            Splits<BattingRatings> ratings = p.getBattingRatings();
 
-           System.out.println(p.getShortName());
-           System.out.println(stats);
-           System.out.println(ratings);
-
            addData(stats.getVsLeft(), ratings.getVsLeft());
            addData(stats.getVsRight(), ratings.getVsRight());
        }

@@ -5,6 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
@@ -21,7 +22,7 @@ import org.jsoup.select.Elements;
  *
  * @author lstephen
  */
-public class SingleTeam {
+public class SingleTeamImpl implements SingleTeam {
 
     private final Page page;
 
@@ -33,14 +34,15 @@ public class SingleTeam {
         CacheBuilder.newBuilder().build();
 
 
-    public SingleTeam(Site site, Id<Team> team) {
+    public SingleTeamImpl(Site site, Id<Team> team) {
         this.site = site;
         this.teamId = team;
 
         page = site.getPage("team" + team.get() + ".html");
     }
 
-    public String extractTeamName() {
+    @Override
+    public String getName() {
         Document doc = page.load();
 
         return CharMatcher.WHITESPACE.trimAndCollapseFrom(
@@ -49,7 +51,8 @@ public class SingleTeam {
             ' ');
     }
 
-    public Roster extractRoster() {
+    @Override
+    public Roster getRoster() {
         Document doc = page.load();
 
         Team team = site.getTeamRatings(teamId).extractTeam();
@@ -86,7 +89,7 @@ public class SingleTeam {
     }
 
     public Iterable<Player> extractPlayers() {
-        return extractRoster().getAllPlayers();
+        return getRoster().getAllPlayers();
     }
 
     public Iterable<PlayerId> extractInjuries() {

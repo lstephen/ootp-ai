@@ -44,6 +44,11 @@ public final class PlayerList {
 
             if (href.contains("players/")) {
                 String id = StringUtils.substringBetween(href, "players/", ".html");
+
+                if (id.equals("player_0")) {
+                    continue;
+                }
+
                 ids.add(new PlayerId(id));
             }
         }

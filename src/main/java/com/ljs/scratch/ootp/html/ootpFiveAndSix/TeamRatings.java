@@ -19,10 +19,13 @@ public class TeamRatings {
 
     private final Site site;
 
+    private final Id<Team> team;
+
     private final Page page;
 
     public TeamRatings(Site site, Id<Team> team) {
         this.site = site;
+        this.team = team;
         page = site.getPage("team" + team.get() + "rr.html");
     }
 
@@ -40,7 +43,7 @@ public class TeamRatings {
 
         Team team = Team.create(result.build());
 
-        team.addInjury(site.getPlayers(site.getSingleTeam().extractInjuries()));
+        team.addInjury(site.getPlayers(new SingleTeamImpl(site, this.team).extractInjuries()));
 
         return team;
     }

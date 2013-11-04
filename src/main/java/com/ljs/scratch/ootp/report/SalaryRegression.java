@@ -1,8 +1,8 @@
 package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Strings;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -137,7 +137,6 @@ public class SalaryRegression {
     }
 
     public void printCoefficients(PrintWriter w) {
-        RegressionResults r = regression.regress();
 
         w.println();
 
@@ -155,9 +154,11 @@ public class SalaryRegression {
                 vsReplacement.getMeanSquareError(),
                 vsAcquisition.getMeanSquareError()));
 
-
-        w.println(String.format("OLS: %.3f/%9.3e", r.getRSquared(), r.getMeanSquareError()));
-        w.println("b:" + Arrays.toString(r.getParameterEstimates()));
+        if (regression.getN() != 0) {
+            RegressionResults r = regression.regress();
+            w.println(String.format("OLS: %.3f/%9.3e", r.getRSquared(), r.getMeanSquareError()));
+            w.println("b:" + Arrays.toString(r.getParameterEstimates()));
+        }
         w.flush();
     }
 

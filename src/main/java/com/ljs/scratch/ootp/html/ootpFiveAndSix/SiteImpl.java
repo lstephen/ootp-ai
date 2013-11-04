@@ -115,17 +115,22 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public Salary getSalary() {
+    public Iterable<Player> getSalariedPlayers(Id<Team> id) {
+        return getSalary(id).getSalariedPlayers();
+    }
+
+    @Override
+    public SalaryImpl getSalary() {
         return getSalary(definition.getTeam());
     }
 
     @Override
-    public Salary getSalary(Id<Team> id) {
-        return new Salary(this, id);
+    public SalaryImpl getSalary(Id<Team> id) {
+        return new SalaryImpl(this, id);
     }
 
     @Override
-    public Salary getSalary(int teamId) {
+    public SalaryImpl getSalary(int teamId) {
         return getSalary(Id.<Team>valueOf(Integer.toString(teamId)));
     }
 
@@ -166,23 +171,23 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public SingleTeam getSingleTeam() {
+    public SingleTeamImpl getSingleTeam() {
         return getSingleTeam(definition.getTeam());
     }
 
     @Override
-    public SingleTeam getSingleTeam(Id<Team> id) {
-        return new SingleTeam(this, id);
+    public SingleTeamImpl getSingleTeam(Id<Team> id) {
+        return new SingleTeamImpl(this, id);
     }
 
     @Override
-    public SingleTeam getSingleTeam(int teamId) {
+    public SingleTeamImpl getSingleTeam(int teamId) {
         return getSingleTeam(Id.<Team>valueOf(teamId));
     }
 
     @Override
-    public Standings getStandings() {
-        return Standings.create(this);
+    public StandingsImpl getStandings() {
+        return StandingsImpl.create(this);
     }
 
     @Override
@@ -288,7 +293,7 @@ public final class SiteImpl implements Site {
 
     @Override
     public Roster extractRoster() {
-        return getSingleTeam().extractRoster();
+        return getSingleTeam().getRoster();
     }
 
     public static Site create(SiteDefinition definition) {

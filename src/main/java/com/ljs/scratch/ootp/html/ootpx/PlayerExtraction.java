@@ -10,6 +10,7 @@ import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.ratings.Position;
 import com.ljs.scratch.ootp.ratings.Splits;
+import org.apache.commons.lang3.StringUtils;
 import org.fest.assertions.api.Assertions;
 import org.fest.util.Strings;
 import org.jsoup.nodes.Document;
@@ -37,7 +38,8 @@ public class PlayerExtraction {
 
         Player player = Player.create(id, extractName(doc), ratings);
 
-
+        player.setAge(Integer.parseInt(StringUtils.substringAfterLast(doc.select("td:containsOwn(Age:)").text(), " ")));
+        player.setTeam(doc.select("a.title3[href~=teams]").text());
 
         return player;
     }
@@ -55,8 +57,12 @@ public class PlayerExtraction {
             site.getDefinition());
     }
 
+    private boolean hasBattingRatings(Document doc) {
+        return !doc.select("td:containsOwn(Contact):not(.sl,.slg)").isEmpty();
+    }
+
     private Splits<BattingRatings> extractBattingRatings(Document doc) {
-        if (doc.select("td:containsOwn(Contact)").isEmpty()) {
+        if (!hasBattingRatings(doc)) {
             return null;
         }
 
@@ -80,7 +86,7 @@ public class PlayerExtraction {
     }
 
     private BattingRatings extractBattingPotential(Document doc) {
-        if (doc.select("td:containsOwn(Contact)").isEmpty()) {
+        if (!hasBattingRatings(doc)) {
             return null;
         }
 
@@ -118,8 +124,12 @@ public class PlayerExtraction {
         return 0.0;
     }
 
+    private boolean hasPitchingRatings(Document doc) {
+        return !doc.select("td:containsOwn(Stuff):not(.sl,.slg)").isEmpty();
+
+    }
     private Splits<PitchingRatings> extractPitchingRatings(Document doc) {
-        if (doc.select("td:containsOwn(Stuff)").isEmpty()) {
+        if (!hasPitchingRatings(doc)) {
             return null;
         }
         PitchingRatings vsL = new PitchingRatings();
@@ -142,7 +152,7 @@ public class PlayerExtraction {
     }
 
     private PitchingRatings extractPitchingPotential(Document doc) {
-        if (doc.select("td:containsOwn(Stuff)").isEmpty()) {
+        if (!hasPitchingRatings(doc)) {
             return null;
         }
         PitchingRatings potential = new PitchingRatings();

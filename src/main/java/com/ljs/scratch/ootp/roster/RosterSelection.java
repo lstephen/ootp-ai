@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
@@ -228,7 +229,8 @@ public final class RosterSelection {
             for (Player p : previous.getPlayers(Status.ML)) {
                 if (team.containsPlayer(p)
                     && p.getOutOfOptions().or(Boolean.FALSE)
-                    && !p.getClearedWaivers().or(Boolean.FALSE)) {
+                    && !p.getClearedWaivers().or(Boolean.FALSE)
+                    && !Iterables.contains(team.getInjuries(), p)) {
 
                     forced.add(p);
                 }

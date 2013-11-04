@@ -140,7 +140,7 @@ public final class Roster {
                     }));
 
         for (int i = 0; i < maxSize; i++) {
-            for (Status s : Status.values()) {
+            for (Status s : Ordering.explicit(Arrays.asList(Status.values())).sortedCopy(assignments.keySet())) {
                 List<Player> ps = Player
                     .byShortName()
                     .sortedCopy(assignments.get(s));
