@@ -6,8 +6,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Slot;
@@ -164,14 +164,14 @@ public final class FreeAgents {
         if (fa.getShortName().contains("fake ") || fa.getShortName().contains("Draft Pik")) {
             return true;
         }
-        if (fa.getTeam().contains("*CEI*")) {
+        if (fa.getTeam() != null && fa.getTeam().contains("*CEI*")) {
             return true;
         }
         return false;
     }
 
     public static FreeAgents create(Site site, Changes changes, Function<Player, Integer> value, TradeValue tv) {
-        FreeAgents fas = create(site.getFreeAgents().extract(), value, tv);
+        FreeAgents fas = create(site.getFreeAgents(), value, tv);
 
         fas.skip(changes.get(Changes.ChangeType.DONT_ACQUIRE));
 

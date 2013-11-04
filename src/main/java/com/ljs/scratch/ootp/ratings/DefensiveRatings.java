@@ -33,32 +33,10 @@ public class DefensiveRatings {
         positionRating.put(p, rating);
     }
 
-    public Integer getInfieldArm() {
-        return infieldArm == null ? 0 : infieldArm;
-    }
-
-    public void setInfieldArm(Integer infieldArm) {
-        this.infieldArm = infieldArm;
-    }
-
-    public Integer getOutfieldArm() {
-        return outfieldArm;
-    }
-
-    public void setOutfieldArm(Integer outfieldArm) {
-        this.outfieldArm = outfieldArm;
-    }
-
-
     public Double getPositionScore(Position p) {
         Double rating = positionRating.containsKey(p) ? positionRating.get(p) : 0;
 
         return MINIMUMS.containsKey(p) && rating < MINIMUMS.get(p) ? 0.0 : rating;
-    }
-
-    @Deprecated
-    public DefensiveRatings applyMinimums() {
-        return this;
     }
 
     public String getPositionScores() {
@@ -96,27 +74,25 @@ public class DefensiveRatings {
     }
 
     public String getPrimaryPosition() {
-        DefensiveRatings rs = applyMinimums();
+        Position specialty = byRawScore(this).max(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD);
 
-        Position specialty = byRawScore(rs).max(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD);
-
-        if (rs.getPositionScore(specialty) > 0) {
+        if (getPositionScore(specialty) > 0) {
             return specialty.getAbbreviation();
         }
 
-        Position tierTwo = byRawScore(rs).max(Position.SECOND_BASE, Position.THIRD_BASE);
+        Position tierTwo = byRawScore(this).max(Position.SECOND_BASE, Position.THIRD_BASE);
 
-        if (rs.getPositionScore(tierTwo) > 0) {
+        if (getPositionScore(tierTwo) > 0) {
             return tierTwo.getAbbreviation();
         }
 
-        Position tierThree = byRawScore(rs).max(Position.RIGHT_FIELD, Position.LEFT_FIELD);
+        Position tierThree = byRawScore(this).max(Position.RIGHT_FIELD, Position.LEFT_FIELD);
 
-        if (rs.getPositionScore(tierThree) > 0) {
+        if (getPositionScore(tierThree) > 0) {
             return tierThree.getAbbreviation();
         }
 
-        return rs.getPositionScore(Position.FIRST_BASE) > 0
+        return getPositionScore(Position.FIRST_BASE) > 0
             ? Position.FIRST_BASE.getAbbreviation()
             : "DH";
 

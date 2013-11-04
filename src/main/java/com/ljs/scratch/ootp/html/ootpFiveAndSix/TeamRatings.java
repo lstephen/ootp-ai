@@ -31,7 +31,7 @@ public class TeamRatings {
             ImmutableSet.builder();
 
         for (PlayerId id : extractPlayerIds()) {
-            Player p = site.getPlayer(id).extract();
+            Player p = site.getPlayer(id);
 
             if (p != null) {
                 result.add(p);

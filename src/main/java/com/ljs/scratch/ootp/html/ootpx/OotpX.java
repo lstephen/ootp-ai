@@ -2,29 +2,32 @@ package com.ljs.scratch.ootp.html.ootpx;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.LeagueBatting;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.LeaguePitching;
+import com.ljs.scratch.ootp.html.TeamBatting;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.MinorLeagues;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.PlayerList;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.Salary;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.SinglePlayer;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.SingleTeam;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.Standings;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamBatting;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamPitching;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamRatings;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
+import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
+import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
+import com.ljs.scratch.ootp.stats.PitchingStats;
+import java.util.Arrays;
+import java.util.List;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.jsoup.nodes.Document;
 
 /**
  *
@@ -32,20 +35,20 @@ import org.joda.time.LocalDate;
  */
 public class OotpX implements Site {
 
-    private SiteDefinition def;
+    private SiteDefinition definition;
 
-    private OotpX(SiteDefinition def) {
-        this.def = def;
+    private OotpX(SiteDefinition definition) {
+        this.definition = definition;
     }
 
     @Override
     public Roster extractRoster() {
-        throw new UnsupportedOperationException();
+        return RosterExtraction.create(this).extract(definition.getTeam());
     }
 
     @Override
     public Team extractTeam() {
-        throw new UnsupportedOperationException();
+        return TeamExtraction.create(this).extractTeam(definition.getTeam());
     }
 
     @Override
@@ -55,32 +58,34 @@ public class OotpX implements Site {
 
     @Override
     public LocalDate getDate() {
-        throw new UnsupportedOperationException();
+        Document doc = Pages.leagueBatting(this).load();
+        String date = doc.select("span:matchesOwn([0-9][0-9]-[0-9][0-9]-[0-9][0-9][0-9][0-9])").text();
+        return LocalDate.parse(date, DateTimeFormat.forPattern("MM-dd-yyyy"));
     }
 
     @Override
     public SiteDefinition getDefinition() {
+        return definition;
+    }
+
+    @Override
+    public Iterable<Player> getDraft() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public PlayerList getDraft() {
-        throw new UnsupportedOperationException();
+    public Iterable<Player> getFreeAgents() {
+        return PlayerList.from(this, "leagues/league_100_free_agents_report_0.html").extract();
     }
 
     @Override
-    public PlayerList getFreeAgents() {
-        throw new UnsupportedOperationException();
+    public BattingStats getLeagueBatting() {
+        return LeagueBattingExtraction.create(this).extract();
     }
 
     @Override
-    public LeagueBatting getLeagueBatting() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public LeaguePitching getLeaguePitching() {
-        throw new UnsupportedOperationException();
+    public PitchingStats getLeaguePitching() {
+        return LeaguePitchingExtraction.create(this).extract();
     }
 
     @Override
@@ -96,42 +101,48 @@ public class OotpX implements Site {
 
     @Override
     public String getName() {
-        throw new UnsupportedOperationException();
+        return definition.getName();
     }
 
     @Override
     public int getNumberOfTeams() {
-        throw new UnsupportedOperationException();
+        return definition.getNumberOfTeams();
     }
 
     @Override
     public Page getPage(String url) {
-        throw new UnsupportedOperationException();
+        return PageFactory.create(definition.getSiteRoot(), url);
     }
 
     @Override
     public PitcherOverall getPitcherSelectionMethod() {
-        throw new UnsupportedOperationException();
+        return PitcherOverall.FIP;
     }
 
     @Override
-    public SinglePlayer getPlayer(PlayerId id) {
-        throw new UnsupportedOperationException();
+    public Player getPlayer(PlayerId id) {
+        return PlayerExtraction.create(this).extract(id);
     }
 
     @Override
     public Iterable<Player> getPlayers(PlayerId... ids) {
-        throw new UnsupportedOperationException();
+        return getPlayers(Arrays.asList(ids));
     }
 
     @Override
     public Iterable<Player> getPlayers(
         Iterable<PlayerId> ids) {
-        throw new UnsupportedOperationException();
+        List<Player> ps = Lists.newArrayList();
+
+        for (PlayerId id : ids) {
+            ps.add(getPlayer(id));
+        }
+
+        return ps;
     }
 
     @Override
-    public PlayerList getRuleFiveDraft() {
+    public Iterable<Player> getRuleFiveDraft() {
         throw new UnsupportedOperationException();
     }
 
@@ -179,12 +190,12 @@ public class OotpX implements Site {
 
     @Override
     public TeamBatting getTeamBatting() {
-        throw new UnsupportedOperationException();
+        return TeamBattingImpl.create(this, definition.getTeam());
     }
 
     @Override
-    public TeamPitching getTeamPitching() {
-        throw new UnsupportedOperationException();
+    public TeamPitchingImpl getTeamPitching() {
+        return TeamPitchingImpl.create(this, definition.getTeam());
     }
 
     @Override
@@ -221,11 +232,11 @@ public class OotpX implements Site {
 
     @Override
     public Version getType() {
-        throw new UnsupportedOperationException();
+        return definition.getType();
     }
 
     @Override
-    public PlayerList getWaiverWire() {
+    public Iterable<Player> getWaiverWire() {
         throw new UnsupportedOperationException();
     }
 

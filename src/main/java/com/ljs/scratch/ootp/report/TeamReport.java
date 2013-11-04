@@ -48,7 +48,7 @@ public final class TeamReport {
         this.title = title;
         this.site = site;
         this.value = value;
-        this.leaguePitching = site.getLeaguePitching().extractTotal();
+        this.leaguePitching = site.getLeaguePitching();
     }
 
     public void print(OutputStream out) {

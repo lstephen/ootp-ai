@@ -1,5 +1,7 @@
 package com.ljs.scratch.ootp.ratings;
 
+import com.google.common.base.Objects;
+
 /**
  *
  * @author lstephen
@@ -36,5 +38,16 @@ public class PitchingRatings {
 
     public int getEndurance() { return endurance; }
     public void setEndurance(int endurance) { this.endurance = endurance; }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("stuff", stuff)
+            .add("control", control)
+            .add("movement", movement)
+            .add("hits", hits)
+            .add("gap", gap)
+            .toString();
+    }
 
 }

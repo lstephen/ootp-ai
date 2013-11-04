@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.ratings;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 import com.ljs.scratch.ootp.regression.SplitPercentages;
 
 /**
@@ -151,6 +152,15 @@ public final class PlayerRatings {
 
     public void setPitchingPotential(PitchingRatings ratings) {
         this.pitchingPotential = ratings;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+            .add("batting", batting)
+            .add("pitching", pitching)
+            .add("defensive", defensive)
+            .toString();
     }
 
     public static BattingRatings getOverallBatting(Splits<BattingRatings> splits) {

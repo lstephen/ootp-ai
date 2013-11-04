@@ -27,7 +27,7 @@ public final class Roster {
 
     private static final Integer DEFAULT_TARGET_MAXIMUM = 110;
 
-    public static enum Status { ML, AAA, AA, A, DL }
+    public static enum Status { ML, AAA, AA, A, SA, R, DL }
 
     private final PlayerSource source;
 

@@ -50,6 +50,9 @@ public final class RosterSelection {
 
     private PitchingRegression pitching;
 
+    private List<Status> remainingLevels =
+        Lists.newArrayList(Status.AAA, Status.AA, Status.A);
+
     private RosterSelection(
         Team team, Predictions predictions, Function<Player, Integer> value) {
 
@@ -158,25 +161,24 @@ public final class RosterSelection {
 
     public void assignMinors(Roster roster) {
 
-        com.ljs.scratch.ootp.roster.Roster.Status level;
-        for (List<Status> remainingLevels = Lists.newArrayList(
-            new com.ljs.scratch.ootp.roster.Roster.Status[]{
-            com.ljs.scratch.ootp.roster.Roster.Status.AAA, com.ljs.scratch.ootp.roster.Roster.Status.AA, com.ljs.scratch.ootp.roster.Roster.Status.A
-        }); !remainingLevels.isEmpty(); remainingLevels.remove(level)) {
-            ImmutableSet<Player> availableHitters = Selections.onlyHitters(roster
-                .getUnassigned());
-            ImmutableSet<Player> availablePitchers = Selections.onlyPitchers(roster
-                .getUnassigned());
+        List<Status> remainingLevels = Lists.newArrayList(this.remainingLevels);
+
+        while (!remainingLevels.isEmpty()) {
+            ImmutableSet<Player> availableHitters =
+                Selections.onlyHitters(roster.getUnassigned());
+
+            ImmutableSet<Player> availablePitchers =
+                Selections.onlyPitchers(roster.getUnassigned());
+
             int hittersSize =
                 ((availableHitters.size() + remainingLevels.size()) - 1) /
                 remainingLevels.size();
             int pitchersSize = ((availablePitchers.size() + remainingLevels
                 .size()) - 1) / remainingLevels.size();
-            Multiset slots = HashMultiset.create();
-            Slot arr$[] = Slot.values();
-            int len$ = arr$.length;
-            for (int i$ = 0; i$ < len$; i$++) {
-                Slot s = arr$[i$];
+
+            Multiset<Slot> slots = HashMultiset.create();
+
+            for (Slot s : Slot.values()) {
                 int toAdd = ((Slot.countPlayersWithPrimary(roster
                     .getUnassigned(), s) + remainingLevels.size()) - 1) /
                     remainingLevels.size();
@@ -186,7 +188,7 @@ public final class RosterSelection {
 
             }
 
-            level = remainingLevels.get(0);
+            Status level = remainingLevels.get(0);
 
             roster.assign(
                 level,
@@ -209,6 +211,8 @@ public final class RosterSelection {
                     .build()
                     .select(ImmutableSet.<Player>of(), availablePitchers)
                     .values());
+
+            remainingLevels.remove(level);
         }
 
     }
@@ -300,6 +304,23 @@ public final class RosterSelection {
         }
 
         w.flush();
+    }
+
+    public static RosterSelection ootpx(Team team, BattingRegression batting,
+        PitchingRegression pitching, Function<Player, Integer> value) {
+
+        RosterSelection selection = new RosterSelection(
+            team,
+            Predictions
+                .predict(team)
+                .using(batting, pitching, PitcherOverall.FIP),
+            value);
+        selection.batting = batting;
+        selection.pitching = pitching;
+
+        selection.remainingLevels = Lists.newArrayList(Status.AAA, Status.AA, Status.A, Status.SA, Status.R);
+
+        return selection;
     }
 
     public static RosterSelection ootp6(Team team, BattingRegression batting,

@@ -1,7 +1,8 @@
-package com.ljs.scratch.ootp.html;
+package com.ljs.scratch.ootp.html.ootpFiveAndSix;
 
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.SinglePlayer;
 import com.google.common.base.Optional;
+import com.ljs.scratch.ootp.html.MockSite;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.ratings.BattingRatings;

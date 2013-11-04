@@ -50,7 +50,7 @@ public class MinorLeagues {
         for (Element el : els.select("a")) {
             PlayerId id = new PlayerId(el.attr("href").replaceAll(".html", ""));
 
-            Player p = site.getPlayer(id).extract();
+            Player p = site.getPlayer(id);
 
             if (p != null) {
                 roster.assign(level, p);
@@ -69,7 +69,7 @@ public class MinorLeagues {
 
             PlayerId id = new PlayerId(el.attr("href").replaceAll(".html", ""));
 
-            players.add(site.getPlayer(id).extract());
+            players.add(site.getPlayer(id));
         }
 
         return players;

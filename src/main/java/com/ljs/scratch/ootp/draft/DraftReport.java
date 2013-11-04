@@ -2,8 +2,8 @@ package com.ljs.scratch.ootp.draft;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
 import java.io.OutputStream;
@@ -30,7 +30,7 @@ public final class DraftReport {
         current = DraftClass.load(
             getDraftClassFile(site.getDate().getYear()), site.getDefinition());
 
-        for (Player p : site.getDraft().extract()) {
+        for (Player p : site.getDraft()) {
             current.addIfNotPresent(p);
         }
 

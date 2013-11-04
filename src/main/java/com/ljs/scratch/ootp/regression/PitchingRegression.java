@@ -1,9 +1,9 @@
 package com.ljs.scratch.ootp.regression;
 
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamPitching;
+import com.ljs.scratch.ootp.html.TeamPitching;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -42,7 +42,7 @@ public final class PitchingRegression {
 
     private PitchingRegression(Site site) {
         this.site = site;
-        this.leaguePitching = site.getLeaguePitching().extractTotal();
+        this.leaguePitching = site.getLeaguePitching();
     }
 
     public Boolean isEmpty() {
@@ -161,6 +161,7 @@ public final class PitchingRegression {
                     (int) (plateAppearances * predict(Predicting.DOUBLES, ratings.getGap()));
                 break;
             case OOTP6:
+            case OOTPX:
                 predictedDoubles = 0;
                 predictedHits =
                     (int) (
@@ -242,7 +243,7 @@ public final class PitchingRegression {
 
         History history = new History();
 
-        int season = teamPitching.extractDate().getYear();
+        int season = teamPitching.getYear();
 
         history.savePitching(pitchingStats, site, season);
 

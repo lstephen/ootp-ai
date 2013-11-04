@@ -1,9 +1,9 @@
 package com.ljs.scratch.ootp.regression;
 
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamBatting;
+import com.ljs.scratch.ootp.html.TeamBatting;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
 import com.ljs.scratch.ootp.stats.BattingStats;
@@ -50,6 +50,10 @@ public final class BattingRegression {
            Splits<BattingStats> stats = teamStats.getSplits(p);
            Splits<BattingRatings> ratings = p.getBattingRatings();
 
+           System.out.println(p.getShortName());
+           System.out.println(stats);
+           System.out.println(ratings);
+
            addData(stats.getVsLeft(), ratings.getVsLeft());
            addData(stats.getVsRight(), ratings.getVsRight());
        }
@@ -95,7 +99,9 @@ public final class BattingRegression {
         Map<Player, SplitStats<BattingStats>> results = Maps.newHashMap();
 
         for (Player p : ps) {
-            results.put(p, predict(p));
+            if (p.getBattingRatings() != null) {
+                results.put(p, predict(p));
+            }
         }
 
         return TeamStats.create(results);
@@ -112,12 +118,14 @@ public final class BattingRegression {
         Map<Player, SplitStats<BattingStats>> results = Maps.newHashMap();
 
         for (Player p : ps) {
-            SplitStats<BattingStats> prediction =
-                SplitStats.create(
-                    predict(p.getBattingPotentialRatings().getVsLeft()),
-                    predict(p.getBattingPotentialRatings().getVsRight()));
+            if (p.getBattingRatings() != null) {
+                SplitStats<BattingStats> prediction =
+                    SplitStats.create(
+                        predict(p.getBattingPotentialRatings().getVsLeft()),
+                        predict(p.getBattingPotentialRatings().getVsRight()));
 
-            results.put(p, prediction);
+                results.put(p, prediction);
+            }
         }
 
         return TeamStats.create(results);
@@ -212,7 +220,7 @@ public final class BattingRegression {
 
         History history = new History();
 
-        int currentSeason = teamBatting.extractDate().getYear();
+        int currentSeason = teamBatting.getYear();
 
         history.saveBatting(battingStats, site, currentSeason);
 
@@ -222,7 +230,7 @@ public final class BattingRegression {
     }
 
     public static BattingRegression run(Site site) {
-        BattingRegression regression = new BattingRegression(site.getLeagueBatting().extractTotal());
+        BattingRegression regression = new BattingRegression(site.getLeagueBatting());
         regression.runRegression(site);
         return regression;
     }

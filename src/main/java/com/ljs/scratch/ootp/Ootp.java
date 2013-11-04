@@ -106,7 +106,7 @@ public class Ootp {
         SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
 
     private static final SiteDefinition PSD =
-        SiteDefinitionFactory.ootpx("PSD", "http://www.redraftleague.com/game/lgreports2/news/html/leagues/league_100_home.html", Id.<Team>valueOf(8), "National", 20);
+        SiteDefinitionFactory.ootpx("PSD", "http://www.redraftleague.com/game/lgreports2/news/html/", Id.<Team>valueOf(8), "American", 20);
 
     public static void main(String[] args) throws IOException {
         new Ootp().run();
@@ -116,11 +116,12 @@ public class Ootp {
         for (SiteDefinition def : Arrays.asList
             //( TWML
             //( CBL
-            ( HFTC
+            //( HFTC
             //( LBB
-            //( BTH
-            //( SAVOY
+            ( BTH
+            , SAVOY
             //, TFMS
+            //(PSD
             )) {
             try (
                 FileOutputStream out =
@@ -208,7 +209,7 @@ public class Ootp {
         if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
             && site.getDate().getMonthOfYear() > DateTimeConstants.MARCH
             && !battingRegression.isEmpty()
-            && !battingRegression.isEmpty()) {
+            && !pitchingRegression.isEmpty()) {
 
             LOG.info("Determining FA acquisition...");
 
@@ -239,6 +240,10 @@ public class Ootp {
 
         if (site.getType() == Version.OOTP5) {
             selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
+        }
+
+        if (site.getType() == Version.OOTPX) {
+            selection = RosterSelection.ootpx(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
         }
 
         selection.setPrevious(oldRoster);
@@ -341,7 +346,7 @@ public class Ootp {
 
         LOG.info("Draft...");
         ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
-        Iterable<Player> remaining = Sets.difference(ImmutableSet.copyOf(site.getDraft().extract()), drafted);
+        Iterable<Player> remaining = Sets.difference(ImmutableSet.copyOf(site.getDraft()), drafted);
 
 
         if (!Iterables.isEmpty(remaining)) {
@@ -396,7 +401,7 @@ public class Ootp {
         if (def.getName().equals("BTH")) {
             LOG.info("Waviers report...");
             generic.setTitle("Waivers");
-            generic.setPlayers(site.getWaiverWire().extract());
+            generic.setPlayers(site.getWaiverWire());
             generic.print(out);
 
             if (site.getDate().getMonthOfYear() < DateTimeConstants.APRIL) {
@@ -404,7 +409,7 @@ public class Ootp {
                 generic.setTitle("Rule 5");
                 generic.setPlayers(
                     Iterables.filter(
-                        site.getRuleFiveDraft().extract(),
+                        site.getRuleFiveDraft(),
                         new Predicate<Player>() {
                             public boolean apply(Player p) {
                                 return tv.getCurrentValueVsReplacement(p) >= 0;
@@ -421,7 +426,7 @@ public class Ootp {
         generic.print(out);
 
         generic.setTitle("Free Agents");
-        generic.setPlayers(site.getFreeAgents().extract());
+        generic.setPlayers(site.getFreeAgents());
         generic.setLimit(50);
         generic.print(out);
 

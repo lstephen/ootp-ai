@@ -7,9 +7,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
-import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
@@ -137,7 +137,7 @@ public class FourtyManRoster {
                             Sets.difference(
                                 Selections.onlyOn40Man(roster.getAllPlayers()),
                                 getDesired40ManRoster())))
-                , getNumberToRemove());
+                , Math.max(getNumberToRemove(), 0));
     }
 
     public Iterable<Player> getPlayersToAdd() {

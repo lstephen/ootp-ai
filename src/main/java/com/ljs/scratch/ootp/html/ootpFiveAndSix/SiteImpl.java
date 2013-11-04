@@ -8,6 +8,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.html.TeamPitching;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
@@ -16,7 +17,9 @@ import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
+import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
+import com.ljs.scratch.ootp.stats.PitchingStats;
 import java.util.Arrays;
 import java.util.Set;
 import org.joda.time.LocalDate;
@@ -54,7 +57,7 @@ public final class SiteImpl implements Site {
 
     @Override
     public LocalDate getDate() {
-        return getLeagueBatting().extractDate();
+        return getLeagueBattingPage().extractDate();
     }
 
     @Override
@@ -73,23 +76,27 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public PlayerList getDraft() {
-        return PlayerList.draft(this);
+    public Iterable<Player> getDraft() {
+        return PlayerList.draft(this).extract();
     }
 
     @Override
-    public PlayerList getFreeAgents() {
-        return PlayerList.freeAgents(this);
+    public Iterable<Player> getFreeAgents() {
+        return PlayerList.freeAgents(this).extract();
     }
 
     @Override
-    public LeagueBatting getLeagueBatting() {
+    public BattingStats getLeagueBatting() {
+        return getLeagueBattingPage().extractTotal();
+    }
+
+    private LeagueBatting getLeagueBattingPage() {
         return new LeagueBatting(this, definition.getLeague());
     }
 
     @Override
-    public LeaguePitching getLeaguePitching() {
-        return new LeaguePitching(this, definition.getLeague());
+    public PitchingStats getLeaguePitching() {
+        return new LeaguePitching(this, definition.getLeague()).extractTotal();
     }
 
     @Override
@@ -103,8 +110,8 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public PlayerList getRuleFiveDraft() {
-        return PlayerList.ruleFiveDraft(this);
+    public Iterable<Player> getRuleFiveDraft() {
+        return PlayerList.ruleFiveDraft(this).extract();
     }
 
     @Override
@@ -179,13 +186,13 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public TeamBatting getTeamBatting() {
-        return new TeamBatting(this, definition.getTeam());
+    public TeamBattingImpl getTeamBatting() {
+        return new TeamBattingImpl(this, definition.getTeam());
     }
 
     @Override
     public TeamPitching getTeamPitching() {
-        return new TeamPitching(this, definition.getTeam());
+        return new TeamPitchingImpl(this, definition.getTeam());
     }
 
     @Override
@@ -214,13 +221,13 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public SinglePlayer getPlayer(PlayerId id) {
-        return new SinglePlayer(this, id);
+    public Player getPlayer(PlayerId id) {
+        return new SinglePlayer(this, id).extract();
     }
 
     @Override
-    public PlayerList getWaiverWire() {
-        return PlayerList.waiverWire(this);
+    public Iterable<Player> getWaiverWire() {
+        return PlayerList.waiverWire(this).extract();
     }
 
     @Override
@@ -233,7 +240,7 @@ public final class SiteImpl implements Site {
         return Iterables.transform(ids, new Function<PlayerId, Player>() {
             @Override
             public Player apply(PlayerId id) {
-                return getPlayer(id).extract();
+                return getPlayer(id);
             }
         });
     }

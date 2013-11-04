@@ -321,22 +321,6 @@ public class SinglePlayer {
             }
         }
 
-        if (raw.contains("Infield Arm :")) {
-            ratings.setInfieldArm(Integer.parseInt(StringUtils.substringBetween(
-                raw, "Infield Arm :", "Outfield").trim()));
-        }
-
-        if (raw.contains("Outfield Arm :")) {
-            Integer ofArm = ratingFromString(StringUtils.substringAfter(
-                raw, "Outfield Arm :").trim());
-
-            if (site.getType() == Version.OOTP5 && ofArm > 0) {
-                ofArm = (ofArm - 5) / 2 + 5;
-            }
-
-            ratings.setOutfieldArm(ofArm);
-        }
-
         return ratings;
     }
 

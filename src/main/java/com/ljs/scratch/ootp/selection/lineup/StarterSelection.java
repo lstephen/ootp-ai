@@ -107,7 +107,7 @@ public class StarterSelection {
     private boolean containsCatcher(Iterable bench) {
         for (Iterator i$ = bench.iterator(); i$.hasNext();) {
             Player p = (Player) i$.next();
-            if (p.getDefensiveRatings().applyMinimums().getPositionScore(
+            if (p.getDefensiveRatings().getPositionScore(
                 Position.CATCHER).doubleValue() > 0.0D) {
                 return true;
             }
@@ -121,7 +121,7 @@ public class StarterSelection {
         if (p == null) {
             return true;
         }
-        DefensiveRatings def = p.getDefensiveRatings().applyMinimums();
+        DefensiveRatings def = p.getDefensiveRatings();
         Set nextPlayers = Sets.newHashSet(ps);
         nextPlayers.remove(p);
         Position arr$[] = Position.values();

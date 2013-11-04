@@ -76,7 +76,7 @@ public class LeaguePitching {
     public PitchingStats extractTotal() {
         Elements total = extractTotalLine();
 
-        BattingStats leagueBatting = site.getLeagueBatting().extractTotal();
+        BattingStats leagueBatting = site.getLeagueBatting();
 
         PitchingStats pitching = new PitchingStats();
 

@@ -14,4 +14,8 @@ public final class ElementsUtil {
         return Integer.valueOf(line.get(idx).text());
     }
 
+    public static Double getDouble(Elements line, int idx) {
+        return Double.valueOf(line.get(idx).text());
+    }
+
 }

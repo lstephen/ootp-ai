@@ -6,10 +6,10 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
+import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.html.ootpFiveAndSix.PlayerList;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.PlayerList;
-import com.ljs.scratch.ootp.html.Site;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +91,7 @@ public final class Changes {
                 if (raw.charAt(0) == 'p') {
                     PlayerId id = new PlayerId(raw);
 
-                    changes.add(type, site.getPlayer(id).extract());
+                    changes.add(type, site.getPlayer(id));
                 } else {
                     switch (type) {
                         case PICKED:

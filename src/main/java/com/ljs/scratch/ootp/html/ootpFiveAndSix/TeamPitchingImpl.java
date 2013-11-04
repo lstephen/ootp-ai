@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.html.ootpFiveAndSix;
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.html.TeamPitching;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -14,7 +15,9 @@ import org.jsoup.select.Elements;
  *
  * @author lstephen
  */
-public class TeamPitching extends SingleTeamStats<PitchingStats> {
+public class TeamPitchingImpl
+    extends SingleTeamStats<PitchingStats>
+    implements TeamPitching {
 
     private static final int ATBAT_IDX = 1;
     private static final int HITS_IDX = 2;
@@ -24,7 +27,7 @@ public class TeamPitching extends SingleTeamStats<PitchingStats> {
     private static final int WALKS_IDX = 7;
     private static final int HOMERUN_IDX = 5;
 
-    public TeamPitching(Site site, Id<Team> team) {
+    public TeamPitchingImpl(Site site, Id<Team> team) {
         super(site.extractTeam(), site.getPage("team" + team.get() + "p.html"));
     }
 

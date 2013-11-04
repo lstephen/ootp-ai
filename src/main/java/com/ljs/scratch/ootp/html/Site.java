@@ -3,16 +3,10 @@ package com.ljs.scratch.ootp.html;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.LeagueBatting;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.LeaguePitching;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.MinorLeagues;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.PlayerList;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.Salary;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.SinglePlayer;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.SingleTeam;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.Standings;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamBatting;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamPitching;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamRatings;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
@@ -22,7 +16,9 @@ import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
+import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
+import com.ljs.scratch.ootp.stats.PitchingStats;
 import org.joda.time.LocalDate;
 
 /**
@@ -41,13 +37,13 @@ public interface Site {
 
     SiteDefinition getDefinition();
 
-    PlayerList getDraft();
+    Iterable<Player> getDraft();
 
-    PlayerList getFreeAgents();
+    Iterable<Player> getFreeAgents();
 
-    LeagueBatting getLeagueBatting();
+    BattingStats getLeagueBatting();
 
-    LeaguePitching getLeaguePitching();
+    PitchingStats getLeaguePitching();
 
     MinorLeagues getMinorLeagues();
 
@@ -62,14 +58,14 @@ public interface Site {
 
     PitcherOverall getPitcherSelectionMethod();
 
-    SinglePlayer getPlayer(PlayerId id);
+    Player getPlayer(PlayerId id);
 
     Iterable<Player> getPlayers(PlayerId... ids);
 
     Iterable<Player> getPlayers(
         Iterable<PlayerId> ids);
 
-    PlayerList getRuleFiveDraft();
+    Iterable<Player> getRuleFiveDraft();
 
     Salary getSalary();
 
@@ -109,7 +105,7 @@ public interface Site {
 
     Version getType();
 
-    PlayerList getWaiverWire();
+    Iterable<Player> getWaiverWire();
 
     boolean isFutureFreeAgent(Player p);
 

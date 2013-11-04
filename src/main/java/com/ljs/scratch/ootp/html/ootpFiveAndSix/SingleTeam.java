@@ -70,7 +70,7 @@ public class SingleTeam {
             if (team.containsPlayer(id)) {
                 roster.assign(Roster.Status.ML, id);
             } else {
-                Player p = site.getPlayer(id).extract();
+                Player p = site.getPlayer(id);
 
                 if (p != null) {
                     roster.assign(Roster.Status.ML, p);

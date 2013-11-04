@@ -6,10 +6,10 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.stats.Stats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import com.ljs.scratch.ootp.roster.Team;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -32,6 +32,10 @@ public abstract class SingleTeamStats<S extends Stats<S>> {
     protected SingleTeamStats(Team team, Page page) {
         this.team = team;
         this.page = page;
+    }
+
+    public Integer getYear() {
+        return extractDate().getYear();
     }
 
     public LocalDate extractDate() {
