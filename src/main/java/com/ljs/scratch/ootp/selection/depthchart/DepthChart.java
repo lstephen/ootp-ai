@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -97,6 +98,8 @@ public class DepthChart {
             return new Function<Backup, String>() {
                 @Override
                 public String apply(Backup bu) {
+                    Assertions.assertThat(bu).isNotNull();
+
                     return String.format(
                         "(%2d%%) %-15s",
                         bu.percentage,

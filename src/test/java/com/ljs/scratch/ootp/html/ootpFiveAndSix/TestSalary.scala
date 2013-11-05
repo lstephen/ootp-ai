@@ -21,7 +21,7 @@ class TestSalary extends FlatSpec {
         val id = randomAlphanumeric(10)
         val site = new MockSite
 
-        val salary = new Salary(site, Id.valueOf(id))
+        val salary = new SalaryImpl(site, Id.valueOf(id))
 
         site.expectGetPage(f"team$id%ssa.html")
         site.onLoadPage("/com/ljs/scratch/ootp/html/pam_salary_ootp6.html")

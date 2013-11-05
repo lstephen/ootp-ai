@@ -148,6 +148,14 @@ public class PlayerExtraction {
         vsR.setHits(vsR.getStuff());
         vsR.setGap(vsR.getMovement());
 
+        if (doc.select("td:containsOwn(Suggested Role) + td").text().contains("Starter")) {
+            vsL.setEndurance(8);
+            vsR.setEndurance(8);
+        } else {
+            vsL.setEndurance(3);
+            vsR.setEndurance(3);
+        };
+
         return Splits.create(vsL, vsR);
     }
 
