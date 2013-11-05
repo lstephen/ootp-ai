@@ -42,7 +42,7 @@ public interface Site {
 
     String getName();
 
-    int getNumberOfTeams();
+    Iterable<Id<Team>> getTeamIds();
 
     Page getPage(String url, Object... args);
 

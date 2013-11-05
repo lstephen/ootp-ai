@@ -66,8 +66,14 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public int getNumberOfTeams() {
-        return definition.getNumberOfTeams();
+    public Iterable<Id<Team>> getTeamIds() {
+        Set<Id<Team>> ids = Sets.newHashSet();
+
+        for (int i = 1; i <= definition.getNumberOfTeams(); i++) {
+            ids.add(Id.<Team>valueOf(i));
+        }
+
+        return ids;
     }
 
     @Override
@@ -126,8 +132,8 @@ public final class SiteImpl implements Site {
 
     @Override
     public String getSalary(Player p) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            String salary = getSalary(i).getSalary(p);
+        for (Id<Team> id : getTeamIds()) {
+            String salary = getSalary(id).getSalary(p);
 
             if (salary != null) {
                 return salary;
@@ -138,8 +144,8 @@ public final class SiteImpl implements Site {
 
     @Override
     public Integer getCurrentSalary(Player p) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            Integer salary = getSalary(i).getCurrentSalary(p);
+        for (Id<Team> id : getTeamIds()) {
+            Integer salary = getSalary(id).getCurrentSalary(p);
 
             if (salary != 0) {
                 return salary;
@@ -150,8 +156,8 @@ public final class SiteImpl implements Site {
 
     @Override
     public Optional<Integer> getTeamTopProspectPosition(PlayerId id) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            Optional<Integer> pos = getTopProspects(i).getPosition(id);
+        for (Id<Team> team : getTeamIds()) {
+            Optional<Integer> pos = getTopProspects(team).getPosition(id);
 
             if (pos.isPresent()) {
                 return pos;
@@ -251,8 +257,8 @@ public final class SiteImpl implements Site {
         if (injured == null) {
             Set<PlayerId> is = Sets.newHashSet();
 
-            for (int i = 1; i <= getNumberOfTeams(); i++) {
-                Iterables.addAll(is, getSingleTeam(i).extractInjuries());
+            for (Id<Team> id : getTeamIds()) {
+                Iterables.addAll(is, getSingleTeam(id).extractInjuries());
             }
 
             injured = ImmutableSet.copyOf(is);

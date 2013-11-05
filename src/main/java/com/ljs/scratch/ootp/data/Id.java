@@ -43,6 +43,11 @@ public final class Id<T> {
         return Objects.hashCode(id);
     }
 
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", id).toString();
+    }
+
     public static <T> Id<T> valueOf(String id) {
         return new Id<T>(id);
     }

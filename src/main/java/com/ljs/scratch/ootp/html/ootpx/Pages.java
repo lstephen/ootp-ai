@@ -31,5 +31,9 @@ public final class Pages {
         return site.getPage("players/%s.html", id.unwrap());
     }
 
+    public static Page standings(Site site) {
+        return site.getPage("leagues/league_100_standings.html");
+    }
+
 
 }

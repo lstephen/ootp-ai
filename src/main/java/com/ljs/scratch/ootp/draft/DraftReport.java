@@ -44,8 +44,9 @@ public final class DraftReport {
     }
 
     private RoundValue getRoundValue(int round) {
-        return getValueOfPicks(
-            (round - 1) * site.getNumberOfTeams(), site.getNumberOfTeams());
+        Integer not = Iterables.size(site.getTeamIds());
+
+        return getValueOfPicks((round - 1) * not, not);
     }
 
     private RoundValue getValueOfPicks(int n) {
@@ -83,8 +84,10 @@ public final class DraftReport {
     public void print(PrintWriter w) {
         w.println();
 
+        Integer not = Iterables.size(site.getTeamIds());
+
         int idx = 0;
-        int n = site.getNumberOfTeams() / 3;
+        int n = not / 3;
 
         RoundValue rv = getValueOfPicks(n);
         if (rv == null) {
@@ -99,19 +102,19 @@ public final class DraftReport {
         rv.print(w, "1M");
 
         idx += n;
-        n = site.getNumberOfTeams() - idx;
+        n = not - idx;
 
         rv = getValueOfPicks(idx, n);
         rv.print(w, "1L");
 
-        idx = site.getNumberOfTeams();
-        n = site.getNumberOfTeams() / 2;
+        idx = not;
+        n = not / 2;
 
         rv = getValueOfPicks(idx, n);
         rv.print(w, "2E");
 
         idx += n;
-        n = site.getNumberOfTeams() * 2 - idx;
+        n = not * 2 - idx;
 
         rv = getValueOfPicks(idx, n);
         rv.print(w, "2L");

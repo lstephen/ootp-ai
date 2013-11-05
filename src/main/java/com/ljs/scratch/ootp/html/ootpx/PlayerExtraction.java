@@ -1,6 +1,7 @@
 package com.ljs.scratch.ootp.html.ootpx;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Throwables;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
@@ -10,6 +11,8 @@ import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.ratings.Position;
 import com.ljs.scratch.ootp.ratings.Splits;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.assertions.api.Assertions;
 import org.fest.util.Strings;
@@ -47,15 +50,39 @@ public class PlayerExtraction {
             player.setSalary("");
         } else {
             String salarySuffix = "  ";
+            try {
+                Integer signedThrough = NumberFormat.getNumberInstance().parse(
+                    doc.select("td:containsOwn(Signed Through:) + td").text()).intValue();
+
+                Integer currentYear = site.getDate().getYear();
+
+                Integer signedFor = signedThrough - currentYear;
+
+                if (signedFor > 1) {
+                    salarySuffix = "x" + signedFor;
+                }
+            } catch (ParseException e) {
+                throw Throwables.propagate(e);
+            }
+
             if (doc.select("td:containsOwn(Arbitration Eligibility:) + td").text().contains("Arbitration eligible")) {
                 salarySuffix = " a";
             }
             if (!doc.select("td:containsOwn(Contract Extension:) + td").text().contains("-")) {
                 salarySuffix = " e";
             }
+            String mlService = doc.select("td:containsOwn(Major Service:) + td").text();
+            if (mlService.contains("None") || mlService.startsWith("1 ") || mlService.startsWith("2 ")) {
+                salarySuffix = " r";
+            }
 
-            player.setSalary(currentSalary + " " + salarySuffix);
+            player.setSalary(currentSalary + salarySuffix);
         }
+
+        if (site.isFutureFreeAgent(player)) {
+            player.setTeam("*FA* " + player.getTeam());
+        }
+
         return player;
     }
 

@@ -2,11 +2,11 @@ package com.ljs.scratch.ootp.html.ootpx;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Salary;
 import com.ljs.scratch.ootp.html.SingleTeam;
@@ -29,10 +29,13 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Strings;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 /**
  *
@@ -41,6 +44,8 @@ import org.jsoup.nodes.Document;
 public class OotpX implements Site {
 
     private SiteDefinition definition;
+
+    private ImmutableSet<PlayerId> fas;
 
     private OotpX(SiteDefinition definition) {
         this.definition = definition;
@@ -58,11 +63,11 @@ public class OotpX implements Site {
 
     @Override
     public Integer getCurrentSalary(Player p) {
-        for (int i = 1; i <= getNumberOfTeams(); i++) {
-            Integer salary = getSalary(i).getCurrentSalary(p);
-
-            if (salary != 0) {
-                return salary;
+        if (!Strings.isNullOrEmpty(p.getSalary()) && p.getSalary().charAt(0) == '$') {
+            try {
+                return NumberFormat.getNumberInstance().parse(p.getSalary().substring(1)).intValue();
+            } catch (ParseException e) {
+                throw Throwables.propagate(e);
             }
         }
         return 0;
@@ -108,8 +113,18 @@ public class OotpX implements Site {
     }
 
     @Override
-    public int getNumberOfTeams() {
-        return definition.getNumberOfTeams();
+    public Iterable<Id<Team>> getTeamIds() {
+        Document doc = Pages.standings(this).load();
+
+        Set<Id<Team>> ids = Sets.newHashSet();
+
+        for (Element el : doc.select("a[href~=teams/]")) {
+            String href = el.attr("href");
+
+            ids.add(Id.<Team>valueOf(StringUtils.substringBetween(href, "team_", ".html")));
+        }
+
+        return ids;
     }
 
     @Override
@@ -158,14 +173,7 @@ public class OotpX implements Site {
     public Salary getSalary(Id<Team> id) {
         return new Salary() {
             public Integer getCurrentSalary(Player p) {
-                if (!Strings.isNullOrEmpty(p.getSalary()) && p.getSalary().charAt(0) == '$') {
-                    try {
-                        return NumberFormat.getNumberInstance().parse(p.getSalary().substring(1)).intValue();
-                    } catch (ParseException e) {
-                        throw Throwables.propagate(e);
-                    }
-                }
-                return 0;
+                return OotpX.this.getCurrentSalary(p);
             }
 
             public Integer getNextSalary(Player p) {
@@ -201,7 +209,8 @@ public class OotpX implements Site {
         return new SingleTeam() {
             @Override
             public String getName() {
-                return "";
+                Document doc = Pages.standings(OotpX.this).load();
+                return doc.select("a[href~=team_" + id.get() + ".html").first().text();
             }
 
             @Override
@@ -262,12 +271,26 @@ public class OotpX implements Site {
 
     @Override
     public boolean isFutureFreeAgent(Player p) {
-        throw new UnsupportedOperationException();
+        return futureFreeAgents().contains(p.getId());
     }
 
     @Override
     public Predicate<Player> isFutureFreeAgent() {
-        return Predicates.alwaysFalse();
+        return new Predicate<Player>() {
+            @Override
+            public boolean apply(Player input) {
+                return isFutureFreeAgent(input);
+            }
+        };
+    }
+
+    private ImmutableSet<PlayerId> futureFreeAgents() {
+        if (fas == null) {
+            fas = ImmutableSet.copyOf(Iterables.concat(
+                PlayerList.from(this, "leagues/league_100_upcoming_free_agents_report_0.html").extractIds(),
+                PlayerList.from(this, "leagues/league_100_upcoming_free_agents_report_1.html").extractIds()));
+        }
+        return fas;
     }
 
     @Override

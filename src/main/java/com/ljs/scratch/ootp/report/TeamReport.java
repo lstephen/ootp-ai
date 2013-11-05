@@ -59,11 +59,11 @@ public final class TeamReport {
 
         Set<TeamScore> scores = Sets.newHashSet();
 
-        for (int i = 1; i <= site.getNumberOfTeams(); i++) {
+        for (Id<Team> id : site.getTeamIds()) {
             scores.add(
                 calculate(
-                Id.<Team>valueOf(i),
-                site.getSingleTeam(i).getRoster().getAllPlayers()));
+                id,
+                site.getSingleTeam(id).getRoster().getAllPlayers()));
         }
 
         scores = normalize(scores);

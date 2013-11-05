@@ -326,10 +326,11 @@ public class Ootp {
 
         SalaryRegression salaryRegression = new SalaryRegression(tv, site);
 
-        for (int i = 1; i <= site.getNumberOfTeams(); i++) {
-            LOG.log(Level.INFO, "{0}/{1}...", new Object[] { i, site.getNumberOfTeams() });
+        Integer n = Iterables.size(site.getTeamIds());
+        for (Id<Team> id : site.getTeamIds()) {
+            LOG.log(Level.INFO, "{0}/{1}...", new Object[] { id, n });
 
-            salaryRegression.add(site.getSalariedPlayers(Id.<Team>valueOf(i)));
+            salaryRegression.add(site.getSalariedPlayers(id));
         }
 
         salaryRegression.printCoefficients(out);
@@ -451,10 +452,10 @@ public class Ootp {
         generic.setLimit(50);
         generic.setMultiplier(0.91);
 
-        for (int i = 1; i <= site.getNumberOfTeams(); i++) {
+        for (Id<Team> id : site.getTeamIds()) {
         //for (int i = 1; i <= 1; i++) {
-            SingleTeam t = site.getSingleTeam(i);
-            LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.getName(), i, site.getNumberOfTeams() });
+            SingleTeam t = site.getSingleTeam(id);
+            LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.getName(), id, n });
             generic.setTitle(t.getName());
 
             Roster r = t.getRoster();
