@@ -25,10 +25,6 @@ public class DefensiveRatings {
 
     private final Map<Position, Double> positionRating = Maps.newHashMap();
 
-    private Integer infieldArm;
-
-    private Integer outfieldArm = 0;
-
     public void setPositionRating(Position p, Double rating) {
         positionRating.put(p, rating);
     }

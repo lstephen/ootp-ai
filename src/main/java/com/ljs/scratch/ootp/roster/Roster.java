@@ -27,6 +27,8 @@ public final class Roster {
 
     private static final Integer DEFAULT_TARGET_MAXIMUM = 110;
 
+    private static final Integer DEFAULT_TARGET_MINIMUM = 90;
+
     public static enum Status { ML, AAA, AA, A, SA, R, DL }
 
     private final PlayerSource source;
@@ -37,6 +39,8 @@ public final class Roster {
         ArrayListMultimap.create();
 
     private Integer targetMaximum = DEFAULT_TARGET_MAXIMUM;
+
+    private Integer targetMinimum = DEFAULT_TARGET_MINIMUM;
 
     private Roster(PlayerSource source, Iterable<Player> available) {
         Preconditions.checkNotNull(source);
@@ -114,6 +118,9 @@ public final class Roster {
         return changes;
     }
 
+    public void setTargetMinimum(Integer min) {
+        this.targetMinimum = min;
+    }
     public void setTargetMaximum(Integer max) {
         this.targetMaximum = max;
     }
@@ -150,7 +157,7 @@ public final class Roster {
             w.println();
         }
 
-        w.println("Total:" + assignments.size() + " (target 90-" + targetMaximum + ")");
+        w.println("Total:" + assignments.size() + " (target " + targetMinimum + "-" + targetMaximum + ")");
 
         w.flush();
     }

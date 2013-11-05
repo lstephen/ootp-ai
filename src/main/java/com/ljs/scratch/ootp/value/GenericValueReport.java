@@ -192,7 +192,7 @@ public class GenericValueReport {
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 13),
                     salary.predict(p) > 0 ? String.format("$%,d", salary.predict(p)) : "",
-                    p.getListedPosition().or("") == p.getPosition() ? "" : p.getListedPosition().or(""),
+                    p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getListedPosition().or(""),
                     p.getId().unwrap(),
                     p.getTeam() == null ? "" : p.getTeam()));
         }

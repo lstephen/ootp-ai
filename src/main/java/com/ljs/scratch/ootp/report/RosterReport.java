@@ -19,8 +19,14 @@ public class RosterReport {
 
     private final Iterable<Player> roster;
 
+    private Integer targetRatio = 40;
+
     private RosterReport(Iterable<Player> roster) {
         this.roster = roster;
+    }
+
+    public void setTargetRatio(Integer ratio) {
+        this.targetRatio = ratio;
     }
 
     private int getPrimaryCount(Slot s) {
@@ -57,7 +63,7 @@ public class RosterReport {
 
         return Sets.filter(slots, new Predicate<Slot>() {
             public boolean apply(Slot s) {
-                return getRatio(s) > 45;
+                return getRatio(s) > (targetRatio * 1.15);
             }
         });
     }
@@ -69,7 +75,7 @@ public class RosterReport {
 
         return Sets.filter(slots, new Predicate<Slot>() {
             public boolean apply(Slot s) {
-                return getRatio(s) < 35;
+                return getRatio(s) < (targetRatio * .85);
             }
         });
     }

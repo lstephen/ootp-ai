@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.html.ootpx;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
@@ -36,6 +37,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -71,6 +73,39 @@ public class OotpX implements Site {
             }
         }
         return 0;
+    }
+
+    private Integer getNextSalary(Player p) {
+        Document doc = Pages.salary(this, definition.getTeam()).load();
+
+        Elements els = doc.select("table.lposhadow tr td:has(a[href~=" + p.getId().unwrap() + "]) + td + td");
+
+        if (els.isEmpty()) {
+            return 0;
+        }
+
+        String raw = CharMatcher.WHITESPACE.trimFrom(els.text());
+
+        if (Strings.isNullOrEmpty(raw)) {
+            return 0;
+        }
+
+        try {
+            Double base = NumberFormat.getNumberInstance().parse(raw.substring(1)).doubleValue();
+
+            if (raw.contains("k")) {
+                base = base * 1000;
+            }
+
+            if (raw.contains("m")) {
+                base = base * 1000000;
+            }
+
+            return base.intValue();
+        } catch (ParseException e) {
+            throw Throwables.propagate(e);
+        }
+
     }
 
     @Override
@@ -177,7 +212,7 @@ public class OotpX implements Site {
             }
 
             public Integer getNextSalary(Player p) {
-                return 0;
+                return OotpX.this.getNextSalary(p);
             }
         };
     }

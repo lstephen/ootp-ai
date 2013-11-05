@@ -83,6 +83,10 @@ public class PlayerExtraction {
             player.setTeam("*FA* " + player.getTeam());
         }
 
+        player.setListedPosition(StringUtils.substringBefore(
+            doc.select("td:containsOwn(" + player.getFirstName() + ")").first().text(),
+            " "));
+
         return player;
     }
 

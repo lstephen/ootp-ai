@@ -189,10 +189,15 @@ public class Ootp {
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
+        Integer minRosterSize = 90;
         Integer maxRosterSize = 110;
 
         if (site.getName().equals("LBB")) {
             maxRosterSize = 100;
+        }
+        if (site.getName().equals("PSD")) {
+            maxRosterSize = 165;
+            minRosterSize = 135;
         }
 
         if (oldRoster.size() > maxRosterSize) {
@@ -219,7 +224,7 @@ public class Ootp {
                 if (fa.isPresent()) {
                     fas.skip(fa.get().getFreeAgent());
 
-                    if (oldRoster.size() > 90) {
+                    if (oldRoster.size() > minRosterSize) {
                         team.remove(fa.get().getRelease());
                     }
                 }
@@ -227,7 +232,7 @@ public class Ootp {
                 nfa = fas.getNeedAcquisition(team);
 
                 if (nfa.isPresent()) {
-                    if (oldRoster.size() > 90) {
+                    if (oldRoster.size() > minRosterSize) {
                         team.remove(nfa.get().getRelease());
                     }
 
@@ -256,6 +261,7 @@ public class Ootp {
 
         Roster newRoster = selection.select(mode, changes);
 
+        newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);
 
         selection.printBattingSelectionTable(out, changes);
@@ -339,7 +345,13 @@ public class Ootp {
 
         generic.printReplacementLevelReport(out);
 
-        RosterReport.create(newRoster).print(out);
+        RosterReport rosterReport = RosterReport.create(newRoster);
+
+        if (site.getName().equals("PSD")) {
+            rosterReport.setTargetRatio(60);
+        }
+
+        rosterReport.print(out);
 
         generic.setCustomValueFunction(tv.getTradeTargetValue());
 

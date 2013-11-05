@@ -31,6 +31,10 @@ public final class Pages {
         return site.getPage("players/%s.html", id.unwrap());
     }
 
+    public static Page salary(Site site, Id<Team> t) {
+        return site.getPage("teams/team_%s_player_salary_report.html", t.get());
+    }
+
     public static Page standings(Site site) {
         return site.getPage("leagues/league_100_standings.html");
     }

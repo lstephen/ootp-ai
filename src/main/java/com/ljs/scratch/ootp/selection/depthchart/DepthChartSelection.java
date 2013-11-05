@@ -102,8 +102,8 @@ public class DepthChartSelection {
 
             Long primaryPct = remaining - Math.round(pct * remaining);
 
-            if (backups.contains(primary)) {
-                dc.addBackup(position, primary, Math.max(primaryPct, 1));
+            if (backups.contains(primary) && primaryPct >= 1) {
+                dc.addBackup(position, primary, primaryPct);
 
             }
 
@@ -111,7 +111,9 @@ public class DepthChartSelection {
             primary = backup;
         }
 
-        dc.addBackup(position, primary, Math.max(remaining, 1));
+        if (remaining >= 1) {
+            dc.addBackup(position, primary, remaining);
+        }
     }
 
     private Double calculateBackupPct(Position p, Player primary, Player backup, Lineup.VsHand vs) {

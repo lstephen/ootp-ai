@@ -97,6 +97,10 @@ public final class Player {
         return String.format("%s, %s", surnames, initial);
     }
 
+    public String getFirstName() {
+        return Arrays.asList(StringUtils.split(name)).get(0);
+    }
+
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
 

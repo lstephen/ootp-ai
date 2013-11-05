@@ -86,12 +86,12 @@ public class DepthChart {
 
         private final Player player;
 
-        private final Integer percentage;
+        private final BackupPlayingTime percentage;
 
         private Backup(Position position, Player player, Integer percentage) {
             this.position = position;
             this.player = player;
-            this.percentage = percentage;
+            this.percentage = BackupPlayingTime.roundFrom(percentage);
         }
 
         public static Function<Backup, String> format() {
@@ -101,8 +101,8 @@ public class DepthChart {
                     Assertions.assertThat(bu).isNotNull();
 
                     return String.format(
-                        "(%2d%%) %-15s",
-                        bu.percentage,
+                        "(%s) %-15s",
+                        bu.percentage.format(),
                         StringUtils.abbreviate(bu.player.getShortName(), 15));
                 }
             };
