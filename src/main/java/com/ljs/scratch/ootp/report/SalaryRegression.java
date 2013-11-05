@@ -41,6 +41,9 @@ public class SalaryRegression {
         if (site.getName().equals("BTH")) {
             return 500000;
         }
+        if (site.getName().equals("PSD")) {
+            return 248045;
+        }
         return 300000;
     }
 

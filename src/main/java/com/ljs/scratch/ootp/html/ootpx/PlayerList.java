@@ -9,7 +9,7 @@ import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.nodes.Document;
+import org.fest.assertions.api.Assertions;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -21,11 +21,14 @@ public final class PlayerList {
 
     private final Site site;
 
-    private final Page page;
+    private final Element root;
 
-    private PlayerList(Site site, Page page) {
+    private PlayerList(Site site, Element root) {
+        Assertions.assertThat(site).isNotNull();
+        Assertions.assertThat(root).isNotNull();
+
         this.site = site;
-        this.page = page;
+        this.root = root;
     }
 
     public Iterable<Player> extract() {
@@ -33,9 +36,7 @@ public final class PlayerList {
     }
 
     public Iterable<PlayerId> extractIds() {
-        Document doc = page.load();
-
-        Elements els = doc.select("tr td a");
+        Elements els = root.select("tr td a");
 
         Set<PlayerId> ids = Sets.newHashSet();
 
@@ -65,11 +66,15 @@ public final class PlayerList {
     }
 
     public static PlayerList from(Site site, String url, Object... args) {
-        return new PlayerList(site, site.getPage(String.format(url, args)));
+        return from(site, site.getPage(String.format(url, args)));
     }
 
     public static PlayerList from(Site site, Page page) {
-        return new PlayerList(site, page);
+        return from(site, page.load());
+    }
+
+    public static PlayerList from(Site site, Element root) {
+        return new PlayerList(site, root);
     }
 
 }

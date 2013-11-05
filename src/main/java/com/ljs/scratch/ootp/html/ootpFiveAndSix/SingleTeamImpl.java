@@ -55,7 +55,7 @@ public class SingleTeamImpl implements SingleTeam {
     public Roster getRoster() {
         Document doc = page.load();
 
-        Team team = site.getTeamRatings(teamId).extractTeam();
+        Team team = new TeamRatings(site, teamId).extractTeam();
 
         Roster roster = Roster.create(team);
 
@@ -81,7 +81,7 @@ public class SingleTeamImpl implements SingleTeam {
             }
         }
 
-        site.getMinorLeagues(teamId).assignTo(roster);
+        new MinorLeagues(site, teamId).assignTo(roster);
 
         roster.assign(Roster.Status.DL, roster.getUnassigned());
 

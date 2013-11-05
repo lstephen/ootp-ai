@@ -8,14 +8,16 @@ import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.roster.Team;
 import org.fest.assertions.api.Assertions;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 /**
  *
  * @author lstephen
  */
-public class RosterExtraction {
+public final class RosterExtraction {
 
-    private Site site;
+    private final Site site;
 
     private RosterExtraction(Site site) {
         Assertions.assertThat(site).isNotNull();
@@ -31,9 +33,25 @@ public class RosterExtraction {
 
         roster.assign(Status.ML, PlayerList.ratingsReport(site, id).extract());
 
+        assignMinorLeagues(roster, id);
+
         return roster;
     }
 
+    private void assignMinorLeagues(Roster roster, Id<Team> id) {
+        Document doc = Pages.minorLeagues(site, id).load();
+
+        roster.assign(Status.AAA, getPlayers(doc, "Triple A"));
+        roster.assign(Status.AA, getPlayers(doc, "Double A"));
+        roster.assign(Status.A, getPlayers(doc, "Single A"));
+        roster.assign(Status.SA, getPlayers(doc, "Short Season A"));
+        roster.assign(Status.R, getPlayers(doc, "Rookie League"));
+    }
+
+    private Iterable<Player> getPlayers(Document doc, String needle) {
+        Elements players = doc.select("tr table:has(span:containsOwn(" + needle + ")");
+        return PlayerList.from(site, players.first()).extract();
+    }
 
     public static RosterExtraction create(Site site) {
         return new RosterExtraction(site);

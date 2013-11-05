@@ -71,8 +71,8 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public Page getPage(String url) {
-        return PageFactory.create(definition.getSiteRoot(), url);
+    public Page getPage(String url, Object... args) {
+        return PageFactory.create(definition.getSiteRoot(), String.format(url, args));
     }
 
     @Override
@@ -97,16 +97,6 @@ public final class SiteImpl implements Site {
     @Override
     public PitchingStats getLeaguePitching() {
         return new LeaguePitching(this, definition.getLeague()).extractTotal();
-    }
-
-    @Override
-    public MinorLeagues getMinorLeagues() {
-        return getMinorLeagues(definition.getTeam());
-    }
-
-    @Override
-    public MinorLeagues getMinorLeagues(Id<Team> id) {
-        return new MinorLeagues(this, id);
     }
 
     @Override
@@ -201,21 +191,6 @@ public final class SiteImpl implements Site {
     }
 
     @Override
-    public TeamRatings getTeamRatings() {
-        return getTeamRatings(definition.getTeam());
-    }
-
-    @Override
-    public TeamRatings getTeamRatings(Integer teamId) {
-        return getTeamRatings(Id.<Team>valueOf(teamId));
-    }
-
-    @Override
-    public TeamRatings getTeamRatings(Id<Team> id) {
-        return new TeamRatings(this, id);
-    }
-
-    @Override
     public TopProspects getTopProspects(Integer teamId) {
         return getTopProspects(Id.<Team>valueOf(teamId));
     }
@@ -288,7 +263,7 @@ public final class SiteImpl implements Site {
 
     @Override
     public Team extractTeam() {
-        return getTeamRatings().extractTeam();
+        return new TeamRatings(this, definition.getTeam()).extractTeam();
     }
 
     @Override

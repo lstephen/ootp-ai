@@ -3,8 +3,6 @@ package com.ljs.scratch.ootp.html;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.MinorLeagues;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamRatings;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
@@ -42,16 +40,11 @@ public interface Site {
 
     PitchingStats getLeaguePitching();
 
-    MinorLeagues getMinorLeagues();
-
-    MinorLeagues getMinorLeagues(
-        Id<Team> id);
-
     String getName();
 
     int getNumberOfTeams();
 
-    Page getPage(String url);
+    Page getPage(String url, Object... args);
 
     PitcherOverall getPitcherSelectionMethod();
 
@@ -86,13 +79,6 @@ public interface Site {
     TeamBatting getTeamBatting();
 
     TeamPitching getTeamPitching();
-
-    TeamRatings getTeamRatings();
-
-    TeamRatings getTeamRatings(Integer teamId);
-
-    TeamRatings getTeamRatings(
-        Id<Team> id);
 
     Optional<Integer> getTeamTopProspectPosition(PlayerId id);
 

@@ -3,7 +3,9 @@ package com.ljs.scratch.ootp.html.ootpx;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Salary;
@@ -11,8 +13,6 @@ import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.Standings;
 import com.ljs.scratch.ootp.html.TeamBatting;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.MinorLeagues;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TeamRatings;
 import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.html.page.PageFactory;
@@ -25,8 +25,11 @@ import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import org.fest.util.Strings;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.jsoup.nodes.Document;
@@ -84,7 +87,9 @@ public class OotpX implements Site {
 
     @Override
     public Iterable<Player> getFreeAgents() {
-        return PlayerList.from(this, "leagues/league_100_free_agents_report_0.html").extract();
+        return Iterables.concat(
+            PlayerList.from(this, "leagues/league_100_free_agents_report_0.html").extract(),
+            PlayerList.from(this, "leagues/league_100_free_agents_report_1.html").extract());
     }
 
     @Override
@@ -98,17 +103,6 @@ public class OotpX implements Site {
     }
 
     @Override
-    public MinorLeagues getMinorLeagues() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public MinorLeagues getMinorLeagues(
-        Id<Team> id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public String getName() {
         return definition.getName();
     }
@@ -119,8 +113,8 @@ public class OotpX implements Site {
     }
 
     @Override
-    public Page getPage(String url) {
-        return PageFactory.create(definition.getSiteRoot(), url);
+    public Page getPage(String url, Object... args) {
+        return PageFactory.create(definition.getSiteRoot(), String.format(url, args));
     }
 
     @Override
@@ -164,6 +158,13 @@ public class OotpX implements Site {
     public Salary getSalary(Id<Team> id) {
         return new Salary() {
             public Integer getCurrentSalary(Player p) {
+                if (!Strings.isNullOrEmpty(p.getSalary()) && p.getSalary().charAt(0) == '$') {
+                    try {
+                        return NumberFormat.getNumberInstance().parse(p.getSalary().substring(1)).intValue();
+                    } catch (ParseException e) {
+                        throw Throwables.propagate(e);
+                    }
+                }
                 return 0;
             }
 
@@ -231,22 +232,6 @@ public class OotpX implements Site {
     @Override
     public TeamPitchingImpl getTeamPitching() {
         return TeamPitchingImpl.create(this, definition.getTeam());
-    }
-
-    @Override
-    public TeamRatings getTeamRatings() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TeamRatings getTeamRatings(Integer teamId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TeamRatings getTeamRatings(
-        Id<Team> id) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

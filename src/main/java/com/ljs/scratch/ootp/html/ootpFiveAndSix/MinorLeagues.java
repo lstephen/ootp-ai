@@ -32,7 +32,7 @@ public class MinorLeagues {
     public MinorLeagues(Site site, Id<Team> team) {
         this.page = site.getPage("team" + team.get() + "m.html");
         this.site = site;
-        this.team = site.getTeamRatings(team).extractTeam();
+        this.team = new TeamRatings(site, team).extractTeam();
     }
 
     public void assignTo(Roster roster) {

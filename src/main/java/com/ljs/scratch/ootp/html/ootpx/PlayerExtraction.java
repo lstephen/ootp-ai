@@ -41,6 +41,21 @@ public class PlayerExtraction {
         player.setAge(Integer.parseInt(StringUtils.substringAfterLast(doc.select("td:containsOwn(Age:)").text(), " ")));
         player.setTeam(doc.select("a.title3[href~=teams]").text());
 
+        String currentSalary = CharMatcher.WHITESPACE.trimFrom(doc.select("td:containsOwn(Salary:) + td").text());
+
+        if (currentSalary.equals("-")) {
+            player.setSalary("");
+        } else {
+            String salarySuffix = "  ";
+            if (doc.select("td:containsOwn(Arbitration Eligibility:) + td").text().contains("Arbitration eligible")) {
+                salarySuffix = " a";
+            }
+            if (!doc.select("td:containsOwn(Contract Extension:) + td").text().contains("-")) {
+                salarySuffix = " e";
+            }
+
+            player.setSalary(currentSalary + " " + salarySuffix);
+        }
         return player;
     }
 
