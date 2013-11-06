@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * @author lstephen
  */
-public final class RosterReport implements Report {
+public final class RosterReport implements Printable {
 
     private final Iterable<Player> roster;
 

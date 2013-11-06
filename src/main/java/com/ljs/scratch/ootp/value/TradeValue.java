@@ -2,19 +2,17 @@ package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.report.SalaryRegression;
+import com.ljs.scratch.ootp.site.Site;
 
 /**
  *
  * @author lstephen
  */
 public class TradeValue {
-
-    private Predictions predictions;
 
     private final PlayerValue playerValue;
 
@@ -23,7 +21,6 @@ public class TradeValue {
     private final ReplacementValue futureReplacementValue;
 
     public TradeValue(Iterable<Player> team, Predictions predictions, BattingRegression batting, PitchingRegression pitching) {
-        this.predictions = predictions;
         this.playerValue = new PlayerValue(predictions, batting, pitching);
         this.replacementValue = new ReplacementValue(
             predictions,

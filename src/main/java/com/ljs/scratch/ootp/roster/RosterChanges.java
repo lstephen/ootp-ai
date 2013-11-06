@@ -4,8 +4,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.report.Printable;
 import com.ljs.scratch.ootp.roster.Roster.Status;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
 import org.fest.assertions.api.Assertions;
@@ -14,7 +14,7 @@ import org.fest.assertions.api.Assertions;
  *
  * @author lstephen
  */
-public class RosterChanges {
+public class RosterChanges implements Printable {
 
     private final Set<RosterChange> changes = Sets.newHashSet();
 
@@ -22,10 +22,7 @@ public class RosterChanges {
         changes.add(new RosterChange(player, from, to));
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
         for (RosterChange c : RosterChange.ordering().sortedCopy(changes)) {
             c.println(w);

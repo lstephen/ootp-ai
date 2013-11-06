@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
-import com.ljs.scratch.ootp.report.Report;
+import com.ljs.scratch.ootp.report.Printable;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.TeamPitching;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -22,8 +22,6 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 public final class PitchingRegression {
 
     private enum Predicting { HITS, DOUBLES, STRIKEOUTS, WALKS, HOME_RUNS }
-
-    private static final int MAX_RATING = 20;
 
     private static final int DEFAULT_PLATE_APPEARANCES = 700;
 
@@ -220,7 +218,7 @@ public final class PitchingRegression {
         return regression;
     }
 
-    public static class CorrelationReport implements Report {
+    public static class CorrelationReport implements Printable {
 
         private final PitchingRegression regression;
 

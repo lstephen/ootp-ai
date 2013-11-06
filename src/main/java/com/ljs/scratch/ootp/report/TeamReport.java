@@ -33,7 +33,7 @@ import org.fest.assertions.api.Assertions;
  */
 @ParametersAreNonnullByDefault
 @ReturnTypesAreNonnullByDefault
-public final class TeamReport implements Report {
+public final class TeamReport implements Printable {
 
     private final String title;
 

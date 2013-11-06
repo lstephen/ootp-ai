@@ -14,12 +14,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 @ReturnTypesAreNonnullByDefault
-public final class Reports {
+public final class Printables {
 
-    private Reports() { }
+    private Printables() { }
 
-    public static ReportDestination print(final Report r) {
-        return new ReportDestination() {
+    public static PrintDestination print(final Printable r) {
+        return new PrintDestination() {
             @Override
             public void to(OutputStream out) {
                 to(new OutputStreamWriter(out, Charsets.ISO_8859_1));
@@ -35,7 +35,7 @@ public final class Reports {
 
     }
 
-    public interface ReportDestination {
+    public interface PrintDestination {
         void to(OutputStream out);
         void to(Writer w);
     }

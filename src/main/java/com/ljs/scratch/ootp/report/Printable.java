@@ -10,7 +10,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  */
 @ParametersAreNonnullByDefault
 @ReturnTypesAreNonnullByDefault
-public interface Report {
+public interface Printable {
 
     void print(PrintWriter w);
 

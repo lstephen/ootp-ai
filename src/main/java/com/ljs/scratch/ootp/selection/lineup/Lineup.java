@@ -7,15 +7,15 @@ import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.Position;
+import com.ljs.scratch.ootp.report.Printable;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class Lineup implements Iterable<Lineup.Entry> {
+public class Lineup implements Iterable<Lineup.Entry>, Printable {
 
     private Defense defense;
     private List<Player> order;
@@ -78,8 +78,7 @@ public class Lineup implements Iterable<Lineup.Entry> {
         public abstract BattingRatings getRatings(Player player);
     }
 
-    public Lineup() {
-    }
+    public Lineup() { }
 
     public void setOrder(Iterable ps) {
         order = ImmutableList.copyOf(ps);
@@ -118,10 +117,7 @@ public class Lineup implements Iterable<Lineup.Entry> {
         return ImmutableSet.copyOf(order);
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
         int idx = 1;
         for (Iterator i$ = order.iterator(); i$.hasNext();) {

@@ -24,15 +24,12 @@ public class ReplacementValue {
 
     private final Function<Player, Integer> value;
 
-    private final Function<Player, Integer> selectionValue;
-
     private final ImmutableMultimap<Slot, Player> hitterSlotSelections;
 
     private final ImmutableMultimap<Slot, Player> pitcherSlotSelections;
 
     public ReplacementValue(Predictions ps, Function<Player, Integer> value, Function<Player, Integer> selectionValue) {
         this.value = value;
-        this.selectionValue = selectionValue;
 
         Selection hitterSelection = HitterSelectionFactory
             .using(selectionValue)

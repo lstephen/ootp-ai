@@ -17,7 +17,7 @@ import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.regression.SplitPercentages;
-import com.ljs.scratch.ootp.report.Reports;
+import com.ljs.scratch.ootp.report.Printables;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
@@ -149,10 +149,10 @@ public class Ootp {
         LOG.log(Level.INFO, "Running regressions...");
 
         final BattingRegression battingRegression = BattingRegression.run(site);
-        Reports.print(battingRegression.correlationReport()).to(out);
+        Printables.print(battingRegression.correlationReport()).to(out);
 
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
-        Reports.print(pitchingRegression.correlationReport()).to(out);
+        Printables.print(pitchingRegression.correlationReport()).to(out);
 
         SplitPercentages pcts = SplitPercentages.create(site);
         pcts.print(out);
@@ -270,11 +270,11 @@ public class Ootp {
         selection.printBattingSelectionTable(out, changes);
         selection.printPitchingSelectionTable(out, changes);
 
-        Reports.print(newRoster).to(out);
+        Printables.print(newRoster).to(out);
 
         LOG.info("Calculating roster changes...");
 
-        newRoster.getChangesFrom(oldRoster).print(out);
+        Printables.print(newRoster.getChangesFrom(oldRoster)).to(out);
 
         if (fa.isPresent() && newRoster.size() < maxRosterSize) {
             Player player = fa.get().getFreeAgent();
@@ -306,7 +306,7 @@ public class Ootp {
             new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
                 .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
-        lineups.print(out);
+        Printables.print(lineups).to(out);
 
         LOG.log(Level.INFO, "Choosing Depth Charts...");
 
@@ -344,7 +344,7 @@ public class Ootp {
             count++;
         }
 
-        Reports.print(salaryRegression).to(out);
+        Printables.print(salaryRegression).to(out);
 
         final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salaryRegression);
 
@@ -356,7 +356,7 @@ public class Ootp {
             rosterReport.setTargetRatio(60);
         }
 
-        Reports.print(rosterReport).to(out);
+        Printables.print(rosterReport).to(out);
 
         generic.setCustomValueFunction(tv.getTradeTargetValue());
 
@@ -386,7 +386,7 @@ public class Ootp {
 
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site);
-        Reports.print(salary).to(out);
+        Printables.print(salary).to(out);
 
         if (def.getName().equals("BTH")) {
             LOG.info("40 man roster reports...");
@@ -497,7 +497,7 @@ public class Ootp {
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getNowValue());
 
-        Reports.print(now).to(out);
+        Printables.print(now).to(out);
 
         LOG.info("Team Medium Term Report...");
         TeamReport future = TeamReport.create(
@@ -506,7 +506,7 @@ public class Ootp {
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getFutureValue());
 
-        Reports.print(future).to(out);
+        Printables.print(future).to(out);
 
         generic.setLimit(10);
 

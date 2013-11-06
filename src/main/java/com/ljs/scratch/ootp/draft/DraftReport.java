@@ -3,8 +3,8 @@ package com.ljs.scratch.ootp.draft;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.report.Report;
-import com.ljs.scratch.ootp.report.Reports;
+import com.ljs.scratch.ootp.report.Printable;
+import com.ljs.scratch.ootp.report.Printables;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
@@ -15,7 +15,7 @@ import java.io.PrintWriter;
  *
  * @author lstephen
  */
-public final class DraftReport implements Report {
+public final class DraftReport implements Printable {
 
     private final Site site;
 
@@ -80,7 +80,7 @@ public final class DraftReport implements Report {
     }
 
     public void print(OutputStream out) {
-        Reports.print(this).to(out);
+        Printables.print(this).to(out);
     }
 
     @Override

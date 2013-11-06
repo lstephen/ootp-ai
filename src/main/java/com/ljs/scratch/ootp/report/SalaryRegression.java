@@ -11,7 +11,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
  *
  * @author lstephen
  */
-public class SalaryRegression implements Report {
+public class SalaryRegression implements Printable {
 
     private final TradeValue trade;
 

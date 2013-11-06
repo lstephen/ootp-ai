@@ -2,14 +2,14 @@ package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.report.Printable;
 import com.ljs.scratch.ootp.selection.All;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
 import org.fest.assertions.api.Assertions;
 
-public final class AllLineups implements Iterable<Lineup> {
+public final class AllLineups implements Iterable<Lineup>, Printable {
 
     private static final Integer LINEUP_SIZE = 9;
     private static final String LINEUP_ENTRY_FORMAT = "%2s %-15s";
@@ -73,10 +73,7 @@ public final class AllLineups implements Iterable<Lineup> {
         return result;
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
         w.println();
         w.println(
@@ -99,8 +96,6 @@ public final class AllLineups implements Iterable<Lineup> {
                     all.getVsLhpPlusDh().getEntry(i).format(LINEUP_ENTRY_FORMAT)
                 ));
         }
-
-        w.flush();
     }
 
     public static AllLineups create(All<Lineup> all) {

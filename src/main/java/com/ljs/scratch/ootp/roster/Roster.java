@@ -11,7 +11,7 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
-import com.ljs.scratch.ootp.report.Report;
+import com.ljs.scratch.ootp.report.Printable;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author lstephen
  */
-public final class Roster implements Report {
+public final class Roster implements Printable {
 
     private static final Integer DEFAULT_TARGET_MAXIMUM = 110;
 

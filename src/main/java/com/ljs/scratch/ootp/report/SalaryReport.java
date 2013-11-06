@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @ParametersAreNonnullByDefault
 @ReturnTypesAreNonnullByDefault
-public class SalaryReport implements Report {
+public class SalaryReport implements Printable {
 
     private final Team team;
 
