@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.regression;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;

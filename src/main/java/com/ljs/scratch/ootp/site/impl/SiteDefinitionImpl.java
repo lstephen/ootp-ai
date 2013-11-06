@@ -1,10 +1,10 @@
 package com.ljs.scratch.ootp.site.impl;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.Ootp5;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.Ootp6;
-import com.ljs.scratch.ootp.html.ootpx.OotpX;
+import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.ootp5.site.Ootp5;
+import com.ljs.scratch.ootp.ootp6.site.Ootp6;
+import com.ljs.scratch.ootp.ootpx.site.OotpX;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;

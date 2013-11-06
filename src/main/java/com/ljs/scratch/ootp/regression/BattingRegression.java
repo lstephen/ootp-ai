@@ -1,8 +1,8 @@
 package com.ljs.scratch.ootp.regression;
 
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.html.Site;
-import com.ljs.scratch.ootp.html.TeamBatting;
+import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.site.TeamBatting;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;

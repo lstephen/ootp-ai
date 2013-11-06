@@ -1,7 +1,6 @@
 package com.ljs.scratch.ootp.site;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.ratings.RatingsDefinition;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.PitcherOverall;

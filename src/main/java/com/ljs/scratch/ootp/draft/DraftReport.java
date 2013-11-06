@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.draft;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.html.Site;
+import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
