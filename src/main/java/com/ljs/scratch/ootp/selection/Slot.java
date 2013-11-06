@@ -18,6 +18,7 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.Position;
 import java.util.List;
+import javax.annotation.Nonnull;
 import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection:
@@ -68,13 +69,15 @@ public enum Slot {
                     .natural()
                     .reverse()
                     .onResultOf(new Function<Position, Double>() {
-                        public Double apply(Position p) {
+                        public Double apply(@Nonnull Position p) {
                             return def.getPositionScore(p);
                         }})
                     .sortedCopy(ImmutableSet.of(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD)),
                 new Predicate<Position>() {
 
                     public boolean apply(Position p) {
+                        Assertions.assertThat(p).isNotNull();
+
                         return def.getPositionScore(p).doubleValue() > 0.0D;
                     }}));
 

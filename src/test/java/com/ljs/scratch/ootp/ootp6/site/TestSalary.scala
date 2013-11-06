@@ -1,7 +1,8 @@
-package com.ljs.scratch.ootp.html.ootpFiveAndSix
+package com.ljs.scratch.ootp.ootp6.site
 
 import com.ljs.scratch.ootp.data.Id
-import com.ljs.scratch.ootp.html.MockSite
+import com.ljs.scratch.ootp.ootp5.site.MockSite
+import com.ljs.scratch.ootp.ootp5.site.SalaryImpl
 import com.ljs.scratch.ootp.player.Player
 import com.ljs.scratch.ootp.player.PlayerId
 
@@ -24,7 +25,7 @@ class TestSalary extends FlatSpec {
         val salary = new SalaryImpl(site, Id.valueOf(id))
 
         site.expectGetPage(f"team$id%ssa.html")
-        site.onLoadPage("/com/ljs/scratch/ootp/html/pam_salary_ootp6.html")
+        site.onLoadPage("/com/ljs/scratch/ootp/ootp6/site/pam_salary.html")
 
         val player = Player.create(new PlayerId("p241"), null, null)
 

@@ -30,7 +30,7 @@ import org.joda.time.LocalDate;
  *
  * @author lstephen
  */
-public final class SiteImpl implements Site {
+public class SiteImpl implements Site {
 
     private final SiteDefinition definition;
 

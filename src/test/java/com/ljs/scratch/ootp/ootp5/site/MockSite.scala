@@ -1,7 +1,7 @@
-package com.ljs.scratch.ootp.html
+package com.ljs.scratch.ootp.ootp5.site
 
-import com.ljs.scratch.ootp.html.page.Page
-
+import com.ljs.scratch.ootp.html.Page
+import com.ljs.scratch.ootp.site.Site
 import com.ljs.scratch.ootp.site.SiteDefinition
 import com.ljs.scratch.ootp.site.Version
 
@@ -14,7 +14,7 @@ import org.scalatest.mock.MockitoSugar
 
 class MockSite extends MockitoSugar {
 
-    val site = mock[Site]
+    val site = mock[SiteImpl]
 
     val page = mock[Page]
 

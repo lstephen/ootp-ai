@@ -89,9 +89,8 @@ public class SinglePlayer {
     }
 
     public Player extract() {
-        Document doc;
         try {
-            doc = loadPage();
+            return extract(loadPage());
         } catch (Exception e) {
             Throwable root = Throwables.getRootCause(e);
 
@@ -103,7 +102,9 @@ public class SinglePlayer {
                 throw Throwables.propagate(e);
             }
         }
+    }
 
+    private Player extract(Document doc) {
         Elements title = doc.select("title");
 
         String team = CharMatcher.WHITESPACE.trimAndCollapseFrom(
