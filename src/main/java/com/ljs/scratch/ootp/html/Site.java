@@ -3,7 +3,6 @@ package com.ljs.scratch.ootp.html;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
@@ -81,11 +80,6 @@ public interface Site {
     TeamPitching getTeamPitching();
 
     Optional<Integer> getTeamTopProspectPosition(PlayerId id);
-
-    TopProspects getTopProspects(Integer teamId);
-
-    TopProspects getTopProspects(
-        Id<Team> id);
 
     Version getType();
 

@@ -108,6 +108,9 @@ public class Ootp {
     private static final SiteDefinition PSD =
         SiteDefinitionFactory.ootpx("PSD", "http://www.redraftleague.com/game/lgreports2/news/html/", Id.<Team>valueOf(8), "American", 20);
 
+    //private static final SiteDefinition OSBL =
+    //    SiteDefinitionFactory.ootpx("OBSL", "http://www.theobsl.com/2013seasonootp/", Id.<Team>valueOf(30), "National", 30);
+
     public static void main(String[] args) throws IOException {
         new Ootp().run();
     }
@@ -117,11 +120,11 @@ public class Ootp {
             //( TWML
             //( CBL
             //( HFTC
-            //( LBB
+            ( LBB
             //( BTH
             //, SAVOY
             //, TFMS
-            (PSD
+            //( PSD
             )) {
             try (
                 FileOutputStream out =
@@ -145,11 +148,9 @@ public class Ootp {
 
         final BattingRegression battingRegression = BattingRegression.run(site);
         battingRegression.printCorrelations(out);
-        //battingRegression.printExpectedValues(out);
 
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
         pitchingRegression.printCorrelations(out);
-        //pitchingRegression.printExpectedValues(out);
 
         SplitPercentages pcts = SplitPercentages.create(site);
         pcts.print(out);
@@ -333,10 +334,12 @@ public class Ootp {
         SalaryRegression salaryRegression = new SalaryRegression(tv, site);
 
         Integer n = Iterables.size(site.getTeamIds());
+        int count = 1;
         for (Id<Team> id : site.getTeamIds()) {
-            LOG.log(Level.INFO, "{0}/{1}...", new Object[] { id, n });
+            LOG.log(Level.INFO, "{0}/{1}...", new Object[] { count, n });
 
             salaryRegression.add(site.getSalariedPlayers(id));
+            count++;
         }
 
         salaryRegression.printCoefficients(out);
@@ -464,10 +467,10 @@ public class Ootp {
         generic.setLimit(50);
         generic.setMultiplier(0.91);
 
+        count = 1;
         for (Id<Team> id : site.getTeamIds()) {
-        //for (int i = 1; i <= 1; i++) {
             SingleTeam t = site.getSingleTeam(id);
-            LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.getName(), id, n });
+            LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.getName(), count, n });
             generic.setTitle(t.getName());
 
             Roster r = t.getRoster();
@@ -477,9 +480,12 @@ public class Ootp {
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.AAA));
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.AA));
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.A));
+            Iterables.addAll(minorLeaguers, r.getPlayers(Status.SA));
+            Iterables.addAll(minorLeaguers, r.getPlayers(Status.R));
 
             generic.setPlayers(r.getAllPlayers());
             generic.print(out);
+            count++;
         }
 
         LOG.info("Team Now Report...");

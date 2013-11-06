@@ -428,11 +428,11 @@ public class SinglePlayer {
                 return Integer.parseInt(s.trim());
             case OOTP5:
                 switch (s.trim()) {
-                    case "A": return 10;
+                    case "A": return 9;
                     case "B": return 7;
                     case "C": return 5;
                     case "D": return 3;
-                    case "E": return 0;
+                    case "E": return 1;
                     case "-": return 0;
                     default: throw new IllegalStateException();
                 }

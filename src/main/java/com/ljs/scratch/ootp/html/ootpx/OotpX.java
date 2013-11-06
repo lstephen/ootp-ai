@@ -14,7 +14,6 @@ import com.ljs.scratch.ootp.html.SingleTeam;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.html.Standings;
 import com.ljs.scratch.ootp.html.TeamBatting;
-import com.ljs.scratch.ootp.html.ootpFiveAndSix.TopProspects;
 import com.ljs.scratch.ootp.html.page.Page;
 import com.ljs.scratch.ootp.html.page.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
@@ -26,6 +25,7 @@ import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
+import com.ljs.scratch.util.ElementsUtil;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -122,7 +122,7 @@ public class OotpX implements Site {
 
     @Override
     public Iterable<Player> getDraft() {
-        return ImmutableSet.<Player>of();
+        return PlayerList.from(this, "leagues/league_100_rookie_draft_pool_report.html").extract();
     }
 
     @Override
@@ -262,9 +262,20 @@ public class OotpX implements Site {
 
     @Override
     public Standings getStandings() {
+        final Document doc = Pages.standings(this).load();
+
+        final Elements standings = doc.select("tr.title3 + tr");
+
         return new Standings() {
-            public Integer getWins(Id<Team> team) { return 0; }
-            public Integer getLosses(Id<Team> team) { return 0; }
+            public Integer getWins(Id<Team> team) {
+                Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + "]) > td");
+                return ElementsUtil.getInteger(els, 1);
+            }
+
+            public Integer getLosses(Id<Team> team) {
+                Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + "]) > td");
+                return ElementsUtil.getInteger(els, 2);
+            }
         };
     }
 
@@ -280,18 +291,20 @@ public class OotpX implements Site {
 
     @Override
     public Optional<Integer> getTeamTopProspectPosition(PlayerId id) {
-        throw new UnsupportedOperationException();
-    }
+        for (Id<Team> t : getTeamIds()) {
+            Document doc = Pages.topProspects(this, t).load();
 
-    @Override
-    public TopProspects getTopProspects(Integer teamId) {
-        throw new UnsupportedOperationException();
-    }
+            Elements els = doc.select("table.lposhadow tr:has(a[href~=" + id.unwrap() + "])");
 
-    @Override
-    public TopProspects getTopProspects(
-        Id<Team> id) {
-        throw new UnsupportedOperationException();
+            if (els.isEmpty()) {
+                continue;
+            }
+
+            Integer rank = Integer.parseInt(els.first().child(0).text());
+
+            return rank <= 10 ? Optional.of(rank) : Optional.<Integer>absent();
+        }
+        return Optional.absent();
     }
 
     @Override

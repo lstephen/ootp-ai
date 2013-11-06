@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Site;
@@ -21,6 +22,7 @@ import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import org.joda.time.LocalDate;
 
@@ -67,7 +69,7 @@ public final class SiteImpl implements Site {
 
     @Override
     public Iterable<Id<Team>> getTeamIds() {
-        Set<Id<Team>> ids = Sets.newHashSet();
+        List<Id<Team>> ids = Lists.newArrayList();
 
         for (int i = 1; i <= definition.getNumberOfTeams(); i++) {
             ids.add(Id.<Team>valueOf(i));
@@ -196,12 +198,10 @@ public final class SiteImpl implements Site {
         return new TeamPitchingImpl(this, definition.getTeam());
     }
 
-    @Override
     public TopProspects getTopProspects(Integer teamId) {
         return getTopProspects(Id.<Team>valueOf(teamId));
     }
 
-    @Override
     public TopProspects getTopProspects(Id<Team> id) {
         return TopProspects.of(this, id);
     }

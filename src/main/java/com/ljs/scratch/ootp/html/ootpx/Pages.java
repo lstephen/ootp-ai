@@ -39,5 +39,12 @@ public final class Pages {
         return site.getPage("leagues/league_100_standings.html");
     }
 
+    public static Page team(Site site, Id<Team> t) {
+        return site.getPage("teams/team_%s.html", t.get());
+    }
+
+    public static Page topProspects(Site site, Id<Team> t) {
+        return site.getPage("teams/team_%s_top_prospects.html", t.get());
+    }
 
 }

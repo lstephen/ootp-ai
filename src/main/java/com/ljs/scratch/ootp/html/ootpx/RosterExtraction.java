@@ -31,6 +31,9 @@ public final class RosterExtraction {
 
         Roster roster = Roster.create(team);
 
+        // Assign players on the main page to the DL, they'll then be assigned
+        // to the ML roster (or others) from the ratings report and minor leagues
+        roster.assign(Status.DL, PlayerList.from(site, Pages.team(site, id).load()).extract());
         roster.assign(Status.ML, PlayerList.ratingsReport(site, id).extract());
 
         assignMinorLeagues(roster, id);

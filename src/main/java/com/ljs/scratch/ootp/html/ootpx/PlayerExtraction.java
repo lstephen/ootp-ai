@@ -1,12 +1,14 @@
 package com.ljs.scratch.ootp.html.ootpx;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.ljs.scratch.ootp.html.Site;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
+import com.ljs.scratch.ootp.ratings.FieldingRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.ratings.Position;
@@ -33,7 +35,7 @@ public class PlayerExtraction {
 
     public Player extract(PlayerId id) {
         Document doc = Pages.player(site, id).load();
-    
+
         PlayerRatings ratings = extractRatings(doc);
 
         ratings.setBattingPotential(extractBattingPotential(doc));
@@ -86,6 +88,13 @@ public class PlayerExtraction {
         player.setListedPosition(StringUtils.substringBefore(
             doc.select("td:containsOwn(" + player.getFirstName() + ")").first().text(),
             " "));
+
+        Optional<Integer> teamTopProspectPosition =
+            site.getTeamTopProspectPosition(id);
+
+        if (teamTopProspectPosition.isPresent()) {
+            player.setTeamTopProspectPosition(teamTopProspectPosition.get());
+        }
 
         return player;
     }
@@ -157,6 +166,10 @@ public class PlayerExtraction {
         defense.setPositionRating(Position.CENTER_FIELD, extractDefensiveRating(doc, "Center Field:"));
         defense.setPositionRating(Position.RIGHT_FIELD, extractDefensiveRating(doc, "Right Field:"));
 
+        defense.setCatcher(extractCatcherRating(doc));
+        defense.setInfield(extractInfieldRating(doc));
+        defense.setOutfield(extractOutfieldRating(doc));
+
         return defense;
     }
 
@@ -168,6 +181,38 @@ public class PlayerExtraction {
         }
 
         return 0.0;
+    }
+
+    private FieldingRatings extractCatcherRating(Document doc) {
+        return extractFieldingRatings(doc, "table.lposhadow:contains(Fielding Ratings) td:containsOwn(%s) + td");
+    }
+
+    private FieldingRatings extractInfieldRating(Document doc) {
+        return extractFieldingRatings(doc, "table.lposhadow:contains(Fielding Ratings) td:containsOwn(%s) + td + td");
+    }
+
+    private FieldingRatings extractOutfieldRating(Document doc) {
+        return extractFieldingRatings(doc, "table.lposhadow:contains(Fielding Ratings) td:containsOwn(%s) + td + td + td");
+    }
+
+    private FieldingRatings extractFieldingRatings(Document doc, String selector) {
+        return FieldingRatings.builder()
+            .range(parse(doc.select(String.format(selector, "Range:")).text()))
+            .errors(parse(doc.select(String.format(selector, "Errors:")).text()))
+            .arm(parse(doc.select(String.format(selector, "Arm:")).text()))
+            .dp(parse(doc.select(String.format(selector, "Turn DP:")).text()))
+            .ability(parse(doc.select(String.format(selector, "Ability:")).text()))
+            .build();
+    }
+
+    private Integer parse(String s) {
+        String trimmed = CharMatcher.WHITESPACE.trimFrom(s);
+
+        if (Strings.isNullOrEmpty(trimmed) || trimmed.equals("-")) {
+            return 0;
+        }
+
+        return Integer.parseInt(trimmed);
     }
 
     private boolean hasPitchingRatings(Document doc) {
@@ -194,6 +239,7 @@ public class PlayerExtraction {
         vsR.setHits(vsR.getStuff());
         vsR.setGap(vsR.getMovement());
 
+        //System.out.println(doc.select("td:containsOwn(Suggested Role) + td").text());
         if (doc.select("td:containsOwn(Suggested Role) + td").text().contains("Starter")) {
             vsL.setEndurance(8);
             vsR.setEndurance(8);

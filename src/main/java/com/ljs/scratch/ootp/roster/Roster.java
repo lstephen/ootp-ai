@@ -130,7 +130,13 @@ public final class Roster {
     }
 
     public void print(PrintWriter w) {
-        for (Status s : Status.values()) {
+        Iterable<Status> levels = Ordering
+            .explicit(Arrays.asList(Status.values()))
+            .sortedCopy(
+                Iterables.concat(
+                    assignments.keySet(), ImmutableSet.of(Status.DL)));
+
+        for (Status s : levels) {
             w.print(String.format("(%d) %-10s ", assignments.get(s).size(), s));
         }
         w.println();
@@ -147,7 +153,7 @@ public final class Roster {
                     }));
 
         for (int i = 0; i < maxSize; i++) {
-            for (Status s : Ordering.explicit(Arrays.asList(Status.values())).sortedCopy(assignments.keySet())) {
+            for (Status s : levels) {
                 List<Player> ps = Player
                     .byShortName()
                     .sortedCopy(assignments.get(s));
