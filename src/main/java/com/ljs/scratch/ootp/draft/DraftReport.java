@@ -2,8 +2,10 @@ package com.ljs.scratch.ootp.draft;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.report.Report;
+import com.ljs.scratch.ootp.report.Reports;
+import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
 import java.io.OutputStream;
@@ -13,7 +15,7 @@ import java.io.PrintWriter;
  *
  * @author lstephen
  */
-public final class DraftReport {
+public final class DraftReport implements Report {
 
     private final Site site;
 
@@ -78,9 +80,10 @@ public final class DraftReport {
     }
 
     public void print(OutputStream out) {
-        print(new PrintWriter(out));
+        Reports.print(this).to(out);
     }
 
+    @Override
     public void print(PrintWriter w) {
         w.println();
 
@@ -130,8 +133,6 @@ public final class DraftReport {
             round++;
             rv = getRoundValue(round);
         }
-
-        w.flush();
     }
 
     public static DraftReport create(Site site, TradeValue value) {

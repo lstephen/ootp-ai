@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
@@ -16,6 +17,7 @@ import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.regression.SplitPercentages;
+import com.ljs.scratch.ootp.report.Reports;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
@@ -147,10 +149,10 @@ public class Ootp {
         LOG.log(Level.INFO, "Running regressions...");
 
         final BattingRegression battingRegression = BattingRegression.run(site);
-        battingRegression.printCorrelations(out);
+        Reports.print(battingRegression.correlationReport()).to(out);
 
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
-        pitchingRegression.printCorrelations(out);
+        Reports.print(pitchingRegression.correlationReport()).to(out);
 
         SplitPercentages pcts = SplitPercentages.create(site);
         pcts.print(out);
@@ -268,7 +270,7 @@ public class Ootp {
         selection.printBattingSelectionTable(out, changes);
         selection.printPitchingSelectionTable(out, changes);
 
-        newRoster.print(out);
+        Reports.print(newRoster).to(out);
 
         LOG.info("Calculating roster changes...");
 
@@ -283,7 +285,7 @@ public class Ootp {
                     "",
                     player.getPosition(),
                     player.getShortName())
-                .getBytes());
+                .getBytes(Charsets.UTF_8));
         }
 
         if (nfa.isPresent() && newRoster.size() < maxRosterSize) {
@@ -295,7 +297,7 @@ public class Ootp {
                     "",
                     player.getPosition(),
                     player.getShortName())
-                .getBytes());
+                .getBytes(Charsets.UTF_8));
         }
 
         LOG.log(Level.INFO, "Choosing lineups...");
@@ -342,7 +344,7 @@ public class Ootp {
             count++;
         }
 
-        salaryRegression.printCoefficients(out);
+        Reports.print(salaryRegression).to(out);
 
         final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salaryRegression);
 
@@ -354,7 +356,7 @@ public class Ootp {
             rosterReport.setTargetRatio(60);
         }
 
-        rosterReport.print(out);
+        Reports.print(rosterReport).to(out);
 
         generic.setCustomValueFunction(tv.getTradeTargetValue());
 
@@ -384,7 +386,7 @@ public class Ootp {
 
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site);
-        salary.print(out);
+        Reports.print(salary).to(out);
 
         if (def.getName().equals("BTH")) {
             LOG.info("40 man roster reports...");
@@ -489,40 +491,22 @@ public class Ootp {
         }
 
         LOG.info("Team Now Report...");
-        TeamReport
-            .create(
-                "Now",
-                site,
-                new PlayerValue(ps, battingRegression, pitchingRegression)
-                    .getNowValue())
-            .print(out);
+        TeamReport now = TeamReport.create(
+            "Now",
+            site,
+            new PlayerValue(ps, battingRegression, pitchingRegression)
+                .getNowValue());
+
+        Reports.print(now).to(out);
 
         LOG.info("Team Medium Term Report...");
-        TeamReport
-            .create(
-                "Medium Term",
-                site,
-                new PlayerValue(ps, battingRegression, pitchingRegression)
-                    .getFutureValue())
-            .print(out);
+        TeamReport future = TeamReport.create(
+            "Medium Term",
+            site,
+            new PlayerValue(ps, battingRegression, pitchingRegression)
+                .getFutureValue());
 
-        /*LOG.info("Team Long Term Report...");
-        TeamReport
-            .create(
-                "Long Term",
-                site,
-                new Function<Player, Integer>() {
-                    @Override
-                    public Integer apply(Player p) {
-                        if (p.getAge() > 27) {
-                            return 0;
-                        } else {
-                            return new PlayerValue(ps, battingRegression, pitchingRegression)
-                                .getFutureValue(p);
-                        }
-                    }
-                })
-            .print(out);*/
+        Reports.print(future).to(out);
 
         generic.setLimit(10);
 

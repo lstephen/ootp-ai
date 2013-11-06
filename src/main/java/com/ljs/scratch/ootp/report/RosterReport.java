@@ -7,7 +7,6 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Slot;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
 
@@ -15,7 +14,7 @@ import java.util.Set;
  *
  * @author lstephen
  */
-public class RosterReport {
+public final class RosterReport implements Report {
 
     private final Iterable<Player> roster;
 
@@ -80,10 +79,7 @@ public class RosterReport {
         });
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
         w.println();
 
@@ -122,8 +118,6 @@ public class RosterReport {
         w.print("Surplus: ");
         w.print(Joiner.on(',').join(getSurplusSlots()));
         w.println();
-
-        w.flush();
     }
 
     public static RosterReport create(Roster roster) {

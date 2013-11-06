@@ -1,17 +1,18 @@
 package com.ljs.scratch.ootp.regression;
 
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.site.TeamPitching;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
+import com.ljs.scratch.ootp.report.Report;
+import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.site.TeamPitching;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.SplitStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 /**
@@ -190,47 +191,8 @@ public final class PitchingRegression {
         return predicted;
     }
 
-    public void printExpectedValues(OutputStream out) {
-        printExpectedValues(new PrintWriter(out));
-    }
-
-    public void printExpectedValues(PrintWriter w) {
-        printCorrelations(w);
-
-        w.println("--+-------+-------+-------+-------+-------+");
-
-        for (int i = MAX_RATING; i > 0; i--) {
-            w.println(
-                String.format(
-                    "%2d| %.3f | %.3f | %.3f | %.3f | %.3f |",
-                    i,
-                    predict(Predicting.STRIKEOUTS, i),
-                    predict(Predicting.WALKS, i),
-                    predict(Predicting.HOME_RUNS, i),
-                    predict(Predicting.HITS, i),
-                    predict(Predicting.DOUBLES, i)));
-        }
-
-        w.flush();
-    }
-
-    public void printCorrelations(OutputStream out) {
-        printCorrelations(new PrintWriter(out));
-    }
-
-    public void printCorrelations(PrintWriter w) {
-        w.println("  |   K%  |  BB%  |  HR%  |   H%  |  2B%  |");
-
-        w.println(
-            String.format(
-                "R2| %.3f | %.3f | %.3f | %.3f | %.3f |",
-                strikeouts.getRSquare(),
-                walks.getRSquare(),
-                homeRuns.getRSquare(),
-                hits.getRSquare(),
-                doubles.getRSquare()));
-
-        w.flush();
+    public CorrelationReport correlationReport() {
+        return CorrelationReport.create(this);
     }
 
     private void runRegression(Site site) {
@@ -256,6 +218,34 @@ public final class PitchingRegression {
         PitchingRegression regression = new PitchingRegression(site);
         regression.runRegression(site);
         return regression;
+    }
+
+    public static class CorrelationReport implements Report {
+
+        private final PitchingRegression regression;
+
+        private CorrelationReport(@Nonnull PitchingRegression regression) {
+            this.regression = regression;
+        }
+
+        @Override
+        public void print(PrintWriter w) {
+            w.println("  |   K%  |  BB%  |  HR%  |   H%  |  2B%  |");
+
+            w.println(
+                String.format(
+                    "R2| %.3f | %.3f | %.3f | %.3f | %.3f |",
+                    regression.strikeouts.getRSquare(),
+                    regression.walks.getRSquare(),
+                    regression.homeRuns.getRSquare(),
+                    regression.hits.getRSquare(),
+                    regression.doubles.getRSquare()));
+        }
+
+        public static CorrelationReport create(PitchingRegression regression) {
+            return new CorrelationReport(regression);
+        }
+
     }
 
 }

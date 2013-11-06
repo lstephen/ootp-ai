@@ -11,7 +11,7 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
-import java.io.OutputStream;
+import com.ljs.scratch.ootp.report.Report;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +23,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  *
  * @author lstephen
  */
-public final class Roster {
+public final class Roster implements Report {
 
     private static final Integer DEFAULT_TARGET_MAXIMUM = 110;
 
@@ -133,10 +133,7 @@ public final class Roster {
         this.targetMaximum = max;
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
         Iterable<Status> levels = Ordering
             .explicit(Arrays.asList(Status.values()))
@@ -173,8 +170,6 @@ public final class Roster {
         }
 
         w.println("Total:" + assignments.size() + " (target " + targetMinimum + "-" + targetMaximum + ")");
-
-        w.flush();
     }
 
     @Override

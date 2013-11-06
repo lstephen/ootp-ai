@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
 /**
@@ -117,7 +118,7 @@ public class SinglePlayer {
             StringUtils.splitByWholeSeparatorPreserveAllTokens(
                 info.html(), "<br />");
 
-        String name = splitInfo[0];
+        String name = Parser.unescapeEntities(splitInfo[0], false);
         Integer age = Integer.valueOf(splitInfo[3]);
 
          String listedPosition = getListedPosition(splitInfo[8]);
@@ -136,7 +137,6 @@ public class SinglePlayer {
         }
 
         Player player = Player.create(id, name, ratings);
-
 
         player.setAge(age);
         player.setTeam(team);

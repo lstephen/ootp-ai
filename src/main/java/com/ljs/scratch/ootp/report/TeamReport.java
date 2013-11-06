@@ -5,9 +5,8 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.annotation.ReturnTypesAreNonnullByDefault;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.site.Standings;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
@@ -18,10 +17,12 @@ import com.ljs.scratch.ootp.selection.SelectionFactory;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.SlotSelection;
+import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.site.Standings;
 import com.ljs.scratch.ootp.stats.PitchingStats;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.fest.assertions.api.Assertions;
@@ -30,7 +31,9 @@ import org.fest.assertions.api.Assertions;
  *
  * @author lstephen
  */
-public final class TeamReport {
+@ParametersAreNonnullByDefault
+@ReturnTypesAreNonnullByDefault
+public final class TeamReport implements Report {
 
     private final String title;
 
@@ -51,10 +54,7 @@ public final class TeamReport {
         this.leaguePitching = site.getLeaguePitching();
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
 
         Set<TeamScore> scores = Sets.newHashSet();

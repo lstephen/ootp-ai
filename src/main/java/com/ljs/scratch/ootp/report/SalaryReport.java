@@ -2,20 +2,23 @@ package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.site.Salary;
-import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.annotation.ReturnTypesAreNonnullByDefault;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
-import java.io.OutputStream;
+import com.ljs.scratch.ootp.site.Salary;
+import com.ljs.scratch.ootp.site.Site;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author lstephen
  */
-public class SalaryReport {
+@ParametersAreNonnullByDefault
+@ReturnTypesAreNonnullByDefault
+public class SalaryReport implements Report {
 
     private final Team team;
 
@@ -44,10 +47,7 @@ public class SalaryReport {
         return total;
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
+    @Override
     public void print(PrintWriter w) {
         w.println();
 

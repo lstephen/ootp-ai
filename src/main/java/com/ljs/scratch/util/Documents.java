@@ -5,7 +5,11 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -37,8 +41,12 @@ public final class Documents {
         try {
             return retryer.call(new Callable<Document>() {
                 @Override
-                public Document call() throws Exception {
-                    return Jsoup.connect(url).get();
+                public Document call() throws IOException {
+                    try (
+                        InputStream in = new URL(url).openStream()) {
+
+                        return Jsoup.parse(in, Charsets.ISO_8859_1.name(), "");
+                    }
                 }
             });
         } catch (RetryException | ExecutionException e) {
