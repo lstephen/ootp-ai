@@ -2,11 +2,11 @@ package com.ljs.scratch.ootp.ootpx.site;
 
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.assertions.api.Assertions;
@@ -43,7 +43,7 @@ public final class PlayerList {
         for (Element el : els) {
             String href = el.attr("href");
 
-            if (href.contains("players/")) {
+            if (href.contains("players/") && href.contains(".html")) {
                 String id = StringUtils.substringBetween(href, "players/", ".html");
 
                 if (id.equals("player_0")) {

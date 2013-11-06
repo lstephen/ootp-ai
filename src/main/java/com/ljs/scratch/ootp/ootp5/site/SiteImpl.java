@@ -257,7 +257,7 @@ public final class SiteImpl implements Site {
             Set<PlayerId> is = Sets.newHashSet();
 
             for (Id<Team> id : getTeamIds()) {
-                Iterables.addAll(is, getSingleTeam(id).extractInjuries());
+                Iterables.addAll(is, getSingleTeam(id).getInjuries());
             }
 
             injured = ImmutableSet.copyOf(is);

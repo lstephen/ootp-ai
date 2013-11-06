@@ -5,13 +5,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.SingleTeam;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.SingleTeam;
+import com.ljs.scratch.ootp.site.Site;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
@@ -92,7 +92,8 @@ public class SingleTeamImpl implements SingleTeam {
         return getRoster().getAllPlayers();
     }
 
-    public Iterable<PlayerId> extractInjuries() {
+    @Override
+    public Iterable<PlayerId> getInjuries() {
         Set<PlayerId> results = injuriesCache.getIfPresent(site.getName() + teamId);
 
         if (results != null) {

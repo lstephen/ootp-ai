@@ -247,6 +247,11 @@ public class OotpX implements Site {
             public Roster getRoster() {
                 return RosterExtraction.create(OotpX.this).extract(id);
             }
+
+            @Override
+            public Iterable<PlayerId> getInjuries() {
+                return TeamExtraction.create(OotpX.this).getInjuries(id);
+            }
         };
     }
 
@@ -338,7 +343,12 @@ public class OotpX implements Site {
 
     @Override
     public boolean isInjured(Player p) {
-        throw new UnsupportedOperationException();
+        for (Id<Team> t : getTeamIds()) {
+            if (Iterables.contains(getSingleTeam(t).getInjuries(), p.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static OotpX create(SiteDefinition def) {

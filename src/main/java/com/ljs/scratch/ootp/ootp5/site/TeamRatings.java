@@ -2,11 +2,11 @@ package com.ljs.scratch.ootp.ootp5.site;
 
 import com.google.common.collect.ImmutableSet;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -43,7 +43,7 @@ public class TeamRatings {
 
         Team team = Team.create(result.build());
 
-        team.addInjury(site.getPlayers(new SingleTeamImpl(site, this.team).extractInjuries()));
+        team.addInjury(site.getPlayers(new SingleTeamImpl(site, this.team).getInjuries()));
 
         return team;
     }

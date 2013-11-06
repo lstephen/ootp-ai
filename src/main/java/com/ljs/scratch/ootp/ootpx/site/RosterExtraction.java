@@ -2,11 +2,11 @@ package com.ljs.scratch.ootp.ootpx.site;
 
 import com.google.common.collect.ImmutableSet;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
 import org.fest.assertions.api.Assertions;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -31,12 +31,15 @@ public final class RosterExtraction {
 
         Roster roster = Roster.create(team);
 
-        // Assign players on the main page to the DL, they'll then be assigned
-        // to the ML roster (or others) from the ratings report and minor leagues
-        roster.assign(Status.DL, PlayerList.from(site, Pages.team(site, id).load()).extract());
         roster.assign(Status.ML, PlayerList.ratingsReport(site, id).extract());
 
         assignMinorLeagues(roster, id);
+
+        // Assign injured players to the DL.
+        // If they're already on a roster they won't be added to the DL
+        // But, this is the only place that DL'd players can be associated with
+        // a team.
+        roster.assign(Status.DL, site.getPlayers(TeamExtraction.create(site).getInjuries(id)));
 
         return roster;
     }

@@ -76,7 +76,6 @@ public class DefensiveRatings {
                     skill = catcher.score(WEIGHTINGS.get(p));
                 }
                 break;
-            case FIRST_BASE:
             case SECOND_BASE:
             case THIRD_BASE:
             case SHORTSTOP:
@@ -89,6 +88,13 @@ public class DefensiveRatings {
             case RIGHT_FIELD:
                 if (outfield != null) {
                     skill = outfield.score(WEIGHTINGS.get(p));
+                }
+                break;
+            case FIRST_BASE:
+                if (infield != null && outfield != null) {
+                    skill = Math.max(
+                        infield.score(WEIGHTINGS.get(p)),
+                        outfield.score(WEIGHTINGS.get(p)));
                 }
                 break;
             default:

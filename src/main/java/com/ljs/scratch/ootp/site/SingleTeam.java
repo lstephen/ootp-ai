@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.site;
 
+import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Roster;
 
 /**
@@ -11,5 +12,7 @@ public interface SingleTeam {
     String getName();
 
     Roster getRoster();
+
+    Iterable<PlayerId> getInjuries();
 
 }

@@ -93,7 +93,15 @@ public final class Roster {
     }
 
     public void assign(Status status, Iterable<Player> ps) {
-        assignments.putAll(status, ps);
+        for (Player p : ps) {
+            assign(status, p);
+        }
+    }
+
+    public void assign(Status status, Player p) {
+        if (!assignments.containsValue(p)) {
+            assignments.put(status, p);
+        }
     }
 
     public RosterChanges getChangesFrom(Roster src) {
@@ -133,8 +141,9 @@ public final class Roster {
         Iterable<Status> levels = Ordering
             .explicit(Arrays.asList(Status.values()))
             .sortedCopy(
-                Iterables.concat(
-                    assignments.keySet(), ImmutableSet.of(Status.DL)));
+                ImmutableSet.copyOf(
+                    Iterables.concat(
+                        assignments.keySet(), ImmutableSet.of(Status.DL))));
 
         for (Status s : levels) {
             w.print(String.format("(%d) %-10s ", assignments.get(s).size(), s));

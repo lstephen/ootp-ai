@@ -81,6 +81,10 @@ public class PlayerExtraction {
             player.setSalary(currentSalary + salarySuffix);
         }
 
+        if (site.isInjured(player)) {
+            player.setTeam("*INJ* " + player.getTeam());
+        }
+
         if (site.isFutureFreeAgent(player)) {
             player.setTeam("*FA* " + player.getTeam());
         }
