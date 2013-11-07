@@ -4,7 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.report.Printable;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import java.io.PrintWriter;
 import java.util.Set;

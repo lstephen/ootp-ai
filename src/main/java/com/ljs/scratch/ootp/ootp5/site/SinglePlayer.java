@@ -2,11 +2,10 @@ package com.ljs.scratch.ootp.ootp5.site;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.PlayerSource;
 import com.ljs.scratch.ootp.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.ratings.PlayerRatings;
@@ -18,7 +17,6 @@ import com.ljs.scratch.util.ElementsUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
@@ -28,7 +26,7 @@ import org.jsoup.select.Elements;
  *
  * @author lstephen
  */
-public class SinglePlayer {
+public class SinglePlayer implements PlayerSource {
 
     private static final Logger LOG = Logger.getLogger(SinglePlayer.class.getName());
 
@@ -76,36 +74,29 @@ public class SinglePlayer {
             .put(PitchingRatingsType.MOVEMENT, 4)
             .build();
 
-    private final PlayerId id;
+    private Site site;
 
-    private final Site site;
+    public SinglePlayer() { }
 
-    public SinglePlayer(Site site, PlayerId id) {
-        this.id = id;
+    public void setSite(Site site) {
         this.site = site;
     }
 
-    private Document loadPage() {
+    private Document loadPage(PlayerId id) {
         return site.getPage(id.unwrap() + ".html").load();
     }
 
-    public Player extract() {
+    @Override
+    public Player get(PlayerId id) {
         try {
-            return extract(loadPage());
+            return extract(id, loadPage(id));
         } catch (Exception e) {
-            Throwable root = Throwables.getRootCause(e);
-
-            if (HttpStatusException.class.isInstance(root)
-                && HttpStatusException.class.cast(root).getStatusCode() == 404) {
-                LOG.log(Level.WARNING, "Player not found. ID: {0}", id);
-                return null;
-            } else {
-                throw Throwables.propagate(e);
-            }
+            LOG.log(Level.WARNING, "Player not found. ID: {0}", id);
+            return null;
         }
     }
 
-    private Player extract(Document doc) {
+    private Player extract(PlayerId id, Document doc) {
         Elements title = doc.select("title");
 
         String team = CharMatcher.WHITESPACE.trimAndCollapseFrom(
@@ -123,17 +114,19 @@ public class SinglePlayer {
 
          String listedPosition = getListedPosition(splitInfo[8]);
 
+         PlayerPage page = PlayerPage.create(doc, site);
+
         PlayerRatings ratings =
             PlayerRatings.create(
-                extractBattingRatings(),
-                extractDefensiveRatings(),
-                extractPitchingRatings(),
+                page.extractBattingRatings(),
+                extractDefensiveRatings(doc),
+                extractPitchingRatings(doc),
                 site.getDefinition());
 
-        ratings.setBattingPotential(extractBattingPotential());
+        ratings.setBattingPotential(page.extractBattingPotential());
 
         if (ratings.hasPitching()) {
-            ratings.setPitchingPotential(extractPitchingPotential());
+            ratings.setPitchingPotential(extractPitchingPotential(doc));
         }
 
         Player player = Player.create(id, name, ratings);
@@ -185,57 +178,6 @@ public class SinglePlayer {
         player.setSalary(((SiteImpl) site).getSalary(player));
 
         return player;
-    }
-
-    private Splits<BattingRatings> extractBattingRatings() {
-        Document doc = loadPage();
-
-        Elements ratings = doc.select("tr:has(td:contains(Batting Ratings)) + tr");
-
-        if (ratings.isEmpty()) {
-            ratings = doc.select("tr:has(td:contains(Ratings)) + tr");
-        }
-
-        Elements vsLhp = ratings.select("tr.g:has(td:contains(LHP)), tr.g2:has(td:contains(LHP))");
-        Elements vsRhp = ratings.select("tr.g:has(td:contains(RHP)), tr.g2:has(td:contains(RHP))");
-
-        return Splits.<BattingRatings>create(
-            extractBattingRatings(vsLhp.get(0)),
-            extractBattingRatings(vsRhp.get(0)));
-    }
-
-    private BattingRatings extractBattingPotential() {
-        Document doc = loadPage();
-
-        Elements ratingsEls = doc.select("tr:has(td:contains(Batting Ratings)) + tr");
-
-        if (ratingsEls.isEmpty()) {
-            ratingsEls = doc.select("tr:has(td:contains(Ratings)) + tr");
-        }
-
-        Elements potential = ratingsEls.select("tr.g:has(td:contains(Talent))");
-
-        if (site.getType() == Version.OOTP5) {
-            Elements els = potential.get(0).children();
-
-            return BattingRatings
-                .builder()
-                .contact(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.CONTACT)))
-                .gap(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.GAP)))
-                .power(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.POWER)))
-                .eye(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.EYE)))
-                .build();
-        } else {
-            BattingRatings unscaled = extractBattingRatings(potential.get(0));
-
-            return BattingRatings
-                .builder()
-                .contact(scaleOotp6PotentialRating(unscaled.getContact()))
-                .gap(scaleOotp6PotentialRating(unscaled.getGap()))
-                .power(scaleOotp6PotentialRating(unscaled.getPower()))
-                .eye(scaleOotp6PotentialRating(unscaled.getEye()))
-                .build();
-        }
     }
 
     private String getListedPosition(String src) {
@@ -301,12 +243,9 @@ public class SinglePlayer {
 
     private Integer getOotp5Potential(Elements els, int idx) {
         return OOTP5_POTENTIAL.get(els.get(idx).text().trim());
-
     }
 
-    private DefensiveRatings extractDefensiveRatings() {
-        Document doc = loadPage();
-
+    private DefensiveRatings extractDefensiveRatings(Document doc) {
         DefensiveRatings ratings = new DefensiveRatings();
 
         String raw = doc.select("td.s4:contains(Fielding Ratings)").text();
@@ -325,9 +264,7 @@ public class SinglePlayer {
         return ratings;
     }
 
-    private Splits<PitchingRatings> extractPitchingRatings() {
-        Document doc = loadPage();
-
+    private Splits<PitchingRatings> extractPitchingRatings(Document doc) {
         Elements vsLhb = doc.select("tr.g:has(td:contains(Versus LHB))");
         Elements vsRhb = doc.select("tr.g2:has(td:contains(Versus RHB))");
 
@@ -375,9 +312,7 @@ public class SinglePlayer {
         return Splits.create(l, r);
     }
 
-    private PitchingRatings extractPitchingPotential() {
-        Document doc = loadPage();
-
+    private PitchingRatings extractPitchingPotential(Document doc) {
         Elements talent = doc.select("tr.g:has(td:contains(Talent))");
 
         if (site.getType() == Version.OOTP5) {
@@ -391,7 +326,7 @@ public class SinglePlayer {
             ratings.setMovement(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.MOVEMENT)));
             ratings.setControl(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.CONTROL)));
 
-            ratings.setEndurance(extractPitchingRatings().getVsLeft().getEndurance());
+            ratings.setEndurance(extractPitchingRatings(doc).getVsLeft().getEndurance());
 
             return ratings;
         } else {
@@ -404,7 +339,7 @@ public class SinglePlayer {
             scaled.setHits(scaleOotp6PotentialRating(unscaled.getHits()));
             scaled.setGap(scaleOotp6PotentialRating(unscaled.getGap()));
 
-            scaled.setEndurance(extractPitchingRatings().getVsLeft().getEndurance());
+            scaled.setEndurance(extractPitchingRatings(doc).getVsLeft().getEndurance());
 
             return scaled;
         }
@@ -440,31 +375,6 @@ public class SinglePlayer {
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    private BattingRatings extractBattingRatings(Element el) {
-
-        ImmutableMap<BattingRatingsType, Integer> idx;
-        switch (site.getType()) {
-            case OOTP5:
-                idx = OOTP5_HITTING;
-                break;
-            case OOTP6:
-                idx = OOTP6_HITTING;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-
-        Elements line = el.children();
-
-        return BattingRatings
-            .builder()
-            .contact(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.CONTACT)))
-            .gap(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.GAP)))
-            .power(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.POWER)))
-            .eye(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.EYE)))
-            .build();
     }
 
     private PitchingRatings extractPitchingRatings(Element el) {

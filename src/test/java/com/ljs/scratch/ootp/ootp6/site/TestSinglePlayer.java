@@ -37,7 +37,8 @@ public class TestSinglePlayer {
     public void setUp() {
         site.expectGetPage(ID.unwrap() + ".html");
 
-        singlePlayer = new SinglePlayer(site.toMock(), ID);
+        singlePlayer = new SinglePlayer();
+        singlePlayer.setSite(site.toMock());
     }
 
     @Test
@@ -65,7 +66,7 @@ public class TestSinglePlayer {
             .when(site.toMock().getSalary(Mockito.notNull(Player.class)))
             .thenReturn("");
 
-        Player extracted = singlePlayer.extract();
+        Player extracted = singlePlayer.get(ID);
 
         Assert.assertEquals("Victor Plata", extracted.getName());
         Assert.assertEquals(31, extracted.getAge());
@@ -113,7 +114,7 @@ public class TestSinglePlayer {
             .when(site.toMock().getSalary(Mockito.notNull(Player.class)))
             .thenReturn("");
 
-        Player extracted = singlePlayer.extract();
+        Player extracted = singlePlayer.get(ID);
 
         Assert.assertEquals("Isidoro Amell", extracted.getName());
         Assert.assertEquals(30, extracted.getAge());

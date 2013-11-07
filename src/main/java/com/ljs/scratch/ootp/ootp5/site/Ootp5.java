@@ -7,10 +7,13 @@ import com.ljs.scratch.ootp.site.SiteDefinition;
  *
  * @author lstephen
  */
-public class Ootp5 {
+public final class Ootp5 {
 
     public static Site create(SiteDefinition def) {
-        return SiteImpl.create(def);
+        SinglePlayer ps = new SinglePlayer();
+        Site site = SiteImpl.create(def, ps);
+        ps.setSite(site);
+        return site;
     }
 
 }

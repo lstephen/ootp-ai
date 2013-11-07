@@ -12,6 +12,7 @@ import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.html.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.player.PlayerSource;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.Site;
@@ -34,12 +35,15 @@ public class SiteImpl implements Site {
 
     private final SiteDefinition definition;
 
+    private final PlayerSource players;
+
     private ImmutableSet<PlayerId> futureFas;
 
     private ImmutableSet<PlayerId> injured;
 
-    private SiteImpl(SiteDefinition def) {
+    private SiteImpl(SiteDefinition def, PlayerSource players) {
         this.definition = def;
+        this.players = players;
     }
 
     @Override
@@ -207,7 +211,7 @@ public class SiteImpl implements Site {
 
     @Override
     public Player getPlayer(PlayerId id) {
-        return new SinglePlayer(this, id).extract();
+        return players.get(id);
     }
 
     @Override
@@ -276,8 +280,8 @@ public class SiteImpl implements Site {
         return getSingleTeam().getRoster();
     }
 
-    public static Site create(SiteDefinition definition) {
-        return new SiteImpl(definition);
+    public static Site create(SiteDefinition definition, PlayerSource players) {
+        return new SiteImpl(definition, players);
     }
 
 }

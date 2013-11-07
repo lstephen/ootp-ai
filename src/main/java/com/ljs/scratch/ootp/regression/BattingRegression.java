@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.Splits;
-import com.ljs.scratch.ootp.report.Printable;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.TeamBatting;
 import com.ljs.scratch.ootp.stats.BattingStats;

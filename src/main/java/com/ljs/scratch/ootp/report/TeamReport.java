@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.report;
 
+import com.ljs.scratch.ootp.io.Printable;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;

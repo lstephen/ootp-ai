@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.ratings.BattingRatings;
 import com.ljs.scratch.ootp.ratings.Position;
-import com.ljs.scratch.ootp.report.Printable;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
 import java.io.PrintWriter;

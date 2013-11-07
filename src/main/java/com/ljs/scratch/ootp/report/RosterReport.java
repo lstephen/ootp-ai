@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.report;
 
+import com.ljs.scratch.ootp.io.Printable;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;

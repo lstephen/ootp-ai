@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.report;
+package com.ljs.scratch.ootp.io;
 
 import com.google.common.base.Charsets;
 import com.ljs.scratch.ootp.annotation.ReturnTypesAreNonnullByDefault;

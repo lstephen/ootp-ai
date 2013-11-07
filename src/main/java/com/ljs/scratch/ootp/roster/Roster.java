@@ -11,7 +11,7 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
-import com.ljs.scratch.ootp.report.Printable;
+import com.ljs.scratch.ootp.io.Printable;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;

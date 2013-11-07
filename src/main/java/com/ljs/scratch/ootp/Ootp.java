@@ -17,7 +17,7 @@ import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.regression.SplitPercentages;
-import com.ljs.scratch.ootp.report.Printables;
+import com.ljs.scratch.ootp.io.Printables;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
@@ -120,13 +120,13 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            ( CBL
+            //( CBL
             //( HFTC
             //( LBB
-            //( BTH
+            //, BTH
             //, SAVOY
-            //, TFMS
-            //( PSD
+            //, PSD
+            ( TFMS
             )) {
             try (
                 FileOutputStream out =

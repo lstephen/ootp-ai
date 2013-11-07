@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.report;
 
+import com.ljs.scratch.ootp.io.Printable;
 import com.google.common.base.Strings;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.site.Site;
