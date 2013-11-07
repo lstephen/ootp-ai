@@ -1,11 +1,11 @@
 package com.ljs.scratch.ootp.ootpx.site;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
 
 /**
  *
@@ -29,6 +29,10 @@ public final class Pages {
 
     public static Page player(Site site, PlayerId id) {
         return site.getPage("players/%s.html", id.unwrap());
+    }
+
+    public static Page roster(Site site, Id<Team> t) {
+        return site.getPage("teams/team_%s_roster_page.html", t.get());
     }
 
     public static Page salary(Site site, Id<Team> t) {

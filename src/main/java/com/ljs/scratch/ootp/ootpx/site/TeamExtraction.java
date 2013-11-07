@@ -30,7 +30,7 @@ public final class TeamExtraction {
     public Team extractTeam(Id<Team> id) {
         Team team = Team.create(
             Iterables.concat(
-                PlayerList.ratingsReport(site, id).extract(),
+                PlayerList.roster(site, id).extract(),
                 PlayerList.minorLeagues(site, id).extract()));
 
         team.addInjury(site.getPlayers(getInjuries(id)));

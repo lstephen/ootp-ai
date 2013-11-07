@@ -39,7 +39,7 @@ public final class RosterExtraction {
         // If they're already on a roster they won't be added to the DL
         // But, this is the only place that DL'd players can be associated with
         // a team.
-        roster.assign(Status.DL, site.getPlayers(TeamExtraction.create(site).getInjuries(id)));
+        roster.assign(Status.DL, PlayerList.roster(site, id).extract());
 
         return roster;
     }

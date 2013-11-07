@@ -65,6 +65,10 @@ public final class PlayerList {
         return from(site, "teams/team_%s_ratings_report.html", id.get());
     }
 
+    public static PlayerList roster(Site site, Id<Team> t) {
+        return from(site, Pages.roster(site, t));
+    }
+
     public static PlayerList from(Site site, String url, Object... args) {
         return from(site, site.getPage(String.format(url, args)));
     }
