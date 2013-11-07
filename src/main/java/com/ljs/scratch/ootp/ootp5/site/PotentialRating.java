@@ -5,7 +5,6 @@ import com.ljs.scratch.ootp.rating.OneToOneHundred;
 import com.ljs.scratch.ootp.rating.Rating;
 import com.ljs.scratch.ootp.rating.Scale;
 import java.util.Locale;
-import org.jsoup.nodes.Element;
 
 /**
  *
@@ -24,16 +23,30 @@ public enum PotentialRating {
         return PotentialRating.valueOf(potential.toUpperCase(Locale.ENGLISH));
     }
 
-    public static Rating<PotentialRating, RatingScale> from(Element el) {
+    public static Rating<PotentialRating, RatingScale> from(String s) {
         return Rating.create(
-            valueOfCaseInsensitive(CharMatcher.WHITESPACE.trimFrom(el.text())),
+            valueOfCaseInsensitive(CharMatcher.WHITESPACE.trimFrom(s)),
             RatingScale.INSTANCE);
+    }
+
+    public static RatingScale scale() {
+        return RatingScale.INSTANCE;
     }
 
     public static class RatingScale implements Scale<PotentialRating> {
         private static final RatingScale INSTANCE = new RatingScale();
 
         private RatingScale() { }
+
+        @Override
+        public Rating<PotentialRating, RatingScale> ratingOf(PotentialRating value) {
+            return Rating.create(value, INSTANCE);
+        }
+
+        @Override
+        public Rating<PotentialRating, RatingScale> parse(String s) {
+            return PotentialRating.from(s);
+        }
 
         @Override
         public Rating<Integer, OneToOneHundred> normalize(

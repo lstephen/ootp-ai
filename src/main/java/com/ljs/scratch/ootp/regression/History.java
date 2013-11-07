@@ -34,7 +34,7 @@ public class History {
 
             if (in.exists()) {
                 try {
-                    result.add(Jackson.getMapper().readValue(in, TeamStats.class));
+                    result.add(Jackson.getMapper(site).readValue(in, TeamStats.class));
                 } catch (IOException e) {
                     throw Throwables.propagate(e);
                 }
@@ -54,7 +54,7 @@ public class History {
 
             if (in.exists()) {
                 try {
-                    result.add(Jackson.getMapper().readValue(in, TeamStats.class));
+                    result.add(Jackson.getMapper(site).readValue(in, TeamStats.class));
                 } catch (IOException e) {
                     throw Throwables.propagate(e);
                 }
@@ -77,7 +77,7 @@ public class History {
         try {
             Files.createParentDirs(f);
 
-            Jackson.getMapper().writeValue(f, stats);
+            Jackson.getMapper(site).writeValue(f, stats);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }

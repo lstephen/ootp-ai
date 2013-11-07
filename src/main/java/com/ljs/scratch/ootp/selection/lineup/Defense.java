@@ -2,15 +2,15 @@ package com.ljs.scratch.ootp.selection.lineup;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.ratings.DefensiveRatings;
-import com.ljs.scratch.ootp.ratings.Position;
-import static com.ljs.scratch.ootp.ratings.Position.CATCHER;
-import static com.ljs.scratch.ootp.ratings.Position.CENTER_FIELD;
-import static com.ljs.scratch.ootp.ratings.Position.LEFT_FIELD;
-import static com.ljs.scratch.ootp.ratings.Position.RIGHT_FIELD;
-import static com.ljs.scratch.ootp.ratings.Position.SECOND_BASE;
-import static com.ljs.scratch.ootp.ratings.Position.SHORTSTOP;
-import static com.ljs.scratch.ootp.ratings.Position.THIRD_BASE;
+import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
+import com.ljs.scratch.ootp.player.ratings.Position;
+import static com.ljs.scratch.ootp.player.ratings.Position.CATCHER;
+import static com.ljs.scratch.ootp.player.ratings.Position.CENTER_FIELD;
+import static com.ljs.scratch.ootp.player.ratings.Position.LEFT_FIELD;
+import static com.ljs.scratch.ootp.player.ratings.Position.RIGHT_FIELD;
+import static com.ljs.scratch.ootp.player.ratings.Position.SECOND_BASE;
+import static com.ljs.scratch.ootp.player.ratings.Position.SHORTSTOP;
+import static com.ljs.scratch.ootp.player.ratings.Position.THIRD_BASE;
 import java.util.Map;
 
 /**

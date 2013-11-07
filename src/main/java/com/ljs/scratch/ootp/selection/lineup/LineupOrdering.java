@@ -8,7 +8,7 @@ package com.ljs.scratch.ootp.selection.lineup;
 import com.google.common.base.Function;
 import com.google.common.collect.*;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.ratings.BattingRatings;
 import com.ljs.scratch.ootp.stats.TeamStats;
 import java.util.Set;
 

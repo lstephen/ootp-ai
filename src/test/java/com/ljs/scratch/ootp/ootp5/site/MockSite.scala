@@ -1,6 +1,7 @@
 package com.ljs.scratch.ootp.ootp5.site
 
 import com.ljs.scratch.ootp.html.Page
+import com.ljs.scratch.ootp.rating.Scale
 import com.ljs.scratch.ootp.site.Site
 import com.ljs.scratch.ootp.site.SiteDefinition
 import com.ljs.scratch.ootp.site.Version
@@ -26,6 +27,9 @@ class MockSite extends MockitoSugar {
 
     def version(v: Version) = when(site.getType).thenReturn(v)
     def `type`(v: Version) = version(v)
+
+    def abilityScale(s: Scale[_]) = when[Scale[_]](site.getAbilityRatingScale).thenReturn(s)
+    def potentialScale(s: Scale[_]) = when[Scale[_]](site.getPotentialRatingScale).thenReturn(s)
 
     def expectGetPage(url: String) =
         when(site.getPage(url)).thenReturn(page)

@@ -1,14 +1,16 @@
 package com.ljs.scratch.ootp.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
-import com.ljs.scratch.ootp.ratings.Splits;
+import com.ljs.scratch.ootp.player.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.ratings.Splits;
+import com.ljs.scratch.ootp.rating.Rating;
+import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.Version;
 import static com.ljs.scratch.ootp.site.Version.OOTP5;
 import static com.ljs.scratch.ootp.site.Version.OOTP6;
-import com.ljs.scratch.util.ElementsUtil;
 import javax.annotation.Nonnull;
+import org.fest.assertions.api.Assertions;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -66,8 +68,8 @@ public final class PlayerPage {
 
 
         return Splits.<BattingRatings>create(
-            extractBattingRatings(vsLhp.first()),
-            extractBattingRatings(vsRhp.first()));
+            extractBattingRatings(vsLhp.first(), site.getAbilityRatingScale()),
+            extractBattingRatings(vsRhp.first(), site.getAbilityRatingScale()));
     }
 
     public BattingRatings extractBattingPotential() {
@@ -82,27 +84,20 @@ public final class PlayerPage {
         if (site.getType() == Version.OOTP5) {
             Elements els = potential.get(0).children();
 
+            Scale<?> scale = PotentialRating.scale();
             return BattingRatings
-                .builder()
-                .contact(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.CONTACT)))
-                .gap(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.GAP)))
-                .power(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.POWER)))
-                .eye(getOotp5Potential(els, OOTP5_HITTING.get(BattingRatingsType.EYE)))
+                .builder(scale)
+                .contact(els.get(OOTP5_HITTING.get(BattingRatingsType.CONTACT)).text())
+                .gap(els.get(OOTP5_HITTING.get(BattingRatingsType.GAP)).text())
+                .power(els.get(OOTP5_HITTING.get(BattingRatingsType.POWER)).text())
+                .eye(els.get(OOTP5_HITTING.get(BattingRatingsType.EYE)).text())
                 .build();
         } else {
-            BattingRatings unscaled = extractBattingRatings(potential.first());
-
-            return BattingRatings
-                .builder()
-                .contact(scaleOotp6PotentialRating(unscaled.getContact()))
-                .gap(scaleOotp6PotentialRating(unscaled.getGap()))
-                .power(scaleOotp6PotentialRating(unscaled.getPower()))
-                .eye(scaleOotp6PotentialRating(unscaled.getEye()))
-                .build();
+            return extractBattingRatings(potential.first(), site.getPotentialRatingScale());
         }
     }
 
-    public BattingRatings extractBattingRatings(Element el) {
+    public <T> BattingRatings<T> extractBattingRatings(Element el, Scale<T> scale) {
 
         ImmutableMap<BattingRatingsType, Integer> idx;
         switch (site.getType()) {
@@ -118,31 +113,28 @@ public final class PlayerPage {
 
         Elements line = el.children();
 
+        Assertions.assertThat(scale).isNotNull();
+        Assertions.assertThat(line).isNotNull();
+        Assertions.assertThat(idx).isNotNull();
+
         return BattingRatings
-            .builder()
-            .contact(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.CONTACT)))
-            .gap(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.GAP)))
-            .power(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.POWER)))
-            .eye(ElementsUtil.getInteger(line, idx.get(BattingRatingsType.EYE)))
+            .builder(scale)
+            .contact(scale.parse(line.get(idx.get(BattingRatingsType.CONTACT)).text()))
+            .gap(scale.parse(line.get(idx.get(BattingRatingsType.GAP)).text()))
+            .power(scale.parse(line.get(idx.get(BattingRatingsType.POWER)).text()))
+            .eye(scale.parse(line.get(idx.get(BattingRatingsType.EYE)).text()))
             .build();
     }
 
-    private Integer getOotp5Potential(Elements els, int idx) {
-        return PotentialRating.from(els.get(idx)).normalize().get() / 10;
+    private Rating<?, ?>
+        getOotp5Potential(Elements els, int idx) {
+
+        return site.getPotentialRatingScale().parse(els.get(idx).text());
     }
 
-    private int scaleOotp6PotentialRating(int r) {
-        if (site.getName().equals("BTH")) {
-            // scale 1-10 to 1-100 scale
-            return r * 10 - 5;
-        }
-
-        if (site.getName().equals("PSD")) {
-            return r;
-        }
-
-        // scale 2-8 to 1-20 scale
-        return r * 2 + (r - 5);
+    private Rating<?, ?> parseOotp6PotentialRating(String s) {
+        site.getPotentialRatingScale();
+        return site.getPotentialRatingScale().parse(s);
     }
 
 

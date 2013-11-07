@@ -3,8 +3,8 @@ package com.ljs.scratch.ootp.ootp5.site;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.html.Page;
+import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.util.Jackson;
 import java.io.File;
@@ -59,7 +59,7 @@ public class LeagueBatting {
         if (f.exists()) {
             try {
                 historical =
-                    Jackson.getMapper().readValue(f, LeagueBatting.class).historical;
+                    Jackson.getMapper(site).readValue(f, LeagueBatting.class).historical;
             } catch (IOException e) {
                 throw Throwables.propagate(e);
             }
@@ -99,7 +99,7 @@ public class LeagueBatting {
         }
 
         try {
-            Jackson.getMapper().writeValue(getHistoricalFile(), this);
+            Jackson.getMapper(site).writeValue(getHistoricalFile(), this);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }

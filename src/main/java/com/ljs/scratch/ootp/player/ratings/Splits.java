@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.ratings;
+package com.ljs.scratch.ootp.player.ratings;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

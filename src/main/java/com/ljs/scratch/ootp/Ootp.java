@@ -11,13 +11,13 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
+import com.ljs.scratch.ootp.io.Printables;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.ratings.PlayerRatings;
+import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.regression.SplitPercentages;
-import com.ljs.scratch.ootp.io.Printables;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
@@ -124,9 +124,9 @@ public class Ootp {
             //( HFTC
             //( LBB
             //, BTH
-            //, SAVOY
-            //, PSD
-            ( TFMS
+            //( SAVOY
+            ( PSD
+            //( TFMS
             )) {
             try (
                 FileOutputStream out =

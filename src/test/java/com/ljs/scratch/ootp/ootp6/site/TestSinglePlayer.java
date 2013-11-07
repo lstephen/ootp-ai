@@ -5,7 +5,7 @@ import com.ljs.scratch.ootp.ootp5.site.MockSite;
 import com.ljs.scratch.ootp.ootp5.site.SinglePlayer;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.ratings.BattingRatings;
 import com.ljs.scratch.ootp.site.Version;
 import java.io.IOException;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -36,6 +36,8 @@ public class TestSinglePlayer {
     @Before
     public void setUp() {
         site.expectGetPage(ID.unwrap() + ".html");
+        site.abilityScale(OneToTwenty.scale());
+        site.potentialScale(TwoToEight.scale());
 
         singlePlayer = new SinglePlayer();
         singlePlayer.setSite(site.toMock());
@@ -73,11 +75,11 @@ public class TestSinglePlayer {
         Assert.assertEquals("Port Adelaide Magpies", extracted.getTeam());
 
         BattingRatings expectedRatings = BattingRatings
-            .builder()
-            .contact(11)
-            .gap(15)
-            .power(20)
-            .eye(20)
+            .builder(OneToTwenty.scale())
+            .contact(OneToTwenty.scale().ratingOf(11))
+            .gap(OneToTwenty.scale().ratingOf(15))
+            .power(OneToTwenty.scale().ratingOf(20))
+            .eye(OneToTwenty.scale().ratingOf(20))
             .build();
 
         Assert.assertEquals(
@@ -121,11 +123,11 @@ public class TestSinglePlayer {
         Assert.assertEquals("Port Adelaide Magpies", extracted.getTeam());
 
         BattingRatings expectedRatings = BattingRatings
-            .builder()
-            .contact(5)
-            .gap(6)
-            .power(3)
-            .eye(3)
+            .builder(OneToTwenty.scale())
+            .contact(OneToTwenty.scale().ratingOf(5))
+            .gap(OneToTwenty.scale().ratingOf(6))
+            .power(OneToTwenty.scale().ratingOf(3))
+            .eye(OneToTwenty.scale().ratingOf(3))
             .build();
 
         Assert.assertEquals(

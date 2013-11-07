@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.ratings.Position;
+import com.ljs.scratch.ootp.player.ratings.Position;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;

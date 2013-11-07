@@ -5,13 +5,14 @@ import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
-import com.ljs.scratch.ootp.ratings.DefensiveRatings;
-import com.ljs.scratch.ootp.ratings.FieldingRatings;
-import com.ljs.scratch.ootp.ratings.PitchingRatings;
-import com.ljs.scratch.ootp.ratings.PlayerRatings;
-import com.ljs.scratch.ootp.ratings.Position;
-import com.ljs.scratch.ootp.ratings.Splits;
+import com.ljs.scratch.ootp.player.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
+import com.ljs.scratch.ootp.player.ratings.FieldingRatings;
+import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
+import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
+import com.ljs.scratch.ootp.player.ratings.Position;
+import com.ljs.scratch.ootp.player.ratings.Splits;
+import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.site.Site;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -125,20 +126,22 @@ public class PlayerExtraction {
             return null;
         }
 
+        Scale<?> s = site.getAbilityRatingScale();
+
         BattingRatings vsL = BattingRatings
-            .builder()
-            .contact(Integer.parseInt(doc.select("td:containsOwn(Contact) + td + td").text()))
-            .gap(Integer.parseInt(doc.select("td:containsOwn(Gap) + td + td").text()))
-            .power(Integer.parseInt(doc.select("td:containsOwn(Power) + td + td").text()))
-            .eye(Integer.parseInt(doc.select("td:containsOwn(Eye) + td + td").text()))
+            .builder(s)
+            .contact(doc.select("td:containsOwn(Contact) + td + td").text())
+            .gap(doc.select("td:containsOwn(Gap) + td + td").text())
+            .power(doc.select("td:containsOwn(Power) + td + td").text())
+            .eye(doc.select("td:containsOwn(Eye) + td + td").text())
             .build();
 
         BattingRatings vsR = BattingRatings
-            .builder()
-            .contact(Integer.parseInt(doc.select("td:containsOwn(Contact) + td + td + td").text()))
-            .gap(Integer.parseInt(doc.select("td:containsOwn(Gap) + td + td + td").text()))
-            .power(Integer.parseInt(doc.select("td:containsOwn(Power) + td + td + td").text()))
-            .eye(Integer.parseInt(doc.select("td:containsOwn(Eye) + td + td + td").text()))
+            .builder(s)
+            .contact(doc.select("td:containsOwn(Contact) + td + td + td").text())
+            .gap(doc.select("td:containsOwn(Gap) + td + td + td").text())
+            .power(doc.select("td:containsOwn(Power) + td + td + td").text())
+            .eye(doc.select("td:containsOwn(Eye) + td + td + td").text())
             .build();
 
         return Splits.create(vsL, vsR);
@@ -149,12 +152,14 @@ public class PlayerExtraction {
             return null;
         }
 
+        Scale<?> s = site.getPotentialRatingScale();
+
         return BattingRatings
-            .builder()
-            .contact(Integer.parseInt(doc.select("td:containsOwn(Contact) + td + td + td + td").text()))
-            .gap(Integer.parseInt(doc.select("td:containsOwn(Gap) + td + td + td + td").text()))
-            .power(Integer.parseInt(doc.select("td:containsOwn(Power) + td + td + td + td").text()))
-            .eye(Integer.parseInt(doc.select("td:containsOwn(Eye) + td + td + td + td").text()))
+            .builder(s)
+            .contact(doc.select("td:containsOwn(Contact) + td + td + td + td").text())
+            .gap(doc.select("td:containsOwn(Gap) + td + td + td + td").text())
+            .power(doc.select("td:containsOwn(Power) + td + td + td + td").text())
+            .eye(doc.select("td:containsOwn(Eye) + td + td + td + td").text())
             .build();
     }
 

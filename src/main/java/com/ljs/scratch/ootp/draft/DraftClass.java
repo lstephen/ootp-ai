@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.util.Jackson;
 import java.io.File;
@@ -44,9 +45,9 @@ public final class DraftClass {
         return ImmutableSet.copyOf(players);
     }
 
-    public void save(File f) {
+    public void save(Site site, File f) {
         try {
-            Jackson.getMapper().writeValue(f, this);
+            Jackson.getMapper(site).writeValue(f, this);
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
@@ -61,7 +62,7 @@ public final class DraftClass {
     public static DraftClass load(File f, SiteDefinition site) {
         if (f.exists()) {
             try {
-                DraftClass dc = Jackson.getMapper().readValue(f, DraftClass.class);
+                DraftClass dc = Jackson.getMapper(site.getSite()).readValue(f, DraftClass.class);
 
                 for (Player p : dc.getPlayers()) {
                     p.setSite(site);

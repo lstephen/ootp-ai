@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.ootp5.site;
 import com.google.common.base.Optional;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.ratings.BattingRatings;
 import com.ljs.scratch.ootp.site.Version;
 import java.io.IOException;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -31,6 +31,9 @@ public class TestSinglePlayer {
     @Before
     public void setUp() {
         site.expectGetPage(ID.unwrap() + ".html");
+        site.type(Version.OOTP5);
+        site.abilityScale(ZeroToTen.scale());
+        site.potentialScale(PotentialRating.scale());
 
         singlePlayer = new SinglePlayer();
         singlePlayer.setSite(site.toMock());
@@ -67,19 +70,19 @@ public class TestSinglePlayer {
         Assert.assertEquals("Detroit Tigers", extracted.getTeam());
 
         BattingRatings expectedRatingsVsRight = BattingRatings
-            .builder()
-            .contact(8)
-            .gap(5)
-            .power(11)
-            .eye(8)
+            .builder(ZeroToTen.scale())
+            .contact(ZeroToTen.scale().ratingOf(8))
+            .gap(ZeroToTen.scale().ratingOf(5))
+            .power(ZeroToTen.scale().ratingOf(11))
+            .eye(ZeroToTen.scale().ratingOf(8))
             .build();
 
         BattingRatings expectedRatingsVsLeft = BattingRatings
-            .builder()
-            .contact(8)
-            .gap(5)
-            .power(11)
-            .eye(9)
+            .builder(ZeroToTen.scale())
+            .contact(ZeroToTen.scale().ratingOf(8))
+            .gap(ZeroToTen.scale().ratingOf(5))
+            .power(ZeroToTen.scale().ratingOf(11))
+            .eye(ZeroToTen.scale().ratingOf(9))
             .build();
 
         Assert.assertEquals(

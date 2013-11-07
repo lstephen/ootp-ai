@@ -2,9 +2,9 @@ package com.ljs.scratch.ootp.draft;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.io.Printables;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.File;
@@ -36,7 +36,7 @@ public final class DraftReport implements Printable {
             current.addIfNotPresent(p);
         }
 
-        current.save(getDraftClassFile(site.getDate().getYear()));
+        current.save(site, getDraftClassFile(site.getDate().getYear()));
 
         // TODO: Historical
     }

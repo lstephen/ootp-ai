@@ -6,6 +6,7 @@ import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.BattingStats;
@@ -86,5 +87,8 @@ public interface Site {
     Predicate<Player> isFutureFreeAgent();
 
     boolean isInjured(Player p);
+
+    Scale<?> getAbilityRatingScale();
+    Scale<?> getPotentialRatingScale();
 
 }

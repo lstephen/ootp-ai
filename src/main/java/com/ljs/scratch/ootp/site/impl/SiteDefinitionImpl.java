@@ -1,11 +1,18 @@
 package com.ljs.scratch.ootp.site.impl;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.ootp5.site.Ootp5;
+import com.ljs.scratch.ootp.ootp5.site.PotentialRating;
+import com.ljs.scratch.ootp.ootp5.site.ZeroToTen;
+import com.ljs.scratch.ootp.ootp6.site.OneToTen;
+import com.ljs.scratch.ootp.ootp6.site.OneToTwenty;
 import com.ljs.scratch.ootp.ootp6.site.Ootp6;
+import com.ljs.scratch.ootp.ootp6.site.TwoToEight;
 import com.ljs.scratch.ootp.ootpx.site.OotpX;
+import com.ljs.scratch.ootp.rating.OneToOneHundred;
+import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
@@ -87,6 +94,46 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     @Override
     public Boolean isFreezeOneRatings() {
         return type == Version.OOTP6;
+    }
+
+    @Override
+    public Scale<?> getPotentialRatingsScale() {
+        if (type == Version.OOTP5) {
+            return PotentialRating.scale();
+        }
+        if (type == Version.OOTPX) {
+            return OneToOneHundred.scale();
+        }
+
+        if (name.equals("BTH")) {
+            return OneToTen.scale();
+        }
+
+        if (name.equals("TWML")) {
+            return TwoToEight.scale();
+        }
+
+        throw new IllegalArgumentException();
+    }
+
+    @Override
+    public Scale<?> getAbilityRatingScale() {
+        if (type == Version.OOTP5) {
+            return ZeroToTen.scale();
+        }
+        if (type == Version.OOTPX) {
+            return OneToOneHundred.scale();
+        }
+
+        if (name.equals("BTH")) {
+            return OneToOneHundred.scale();
+        }
+
+        if (name.equals("TWML")) {
+            return OneToTwenty.scale();
+        }
+
+        throw new IllegalArgumentException();
     }
 
     @Override

@@ -2,9 +2,9 @@ package com.ljs.scratch.ootp.value;
 
 import com.google.common.base.Function;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.ratings.BattingRatings;
-import com.ljs.scratch.ootp.ratings.PitchingRatings;
-import com.ljs.scratch.ootp.ratings.Splits;
+import com.ljs.scratch.ootp.player.ratings.BattingRatings;
+import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
+import com.ljs.scratch.ootp.player.ratings.Splits;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;

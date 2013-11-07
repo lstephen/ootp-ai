@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.ratings;
+package com.ljs.scratch.ootp.player.ratings;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;

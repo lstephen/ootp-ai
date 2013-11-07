@@ -4,19 +4,25 @@ package com.ljs.scratch.ootp.rating;
  *
  * @author lstephen
  */
-public final class OneToOneHundred  implements Scale<Integer> {
+public final class OneToOneHundred extends IntegerScale {
 
     private static final OneToOneHundred INSTANCE = new OneToOneHundred();
 
-    private OneToOneHundred() { }
+    private OneToOneHundred() {
+        super();
+    }
 
     @Override
-    public Rating<Integer, OneToOneHundred> normalize(Integer value) {
-        return valueOf(value);
+    protected Integer scale(Integer value) {
+        return value;
     }
 
     public static Rating<Integer, OneToOneHundred> valueOf(Integer value) {
         return Rating.create(value, INSTANCE);
+    }
+
+    public static OneToOneHundred scale() {
+        return INSTANCE;
     }
 
 }

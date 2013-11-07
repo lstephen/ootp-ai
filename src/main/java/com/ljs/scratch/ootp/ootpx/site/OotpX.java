@@ -13,6 +13,7 @@ import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.html.PageFactory;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
+import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.Salary;
@@ -349,6 +350,16 @@ public class OotpX implements Site {
             }
         }
         return false;
+    }
+
+    @Override
+    public Scale<?> getAbilityRatingScale() {
+        return definition.getAbilityRatingScale();
+    }
+
+    @Override
+    public Scale<?> getPotentialRatingScale() {
+        return definition.getPotentialRatingsScale();
     }
 
     public static OotpX create(SiteDefinition def) {

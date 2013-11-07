@@ -6,11 +6,11 @@ import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
-import com.ljs.scratch.ootp.ratings.DefensiveRatings;
-import com.ljs.scratch.ootp.ratings.PitchingRatings;
-import com.ljs.scratch.ootp.ratings.PlayerRatings;
-import com.ljs.scratch.ootp.ratings.Position;
-import com.ljs.scratch.ootp.ratings.Splits;
+import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
+import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
+import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
+import com.ljs.scratch.ootp.player.ratings.Position;
+import com.ljs.scratch.ootp.player.ratings.Splits;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.util.ElementsUtil;
@@ -88,12 +88,15 @@ public class SinglePlayer implements PlayerSource {
 
     @Override
     public Player get(PlayerId id) {
+        Document doc;
         try {
-            return extract(id, loadPage(id));
+            doc = loadPage(id);
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Player not found. ID: {0}", id);
             return null;
         }
+
+        return extract(id, doc);
     }
 
     private Player extract(PlayerId id, Document doc) {
