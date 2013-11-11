@@ -19,7 +19,11 @@ public final class SalaryFormat {
             return "";
         }
 
-        Integer displayDigits = Integer.parseInt(salary.toString().substring(0, 3)) + 1;
+        Integer displayDigits = Integer.parseInt(salary.toString().substring(0, 3));
+
+        if (salary.toString().charAt(3) != '0') {
+            displayDigits += 1;
+        }
 
         int exp = (int) (Math.log(salary) / Math.log(10));
 

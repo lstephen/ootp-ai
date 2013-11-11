@@ -117,18 +117,13 @@ public class PowerRankingsReport implements Printable {
     private Long newRating(Long ratingFor, Long ratingAgainst, Integer scoreFor, Integer scoreAgainst, boolean home) {
         Integer w = scoreFor > scoreAgainst ? 1 : 0;
 
-        Double kFactor = ((double) 162 / (numberOfResults / Iterables.size(site.getTeamIds())));
+        Double kFactor = ((double) 162 / (numberOfResults / Iterables.size(site.getTeamIds()))) / 2;
 
         Double k = kFactor * Math.pow(Math.abs(scoreFor - scoreAgainst), 0.33);
 
         Double dr = (double) (ratingFor - ratingAgainst) + (home ? 25 : -25);
 
         Double we = 1 / (Math.pow(10, (-dr / 400)) + 1);
-
-        //System.out.println("ratings:" + ratingFor + "/" + ratingAgainst);
-        //System.out.println("dr:" + dr + " hm:" + home);
-        //System.out.println("we:" + we);
-        //System.out.println("new:" + (ratingFor + k * (w - we)));
 
         return (long) (ratingFor + k * (w - we));
     }
@@ -137,10 +132,10 @@ public class PowerRankingsReport implements Printable {
         Standings standings = site.getStandings();
 
         for (Id<Team> team : site.getTeamIds()) {
-            Integer w = standings.getWins(team);
-            Integer l = standings.getLosses(team);
+            Integer w = standings.getWins(team) + 35;
+            Integer l = standings.getLosses(team) + 35;
 
-            Double we = w + l == 0 ? 0.5 : (double) w / (w + l);
+            Double we = (double) w / (w + l);
 
             Long elo = 1500 + Math.round(
                 (400 * Math.log((double) -we / (we-1)))

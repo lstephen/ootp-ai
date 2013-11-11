@@ -1,6 +1,5 @@
 package com.ljs.scratch.ootp.report;
 
-import com.ljs.scratch.ootp.io.Printable;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
@@ -8,6 +7,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.annotation.ReturnTypesAreNonnullByDefault;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
@@ -61,10 +61,7 @@ public final class TeamReport implements Printable {
         Set<TeamScore> scores = Sets.newHashSet();
 
         for (Id<Team> id : site.getTeamIds()) {
-            scores.add(
-                calculate(
-                id,
-                site.getSingleTeam(id).getRoster().getAllPlayers()));
+            scores.add(calculate(id));
         }
 
         scores = normalize(scores);
@@ -166,6 +163,10 @@ public final class TeamReport implements Printable {
             stats.addValue(s.getRotation());
         }
         return stats.getMean();
+    }
+
+    private TeamScore calculate(Id<Team> id) {
+        return calculate(id, site.getSingleTeam(id).getRoster().getAllPlayers());
     }
 
     private TeamScore calculate(Id<Team> id, Iterable<Player> players) {

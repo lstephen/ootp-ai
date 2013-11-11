@@ -121,12 +121,12 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            //( CBL
+            ( CBL
             //( HFTC
-            //( LBB
-            ( BTH
-            , SAVOY
-            //( PSD
+            //, LBB
+            //( BTH
+            //, SAVOY
+            //, PSD
             //( TFMS
             )) {
             try (
