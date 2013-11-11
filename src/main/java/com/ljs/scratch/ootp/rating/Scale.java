@@ -1,12 +1,18 @@
 package com.ljs.scratch.ootp.rating;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.ljs.scratch.ootp.ootp5.site.ZeroToTen;
 
 /**
  *
  * @author lstephen
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes({
+    @Type(ZeroToTen.class)
+})
 public interface Scale<T> {
 
     Rating<T, ? extends Scale<T>> ratingOf(T value);
