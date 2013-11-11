@@ -12,6 +12,7 @@ import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.io.Printables;
+import com.ljs.scratch.ootp.ootp5.report.PowerRankingsReport;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
@@ -122,9 +123,9 @@ public class Ootp {
             //( TWML
             //( CBL
             //( HFTC
-            ( LBB
-            //( BTH
-            //( SAVOY
+            //( LBB
+            ( BTH
+            , SAVOY
             //( PSD
             //( TFMS
             )) {
@@ -484,6 +485,11 @@ public class Ootp {
             generic.setPlayers(r.getAllPlayers());
             generic.print(out);
             count++;
+        }
+
+        if (site.getType() != Version.OOTPX) {
+            LOG.info("Power Rankings...");
+            Printables.print(PowerRankingsReport.create(site)).to(out);
         }
 
         LOG.info("Team Now Report...");

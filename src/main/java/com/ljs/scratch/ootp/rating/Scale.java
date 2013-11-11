@@ -11,7 +11,8 @@ import com.ljs.scratch.ootp.ootp5.site.ZeroToTen;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
-    @Type(ZeroToTen.class)
+    @Type(ZeroToTen.class),
+    @Type(OneToOneHundred.class)
 })
 public interface Scale<T> {
 

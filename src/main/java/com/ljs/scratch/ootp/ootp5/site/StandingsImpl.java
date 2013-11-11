@@ -1,10 +1,10 @@
 package com.ljs.scratch.ootp.ootp5.site;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.site.Standings;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.site.Standings;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 

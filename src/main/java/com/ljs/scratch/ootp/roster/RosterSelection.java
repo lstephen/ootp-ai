@@ -29,7 +29,6 @@ import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.PlayerValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -144,20 +143,15 @@ public final class RosterSelection {
         return roster;
     }
 
-    private void assignToDisabledList(Roster r, Iterable ps) {
-        Iterator i$ = ps.iterator();
-        do {
-            if (!i$.hasNext()) {
-                break;
-            }
-            Player p = (Player) i$.next();
-            if (((Boolean) p.getOn40Man().or(Boolean.TRUE)).booleanValue()) {
-                r.assign(com.ljs.scratch.ootp.roster.Roster.Status.DL,
-                    new Player[]{
-                    p
-                });
-            }
-        } while (true);
+    private void assignToDisabledList(Roster r, Iterable<Player> ps) {
+        for (Player p : ps) {
+            boolean isOn40Man = p.getOn40Man().or(Boolean.TRUE);
+            boolean isOnDl = previous != null && previous.getStatus(p) == Status.DL;
+
+            if (isOn40Man || isOnDl) {
+                r.assign(com.ljs.scratch.ootp.roster.Roster.Status.DL, p);
+            };
+        }
     }
 
     public void assignMinors(Roster roster) {
