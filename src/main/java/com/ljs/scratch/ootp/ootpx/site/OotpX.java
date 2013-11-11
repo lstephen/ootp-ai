@@ -66,14 +66,7 @@ public class OotpX implements Site {
 
     @Override
     public Integer getCurrentSalary(Player p) {
-        if (!Strings.isNullOrEmpty(p.getSalary()) && p.getSalary().charAt(0) == '$') {
-            try {
-                return NumberFormat.getNumberInstance().parse(p.getSalary().substring(1)).intValue();
-            } catch (ParseException e) {
-                throw Throwables.propagate(e);
-            }
-        }
-        return 0;
+        return PlayerExtraction.create(this).getCurrentSalary(p.getId());
     }
 
     private Integer getNextSalary(Player p) {
@@ -303,7 +296,7 @@ public class OotpX implements Site {
 
             Integer rank = Integer.parseInt(els.first().child(0).text());
 
-            return rank <= 10 ? Optional.of(rank) : Optional.<Integer>absent();
+            return Optional.of(rank);
         }
         return Optional.absent();
     }

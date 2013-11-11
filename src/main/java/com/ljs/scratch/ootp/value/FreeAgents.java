@@ -6,11 +6,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.config.Changes;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.site.Site;
 import java.util.Set;
 
 /**
@@ -18,6 +18,8 @@ import java.util.Set;
  * @author lstephen
  */
 public final class FreeAgents {
+
+    private final Site site;
 
     private final Set<Player> skipped = Sets.newHashSet();
 
@@ -27,7 +29,8 @@ public final class FreeAgents {
 
     private TradeValue tv;
 
-    private FreeAgents(Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
+    private FreeAgents(Site site, Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
+        this.site = site;
         this.fas = fas;
         this.value = value;
         this.tv = tv;
@@ -65,7 +68,7 @@ public final class FreeAgents {
     public Optional<FreeAgentAcquisition> getNeedAcquisition(
         Iterable<Player> roster) {
 
-        Set<Slot> needed = RosterReport.create(roster).getNeededSlots();
+        Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
 
         for (Player fa : byValue(value).sortedCopy(fas)) {
             if (skipPlayer(fa)) {
@@ -88,8 +91,8 @@ public final class FreeAgents {
     private Optional<Player> getPlayerToReleaseFor(
         Iterable<Player> roster, Player fa) {
 
-        Set<Slot> surplus = RosterReport.create(roster).getSurplusSlots();
-        Set<Slot> needed = RosterReport.create(roster).getNeededSlots();
+        Set<Slot> surplus = RosterReport.create(site, roster).getSurplusSlots();
+        Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
 
         for (Player r : byValue(value).reverse().sortedCopy(roster)) {
             if (!fa.getSlots().contains(Slot.getPrimarySlot(r)) && !surplus.contains(Slot.getPrimarySlot(r))) {
@@ -111,7 +114,7 @@ public final class FreeAgents {
 
     public Optional<Player> getPlayerToRelease(Iterable<Player> roster) {
 
-        Set<Slot> needed = RosterReport.create(roster).getNeededSlots();
+        Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
 
         for (Player r : byValue(value).reverse().sortedCopy(roster)) {
             if (!Sets.intersection(ImmutableSet.copyOf(r.getSlots()), needed).isEmpty()) {
@@ -171,15 +174,15 @@ public final class FreeAgents {
     }
 
     public static FreeAgents create(Site site, Changes changes, Function<Player, Integer> value, TradeValue tv) {
-        FreeAgents fas = create(site.getFreeAgents(), value, tv);
+        FreeAgents fas = create(site, site.getFreeAgents(), value, tv);
 
         fas.skip(changes.get(Changes.ChangeType.DONT_ACQUIRE));
 
         return fas;
     }
 
-    public static FreeAgents create(Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
-        return new FreeAgents(fas, value, tv);
+    public static FreeAgents create(Site site, Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
+        return new FreeAgents(site, fas, value, tv);
     }
 
 }

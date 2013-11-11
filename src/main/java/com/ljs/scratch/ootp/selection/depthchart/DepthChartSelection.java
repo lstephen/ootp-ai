@@ -91,7 +91,7 @@ public class DepthChartSelection {
     private void selectBackup(DepthChart dc, Position position, Iterable<Player> bench, Lineup.VsHand vs) {
 
         Player starter = dc.getStarter(position);
-        Set<Player> backups = ImmutableSet.copyOf(Iterables.limit(selectBackups(position, bench, vs), 3));
+        Set<Player> backups = ImmutableSet.copyOf(Iterables.limit(selectBackups(position, bench, vs), 2));
 
         Player primary = starter;
 

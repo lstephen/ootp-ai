@@ -122,10 +122,10 @@ public class Ootp {
             //( TWML
             //( CBL
             //( HFTC
-            //( LBB
-            //, BTH
+            ( LBB
+            //( BTH
             //( SAVOY
-            ( PSD
+            //( PSD
             //( TFMS
             )) {
             try (
@@ -350,11 +350,7 @@ public class Ootp {
 
         generic.printReplacementLevelReport(out);
 
-        RosterReport rosterReport = RosterReport.create(newRoster);
-
-        if (site.getName().equals("PSD")) {
-            rosterReport.setTargetRatio(60);
-        }
+        RosterReport rosterReport = RosterReport.create(site, newRoster);
 
         Printables.print(rosterReport).to(out);
 
@@ -618,7 +614,7 @@ public class Ootp {
                         }
                     }));
 
-        generic.setTitle("Non Top 10 prospects");
+        generic.setTitle("Non Top prospects");
         generic.setMultiplier(0.91);
         generic.setLimit(50);
         generic.setPlayers(nonTopTens);

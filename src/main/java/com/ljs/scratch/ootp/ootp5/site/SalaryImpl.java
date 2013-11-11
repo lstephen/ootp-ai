@@ -4,12 +4,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Salary;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.html.Page;
+import com.ljs.scratch.ootp.io.SalaryFormat;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Salary;
+import com.ljs.scratch.ootp.site.Site;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Map;
@@ -55,20 +56,27 @@ public class SalaryImpl implements Salary {
                 String salary = el.children().get(2).text().trim();
 
                 if (salary.startsWith("$")) {
+                    String value;
+                    try {
+                        value = SalaryFormat.prettyPrint(NumberFormat.getNumberInstance().parse(salary.substring(1)));
+                    } catch (ParseException e) {
+                        throw Throwables.propagate(e);
+                    }
+
                     char years = el.children().get(4).text().trim().charAt(0);
 
                     if (years != '1') {
-                        return salary + "x" + years;
+                        return value + "x" + years;
                     } else {
                         String comment = el.children().get(5).text();
                         if (comment.contains("Extension")) {
-                            return salary + " e";
+                            return value + " e";
                         } else if (comment.contains("Automatic")) {
-                            return salary + " r";
+                            return value + " r";
                         } else if (comment.contains("Arbitration")) {
-                            return salary + " a";
+                            return value + " a";
                         } else {
-                            return salary + "  ";
+                            return value + "  ";
                         }
                     }
                 } else {

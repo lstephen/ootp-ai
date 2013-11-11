@@ -1,13 +1,14 @@
 package com.ljs.scratch.ootp.report;
 
-import com.ljs.scratch.ootp.io.Printable;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.site.Site;
 import java.io.PrintWriter;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public final class RosterReport implements Printable {
         this.roster = roster;
     }
 
-    public void setTargetRatio(Integer ratio) {
+    private void setTargetRatio(Integer ratio) {
         this.targetRatio = ratio;
     }
 
@@ -121,12 +122,18 @@ public final class RosterReport implements Printable {
         w.println();
     }
 
-    public static RosterReport create(Roster roster) {
-        return create(roster.getAllPlayers());
+    public static RosterReport create(Site site, Roster roster) {
+        return create(site, roster.getAllPlayers());
     }
 
-    public static RosterReport create(Iterable<Player> ps) {
-        return new RosterReport(ps);
+    public static RosterReport create(Site site, Iterable<Player> ps) {
+        RosterReport report = new RosterReport(ps);
+
+        if (site.getName().equals("PSD")) {
+            report.setTargetRatio(60);
+        }
+
+        return report;
     }
 
 }

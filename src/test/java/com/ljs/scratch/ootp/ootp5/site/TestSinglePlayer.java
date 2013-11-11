@@ -69,20 +69,20 @@ public class TestSinglePlayer {
         Assert.assertEquals(32, extracted.getAge());
         Assert.assertEquals("Detroit Tigers", extracted.getTeam());
 
-        BattingRatings expectedRatingsVsRight = BattingRatings
+        BattingRatings<Integer> expectedRatingsVsRight = BattingRatings
             .builder(ZeroToTen.scale())
-            .contact(ZeroToTen.scale().ratingOf(8))
-            .gap(ZeroToTen.scale().ratingOf(5))
-            .power(ZeroToTen.scale().ratingOf(11))
-            .eye(ZeroToTen.scale().ratingOf(8))
+            .contact(8)
+            .gap(5)
+            .power(11)
+            .eye(8)
             .build();
 
-        BattingRatings expectedRatingsVsLeft = BattingRatings
+        BattingRatings<Integer> expectedRatingsVsLeft = BattingRatings
             .builder(ZeroToTen.scale())
-            .contact(ZeroToTen.scale().ratingOf(8))
-            .gap(ZeroToTen.scale().ratingOf(5))
-            .power(ZeroToTen.scale().ratingOf(11))
-            .eye(ZeroToTen.scale().ratingOf(9))
+            .contact(8)
+            .gap(5)
+            .power(11)
+            .eye(9)
             .build();
 
         Assert.assertEquals(

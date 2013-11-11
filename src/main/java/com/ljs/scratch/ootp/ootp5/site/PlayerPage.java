@@ -6,11 +6,9 @@ import com.ljs.scratch.ootp.player.ratings.Splits;
 import com.ljs.scratch.ootp.rating.Rating;
 import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.site.Version;
 import static com.ljs.scratch.ootp.site.Version.OOTP5;
 import static com.ljs.scratch.ootp.site.Version.OOTP6;
 import javax.annotation.Nonnull;
-import org.fest.assertions.api.Assertions;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -81,20 +79,7 @@ public final class PlayerPage {
 
         Elements potential = ratingsEls.select("tr.g:has(td:contains(Talent))");
 
-        if (site.getType() == Version.OOTP5) {
-            Elements els = potential.get(0).children();
-
-            Scale<?> scale = PotentialRating.scale();
-            return BattingRatings
-                .builder(scale)
-                .contact(els.get(OOTP5_HITTING.get(BattingRatingsType.CONTACT)).text())
-                .gap(els.get(OOTP5_HITTING.get(BattingRatingsType.GAP)).text())
-                .power(els.get(OOTP5_HITTING.get(BattingRatingsType.POWER)).text())
-                .eye(els.get(OOTP5_HITTING.get(BattingRatingsType.EYE)).text())
-                .build();
-        } else {
-            return extractBattingRatings(potential.first(), site.getPotentialRatingScale());
-        }
+        return extractBattingRatings(potential.first(), site.getPotentialRatingScale());
     }
 
     public <T> BattingRatings<T> extractBattingRatings(Element el, Scale<T> scale) {
@@ -113,16 +98,12 @@ public final class PlayerPage {
 
         Elements line = el.children();
 
-        Assertions.assertThat(scale).isNotNull();
-        Assertions.assertThat(line).isNotNull();
-        Assertions.assertThat(idx).isNotNull();
-
         return BattingRatings
             .builder(scale)
-            .contact(scale.parse(line.get(idx.get(BattingRatingsType.CONTACT)).text()))
-            .gap(scale.parse(line.get(idx.get(BattingRatingsType.GAP)).text()))
-            .power(scale.parse(line.get(idx.get(BattingRatingsType.POWER)).text()))
-            .eye(scale.parse(line.get(idx.get(BattingRatingsType.EYE)).text()))
+            .contact(line.get(idx.get(BattingRatingsType.CONTACT)).text())
+            .gap(line.get(idx.get(BattingRatingsType.GAP)).text())
+            .power(line.get(idx.get(BattingRatingsType.POWER)).text())
+            .eye(line.get(idx.get(BattingRatingsType.EYE)).text())
             .build();
     }
 

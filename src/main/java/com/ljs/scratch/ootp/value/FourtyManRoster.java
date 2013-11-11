@@ -69,13 +69,22 @@ public class FourtyManRoster {
     private ImmutableSet<Player> getDesired40ManRoster() {
         Set<Player> fourtyMan = Sets.newHashSet();
 
+        Iterable<Player> available = Iterables.filter(
+            roster.getAllPlayers(),
+            new Predicate<Player>() {
+                public boolean apply(Player p) {
+                    return roster.getStatus(p) != Status.DL || p.getOn40Man().or(false);
+                }
+            });
+
+
         fourtyMan.addAll(
             Selections
                 .select(
                     HitterSelectionFactory
                         .using(predictions)
                         .create(Mode.EXPANDED),
-                    Selections.onlyHitters(roster.getAllPlayers()))
+                    Selections.onlyHitters(available))
                 .values());
 
         fourtyMan.addAll(
@@ -84,7 +93,7 @@ public class FourtyManRoster {
                     PitcherSelectionFactory
                         .using(predictions)
                         .create(Mode.EXPANDED),
-                    Selections.onlyPitchers(roster.getAllPlayers()))
+                    Selections.onlyPitchers(available))
                 .values());
 
         Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;

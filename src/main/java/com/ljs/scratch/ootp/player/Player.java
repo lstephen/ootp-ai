@@ -167,7 +167,13 @@ public final class Player {
 
         Optional<Integer> pos = getTeamTopProspectPosition();
         if (pos.isPresent()) {
-            str.append(pos.get() >= 10 ? "T" : pos.get());
+            if (pos.get() > 10) {
+                str.append(">");
+            } else if (pos.get() == 10) {
+                str.append("T");
+            } else {
+                str.append(pos.get());
+            }
         } else {
             str.append(" ");
         }

@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.ootpx.site;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
+import com.ljs.scratch.ootp.io.SalaryFormat;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.ratings.BattingRatings;
@@ -47,10 +48,40 @@ public class PlayerExtraction {
         player.setAge(Integer.parseInt(StringUtils.substringAfterLast(doc.select("td:containsOwn(Age:)").text(), " ")));
         player.setTeam(doc.select("a.title3[href~=teams]").text());
 
-        String currentSalary = CharMatcher.WHITESPACE.trimFrom(doc.select("td:containsOwn(Salary:) + td").text());
+        player.setSalary(extractSalary(doc));
 
-        if (currentSalary.equals("-")) {
-            player.setSalary("");
+        if (site.isInjured(player)) {
+            player.setTeam("*INJ* " + player.getTeam());
+        }
+
+        if (site.isFutureFreeAgent(player)) {
+            player.setTeam("*FA* " + player.getTeam());
+        }
+
+        player.setListedPosition(StringUtils.substringBefore(
+            doc.select("td:containsOwn(" + player.getFirstName() + ")").first().text(),
+            " "));
+
+        Optional<Integer> teamTopProspectPosition =
+            site.getTeamTopProspectPosition(id);
+
+        if (teamTopProspectPosition.isPresent()) {
+            player.setTeamTopProspectPosition(teamTopProspectPosition.get());
+        }
+
+        return player;
+    }
+
+    private String extractName(Document doc) {
+        return CharMatcher.WHITESPACE.trimFrom(
+            doc.select("td.capt1 > a").text());
+    }
+
+    private String extractSalary(Document doc) {
+        Integer currentSalary = getCurrentSalary(doc);
+
+        if (currentSalary == 0) {
+            return "";
         } else {
             String salarySuffix = "  ";
             try {
@@ -79,34 +110,25 @@ public class PlayerExtraction {
                 salarySuffix = " r";
             }
 
-            player.setSalary(currentSalary + salarySuffix);
+            return SalaryFormat.prettyPrint(currentSalary) + salarySuffix;
         }
-
-        if (site.isInjured(player)) {
-            player.setTeam("*INJ* " + player.getTeam());
-        }
-
-        if (site.isFutureFreeAgent(player)) {
-            player.setTeam("*FA* " + player.getTeam());
-        }
-
-        player.setListedPosition(StringUtils.substringBefore(
-            doc.select("td:containsOwn(" + player.getFirstName() + ")").first().text(),
-            " "));
-
-        Optional<Integer> teamTopProspectPosition =
-            site.getTeamTopProspectPosition(id);
-
-        if (teamTopProspectPosition.isPresent()) {
-            player.setTeamTopProspectPosition(teamTopProspectPosition.get());
-        }
-
-        return player;
     }
 
-    private String extractName(Document doc) {
-        return CharMatcher.WHITESPACE.trimFrom(
-            doc.select("td.capt1 > a").text());
+    public Integer getCurrentSalary(PlayerId id) {
+        return getCurrentSalary(Pages.player(site, id).load());
+    }
+
+    private Integer getCurrentSalary(Document doc) {
+        String salary = CharMatcher.WHITESPACE.trimFrom(doc.select("td:containsOwn(Salary:) + td").text());
+
+        if (!Strings.isNullOrEmpty(salary) && salary.charAt(0) == '$') {
+            try {
+                return NumberFormat.getNumberInstance().parse(salary.substring(1)).intValue();
+            } catch (ParseException e) {
+                throw Throwables.propagate(e);
+            }
+        }
+        return 0;
     }
 
     private PlayerRatings extractRatings(Document doc) {
