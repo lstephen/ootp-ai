@@ -48,7 +48,7 @@ public class PlayerExtraction {
         player.setAge(Integer.parseInt(StringUtils.substringAfterLast(doc.select("td:containsOwn(Age:)").text(), " ")));
         player.setTeam(doc.select("a.title3[href~=teams]").text());
 
-        player.setSalary(extractSalary(doc));
+        player.setSalary(extractSalary(doc, player));
 
         if (site.isInjured(player)) {
             player.setTeam("*INJ* " + player.getTeam());
@@ -77,37 +77,38 @@ public class PlayerExtraction {
             doc.select("td.capt1 > a").text());
     }
 
-    private String extractSalary(Document doc) {
+    private String extractSalary(Document doc, Player p) {
         Integer currentSalary = getCurrentSalary(doc);
 
         if (currentSalary == 0) {
             return "";
         } else {
             String salarySuffix = "  ";
+
+            Integer signedThrough;
             try {
-                Integer signedThrough = NumberFormat.getNumberInstance().parse(
+                signedThrough = NumberFormat.getNumberInstance().parse(
                     doc.select("td:containsOwn(Signed Through:) + td").text()).intValue();
-
-                Integer currentYear = site.getDate().getYear();
-
-                Integer signedFor = signedThrough - currentYear + 1;
-
-                if (signedFor > 1) {
-                    salarySuffix = "x" + signedFor;
-                }
             } catch (ParseException e) {
                 throw Throwables.propagate(e);
             }
 
+            Integer currentYear = site.getDate().getYear();
+
+            Integer signedFor = signedThrough - currentYear + 1;
+
+            if (signedFor > 1) {
+                salarySuffix = "x" + signedFor;
+            }
+
+            if (signedFor == 1 && !site.isFutureFreeAgent(p)) {
+                salarySuffix = " r";
+            }
             if (doc.select("td:containsOwn(Arbitration Eligibility:) + td").text().contains("Arbitration eligible")) {
                 salarySuffix = " a";
             }
             if (!doc.select("td:containsOwn(Contract Extension:) + td").text().contains("-")) {
                 salarySuffix = " e";
-            }
-            String mlService = doc.select("td:containsOwn(Major Service:) + td").text();
-            if (mlService.contains("None") || mlService.startsWith("1 ") || mlService.startsWith("2 ")) {
-                salarySuffix = " r";
             }
 
             return SalaryFormat.prettyPrint(currentSalary) + salarySuffix;

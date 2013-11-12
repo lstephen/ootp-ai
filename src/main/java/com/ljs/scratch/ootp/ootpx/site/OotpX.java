@@ -11,11 +11,16 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.html.PageFactory;
+import com.ljs.scratch.ootp.io.Printable;
+import com.ljs.scratch.ootp.ootpx.report.PowerRankingsReport;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.rating.Scale;
+import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.LeagueStructure;
+import com.ljs.scratch.ootp.site.Record;
 import com.ljs.scratch.ootp.site.Salary;
 import com.ljs.scratch.ootp.site.SingleTeam;
 import com.ljs.scratch.ootp.site.Site;
@@ -157,6 +162,11 @@ public class OotpX implements Site {
     }
 
     @Override
+    public LeagueStructure getLeagueStructure() {
+        return LeagueStructureImpl.create(this);
+    }
+
+    @Override
     public Page getPage(String url, Object... args) {
         return PageFactory.create(definition.getSiteRoot(), String.format(url, args));
     }
@@ -270,6 +280,10 @@ public class OotpX implements Site {
                 Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + "]) > td");
                 return ElementsUtil.getInteger(els, 2);
             }
+
+            public Record getRecord(Id<Team> team) {
+                return Record.create(getWins(team), getLosses(team));
+            }
         };
     }
 
@@ -353,6 +367,11 @@ public class OotpX implements Site {
     @Override
     public Scale<?> getPotentialRatingScale() {
         return definition.getPotentialRatingsScale();
+    }
+
+    @Override
+    public Printable getPowerRankingsReport(TeamReport teamReport) {
+        return PowerRankingsReport.create(this, teamReport);
     }
 
     public static OotpX create(SiteDefinition def) {

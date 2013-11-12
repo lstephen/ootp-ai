@@ -3,38 +3,44 @@ package com.ljs.scratch.ootp.ootp5.report;
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.elo.EloRatings;
+import com.ljs.scratch.ootp.elo.GameResult;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.ootp5.site.BoxScores;
-import com.ljs.scratch.ootp.ootp5.site.BoxScores.Result;
+import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Record;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.Standings;
 import java.io.PrintWriter;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author lstephen
  */
-public class PowerRankingsReport implements Printable {
+public final class PowerRankingsReport implements Printable {
 
     private final Site site;
 
-    private Map<Id<Team>, Long> ratings = Maps.newHashMap();
+    private final TeamReport teamReport;
 
-    private Multiset<Id<Team>> wins = HashMultiset.create();
+    //private final Map<Id<Team>, Long> ratings = Maps.newHashMap();
 
-    private Multiset<Id<Team>> losses = HashMultiset.create();
+    private final EloRatings ratings = EloRatings.create();
+
+    private final Multiset<Id<Team>> wins = HashMultiset.create();
+
+    private final Multiset<Id<Team>> losses = HashMultiset.create();
 
     private Integer numberOfResults;
 
-    private PowerRankingsReport(Site site) {
+    private PowerRankingsReport(Site site, TeamReport teamReport) {
         this.site = site;
+        this.teamReport = teamReport;
     }
 
     @Override
@@ -47,7 +53,9 @@ public class PowerRankingsReport implements Printable {
 
         numberOfResults = Iterables.size(scores.getResults());
 
-        for (Result result : scores.getResults()) {
+        ratings.setKFactor(((double) 162 / (numberOfResults / Iterables.size(site.getTeamIds()))) / 2);
+
+        for (GameResult result : scores.getResults()) {
             updateRating(result);
         }
 
@@ -60,23 +68,20 @@ public class PowerRankingsReport implements Printable {
                         return ratings.get(id);
                     }
                 })
-            .sortedCopy(ratings.keySet());
+            .sortedCopy(site.getTeamIds());
 
         w.println("** Power Rankings **");
 
         for (Id<Team> id : ids) {
-            int ws = site.getStandings().getWins(id);
-            int ls = site.getStandings().getLosses(id);
-
-            double pct = ws + ls > 0 ? (double) ws / (ws + ls) : .500;
+            Record current = site.getStandings().getRecord(id);
 
             w.println(
                 String.format(
                     "%-20s | %3d-%3d %.3f | %2d-%2d | %4d ",
                     StringUtils.abbreviate(site.getSingleTeam(id).getName(), 20),
-                    ws,
-                    ls,
-                    pct,
+                    current.getWins(),
+                    current.getLosses(),
+                    current.getWinPercentage(),
                     wins.count(id),
                     losses.count(id),
                     ratings.get(id)
@@ -85,22 +90,13 @@ public class PowerRankingsReport implements Printable {
         }
     }
 
-    private Id<Team> getTeamId(String teamName) {
-        for (Id<Team> id : site.getTeamIds()) {
-            if (site.getSingleTeam(id).getName().startsWith(teamName)) {
-                return id;
-            }
+    private void updateRating(GameResult result) {
+        Id<Team> visitor = result.getVisitor();
+        Id<Team> home = result.getHome();
+
+        if (site.getStandings().getRecord(visitor).getGames() == 0 && site.getStandings().getRecord(home).getGames() == 0) {
+            return;
         }
-
-        throw new IllegalStateException(teamName);
-    }
-
-    private void updateRating(Result result) {
-        Id<Team> visitor = getTeamId(result.getVisitorName());
-        Id<Team> home = getTeamId(result.getHomeName());
-
-        Long visitorRating = ratings.get(visitor);
-        Long homeRating = ratings.get(home);
 
         if (result.getVisitorScore() > result.getHomeScore()) {
             wins.add(visitor);
@@ -110,8 +106,7 @@ public class PowerRankingsReport implements Printable {
             losses.add(visitor);
         }
 
-        ratings.put(visitor, newRating(visitorRating, homeRating, result.getVisitorScore(), result.getHomeScore(), false));
-        ratings.put(home, newRating(homeRating, visitorRating, result.getHomeScore(), result.getVisitorScore(), true));
+        ratings.update(result);
     }
 
     private Long newRating(Long ratingFor, Long ratingAgainst, Integer scoreFor, Integer scoreAgainst, boolean home) {
@@ -132,21 +127,18 @@ public class PowerRankingsReport implements Printable {
         Standings standings = site.getStandings();
 
         for (Id<Team> team : site.getTeamIds()) {
-            Integer w = standings.getWins(team) + 35;
-            Integer l = standings.getLosses(team) + 35;
-
-            Double we = (double) w / (w + l);
+            Double we = teamReport.getExpectedEndOfSeason(team).getWinPercentage();
 
             Long elo = 1500 + Math.round(
                 (400 * Math.log((double) -we / (we-1)))
                 / Math.log(10));
 
-            ratings.put(team, elo);
+            ratings.setRating(team, elo);
         }
     }
 
-    public static PowerRankingsReport create(Site site) {
-        return new PowerRankingsReport(site);
+    public static PowerRankingsReport create(Site site, TeamReport teamReport) {
+        return new PowerRankingsReport(site, teamReport);
     }
 
 }

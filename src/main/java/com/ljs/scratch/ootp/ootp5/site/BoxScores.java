@@ -1,7 +1,9 @@
 package com.ljs.scratch.ootp.ootp5.site;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import com.ljs.scratch.ootp.data.Id;
+import com.ljs.scratch.ootp.elo.GameResult;
+import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.Site;
 import java.util.Collections;
 import java.util.List;
@@ -26,15 +28,15 @@ public final class BoxScores {
         return site.getPage("box.html").load();
     }
 
-    public Iterable<Result> getResults() {
+    public Iterable<GameResult> getResults() {
 
         Document doc = loadPage();
 
-        List<Result> results = Lists.newArrayList();
+        List<GameResult> results = Lists.newArrayList();
 
         Elements els = doc.select("tr.g ~ tr.g2");
 
-        Result r = Result.create();
+        GameResult.Builder r = GameResult.builder();
 
         for (Element e : els) {
             String[] split = StringUtils.substringsBetween(e.html(), "<b>", "</b>");
@@ -42,15 +44,12 @@ public final class BoxScores {
             String teamName = split[0];
             Integer score = Integer.parseInt(split[1]);
 
-            if (r.visitorName == null) {
-                r.visitorName = teamName;
-                r.visitorScore = score;
+            if (r.isVisitorSet()) {
+                r.home(getTeamId(teamName), score);
+                results.add(r.build());
+                r = GameResult.builder();
             } else {
-                r.homeName = teamName;
-                r.homeScore = score;
-
-                results.add(r);
-                r = Result.create();
+                r.visitor(getTeamId(teamName), score);
             }
         }
 
@@ -59,52 +58,18 @@ public final class BoxScores {
         return results;
     }
 
-    public static BoxScores create(Site site) {
-        return new BoxScores(site);
+    private Id<Team> getTeamId(String teamName) {
+        for (Id<Team> id : site.getTeamIds()) {
+            if (site.getSingleTeam(id).getName().startsWith(teamName)) {
+                return id;
+            }
+        }
+
+        throw new IllegalStateException(teamName);
     }
 
-    public static final class Result {
-
-        private String visitorName;
-
-        private Integer visitorScore;
-
-        private String homeName;
-
-        private Integer homeScore;
-
-        private Result() { }
-
-        public String getVisitorName() {
-            return visitorName;
-        }
-
-        public Integer getVisitorScore() {
-            return visitorScore;
-        }
-
-        public String getHomeName() {
-            return homeName;
-        }
-
-        public Integer getHomeScore() {
-            return homeScore;
-        }
-
-        @Override
-        public String toString() {
-            return Objects.toStringHelper(this)
-                .add("visitorName", visitorName)
-                .add("visitorScore", visitorScore)
-                .add("homeName", homeName)
-                .add("homeScore", homeScore)
-                .toString();
-        }
-
-        private static Result create() {
-            return new Result();
-        }
-
+    public static BoxScores create(Site site) {
+        return new BoxScores(site);
     }
 
 }

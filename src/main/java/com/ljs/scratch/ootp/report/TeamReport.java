@@ -18,6 +18,8 @@ import com.ljs.scratch.ootp.selection.SelectionFactory;
 import com.ljs.scratch.ootp.selection.Selections;
 import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.SlotSelection;
+import com.ljs.scratch.ootp.site.LeagueStructure;
+import com.ljs.scratch.ootp.site.Record;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.Standings;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -27,6 +29,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.fest.assertions.api.Assertions;
+import org.fest.util.Strings;
 
 /**
  *
@@ -48,6 +51,10 @@ public final class TeamReport implements Printable {
 
     private final DescriptiveStatistics mlPitching = new DescriptiveStatistics();
 
+    private Set<TeamScore> scores;
+
+    private Ordering<TeamScore> ordering;
+
     private TeamReport(String title, Site site, Function<Player, Integer> value) {
         this.title = title;
         this.site = site;
@@ -55,55 +62,136 @@ public final class TeamReport implements Printable {
         this.leaguePitching = site.getLeaguePitching();
     }
 
-    @Override
-    public void print(PrintWriter w) {
+    public void sortByTalentLevel() {
+        ordering = TeamScore.byWinningPercentage(getExpectedRunsPerGame());
+    }
 
+    public void sortByEndOfSeason() {
+        ordering = Ordering
+            .natural()
+            .reverse()
+            .onResultOf(new Function<TeamScore, Double>() {
+                @Override
+                public Double apply(TeamScore score) {
+                    Assertions.assertThat(score).isNotNull();
+
+                    return getExpectedEndOfSeason(score.getId()).getWinPercentage();
+                }
+            });
+    }
+
+    private Ordering<TeamScore> getOrdering() {
+        return ordering == null
+            ? TeamScore.byWinningPercentage(getExpectedRunsPerGame())
+            : ordering;
+    }
+
+    private Set<TeamScore> getScores() {
+        if (scores == null) {
+            scores = calculateScores();
+        }
+
+        return scores;
+    }
+
+    private TeamScore getScore(Id<Team> team) {
+        for (TeamScore s : getScores()) {
+            if (s.getId().equals(team)) {
+                return s;
+            }
+        }
+        throw new IllegalStateException();
+    }
+
+    private Set<TeamScore> calculateScores() {
         Set<TeamScore> scores = Sets.newHashSet();
 
         for (Id<Team> id : site.getTeamIds()) {
             scores.add(calculate(id));
         }
 
-        scores = normalize(scores);
+        return normalize(scores);
+    }
 
-        double rpg = site.getPitcherSelectionMethod().getEraEstimate(leaguePitching);
+    private Double getExpectedRunsPerGame() {
+        return site.getPitcherSelectionMethod().getEraEstimate(leaguePitching);
+    }
+
+    @Override
+    public void print(PrintWriter w) {
+        Set<TeamScore> scores = getScores();
+
 
         w.println();
-        w.println(String.format("%-20s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", rpg));
+        w.println(String.format("%-20s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", getExpectedRunsPerGame()));
 
-        Standings standings = site.getStandings();
+        for (LeagueStructure.League league : site.getLeagueStructure().getLeagues()) {
+            w.println(league.getName());
 
-        for (TeamScore s : TeamScore.byWinningPercentage(rpg).sortedCopy(scores)) {
-            Integer ws = standings.getWins(s.getId());
-            Integer ls = standings.getLosses(s.getId());
+            for (LeagueStructure.Division division : league.getDivisions()) {
+                if (!Strings.isNullOrEmpty(division.getName())) {
+                    w.println(division.getName());
+                }
 
-            Long eosWs = ws + Math.round(s.getExpectedWinningPercentage(rpg) * (162 - ws - ls));
-            Long eosLs = 162 - eosWs;
+                Set<TeamScore> divisionScores = Sets.newHashSet();
 
-            w.println(
-                String.format(
-                    "%-20s | %5.1f %5.1f %5.1f | %5.1f %5.1f %5.1f | %s %.3f | %3d-%3d %.3f | %3d-%3d %.3f ",
-                    StringUtils.abbreviate(site.getSingleTeam(s.getId()).getName(), 20),
-                    s.getBatting(),
-                    s.getLineup(),
-                    s.getOverallBatting(),
-                    s.getPitching(),
-                    s.getRotation(),
-                    s.getOverallPitching(),
-                    s.getExpectedReocrd(rpg),
-                    s.getExpectedWinningPercentage(rpg),
-                    ws,
-                    ls,
-                    (double) ws / (ws + ls),
-                    eosWs,
-                    eosLs,
-                    (double) eosWs / (eosWs + eosLs)
-                    ));
+                for (Id<Team> team : division.getTeams()) {
+                    divisionScores.add(getScore(team));
+                }
+
+                for (TeamScore s : getOrdering().sortedCopy(divisionScores)) {
+                    printTeamScore(s, w);
+                }
+
+                w.println();
+            }
         }
 
         w.println(String.format("%-20s | %11s %5.1f | %11s %5.1f |", "", "", mlHitting.getMean(), "", mlPitching.getMean()));
 
         w.flush();
+    }
+
+    private void printTeamScore(TeamScore s, PrintWriter w) {
+        Record current = site.getStandings().getRecord(s.getId());
+        Record eos = getExpectedEndOfSeason(s.getId());
+
+        w.println(
+            String.format(
+                "%-20s | %5.1f %5.1f %5.1f | %5.1f %5.1f %5.1f | %s %.3f | %3d-%3d %.3f | %3d-%3d %.3f ",
+                StringUtils.abbreviate(site.getSingleTeam(s.getId()).getName(), 20),
+                s.getBatting(),
+                s.getLineup(),
+                s.getOverallBatting(),
+                s.getPitching(),
+                s.getRotation(),
+                s.getOverallPitching(),
+                s.getExpectedReocrd(getExpectedRunsPerGame()),
+                s.getExpectedWinningPercentage(getExpectedRunsPerGame()),
+                current.getWins(),
+                current.getLosses(),
+                current.getWinPercentage(),
+                eos.getWins(),
+                eos.getLosses(),
+                eos.getWinPercentage()
+                ));
+
+    }
+
+    public Record getExpectedEndOfSeason(Id<Team> team) {
+        Standings standings = site.getStandings();
+
+        Record current = standings.getRecord(team);
+
+        Long eosWs = current.getWins()
+            + Math.round(
+                getScore(team)
+                    .getExpectedWinningPercentage(getExpectedRunsPerGame())
+                    * (162 - current.getGames()));
+
+        Long eosLs = 162 - eosWs;
+
+        return Record.create(eosWs, eosLs);
     }
 
     private Set<TeamScore> normalize(Iterable<TeamScore> scores) {

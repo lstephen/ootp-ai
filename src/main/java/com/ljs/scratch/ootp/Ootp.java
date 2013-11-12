@@ -12,7 +12,6 @@ import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.io.Printables;
-import com.ljs.scratch.ootp.ootp5.report.PowerRankingsReport;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
@@ -121,12 +120,12 @@ public class Ootp {
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
             //( TWML
-            ( CBL
+            //( CBL
             //( HFTC
             //, LBB
             //( BTH
             //, SAVOY
-            //, PSD
+            ( PSD
             //( TFMS
             )) {
             try (
@@ -487,17 +486,18 @@ public class Ootp {
             count++;
         }
 
-        if (site.getType() != Version.OOTPX) {
-            LOG.info("Power Rankings...");
-            Printables.print(PowerRankingsReport.create(site)).to(out);
-        }
-
-        LOG.info("Team Now Report...");
         TeamReport now = TeamReport.create(
             "Now",
             site,
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getNowValue());
+
+        LOG.info("Power Rankings...");
+        Printables.print(site.getPowerRankingsReport(now)).to(out);
+
+        LOG.info("Team Now Report...");
+
+        now.sortByEndOfSeason();
 
         Printables.print(now).to(out);
 
@@ -508,9 +508,11 @@ public class Ootp {
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getFutureValue());
 
+        future.sortByTalentLevel();
         Printables.print(future).to(out);
 
         generic.setLimit(10);
+        generic.setCustomValueFunction(tv.getOverall());
 
         for (final Slot s : Slot.values()) {
             if (s == Slot.P) {
@@ -528,6 +530,8 @@ public class Ootp {
 
             generic.print(out);
         }
+
+        generic.setCustomValueFunction(tv.getTradeTargetValue());
 
         /*LOG.log(Level.INFO, "Trade target report...");
         generic.setTitle("Trade Targets");

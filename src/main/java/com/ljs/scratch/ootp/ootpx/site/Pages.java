@@ -6,6 +6,7 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.Site;
+import org.joda.time.LocalDate;
 
 /**
  *
@@ -14,6 +15,10 @@ import com.ljs.scratch.ootp.site.Site;
 public final class Pages {
 
     private Pages() { }
+
+    public static Page boxScores(Site site, LocalDate date) {
+        return site.getPage("leagues/league_100_scores_%d_%02d_%02d.html", date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
+    }
 
     public static Page minorLeagues(Site site, Id<Team> t) {
         return site.getPage("teams/team_%s_minor_league_system.html", t.get());

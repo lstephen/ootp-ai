@@ -4,9 +4,11 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Page;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.rating.Scale;
+import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.stats.BattingStats;
@@ -41,6 +43,8 @@ public interface Site {
     String getName();
 
     Iterable<Id<Team>> getTeamIds();
+
+    LeagueStructure getLeagueStructure();
 
     Page getPage(String url, Object... args);
 
@@ -90,5 +94,7 @@ public interface Site {
 
     Scale<?> getAbilityRatingScale();
     Scale<?> getPotentialRatingScale();
+
+    Printable getPowerRankingsReport(TeamReport teamReport);
 
 }

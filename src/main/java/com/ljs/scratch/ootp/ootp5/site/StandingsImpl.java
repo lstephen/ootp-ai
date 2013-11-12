@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.ootp5.site;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Record;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.Standings;
 import org.jsoup.nodes.Document;
@@ -17,7 +18,7 @@ public final class StandingsImpl implements Standings {
     private final Page page;
 
     private StandingsImpl(Site site) {
-        this.page = site.getPage("standr.html");
+        this.page = Pages.standings(site);
     }
 
     @Override
@@ -36,6 +37,11 @@ public final class StandingsImpl implements Standings {
         Elements row = doc.select("table.s0 tr:has(a[href=team" + id.get() + ".html]");
 
         return Integer.parseInt(row.get(0).child(2).text());
+    }
+
+    @Override
+    public Record getRecord(Id<Team> id) {
+        return Record.create(getWins(id), getLosses(id));
     }
 
     public static StandingsImpl create(Site site) {

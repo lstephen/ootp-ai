@@ -10,12 +10,16 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.html.PageFactory;
+import com.ljs.scratch.ootp.io.Printable;
+import com.ljs.scratch.ootp.ootp5.report.PowerRankingsReport;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
 import com.ljs.scratch.ootp.rating.Scale;
+import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.LeagueStructure;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.TeamPitching;
@@ -81,6 +85,11 @@ public class SiteImpl implements Site {
         }
 
         return ids;
+    }
+
+    @Override
+    public LeagueStructure getLeagueStructure() {
+        return LeagueStructureImpl.create(this);
     }
 
     @Override
@@ -289,6 +298,11 @@ public class SiteImpl implements Site {
     @Override
     public Scale<?> getPotentialRatingScale() {
         return definition.getPotentialRatingsScale();
+    }
+
+    @Override
+    public Printable getPowerRankingsReport(TeamReport teamReport) {
+        return PowerRankingsReport.create(this, teamReport);
     }
 
     public static Site create(SiteDefinition definition, PlayerSource players) {
