@@ -180,7 +180,7 @@ public class GenericValueReport {
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
                     playerValue.getNowValue(p),
-                    playerValue.getFutureValue(p),
+                    playerValue.getCeilingValue(p),
                     getNowVsLeft(p),
                     getNowVsRight(p),
                     replacementValue.getValueVsReplacement(p),

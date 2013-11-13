@@ -8,10 +8,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
-import com.ljs.scratch.ootp.io.Printable;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
@@ -142,6 +142,7 @@ public final class Roster implements Printable {
                     Iterables.concat(
                         assignments.keySet(), ImmutableSet.of(Status.DL))));
 
+        w.println();
         for (Status s : levels) {
             w.print(String.format("(%d) %-10s ", assignments.get(s).size(), s));
         }

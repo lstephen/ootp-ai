@@ -96,6 +96,15 @@ public class PlayerValue {
     }
 
     public Integer getFutureValue(Player p) {
+        Integer now = getNowValue(p);
+        Integer ceiling = getCeilingValue(p);
+
+        Double risk = Math.pow((double) (ceiling - now) / ceiling, 2);
+
+        return (int) (risk * now + (1.0 - risk) * ceiling);
+    }
+
+    public Integer getCeilingValue(Player p) {
         Slot st = Slot.getPrimarySlot(p);
 
         return st == Slot.MR

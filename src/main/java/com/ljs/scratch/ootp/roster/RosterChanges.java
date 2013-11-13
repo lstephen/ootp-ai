@@ -3,8 +3,8 @@ package com.ljs.scratch.ootp.roster;
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.io.Printable;
+import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -24,11 +24,10 @@ public class RosterChanges implements Printable {
 
     @Override
     public void print(PrintWriter w) {
+        w.println();
         for (RosterChange c : RosterChange.ordering().sortedCopy(changes)) {
             c.println(w);
         }
-
-        w.flush();
     }
 
     private static class RosterChange {

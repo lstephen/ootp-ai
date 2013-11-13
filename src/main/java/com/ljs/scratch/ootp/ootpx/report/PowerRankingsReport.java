@@ -57,6 +57,7 @@ public class PowerRankingsReport implements Printable {
                 })
             .sortedCopy(site.getTeamIds());
 
+        w.println();
         w.println("** Power Rankings **");
 
         for (Id<Team> id : ids) {

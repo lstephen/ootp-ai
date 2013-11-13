@@ -121,12 +121,12 @@ public class Ootp {
         for (SiteDefinition def : Arrays.asList
             //( TWML
             //( CBL
-            //( HFTC
+            //, HFTC
             //, LBB
-            //( BTH
+            ( BTH
             //, SAVOY
-            ( PSD
-            //( TFMS
+            //( PSD
+            //, TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -512,7 +512,9 @@ public class Ootp {
         Printables.print(future).to(out);
 
         generic.setLimit(10);
-        generic.setCustomValueFunction(tv.getOverall());
+        generic.setCustomValueFunction(
+            new PlayerValue(ps, battingRegression, pitchingRegression)
+                .getFutureValue());
 
         for (final Slot s : Slot.values()) {
             if (s == Slot.P) {
