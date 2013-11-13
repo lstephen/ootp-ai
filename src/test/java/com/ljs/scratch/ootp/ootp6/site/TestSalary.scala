@@ -31,7 +31,7 @@ class TestSalary extends FlatSpec {
 
         val result = salary.getSalary(player)
 
-        assertThat(result).isEqualTo("$4,200,000  ");
+        assertThat(result).isEqualTo("$4.20m  ");
     }
 
 }

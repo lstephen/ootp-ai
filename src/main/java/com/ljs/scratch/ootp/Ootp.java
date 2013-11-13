@@ -120,14 +120,14 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            //( TWML
-            //( CBL
+            ( TWML
+            , CBL
             //, HFTC
-            ( BTH
+            , BTH
             , LBB
             //, SAVOY
             //( PSD
-            //( TFMS
+            , TFMS
             )) {
             try (
                 FileOutputStream out =
@@ -513,6 +513,7 @@ public class Ootp {
         Printables.print(future).to(out);
 
         generic.setLimit(10);
+        generic.clearMultiplier();
         generic.setCustomValueFunction(
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getFutureValue());

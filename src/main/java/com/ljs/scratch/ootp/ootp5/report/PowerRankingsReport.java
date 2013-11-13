@@ -14,7 +14,6 @@ import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.Record;
 import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.site.Standings;
 import java.io.PrintWriter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,9 +50,12 @@ public final class PowerRankingsReport implements Printable {
 
         BoxScores scores = BoxScores.create(site);
 
+
         numberOfResults = Iterables.size(scores.getResults());
 
-        ratings.setKFactor(((double) 162 / (numberOfResults / Iterables.size(site.getTeamIds()))) / 2);
+        Double resultsPerTeam = (double) numberOfResults / Iterables.size(site.getTeamIds());
+
+        ratings.setKFactor((162.0 / resultsPerTeam) / 2);
 
         for (GameResult result : scores.getResults()) {
             updateRating(result);
@@ -109,23 +111,7 @@ public final class PowerRankingsReport implements Printable {
         ratings.update(result);
     }
 
-    private Long newRating(Long ratingFor, Long ratingAgainst, Integer scoreFor, Integer scoreAgainst, boolean home) {
-        Integer w = scoreFor > scoreAgainst ? 1 : 0;
-
-        Double kFactor = ((double) 162 / (numberOfResults / Iterables.size(site.getTeamIds()))) / 2;
-
-        Double k = kFactor * Math.pow(Math.abs(scoreFor - scoreAgainst), 0.33);
-
-        Double dr = (double) (ratingFor - ratingAgainst) + (home ? 25 : -25);
-
-        Double we = 1 / (Math.pow(10, (-dr / 400)) + 1);
-
-        return (long) (ratingFor + k * (w - we));
-    }
-
     private void populateInitialRatings() {
-        Standings standings = site.getStandings();
-
         for (Id<Team> team : site.getTeamIds()) {
             Double we = teamReport.getExpectedEndOfSeason(team).getWinPercentage();
 
