@@ -1,9 +1,10 @@
 package com.ljs.scratch.ootp.report;
 
-import com.ljs.scratch.ootp.io.Printable;
 import com.google.common.base.Strings;
+import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.value.SalaryPredictor;
 import com.ljs.scratch.ootp.value.TradeValue;
 import java.io.PrintWriter;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -12,7 +13,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
  *
  * @author lstephen
  */
-public class SalaryRegression implements Printable {
+public class SalaryRegression implements SalaryPredictor, Printable {
 
     private final TradeValue trade;
 

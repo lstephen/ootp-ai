@@ -5,7 +5,6 @@ import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
-import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.site.Site;
 
 /**
@@ -102,7 +101,7 @@ public class TradeValue {
     }
 
     public Function<Player, Integer> getTradeBaitValue(
-        final Site site, final SalaryRegression salary) {
+        final Site site, final SalaryPredictor salary) {
 
         return new Function<Player, Integer>() {
             @Override
@@ -112,7 +111,7 @@ public class TradeValue {
         };
     }
 
-    private Integer getTradeBaitValue(Player p, Site site, SalaryRegression salary) {
+    private Integer getTradeBaitValue(Player p, Site site, SalaryPredictor salary) {
         int salaryFactor = (site.getCurrentSalary(p) - salary.predict(p)) / 750000;
 
         return salaryFactor

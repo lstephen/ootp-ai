@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.value;
+package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -14,6 +14,8 @@ import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
 import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.selection.Selections;
+import com.ljs.scratch.ootp.value.PlayerValue;
+import com.ljs.scratch.ootp.value.ReplacementValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import org.apache.commons.lang3.StringUtils;

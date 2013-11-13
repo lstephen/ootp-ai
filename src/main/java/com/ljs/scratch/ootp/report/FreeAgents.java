@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.value;
+package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -11,6 +11,8 @@ import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
+import com.ljs.scratch.ootp.value.TradeValue;
 import java.util.Set;
 
 /**

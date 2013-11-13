@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.value;
+package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.report.SalaryRegression;
+import com.ljs.scratch.ootp.value.TradeValue;
 import java.util.Iterator;
 import java.util.Set;
 import org.fest.assertions.api.Assertions;

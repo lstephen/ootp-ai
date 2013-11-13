@@ -1,7 +1,8 @@
-package com.ljs.scratch.ootp.site;
+package com.ljs.scratch.ootp.site.impl;
 
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.impl.SiteDefinitionImpl;
 
 /**
