@@ -99,7 +99,12 @@ public final class FreeAgents {
                 continue;
             }
             Set<Slot> needsFulfilled = Sets.intersection(ImmutableSet.copyOf(Slot.getPlayerSlots(r)), needed);
-            if (!needsFulfilled.isEmpty() && Slot.getPrimarySlot(fa) != Slot.getPrimarySlot(r)) {
+
+            boolean fillsNeed = !needsFulfilled.isEmpty();
+            boolean fillsReplaceableNeed = needsFulfilled.size() == 1 && needsFulfilled.iterator().next() == Slot.getPrimarySlot(fa);
+            boolean occupiesSameSlot = Slot.getPrimarySlot(fa) == Slot.getPrimarySlot(r);
+
+            if (fillsNeed && !fillsReplaceableNeed && !occupiesSameSlot) {
                 continue;
             }
             if ((int) (value.apply(r) * 1.1) > value.apply(fa)) {

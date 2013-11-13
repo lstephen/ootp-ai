@@ -99,9 +99,11 @@ public class PlayerValue {
         Integer now = getNowValue(p);
         Integer ceiling = getCeilingValue(p);
 
-        Double risk = Math.pow((double) (ceiling - now) / ceiling, 2);
+        Double risk = ceiling > now
+            ? Math.pow((double) (ceiling - now) / ceiling, 2)
+            : 0.0;
 
-        return (int) (risk * now + (1.0 - risk) * ceiling);
+        return (int) Math.round(risk * now + (1.0 - risk) * ceiling);
     }
 
     public Integer getCeilingValue(Player p) {

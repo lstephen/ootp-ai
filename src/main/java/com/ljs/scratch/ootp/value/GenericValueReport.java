@@ -173,14 +173,19 @@ public class GenericValueReport {
                 mv = String.format(" (%3.0f)", multiplier.get() * value);
             }
 
+            Integer current = playerValue.getNowValue(p);
+            Integer ceiling = playerValue.getCeilingValue(p);
+            Integer future = playerValue.getFutureValue(p);
+
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %8s | %6s | %2s %5s | %s",
+                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %8s | %6s | %2s %5s | %s",
                     p.getPosition(),
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
-                    playerValue.getNowValue(p),
-                    playerValue.getCeilingValue(p),
+                    current,
+                    ceiling,
+                    ceiling.equals(future) ? "" : String.format("/%3d", future),
                     getNowVsLeft(p),
                     getNowVsRight(p),
                     replacementValue.getValueVsReplacement(p),
