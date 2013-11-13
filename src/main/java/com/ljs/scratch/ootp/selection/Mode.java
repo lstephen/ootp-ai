@@ -2,6 +2,7 @@ package com.ljs.scratch.ootp.selection;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 
 public enum Mode {
@@ -86,4 +87,9 @@ public enum Mode {
     public abstract ImmutableMultiset<Slot> getHittingSlots();
 
     public abstract ImmutableMultiset<Slot> getPitchingSlots();
+
+    public ImmutableMultiset<Slot> getAllSlots() {
+        return ImmutableMultiset.copyOf(
+            Iterables.concat(getHittingSlots(), getPitchingSlots()));
+    }
 }

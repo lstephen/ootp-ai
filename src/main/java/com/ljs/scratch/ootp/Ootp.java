@@ -45,6 +45,7 @@ import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.FreeAgents;
 import com.ljs.scratch.ootp.value.GenericValueReport;
+import com.ljs.scratch.ootp.value.LeagueReplacementLevel;
 import com.ljs.scratch.ootp.value.PlayerValue;
 import com.ljs.scratch.ootp.value.Trade;
 import com.ljs.scratch.ootp.value.TradeValue;
@@ -119,11 +120,11 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            //( TWML
+            ( TWML
             //( CBL
             //, HFTC
             //, LBB
-            ( BTH
+            //( BTH
             //, SAVOY
             //( PSD
             //, TFMS
@@ -533,6 +534,16 @@ public class Ootp {
             generic.print(out);
         }
 
+        LOG.log(Level.INFO, "League wide replacement Level...");
+
+        Printables
+            .print(
+                LeagueReplacementLevel.create(
+                    site,
+                    new PlayerValue(ps, battingRegression, pitchingRegression),
+                    all))
+            .to(out);
+
         generic.setCustomValueFunction(tv.getTradeTargetValue());
 
         /*LOG.log(Level.INFO, "Trade target report...");
@@ -668,7 +679,7 @@ public class Ootp {
 
         generic.clearMultiplier();
 
-        LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
+        //LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
 
         /*idx = 1;
         for (Trade trade

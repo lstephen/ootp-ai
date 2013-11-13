@@ -123,7 +123,7 @@ public final class TeamReport implements Printable {
 
 
         w.println();
-        w.println(String.format("%-20s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", getExpectedRunsPerGame()));
+        w.println(String.format("**%-18s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", getExpectedRunsPerGame()));
 
         for (LeagueStructure.League league : site.getLeagueStructure().getLeagues()) {
             w.println(league.getName());
