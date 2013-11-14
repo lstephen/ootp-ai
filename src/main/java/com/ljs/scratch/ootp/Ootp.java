@@ -13,6 +13,7 @@ import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.draft.DraftReport;
 import com.ljs.scratch.ootp.io.Printables;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.Slot;
 import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
@@ -31,7 +32,6 @@ import com.ljs.scratch.ootp.roster.RosterSelection;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Selections;
-import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.depthchart.AllDepthCharts;
 import com.ljs.scratch.ootp.selection.depthchart.DepthChartSelection;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
@@ -120,9 +120,9 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            //( TWML
+            ( TWML
             //, CBL
-            ( HFTC
+            //( HFTC
             //( BTH
             //, LBB
             //, SAVOY

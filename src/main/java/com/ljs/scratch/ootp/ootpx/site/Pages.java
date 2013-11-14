@@ -1,7 +1,7 @@
 package com.ljs.scratch.ootp.ootpx.site;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.Page;
+import com.ljs.ootp.extract.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;

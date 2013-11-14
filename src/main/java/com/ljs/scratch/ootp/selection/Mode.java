@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.selection;
 
+import com.ljs.scratch.ootp.player.Slot;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterables;

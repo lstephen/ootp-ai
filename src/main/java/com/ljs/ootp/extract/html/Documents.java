@@ -1,4 +1,4 @@
-package com.ljs.scratch.util;
+package com.ljs.ootp.extract.html;
 
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;

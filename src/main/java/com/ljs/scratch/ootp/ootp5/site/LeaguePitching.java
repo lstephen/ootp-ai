@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.ootp5.site;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
-import com.ljs.scratch.ootp.html.Page;
+import com.ljs.ootp.extract.html.Page;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitchingStats;

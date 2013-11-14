@@ -12,7 +12,7 @@ import com.ljs.scratch.ootp.player.ratings.FieldingRatings;
 import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.player.ratings.Position;
-import com.ljs.scratch.ootp.player.ratings.Splits;
+import com.ljs.scratch.ootp.splits.Splits;
 import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.site.Site;
 import java.text.NumberFormat;

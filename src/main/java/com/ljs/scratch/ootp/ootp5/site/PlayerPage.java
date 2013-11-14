@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.player.ratings.BattingRatings;
-import com.ljs.scratch.ootp.player.ratings.Splits;
+import com.ljs.scratch.ootp.splits.Splits;
 import com.ljs.scratch.ootp.rating.Rating;
 import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.site.Site;

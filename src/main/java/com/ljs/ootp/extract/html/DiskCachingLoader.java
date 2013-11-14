@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.html;
+package com.ljs.ootp.extract.html;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;

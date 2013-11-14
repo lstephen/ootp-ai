@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.ootp5.site;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.html.Page;
+import com.ljs.ootp.extract.html.Page;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;

@@ -9,7 +9,7 @@ import com.google.common.collect.*;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.Selections;
-import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.player.Slot;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;

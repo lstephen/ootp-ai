@@ -1,6 +1,7 @@
 package com.ljs.scratch.ootp.report;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
@@ -9,6 +10,7 @@ import com.ljs.scratch.ootp.annotation.ReturnTypesAreNonnullByDefault;
 import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.Slot;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.selection.HitterSelectionFactory;
 import com.ljs.scratch.ootp.selection.Mode;
@@ -16,7 +18,6 @@ import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
 import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.SelectionFactory;
 import com.ljs.scratch.ootp.selection.Selections;
-import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.site.LeagueStructure;
 import com.ljs.scratch.ootp.site.Record;
@@ -153,13 +154,19 @@ public final class TeamReport implements Printable, RecordPredictor {
         w.flush();
     }
 
+    private Integer getOverallPosition(TeamScore score) {
+        ImmutableList<TeamScore> scores = getOrdering().immutableSortedCopy(getScores());
+
+        return scores.indexOf(score) + 1;
+    }
+
     private void printTeamScore(TeamScore s, PrintWriter w) {
         Record current = site.getStandings().getRecord(s.getId());
         Record eos = getExpectedEndOfSeason(s.getId());
 
         w.println(
             String.format(
-                "%-20s | %5.1f %5.1f %5.1f | %5.1f %5.1f %5.1f | %s %.3f | %3d-%3d %.3f | %3d-%3d %.3f ",
+                "%-20s | %5.1f %5.1f %5.1f | %5.1f %5.1f %5.1f | %s %.3f | %3d-%3d %.3f | %3d-%3d %.3f (%2d) ",
                 StringUtils.abbreviate(site.getSingleTeam(s.getId()).getName(), 20),
                 s.getBatting(),
                 s.getLineup(),
@@ -174,7 +181,8 @@ public final class TeamReport implements Printable, RecordPredictor {
                 current.getWinPercentage(),
                 eos.getWins(),
                 eos.getLosses(),
-                eos.getWinPercentage()
+                eos.getWinPercentage(),
+                getOverallPosition(s)
                 ));
 
     }

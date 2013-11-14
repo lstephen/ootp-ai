@@ -2,7 +2,7 @@ package com.ljs.scratch.ootp.stats;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ljs.scratch.ootp.player.ratings.Splits;
+import com.ljs.scratch.ootp.splits.Splits;
 
 /**
  *

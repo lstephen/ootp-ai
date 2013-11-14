@@ -1,9 +1,4 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   Slot.java
-
-package com.ljs.scratch.ootp.selection;
+package com.ljs.scratch.ootp.player;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -14,7 +9,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.player.ratings.Position;
 import java.util.List;
@@ -50,7 +44,7 @@ public enum Slot {
     }
 
     public static ImmutableList<Slot> getPlayerSlots(Player p) {
-        return Selections.isHitter(p) ? getBatterSlots(p) : getPitcherSlots(p);
+        return p.isHitter() ? getBatterSlots(p) : getPitcherSlots(p);
     }
 
     private static ImmutableList<Slot> getPitcherSlots(Player p) {

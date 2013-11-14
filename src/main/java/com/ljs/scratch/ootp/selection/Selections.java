@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.ljs.scratch.ootp.player.Player;
+import com.ljs.scratch.ootp.player.Slot;
 import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection:
@@ -27,14 +28,12 @@ public final class Selections {
         return ImmutableSet.copyOf(Iterables.filter(ps, IS_PITCHER));
     }
 
-    public static boolean isHitter(Player p)
-    {
-        return p.getBattingRatings() != null && !isPitcher(p);
+    public static boolean isHitter(Player p) {
+        return p.isHitter();
     }
 
-    public static boolean isPitcher(Player p)
-    {
-        return p.hasPitchingRatings();
+    public static boolean isPitcher(Player p) {
+        return p.isPitcher();
     }
 
     public static ImmutableSet<Player> onlyOn40Man(Iterable<Player> ps) {

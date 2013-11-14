@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.html;
+package com.ljs.ootp.extract.html;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.jsoup.nodes.Document;

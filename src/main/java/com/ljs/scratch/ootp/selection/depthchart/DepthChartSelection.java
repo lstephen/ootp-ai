@@ -10,7 +10,7 @@ import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.ratings.Position;
 import com.ljs.scratch.ootp.selection.All;
-import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.player.Slot;
 import com.ljs.scratch.ootp.selection.lineup.AllLineups;
 import com.ljs.scratch.ootp.selection.lineup.Defense;
 import com.ljs.scratch.ootp.selection.lineup.Lineup;

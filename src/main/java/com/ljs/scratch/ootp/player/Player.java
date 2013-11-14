@@ -12,8 +12,7 @@ import com.ljs.scratch.ootp.player.ratings.BattingRatings;
 import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
-import com.ljs.scratch.ootp.player.ratings.Splits;
-import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.splits.Splits;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import java.util.Arrays;
 import java.util.List;
@@ -213,6 +212,14 @@ public final class Player {
 
     public void setListedPosition(String listedPosition) {
         this.listedPosition = Optional.of(listedPosition);
+    }
+
+    public boolean isHitter() {
+        return getBattingRatings() != null && !isPitcher();
+    }
+
+    public boolean isPitcher() {
+        return hasPitchingRatings();
     }
 
     public DefensiveRatings getDefensiveRatings() {

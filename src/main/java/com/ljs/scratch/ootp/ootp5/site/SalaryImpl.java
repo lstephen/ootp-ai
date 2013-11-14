@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.Page;
+import com.ljs.ootp.extract.html.Page;
 import com.ljs.scratch.ootp.io.SalaryFormat;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;

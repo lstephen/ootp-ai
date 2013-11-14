@@ -7,7 +7,7 @@ import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.selection.Mode;
-import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.player.Slot;
 import com.ljs.scratch.ootp.site.Site;
 import java.io.PrintWriter;
 

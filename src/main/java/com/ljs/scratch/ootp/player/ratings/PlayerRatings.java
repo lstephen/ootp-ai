@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.player.ratings;
 
+import com.ljs.scratch.ootp.splits.Splits;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

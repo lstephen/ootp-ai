@@ -1,9 +1,10 @@
 package com.ljs.scratch.ootp.regression;
 
+import com.ljs.scratch.ootp.stats.History;
 import com.google.common.collect.Maps;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
-import com.ljs.scratch.ootp.player.ratings.Splits;
+import com.ljs.scratch.ootp.splits.Splits;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.TeamPitching;

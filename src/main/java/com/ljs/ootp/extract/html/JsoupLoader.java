@@ -1,6 +1,5 @@
-package com.ljs.scratch.ootp.html;
+package com.ljs.ootp.extract.html;
 
-import com.ljs.scratch.util.Documents;
 import org.jsoup.nodes.Document;
 
 /**

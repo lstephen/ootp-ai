@@ -12,7 +12,7 @@ import com.ljs.scratch.ootp.selection.Mode;
 import com.ljs.scratch.ootp.selection.PitcherSelectionFactory;
 import com.ljs.scratch.ootp.selection.Selection;
 import com.ljs.scratch.ootp.selection.Selections;
-import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.player.Slot;
 import java.io.PrintWriter;
 import java.util.List;
 

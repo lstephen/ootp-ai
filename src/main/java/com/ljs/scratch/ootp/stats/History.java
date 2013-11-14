@@ -1,12 +1,9 @@
-package com.ljs.scratch.ootp.regression;
+package com.ljs.scratch.ootp.stats;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.stats.BattingStats;
-import com.ljs.scratch.ootp.stats.PitchingStats;
-import com.ljs.scratch.ootp.stats.TeamStats;
 import com.ljs.scratch.util.Jackson;
 import java.io.File;
 import java.io.IOException;

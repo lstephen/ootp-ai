@@ -3,7 +3,7 @@ package com.ljs.scratch.ootp.site;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.html.Page;
+import com.ljs.ootp.extract.html.Page;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;

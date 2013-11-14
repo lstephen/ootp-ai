@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.selection;
 
+import com.ljs.scratch.ootp.player.Slot;
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.ljs.scratch.ootp.player.Player;

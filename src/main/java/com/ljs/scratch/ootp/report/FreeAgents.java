@@ -9,7 +9,7 @@ import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.report.RosterReport;
 import com.ljs.scratch.ootp.selection.Mode;
-import com.ljs.scratch.ootp.selection.Slot;
+import com.ljs.scratch.ootp.player.Slot;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.TradeValue;
