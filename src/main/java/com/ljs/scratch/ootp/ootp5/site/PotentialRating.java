@@ -35,15 +35,10 @@ public enum PotentialRating {
         return RatingScale.INSTANCE;
     }
 
-    public static class RatingScale implements Scale<PotentialRating> {
+    public static final class RatingScale implements Scale<PotentialRating> {
         private static final RatingScale INSTANCE = new RatingScale();
 
         private RatingScale() { }
-
-        @Override
-        public Rating<PotentialRating, RatingScale> ratingOf(PotentialRating value) {
-            return Rating.create(value, INSTANCE);
-        }
 
         @Override
         public Rating<PotentialRating, RatingScale> parse(String s) {

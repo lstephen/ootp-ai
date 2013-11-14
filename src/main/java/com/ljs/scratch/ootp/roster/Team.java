@@ -1,8 +1,8 @@
 package com.ljs.scratch.ootp.roster;
 
+import com.ljs.scratch.ootp.config.Changes;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;

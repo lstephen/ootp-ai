@@ -7,9 +7,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.data.Id;
 import com.ljs.ootp.extract.html.Page;
 import com.ljs.ootp.extract.html.PageFactory;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.ootp5.report.PowerRankingsReport;
 import com.ljs.scratch.ootp.ootp5.site.LeagueBatting;
@@ -34,12 +34,12 @@ import com.ljs.scratch.ootp.site.LeagueStructure;
 import com.ljs.scratch.ootp.site.RecordPredictor;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
+import com.ljs.scratch.ootp.site.Standings;
 import com.ljs.scratch.ootp.site.TeamPitching;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.joda.time.LocalDate;
@@ -209,7 +209,7 @@ public class SiteImpl implements Site, SalarySource {
     }
 
     @Override
-    public StandingsImpl getStandings() {
+    public Standings getStandings() {
         return StandingsImpl.create(this);
     }
 
@@ -239,11 +239,6 @@ public class SiteImpl implements Site, SalarySource {
     @Override
     public Iterable<Player> getWaiverWire() {
         return PlayerList.waiverWire(this).extract();
-    }
-
-    @Override
-    public Iterable<Player> getPlayers(PlayerId... ids) {
-        return getPlayers(Arrays.asList(ids));
     }
 
     @Override

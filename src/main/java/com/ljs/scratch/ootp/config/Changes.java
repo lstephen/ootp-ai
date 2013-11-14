@@ -6,6 +6,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
+import com.ljs.scratch.ootp.config.Directories;
 import com.ljs.scratch.ootp.ootp5.site.PlayerList;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;

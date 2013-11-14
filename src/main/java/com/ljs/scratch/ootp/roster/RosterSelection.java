@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.roster;
 
+import com.ljs.scratch.ootp.config.Changes;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
@@ -8,7 +9,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.config.Changes;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;

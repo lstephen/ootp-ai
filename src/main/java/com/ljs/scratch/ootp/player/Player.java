@@ -12,8 +12,8 @@ import com.ljs.scratch.ootp.player.ratings.BattingRatings;
 import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.player.ratings.PitchingRatings;
 import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
-import com.ljs.scratch.ootp.splits.Splits;
 import com.ljs.scratch.ootp.site.SiteDefinition;
+import com.ljs.scratch.ootp.splits.Splits;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -44,22 +44,8 @@ public final class Player {
     private Optional<String> listedPosition = Optional.absent();
 
     @JsonIgnore
-    private Optional<Boolean> on40Man = Optional.absent();
+    private RosterStatus rosterStatus = RosterStatus.create();
 
-    @JsonIgnore
-    private Optional<Boolean> ruleFiveEligible = Optional.absent();
-
-    @JsonIgnore
-    private Optional<Boolean> outOfOptions = Optional.absent();
-
-    @JsonIgnore
-    private Optional<Boolean> clearedWaivers = Optional.absent();
-
-    @JsonIgnore
-    private Optional<Integer> yearsOfProService = Optional.absent();
-
-    @JsonIgnore
-    private Optional<Integer> teamTopProspectPosition = Optional.absent();
 
     @JsonIgnore
     private ImmutableList<Slot> slots;
@@ -109,49 +95,52 @@ public final class Player {
     public String getSalary() { return salary; }
     public void setSalary(String salary) { this.salary = salary; }
 
-    public Optional<Boolean> getOn40Man() { return on40Man; }
+    public Optional<Boolean> getOn40Man() {
+        return rosterStatus.getOn40Man();
+    }
+
     public void setOn40Man(Boolean on40Man) {
-        this.on40Man = Optional.of(on40Man);
+        rosterStatus.setOn40Man(on40Man);
     }
 
     public Optional<Boolean> getRuleFiveEligible() {
-        return ruleFiveEligible;
+        return rosterStatus.getRuleFiveEligible();
     }
 
     public void setRuleFiveEligible(Boolean ruleFiveEligible) {
-        this.ruleFiveEligible = Optional.of(ruleFiveEligible);
+        rosterStatus.setRuleFiveEligible(ruleFiveEligible);
     }
 
     public Optional<Boolean> getOutOfOptions() {
-        return outOfOptions;
+        return rosterStatus.getOutOfOptions();
     }
 
     public void setOutOfOptions(Boolean outOfOptions) {
-        this.outOfOptions = Optional.of(outOfOptions);
+        rosterStatus.setOutOfOptions(outOfOptions);
     }
 
     public Optional<Boolean> getClearedWaivers() {
-        return clearedWaivers;
+        return rosterStatus.getClearedWaivers();
     }
 
     public void setClearedWaivers(Boolean clearedWaivers) {
-        this.clearedWaivers = Optional.of(clearedWaivers);
+        rosterStatus.setClearedWaivers(clearedWaivers);
     }
 
     public Optional<Integer> getYearsOfProService() {
-        return yearsOfProService;
+        return rosterStatus.getYearsOfProService();
     }
 
     public void setYearsOfProService(Integer years) {
-        this.yearsOfProService = Optional.of(years);
+        rosterStatus.setYearsOfProService(years);
     }
 
     public Optional<Integer> getTeamTopProspectPosition() {
-        return teamTopProspectPosition;
+        return rosterStatus.getTeamTopProspectPosition();
     }
 
     public void setTeamTopProspectPosition(Integer position) {
-        this.teamTopProspectPosition = Optional.of(position);
+        rosterStatus.setTeamTopProspectPosition(position);
     }
 
     public ImmutableList<Slot> getSlots() {

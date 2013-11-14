@@ -8,9 +8,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ljs.scratch.ootp.data.Id;
 import com.ljs.ootp.extract.html.Page;
 import com.ljs.ootp.extract.html.PageFactory;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.ootpx.report.PowerRankingsReport;
 import com.ljs.scratch.ootp.ootpx.site.LeagueBattingExtraction;
@@ -44,7 +44,6 @@ import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.util.ElementsUtil;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -189,11 +188,6 @@ public class OotpX implements Site {
     @Override
     public Player getPlayer(PlayerId id) {
         return PlayerExtraction.create(this).extract(id);
-    }
-
-    @Override
-    public Iterable<Player> getPlayers(PlayerId... ids) {
-        return getPlayers(Arrays.asList(ids));
     }
 
     @Override

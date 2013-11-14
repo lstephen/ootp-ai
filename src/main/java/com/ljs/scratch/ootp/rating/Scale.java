@@ -20,8 +20,6 @@ import com.ljs.scratch.ootp.ootp6.site.OneToTwenty;
 })
 public interface Scale<T> {
 
-    Rating<T, ? extends Scale<T>> ratingOf(T value);
-
     Rating<T, ? extends Scale<T>> parse(String s);
 
     Rating<Integer, OneToOneHundred> normalize(T value);

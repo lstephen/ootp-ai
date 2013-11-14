@@ -2,11 +2,11 @@ package com.ljs.scratch.ootp.ootp5.site;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
-import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
 import com.ljs.ootp.extract.html.Page;
+import com.ljs.scratch.ootp.data.Id;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;

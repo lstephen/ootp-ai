@@ -148,7 +148,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> contact(T value) {
-            return contact(scale.ratingOf(value));
+            return contact(Rating.create(value, scale));
         }
 
         public Builder<T> gap(Rating<T, ?> gap) {
@@ -162,7 +162,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> gap(T value) {
-            return gap(scale.ratingOf(value));
+            return gap(Rating.create(value, scale));
         }
 
         public Builder<T> power(Rating<T, ?> power) {
@@ -176,7 +176,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> power(T value) {
-            return power(scale.ratingOf(value));
+            return power(Rating.create(value, scale));
         }
 
         public Builder<T> eye(Rating<T, ?> eye) {
@@ -190,7 +190,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> eye(T value) {
-            return eye(scale.ratingOf(value));
+            return eye(Rating.create(value, scale));
         }
 
         public BattingRatings<T> build() {

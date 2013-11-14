@@ -77,10 +77,10 @@ public class TestSinglePlayer {
 
         BattingRatings expectedRatings = BattingRatings
             .builder(OneToTwenty.scale())
-            .contact(OneToTwenty.scale().ratingOf(11))
-            .gap(OneToTwenty.scale().ratingOf(15))
-            .power(OneToTwenty.scale().ratingOf(20))
-            .eye(OneToTwenty.scale().ratingOf(20))
+            .contact(11)
+            .gap(15)
+            .power(20)
+            .eye(20)
             .build();
 
         Assert.assertEquals(
@@ -125,10 +125,10 @@ public class TestSinglePlayer {
 
         BattingRatings expectedRatings = BattingRatings
             .builder(OneToTwenty.scale())
-            .contact(OneToTwenty.scale().ratingOf(5))
-            .gap(OneToTwenty.scale().ratingOf(6))
-            .power(OneToTwenty.scale().ratingOf(3))
-            .eye(OneToTwenty.scale().ratingOf(3))
+            .contact(5)
+            .gap(6)
+            .power(3)
+            .eye(3)
             .build();
 
         Assert.assertEquals(

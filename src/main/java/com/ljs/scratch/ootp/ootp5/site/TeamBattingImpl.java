@@ -2,10 +2,10 @@ package com.ljs.scratch.ootp.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.site.Site;
-import com.ljs.scratch.ootp.site.TeamBatting;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.roster.Team;
+import com.ljs.scratch.ootp.site.Site;
+import com.ljs.scratch.ootp.site.TeamBatting;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.util.ElementsUtil;
 import org.jsoup.nodes.Document;
@@ -26,7 +26,7 @@ public class TeamBattingImpl
     private static final int TRIPLES_IDX = 4;
     private static final int WALKS_IDX = 8;
 
-    private BattingStats leagueBatting;
+    private final BattingStats leagueBatting;
 
     public TeamBattingImpl(Site site, Id<Team> team) {
         super(site.extractTeam(), site.getPage("team" + team.get() + "b.html"));
