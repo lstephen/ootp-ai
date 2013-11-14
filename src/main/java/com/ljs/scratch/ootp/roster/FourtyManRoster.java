@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.value;
+package com.ljs.scratch.ootp.roster;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;

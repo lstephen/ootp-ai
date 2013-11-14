@@ -1,4 +1,4 @@
-package com.ljs.scratch.ootp.ootp5.site;
+package com.ljs.scratch.ootp.ootp5;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -12,14 +12,26 @@ import com.ljs.scratch.ootp.html.Page;
 import com.ljs.scratch.ootp.html.PageFactory;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.ootp5.report.PowerRankingsReport;
+import com.ljs.scratch.ootp.ootp5.site.LeagueBatting;
+import com.ljs.scratch.ootp.ootp5.site.LeaguePitching;
+import com.ljs.scratch.ootp.ootp5.site.LeagueStructureImpl;
+import com.ljs.scratch.ootp.ootp5.site.PlayerList;
+import com.ljs.scratch.ootp.ootp5.site.SalaryImpl;
+import com.ljs.scratch.ootp.ootp5.site.SalarySource;
+import com.ljs.scratch.ootp.ootp5.site.SingleTeamImpl;
+import com.ljs.scratch.ootp.ootp5.site.StandingsImpl;
+import com.ljs.scratch.ootp.ootp5.site.TeamBattingImpl;
+import com.ljs.scratch.ootp.ootp5.site.TeamPitchingImpl;
+import com.ljs.scratch.ootp.ootp5.site.TeamRatings;
+import com.ljs.scratch.ootp.ootp5.site.TopProspects;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.PlayerId;
 import com.ljs.scratch.ootp.player.PlayerSource;
 import com.ljs.scratch.ootp.rating.Scale;
-import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.LeagueStructure;
+import com.ljs.scratch.ootp.site.RecordPredictor;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.TeamPitching;
@@ -36,7 +48,7 @@ import org.joda.time.LocalDate;
  *
  * @author lstephen
  */
-public class SiteImpl implements Site {
+public class SiteImpl implements Site, SalarySource {
 
     private final SiteDefinition definition;
 
@@ -301,11 +313,11 @@ public class SiteImpl implements Site {
     }
 
     @Override
-    public Printable getPowerRankingsReport(TeamReport teamReport) {
-        return PowerRankingsReport.create(this, teamReport);
+    public Printable getPowerRankingsReport(RecordPredictor recordPredictor) {
+        return PowerRankingsReport.create(this, recordPredictor);
     }
 
-    public static Site create(SiteDefinition definition, PlayerSource players) {
+    public static SiteImpl create(SiteDefinition definition, PlayerSource players) {
         return new SiteImpl(definition, players);
     }
 

@@ -20,6 +20,7 @@ import com.ljs.scratch.ootp.selection.Slot;
 import com.ljs.scratch.ootp.selection.SlotSelection;
 import com.ljs.scratch.ootp.site.LeagueStructure;
 import com.ljs.scratch.ootp.site.Record;
+import com.ljs.scratch.ootp.site.RecordPredictor;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.Standings;
 import com.ljs.scratch.ootp.stats.PitchingStats;
@@ -37,7 +38,7 @@ import org.fest.util.Strings;
  */
 @ParametersAreNonnullByDefault
 @ReturnTypesAreNonnullByDefault
-public final class TeamReport implements Printable {
+public final class TeamReport implements Printable, RecordPredictor {
 
     private final String title;
 

@@ -25,14 +25,14 @@ import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitcherOverall;
 import com.ljs.scratch.ootp.stats.PitchingStats;
 import com.ljs.scratch.ootp.stats.TeamStats;
-import com.ljs.scratch.ootp.value.FourtyManRoster;
-import com.ljs.scratch.ootp.value.PlayerValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
 
 public final class RosterSelection {
+
+    private static final Double MR_CONSTANT = .865;
 
     private final Team team;
 
@@ -292,7 +292,7 @@ public final class RosterSelection {
                     method.getPlus(pitching.getSplits(p).getVsRight()),
                     method.getPlus(pitching.getOverall(p)),
                     p.getPosition().equals("MR")
-                        ? (int) (PlayerValue.MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
+                        ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
                         : "",
                     method.getEraEstimate(pitching.getOverall(p)),
                     Joiner.on(',').join(Slot.getPlayerSlots(p))

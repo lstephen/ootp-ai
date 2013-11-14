@@ -1,14 +1,14 @@
 package com.ljs.scratch.ootp.site.impl;
 
 import com.ljs.scratch.ootp.data.Id;
-import com.ljs.scratch.ootp.ootp5.site.Ootp5;
+import com.ljs.scratch.ootp.ootp5.Ootp5;
 import com.ljs.scratch.ootp.ootp5.site.PotentialRating;
 import com.ljs.scratch.ootp.ootp5.site.ZeroToTen;
 import com.ljs.scratch.ootp.ootp6.site.OneToTen;
 import com.ljs.scratch.ootp.ootp6.site.OneToTwenty;
-import com.ljs.scratch.ootp.ootp6.site.Ootp6;
+import com.ljs.scratch.ootp.ootp6.Ootp6;
 import com.ljs.scratch.ootp.ootp6.site.TwoToEight;
-import com.ljs.scratch.ootp.ootpx.site.OotpX;
+import com.ljs.scratch.ootp.ootpx.OotpX;
 import com.ljs.scratch.ootp.rating.OneToOneHundred;
 import com.ljs.scratch.ootp.rating.Scale;
 import com.ljs.scratch.ootp.roster.Team;

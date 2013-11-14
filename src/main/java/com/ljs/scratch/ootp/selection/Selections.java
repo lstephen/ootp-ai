@@ -1,17 +1,10 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   Selections.java
-
 package com.ljs.scratch.ootp.selection;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.roster.Team;
-import java.util.Iterator;
-import java.util.Set;
 import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection:
@@ -26,28 +19,8 @@ public final class Selections {
         return selection.select(ImmutableSet.<Player>of(), available);
     }
 
-    public static ImmutableSet onlyHitters(Team t, Iterable ids)
-    {
-        Set players = Sets.newHashSet();
-        PlayerId id;
-        for(Iterator i$ = ids.iterator(); i$.hasNext(); players.add(t.get(id)))
-            id = (PlayerId)i$.next();
-
-        return onlyHitters(((Iterable) (players)));
-    }
-
     public static ImmutableSet<Player> onlyHitters(Iterable<Player> ps) {
         return ImmutableSet.copyOf(Iterables.filter(ps, IS_HITTER));
-    }
-
-    public static ImmutableSet onlyPitchers(Team t, Iterable ids)
-    {
-        Set players = Sets.newHashSet();
-        PlayerId id;
-        for(Iterator i$ = ids.iterator(); i$.hasNext(); players.add(t.get(id)))
-            id = (PlayerId)i$.next();
-
-        return onlyPitchers(((Iterable) (players)));
     }
 
     public static ImmutableSet<Player> onlyPitchers(Iterable<Player> ps) {

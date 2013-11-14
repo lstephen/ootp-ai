@@ -8,7 +8,7 @@ import com.google.common.base.Objects;
 import com.ljs.scratch.ootp.player.ratings.json.BattingPotentialSerializer;
 import com.ljs.scratch.ootp.rating.OneToOneHundred;
 import com.ljs.scratch.ootp.rating.Rating;
-import com.ljs.scratch.ootp.regression.SplitPercentages;
+import com.ljs.scratch.ootp.stats.SplitPercentages;
 
 /**
  *

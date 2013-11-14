@@ -1,6 +1,7 @@
-package com.ljs.scratch.ootp.regression;
+package com.ljs.scratch.ootp.stats;
 
 import com.google.common.base.Charsets;
+import com.ljs.scratch.ootp.regression.History;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.stats.BattingStats;
 import com.ljs.scratch.ootp.stats.PitchingStats;

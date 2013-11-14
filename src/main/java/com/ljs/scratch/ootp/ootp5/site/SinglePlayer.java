@@ -76,10 +76,14 @@ public class SinglePlayer implements PlayerSource {
 
     private Site site;
 
-    public SinglePlayer() { }
+    private SalarySource salaries;
 
     public void setSite(Site site) {
         this.site = site;
+    }
+
+    public void setSalarySource(SalarySource salaries) {
+        this.salaries = salaries;
     }
 
     private Document loadPage(PlayerId id) {
@@ -178,7 +182,7 @@ public class SinglePlayer implements PlayerSource {
         }
 
 
-        player.setSalary(((SiteImpl) site).getSalary(player));
+        player.setSalary(salaries.getSalary(player));
 
         return player;
     }

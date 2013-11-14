@@ -44,6 +44,10 @@ public final class BoxScores {
             String teamName = split[0];
             Integer score = Integer.parseInt(split[1]);
 
+            if (teamName.contains("Allstars")) {
+                continue;
+            }
+
             if (r.isVisitorSet()) {
                 r.home(getTeamId(teamName), score);
                 results.add(r.build());

@@ -37,6 +37,7 @@ public class TestSinglePlayer {
 
         singlePlayer = new SinglePlayer();
         singlePlayer.setSite(site.toMock());
+        singlePlayer.setSalarySource(site.toMock());
     }
 
     @Test

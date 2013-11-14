@@ -17,7 +17,6 @@ import com.ljs.scratch.ootp.player.ratings.PlayerRatings;
 import com.ljs.scratch.ootp.regression.BattingRegression;
 import com.ljs.scratch.ootp.regression.PitchingRegression;
 import com.ljs.scratch.ootp.regression.Predictions;
-import com.ljs.scratch.ootp.regression.SplitPercentages;
 import com.ljs.scratch.ootp.report.FreeAgents;
 import com.ljs.scratch.ootp.report.GenericValueReport;
 import com.ljs.scratch.ootp.report.RosterReport;
@@ -25,6 +24,7 @@ import com.ljs.scratch.ootp.report.SalaryRegression;
 import com.ljs.scratch.ootp.report.SalaryReport;
 import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.report.Trade;
+import com.ljs.scratch.ootp.roster.FourtyManRoster;
 import com.ljs.scratch.ootp.roster.Roster;
 import com.ljs.scratch.ootp.roster.Roster.Status;
 import com.ljs.scratch.ootp.roster.RosterSelection;
@@ -43,8 +43,8 @@ import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 import com.ljs.scratch.ootp.site.Version;
 import com.ljs.scratch.ootp.site.impl.SiteDefinitionFactory;
+import com.ljs.scratch.ootp.stats.SplitPercentages;
 import com.ljs.scratch.ootp.stats.SplitStats;
-import com.ljs.scratch.ootp.value.FourtyManRoster;
 import com.ljs.scratch.ootp.value.FreeAgentAcquisition;
 import com.ljs.scratch.ootp.value.LeagueReplacementLevel;
 import com.ljs.scratch.ootp.value.PlayerValue;
@@ -122,12 +122,12 @@ public class Ootp {
         for (SiteDefinition def : Arrays.asList
             //( TWML
             //, CBL
-            //, HFTC
+            ( HFTC
             //( BTH
-            //( LBB
+            //, LBB
             //, SAVOY
             //( PSD
-            ( TFMS
+            //, TFMS
             )) {
             try (
                 FileOutputStream out =

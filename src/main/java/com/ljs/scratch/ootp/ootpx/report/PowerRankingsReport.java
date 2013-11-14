@@ -7,9 +7,9 @@ import com.ljs.scratch.ootp.elo.EloRatings;
 import com.ljs.scratch.ootp.elo.GameResult;
 import com.ljs.scratch.ootp.io.Printable;
 import com.ljs.scratch.ootp.ootpx.site.BoxScores;
-import com.ljs.scratch.ootp.report.TeamReport;
 import com.ljs.scratch.ootp.roster.Team;
 import com.ljs.scratch.ootp.site.Record;
+import com.ljs.scratch.ootp.site.RecordPredictor;
 import com.ljs.scratch.ootp.site.Site;
 import java.io.PrintWriter;
 import org.apache.commons.lang3.StringUtils;
@@ -24,13 +24,13 @@ public class PowerRankingsReport implements Printable {
 
     private final Site site;
 
-    private final TeamReport teamReport;
+    private final RecordPredictor recordPredictor;
 
     private final EloRatings ratings = EloRatings.create();
 
-    public PowerRankingsReport(Site site, TeamReport teamReport) {
+    public PowerRankingsReport(Site site, RecordPredictor recordPredictor) {
         this.site = site;
-        this.teamReport = teamReport;
+        this.recordPredictor = recordPredictor;
     }
 
 
@@ -78,7 +78,7 @@ public class PowerRankingsReport implements Printable {
 
     private void populateInitialRatings() {
         for (Id<Team> team : site.getTeamIds()) {
-            Double we = teamReport.getExpectedEndOfSeason(team).getWinPercentage();
+            Double we = recordPredictor.getExpectedEndOfSeason(team).getWinPercentage();
 
             Long elo = 1500 + Math.round(
                 (400 * Math.log((double) -we / (we-1)))
@@ -88,8 +88,8 @@ public class PowerRankingsReport implements Printable {
         }
     }
 
-    public static PowerRankingsReport create(Site site, TeamReport teamReport) {
-        return new PowerRankingsReport(site, teamReport);
+    public static PowerRankingsReport create(Site site, RecordPredictor recordPredictor) {
+        return new PowerRankingsReport(site, recordPredictor);
     }
 
 }

@@ -1,5 +1,7 @@
-package com.ljs.scratch.ootp.ootp5.site;
+package com.ljs.scratch.ootp.ootp6;
 
+import com.ljs.scratch.ootp.ootp5.site.SinglePlayer;
+import com.ljs.scratch.ootp.ootp5.SiteImpl;
 import com.ljs.scratch.ootp.site.Site;
 import com.ljs.scratch.ootp.site.SiteDefinition;
 
@@ -7,7 +9,7 @@ import com.ljs.scratch.ootp.site.SiteDefinition;
  *
  * @author lstephen
  */
-public final class Ootp5 {
+public class Ootp6 {
 
     public static Site create(SiteDefinition def) {
         SinglePlayer ps = new SinglePlayer();
