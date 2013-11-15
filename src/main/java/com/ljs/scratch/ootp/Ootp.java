@@ -120,14 +120,14 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            ( TWML
-            , CBL
+            //( TWML
+            //, CBL
             //, HFTC
-            , BTH
-            , LBB
+            //( BTH
+            //, LBB
             //, SAVOY
-            //( PSD
-            , TFMS
+            ( PSD
+            //, TFMS
             )) {
             try (
                 FileOutputStream out =

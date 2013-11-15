@@ -6,18 +6,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.ljs.scratch.ootp.player.Player;
 import com.ljs.scratch.ootp.player.ratings.DefensiveRatings;
 import com.ljs.scratch.ootp.player.ratings.Position;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class DefenseSelection {
 
     public Defense select(Iterable<Player> selected) {
-        Iterable<Defense> defenses = getAllDefenses(selected);
         return Ordering
             .natural()
             .onResultOf(new Function<Defense, Double>() {
@@ -26,14 +24,30 @@ public class DefenseSelection {
                     return def.score();
                 }
             })
-            .max(defenses);
+            .max(DefenseIterator.create(selected));
     }
 
-    private Iterable<Defense> getAllDefenses(Iterable<Player> selected) {
-        Set<Defense> result = Sets.newHashSet();
+    private static class DefenseIterator implements Iterator<Defense> {
 
-        for (List<Player> ps
-            : Collections2.permutations(ImmutableSet.copyOf(selected))) {
+	    private final Iterator<List<Player>> permutations;
+
+        private DefenseIterator(Iterator<List<Player>> permutations) {
+            this.permutations = permutations;
+        }
+
+        @Override
+		public boolean hasNext() {
+			return permutations.hasNext();
+		}
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Defense next() {
+            List<Player> permutation = permutations.next();
 
             Map<Player, Position> defense = Maps.newHashMap();
 
@@ -50,18 +64,20 @@ public class DefenseSelection {
                     Position.CENTER_FIELD,
                     Position.RIGHT_FIELD)) {
 
-                DefensiveRatings ratings = ps.get(idx).getDefensiveRatings();
+                DefensiveRatings ratings = permutation.get(idx).getDefensiveRatings();
 
-                /*if (p != Position.FIRST_BASE
-                    && ratings.getPositionScore(p) <= 0) {
-                    continue;
-                }*/
-                defense.put(ps.get(idx), p);
+                defense.put(permutation.get(idx), p);
                 idx++;
             }
 
-            result.add(Defense.create(defense));
+            return Defense.create(defense);
         }
-        return result;
+
+        public static DefenseIterator create(Iterable<Player> available) {
+            return new DefenseIterator(
+                Collections2
+                    .permutations(ImmutableSet.copyOf(available))
+                    .iterator());
+        }
     }
 }
