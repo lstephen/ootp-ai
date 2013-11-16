@@ -3,6 +3,7 @@ package com.ljs.scratch.ootp.rating;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.ljs.scratch.ootp.ootp5.site.PotentialRating;
 import com.ljs.scratch.ootp.ootp5.site.ZeroToTen;
 import com.ljs.scratch.ootp.ootp6.site.OneToTwenty;
 
@@ -13,6 +14,7 @@ import com.ljs.scratch.ootp.ootp6.site.OneToTwenty;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes({
     @Type(ZeroToTen.class),
+	@Type(PotentialRating.RatingScale.class),
     @Type(OneToOneHundred.class),
     @Type(OneToTwenty.class)
 })

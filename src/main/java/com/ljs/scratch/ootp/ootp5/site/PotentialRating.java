@@ -1,5 +1,6 @@
 package com.ljs.scratch.ootp.ootp5.site;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.base.CharMatcher;
 import com.ljs.scratch.ootp.rating.OneToOneHundred;
 import com.ljs.scratch.ootp.rating.Rating;
@@ -19,6 +20,7 @@ public enum PotentialRating {
         this.value = value;
     }
 
+	@JsonCreator
     private static PotentialRating valueOfCaseInsensitive(String potential) {
         return PotentialRating.valueOf(potential.toUpperCase(Locale.ENGLISH));
     }
