@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.ljs.scratch.ootp.player.ratings.json.BattingPotentialSerializer;
-import com.ljs.scratch.ootp.site.Site;
+import com.ljs.ootp.ai.player.ratings.json.BattingPotentialSerializer;
+import com.ljs.ootp.ai.site.Site;
 
 /**
  *

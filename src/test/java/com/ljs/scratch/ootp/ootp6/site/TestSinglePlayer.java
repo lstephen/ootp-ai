@@ -1,12 +1,14 @@
 package com.ljs.scratch.ootp.ootp6.site;
 
+import com.ljs.ootp.ai.ootp6.site.TwoToEight;
+import com.ljs.ootp.ai.ootp6.site.OneToTwenty;
 import com.google.common.base.Optional;
 import com.ljs.scratch.ootp.ootp5.site.MockSite;
-import com.ljs.scratch.ootp.ootp5.site.SinglePlayer;
-import com.ljs.scratch.ootp.player.Player;
-import com.ljs.scratch.ootp.player.PlayerId;
-import com.ljs.scratch.ootp.player.ratings.BattingRatings;
-import com.ljs.scratch.ootp.site.Version;
+import com.ljs.ootp.ai.ootp5.site.SinglePlayer;
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.PlayerId;
+import com.ljs.ootp.ai.player.ratings.BattingRatings;
+import com.ljs.ootp.ai.site.Version;
 import java.io.IOException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
