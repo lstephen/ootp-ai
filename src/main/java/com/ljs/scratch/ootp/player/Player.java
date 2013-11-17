@@ -203,10 +203,12 @@ public final class Player {
         this.listedPosition = Optional.of(listedPosition);
     }
 
+    @JsonIgnore
     public boolean isHitter() {
         return getBattingRatings() != null && !isPitcher();
     }
 
+    @JsonIgnore
     public boolean isPitcher() {
         return hasPitchingRatings();
     }

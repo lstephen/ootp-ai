@@ -120,9 +120,9 @@ public class Ootp {
 
     public void run() throws IOException {
         for (SiteDefinition def : Arrays.asList
-            ( TWML
+            //( TWML
             //, CBL
-            //( HFTC
+            ( HFTC
             //( BTH
             //, LBB
             //, SAVOY
