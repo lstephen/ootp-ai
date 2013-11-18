@@ -3,6 +3,7 @@ package com.ljs.ootp.ai;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -17,6 +18,7 @@ import com.ljs.ootp.ai.ootp5.report.SpringTraining;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
+import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
@@ -558,6 +560,19 @@ public class Main {
             generic.setPlayers(Iterables.filter(all, new Predicate<Player>() {
                 public boolean apply(Player p) {
                     return Slot.getPrimarySlot(p) == s;
+                }
+            }));
+
+            generic.print(out);
+        }
+
+        for (final Position pos : ImmutableList.of(Position.SECOND_BASE, Position.THIRD_BASE)) {
+            LOG.log(Level.INFO, "Position Report: {0}...", pos.name());
+
+            generic.setTitle("Top: " + pos.name());
+            generic.setPlayers(Iterables.filter(all, new Predicate<Player>() {
+                public boolean apply(Player pl) {
+                    return pl.getPosition().equals(pos.getAbbreviation());
                 }
             }));
 

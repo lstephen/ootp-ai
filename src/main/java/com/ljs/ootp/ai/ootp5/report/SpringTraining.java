@@ -24,7 +24,7 @@ public final class SpringTraining implements Printable {
 
     private static enum HitterSkills { CONTACT, POWER, EYE, DEFENSE }
 
-    private static Integer HITTING_THRESHOLD = 15;
+    private static final Integer HITTING_THRESHOLD = 20;
 
     private final Version version;
 
@@ -90,7 +90,18 @@ public final class SpringTraining implements Printable {
 
         Integer remaining = 20;
 
-        for (HitterSkills skill : HitterSkills.values()) {
+        if (skills.contains(HitterSkills.DEFENSE)) {
+            values.put(HitterSkills.DEFENSE, 5);
+            remaining = 15;
+            skills.remove(HitterSkills.DEFENSE);
+        } else {
+            values.put(HitterSkills.DEFENSE, 0);
+        }
+
+        for (HitterSkills skill :
+            ImmutableList.of(
+                HitterSkills.CONTACT, HitterSkills.POWER, HitterSkills.EYE)) {
+
             if (skills.contains(skill)) {
                 Integer points = remaining / skills.size();
                 remaining -= points;
