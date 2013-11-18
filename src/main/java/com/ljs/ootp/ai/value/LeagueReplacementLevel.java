@@ -2,12 +2,13 @@ package com.ljs.ootp.ai.value;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.site.Site;
 import java.io.PrintWriter;
 
@@ -30,12 +31,13 @@ public class LeagueReplacementLevel implements Printable {
     }
 
     public Integer getReplacementLevel(final Slot s, Function<Player, Integer> value) {
-        Iterable<Player> playersAtSlot =
-            Iterables.filter(players, new Predicate<Player>() {
-                public boolean apply(Player p) {
-                    return Slot.getPrimarySlot(p) == s;
-                }
-            });
+        ImmutableSet<Player> playersAtSlot =
+            ImmutableSet.copyOf(
+                Iterables.filter(players, new Predicate<Player>() {
+                    public boolean apply(Player p) {
+                        return Slot.getPrimarySlot(p) == s;
+                    }
+                }));
 
         Integer replacementLevelRank = Mode.REGULAR_SEASON.getAllSlots().count(s) * Iterables.size(site.getTeamIds());
 
@@ -47,7 +49,9 @@ public class LeagueReplacementLevel implements Printable {
                         .reverse()
                         .onResultOf(value)
                         .sortedCopy(playersAtSlot),
-                    replacementLevelRank),
+                    replacementLevelRank > playersAtSlot.size()
+                        ? playersAtSlot.size() - 1
+                        : replacementLevelRank),
                 null));
     }
 
