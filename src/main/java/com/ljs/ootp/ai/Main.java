@@ -3,6 +3,7 @@ package com.ljs.ootp.ai;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
@@ -53,10 +54,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.joda.time.DateTimeConstants;
 
 /**
@@ -114,26 +115,45 @@ public class Main {
     //private static final SiteDefinition OSBL =
     //    SiteDefinitionFactory.ootpx("OBSL", "http://www.theobsl.com/2013seasonootp/", Id.<Team>valueOf(30), "National", 30);
 
+    private static final ImmutableMap<String, SiteDefinition> SITES =
+        ImmutableMap
+            .<String, SiteDefinition>builder()
+            .put("TWML", TWML)
+            .put("CBL", CBL)
+            .put("HFTC", HFTC)
+            .put("BTH", BTH)
+            .put("LBB", LBB)
+            .put("SAVOY", SAVOY)
+            .put("PSD", PSD)
+            .put("TFMS", TFMS)
+            .build();
+
     public static void main(String[] args) throws IOException {
         new Main().run();
     }
 
     public void run() throws IOException {
-        for (SiteDefinition def : Arrays.asList
-            //( TWML
-            //, CBL
-            //( HFTC
-            //( BTH
-            //, LBB
-            ( SAVOY
-            //( PSD
-            //, TFMS
-            )) {
-            try (
-                FileOutputStream out =
-                    new FileOutputStream(new File(Directories.OUT + def.getName() + ".txt"), false)) {
-                run(def, out);
-            }
+        String site = System.getProperty("site");
+
+        if (site == null) {
+            site = (String) JOptionPane.showInputDialog(
+                null,
+                "Please select site:",
+                "OOTP-AI",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                Ordering.natural().sortedCopy(SITES.keySet()).toArray(),
+                null);
+        }
+
+        run(SITES.get(site));
+    }
+
+    private void run(SiteDefinition def) throws IOException {
+        try (
+            FileOutputStream out =
+                new FileOutputStream(new File(Directories.OUT + def.getName() + ".txt"), false)) {
+            run(def, out);
         }
     }
 
