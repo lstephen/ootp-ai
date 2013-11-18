@@ -2,13 +2,13 @@ package com.ljs.ootp.ai.value;
 
 import com.google.common.base.Function;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
-import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
-import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.SplitStats;
@@ -135,7 +135,7 @@ public class PlayerValue {
             case IF:
             case OF:
             case H:
-                Splits<BattingRatings> splitsB = p.getBattingPotentialRatings();
+                Splits<BattingRatings<Integer>> splitsB = p.getBattingPotentialRatings();
                 BattingStats vsLeftB = batting.predict(splitsB.getVsLeft());
                 BattingStats vsRightB = batting.predict(splitsB.getVsRight());
 

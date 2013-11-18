@@ -1,10 +1,10 @@
 package com.ljs.ootp.ai.selection;
 
-import com.ljs.ootp.ai.player.Slot;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
@@ -16,17 +16,15 @@ import com.ljs.ootp.ai.stats.TeamStats;
  */
 public final class PitcherSelectionFactory implements SelectionFactory {
 
-    private final Function<Player, Double> value;
-
-    private final PitcherOverall overall;
+    private final Function<Player, Integer> value;
 
     private PitcherSelectionFactory(
-        Function<Player, Double> value, PitcherOverall overall) {
+        Function<Player, Integer> value) {
 
         this.value = value;
-        this.overall = overall;
     }
 
+    @Override
     public Selection create(Mode mode) {
         return SlotSelection
             .builder()
@@ -42,8 +40,7 @@ public final class PitcherSelectionFactory implements SelectionFactory {
             .natural()
             .reverse()
             .onResultOf(value)
-            .compound(overall.byWeightedRating())
-            .compound(Player.byAge());
+            .compound(Player.byTieBreak());
     }
 
     public static PitcherSelectionFactory using(Predictions predictions) {
@@ -55,20 +52,13 @@ public final class PitcherSelectionFactory implements SelectionFactory {
     public static PitcherSelectionFactory using(
         TeamStats<PitchingStats> stats, PitcherOverall overall) {
 
-        return using(defaultValueFunction(stats, overall), overall);
+        return using(defaultValueFunction(stats, overall));
     }
 
     public static PitcherSelectionFactory using(
-        final Function<Player, ? extends Number> value,
-        PitcherOverall overall) {
+        final Function<Player, Integer> value) {
 
-        return new PitcherSelectionFactory(
-            new Function<Player, Double>() {
-                @Override
-                public Double apply(Player input) {
-                    return value.apply(input).doubleValue();
-                }},
-            overall);
+        return new PitcherSelectionFactory(value);
     }
 
     private static Function<Player, Integer> defaultValueFunction(
@@ -79,7 +69,6 @@ public final class PitcherSelectionFactory implements SelectionFactory {
                 try {
                     return overall.getPlus(pitching, p);
                 } catch (Exception e) {
-                    System.out.println(p);
                     throw Throwables.propagate(e);
                 }
             }

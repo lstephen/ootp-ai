@@ -13,6 +13,7 @@ import com.ljs.ootp.ai.config.Directories;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.draft.DraftReport;
 import com.ljs.ootp.ai.io.Printables;
+import com.ljs.ootp.ai.ootp5.report.SpringTraining;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
@@ -351,6 +352,14 @@ public class Main {
                 .select(newRoster.getPlayers(Status.ML));
 
         rotation.print(out);
+
+        if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH && site.getType() != Version.OOTPX) {
+            LOG.log(Level.INFO, "Spring training...");
+            Printables
+                .print(SpringTraining.create(
+                    site.getType(), newRoster.getAllPlayers()))
+                .to(out);
+        }
 
         LOG.log(Level.INFO, "Salary Regression...");
 

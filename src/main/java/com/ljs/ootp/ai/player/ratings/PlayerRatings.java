@@ -1,6 +1,5 @@
 package com.ljs.ootp.ai.player.ratings;
 
-import com.ljs.ootp.ai.splits.Splits;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,6 +8,7 @@ import com.google.common.base.Objects;
 import com.ljs.ootp.ai.player.ratings.json.BattingPotentialSerializer;
 import com.ljs.ootp.ai.rating.OneToOneHundred;
 import com.ljs.ootp.ai.rating.Rating;
+import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 
 /**
@@ -19,7 +19,7 @@ public final class PlayerRatings {
 
     private static final Integer PEAK_AGE = 27;
 
-    private final Splits<BattingRatings> batting;
+    private final Splits<BattingRatings<?>> batting;
 
     private final DefensiveRatings defensive;
 
@@ -38,7 +38,7 @@ public final class PlayerRatings {
 
     @JsonCreator
     private PlayerRatings(
-        @JsonProperty("batting") Splits<BattingRatings> batting,
+        @JsonProperty("batting") Splits<BattingRatings<?>> batting,
         @JsonProperty("defensive") DefensiveRatings defensive,
         @JsonProperty("pitching") Splits<PitchingRatings> pitching) {
 
@@ -57,17 +57,17 @@ public final class PlayerRatings {
 
     public DefensiveRatings getDefensive() { return defensive; }
 
-    public Splits<BattingRatings> getBatting() { return batting; }
+    public Splits<BattingRatings<?>> getBatting() { return batting; }
 
     public Splits<PitchingRatings> getPitching() { return pitching; }
 
     public boolean hasPitching() { return pitching != null; }
 
-    public Splits<BattingRatings> getBattingPotential(int age) {
+    public Splits<BattingRatings<Integer>> getBattingPotential(int age) {
 
-        BattingRatings ovr = getOverallBatting(getBatting());
+        BattingRatings<?> ovr = getOverallBatting(getBatting());
 
-        BattingRatings capped = BattingRatings
+        BattingRatings<Integer> capped = BattingRatings
             .builder(OneToOneHundred.scale())
             .contact(capBattingPotential(age, ovr.getContact(), battingPotential.getContact()))
             .gap(capBattingPotential(age, ovr.getGap(), battingPotential.getGap()))
@@ -75,9 +75,9 @@ public final class PlayerRatings {
             .eye(capBattingPotential(age, ovr.getEye(), battingPotential.getEye()))
             .build();
 
-        BattingRatings curVsLeft = getBatting().getVsLeft();
+        BattingRatings<?> curVsLeft = getBatting().getVsLeft();
 
-        BattingRatings potVsLeft = BattingRatings
+        BattingRatings<Integer> potVsLeft = BattingRatings
             .builder(OneToOneHundred.scale())
             .contact(capBatting(age, curVsLeft.getContact(), capped.getContact(), ovr.getContact()))
             .gap(capBatting(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
@@ -85,9 +85,9 @@ public final class PlayerRatings {
             .eye(capBatting(age, curVsLeft.getEye(), capped.getEye(), ovr.getEye()))
             .build();
 
-        BattingRatings curVsRight = getBatting().getVsRight();
+        BattingRatings<?> curVsRight = getBatting().getVsRight();
 
-        BattingRatings potVsRight = BattingRatings
+        BattingRatings<Integer> potVsRight = BattingRatings
             .builder(OneToOneHundred.scale())
             .contact(capBatting(age, curVsRight.getContact(), capped.getContact(), ovr.getContact()))
             .gap(capBatting(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
@@ -195,7 +195,7 @@ public final class PlayerRatings {
             .toString();
     }
 
-    public static BattingRatings getOverallBatting(Splits<BattingRatings> splits) {
+    public static BattingRatings getOverallBatting(Splits<BattingRatings<?>> splits) {
         Integer vR = (int) Math.round(splitPercentages.getVsRhpPercentage() * 1000);
         Integer vL = 1000 - vR;
 
@@ -225,7 +225,7 @@ public final class PlayerRatings {
     }
 
     public static PlayerRatings create(
-        Splits<BattingRatings> batting,
+        Splits<BattingRatings<?>> batting,
         DefensiveRatings defensive,
         Splits<PitchingRatings> pitching,
         RatingsDefinition definition) {

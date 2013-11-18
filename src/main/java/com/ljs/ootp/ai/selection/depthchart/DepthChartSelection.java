@@ -8,9 +8,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.selection.All;
-import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Defense;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
@@ -25,7 +25,7 @@ import org.fest.util.Lists;
  *
  * @author lstephen
  */
-public class DepthChartSelection {
+public final class DepthChartSelection {
 
     private final TeamStats<BattingStats> predictions;
 
@@ -80,6 +80,7 @@ public class DepthChartSelection {
                     return p.getDefensiveRatings().getPositionScore(position);
                 }
             })
+            .compound(Player.byTieBreak())
             .max(bench);
 
         return candidate.getDefensiveRatings().getPositionScore(position)
@@ -140,6 +141,7 @@ public class DepthChartSelection {
                     return vs.getStats(predictions, player).getWobaPlus();
                 }
             })
+            .compound(Player.byTieBreak())
             .immutableSortedCopy(bench);
 
         Player fallback = sortedBench.get(0);

@@ -6,13 +6,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.selection.HitterSelectionFactory;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.PitcherSelectionFactory;
 import com.ljs.ootp.ai.selection.Selection;
 import com.ljs.ootp.ai.selection.Selections;
-import com.ljs.ootp.ai.player.Slot;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class ReplacementValue {
             .create(Mode.REGULAR_SEASON);
 
         Selection pitcherSelection = PitcherSelectionFactory
-            .using(selectionValue, ps.getPitcherOverall())
+            .using(selectionValue)
             .create(Mode.REGULAR_SEASON);
 
         hitterSlotSelections = Selections

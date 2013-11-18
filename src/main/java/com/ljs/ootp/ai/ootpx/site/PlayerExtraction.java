@@ -12,9 +12,9 @@ import com.ljs.ootp.ai.player.ratings.FieldingRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.rating.Scale;
 import com.ljs.ootp.ai.site.Site;
+import com.ljs.ootp.ai.splits.Splits;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import org.apache.commons.lang3.StringUtils;
@@ -144,14 +144,14 @@ public class PlayerExtraction {
         return !doc.select("td:containsOwn(Contact):not(.sl,.slg)").isEmpty();
     }
 
-    private Splits<BattingRatings> extractBattingRatings(Document doc) {
+    private Splits<BattingRatings<?>> extractBattingRatings(Document doc) {
         if (!hasBattingRatings(doc)) {
             return null;
         }
 
         Scale<?> s = site.getAbilityRatingScale();
 
-        BattingRatings vsL = BattingRatings
+        BattingRatings<?> vsL = BattingRatings
             .builder(s)
             .contact(doc.select("td:containsOwn(Contact) + td + td").text())
             .gap(doc.select("td:containsOwn(Gap) + td + td").text())
@@ -159,7 +159,7 @@ public class PlayerExtraction {
             .eye(doc.select("td:containsOwn(Eye) + td + td").text())
             .build();
 
-        BattingRatings vsR = BattingRatings
+        BattingRatings<?> vsR = BattingRatings
             .builder(s)
             .contact(doc.select("td:containsOwn(Contact) + td + td + td").text())
             .gap(doc.select("td:containsOwn(Gap) + td + td + td").text())

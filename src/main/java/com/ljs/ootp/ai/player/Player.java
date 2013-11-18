@@ -217,11 +217,11 @@ public final class Player {
         return ratings.getDefensive();
     }
 
-    public Splits<BattingRatings> getBattingRatings() {
+    public Splits<BattingRatings<?>> getBattingRatings() {
         return ratings.getBatting();
     }
 
-    public Splits<BattingRatings> getBattingPotentialRatings() {
+    public Splits<BattingRatings<Integer>> getBattingPotentialRatings() {
         return ratings.getBattingPotential(age);
     }
 
@@ -263,6 +263,14 @@ public final class Player {
         @JsonProperty("ratings") PlayerRatings ratings) {
 
         return new Player(id, name, ratings);
+    }
+
+    /**
+     * An ordering designed to produce consistent results when players are
+     * otherwise valued equally.
+     */
+    public static Ordering<Player> byTieBreak() {
+        return Player.byAge().compound(Player.byShortName());
     }
 
     public static Ordering<Player> byAge() {

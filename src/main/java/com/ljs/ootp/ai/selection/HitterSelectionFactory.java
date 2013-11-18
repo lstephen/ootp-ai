@@ -1,9 +1,9 @@
 package com.ljs.ootp.ai.selection;
 
-import com.ljs.ootp.ai.player.Slot;
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
@@ -11,12 +11,13 @@ import org.fest.assertions.api.Assertions;
 
 public final class HitterSelectionFactory implements SelectionFactory {
 
-    private final Function<Player, Double> value;
+    private final Function<Player, Integer> value;
 
-    private HitterSelectionFactory(Function<Player, Double> value) {
+    private HitterSelectionFactory(Function<Player, Integer> value) {
         this.value = value;
     }
 
+    @Override
     public Selection create(Mode mode) {
         return SlotSelection
             .builder()
@@ -28,8 +29,11 @@ public final class HitterSelectionFactory implements SelectionFactory {
     }
 
     public Ordering<Player> byOverall() {
-        return Ordering.natural().reverse().onResultOf(value).compound(Player
-            .byWeightedBattingRating()).compound(Player.byAge());
+        return Ordering
+            .natural()
+            .reverse()
+            .onResultOf(value)
+            .compound(Player.byTieBreak());
     }
 
     public static HitterSelectionFactory using(Predictions predictions) {
@@ -43,24 +47,18 @@ public final class HitterSelectionFactory implements SelectionFactory {
     }
 
     public static HitterSelectionFactory using(
-        final Function<Player, ? extends Number> value) {
-
-        return new HitterSelectionFactory(new Function<Player, Double>() {
-            @Override
-            public Double apply(Player p) {
-                return Double.valueOf(((Number) value.apply(p)).doubleValue());
-            }
-        });
+        final Function<Player, Integer> value) {
+        return new HitterSelectionFactory(value);
     }
 
-    private static Function<Player, Double> defaultValueFunction(
+    private static Function<Player, Integer> defaultValueFunction(
         final TeamStats<BattingStats> batting) {
 
-        return new Function<Player, Double>() {
+        return new Function<Player, Integer>() {
             @Override
-            public Double apply(Player p) {
+            public Integer apply(Player p) {
                 Assertions.assertThat(p).isNotNull();
-                return batting.getOverall(p).getWoba();
+                return batting.getOverall(p).getWobaPlus();
             }
         };
     }

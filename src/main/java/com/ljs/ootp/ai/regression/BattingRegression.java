@@ -48,7 +48,7 @@ public final class BattingRegression {
     private void addData(TeamStats<BattingStats> teamStats) {
        for (Player p : teamStats.getPlayers()) {
            Splits<BattingStats> stats = teamStats.getSplits(p);
-           Splits<BattingRatings> ratings = p.getBattingRatings();
+           Splits<BattingRatings<?>> ratings = p.getBattingRatings();
 
            addData(stats.getVsLeft(), ratings.getVsLeft());
            addData(stats.getVsRight(), ratings.getVsRight());

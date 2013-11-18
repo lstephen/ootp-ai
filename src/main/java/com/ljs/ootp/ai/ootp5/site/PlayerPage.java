@@ -2,12 +2,12 @@ package com.ljs.ootp.ai.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
-import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.rating.Rating;
 import com.ljs.ootp.ai.rating.Scale;
 import com.ljs.ootp.ai.site.Site;
 import static com.ljs.ootp.ai.site.Version.OOTP5;
 import static com.ljs.ootp.ai.site.Version.OOTP6;
+import com.ljs.ootp.ai.splits.Splits;
 import javax.annotation.Nonnull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -54,7 +54,7 @@ public final class PlayerPage {
         this.site = site;
     }
 
-    public Splits<BattingRatings> extractBattingRatings() {
+    public Splits<BattingRatings<?>> extractBattingRatings() {
         Elements ratings = html.select("tr:has(td:contains(Batting Ratings)) + tr");
 
         if (ratings.isEmpty()) {
@@ -65,7 +65,7 @@ public final class PlayerPage {
         Elements vsRhp = ratings.select("tr.g:has(td:contains(RHP)), tr.g2:has(td:contains(RHP))");
 
 
-        return Splits.<BattingRatings>create(
+        return Splits.<BattingRatings<?>>create(
             extractBattingRatings(vsLhp.first(), site.getAbilityRatingScale()),
             extractBattingRatings(vsRhp.first(), site.getAbilityRatingScale()));
     }

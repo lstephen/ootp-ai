@@ -7,9 +7,8 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.config.Changes;
 import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.report.RosterReport;
-import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.value.FreeAgentAcquisition;
 import com.ljs.ootp.ai.value.TradeValue;
@@ -164,7 +163,7 @@ public final class FreeAgents {
             .natural()
             .reverse()
             .onResultOf(value)
-            .compound(Player.byAge());
+            .compound(Player.byTieBreak());
     }
 
     private Boolean skipPlayer(Player fa) {

@@ -12,7 +12,6 @@ import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
-import com.ljs.ootp.ai.report.SalaryRegression;
 import com.ljs.ootp.ai.selection.Selections;
 import com.ljs.ootp.ai.value.PlayerValue;
 import com.ljs.ootp.ai.value.ReplacementValue;
@@ -155,7 +154,7 @@ public class GenericValueReport {
                     return custom == null ? getValue(p) : custom.apply(p);
                 }
             })
-            .compound(Player.byAge())
+            .compound(Player.byTieBreak())
             .sortedCopy(players);
 
         if (reverse) {
