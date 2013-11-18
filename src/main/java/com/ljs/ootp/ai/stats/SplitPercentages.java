@@ -2,11 +2,6 @@ package com.ljs.ootp.ai.stats;
 
 import com.google.common.base.Charsets;
 import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.ai.stats.BattingStats;
-import com.ljs.ootp.ai.stats.PitchingStats;
-import com.ljs.ootp.ai.stats.SplitStats;
-import com.ljs.ootp.ai.stats.Stats;
-import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -65,7 +60,7 @@ public final class SplitPercentages {
         loadBatting(site.getTeamBatting().extract());
         loadPitching(site.getTeamPitching().extract());
 
-        History history = new History();
+        History history = History.create();
 
         int currentSeason = site.getDate().getYear();
 

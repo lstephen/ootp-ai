@@ -1,13 +1,13 @@
 package com.ljs.ootp.ai.regression;
 
-import com.ljs.ootp.ai.stats.History;
 import com.google.common.collect.Maps;
+import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
-import com.ljs.ootp.ai.splits.Splits;
-import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.TeamPitching;
+import com.ljs.ootp.ai.splits.Splits;
+import com.ljs.ootp.ai.stats.History;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.TeamStats;
@@ -202,7 +202,7 @@ public final class PitchingRegression {
 
         addData(pitchingStats);
 
-        History history = new History();
+        History history = History.create();
 
         int season = teamPitching.getYear();
 

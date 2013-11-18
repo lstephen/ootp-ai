@@ -122,10 +122,10 @@ public class Main {
         for (SiteDefinition def : Arrays.asList
             //( TWML
             //, CBL
-            ( HFTC
+            //( HFTC
             //( BTH
             //, LBB
-            //, SAVOY
+            ( SAVOY
             //( PSD
             //, TFMS
             )) {
@@ -286,7 +286,7 @@ public class Main {
                     "",
                     player.getPosition(),
                     player.getShortName())
-                .getBytes(Charsets.UTF_8));
+                .getBytes(Charsets.ISO_8859_1));
         }
 
         if (nfa.isPresent() && newRoster.size() < maxRosterSize) {
@@ -298,7 +298,7 @@ public class Main {
                     "",
                     player.getPosition(),
                     player.getShortName())
-                .getBytes(Charsets.UTF_8));
+                .getBytes(Charsets.ISO_8859_1));
         }
 
         LOG.log(Level.INFO, "Choosing lineups...");

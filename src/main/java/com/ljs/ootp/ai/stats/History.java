@@ -1,10 +1,11 @@
 package com.ljs.ootp.ai.stats;
 
-import com.ljs.scratch.util.Jackson;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
+import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.site.Site;
+import com.ljs.scratch.util.Jackson;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -15,10 +16,16 @@ import java.util.logging.Logger;
  *
  * @author lstephen
  */
-public class History {
+public final class History {
 
     private static final Logger LOG =
         Logger.getLogger(History.class.getName());
+
+    private final Config config;
+
+    private History(Config config) {
+        this.config = config;
+    }
 
     public Iterable<TeamStats<BattingStats>> loadBatting(Site site, int season, int years) {
 
@@ -83,11 +90,29 @@ public class History {
     
 
     private File getBattingFile(Site site, int season) {
-        return new File("c:/ootp/history", site.getName() + season + ".batting.json");
+        return new File(getHistoryDir(), site.getName() + season + ".batting.json");
     }
 
     private File getPitchingFile(Site site, int season) {
-        return new File("c:/ootp/history", site.getName() + season + ".pitching.json");
+        return new File(getHistoryDir(), site.getName() + season + ".pitching.json");
+    }
+
+    private String getHistoryDir() {
+        String dir = config.getValue("history.dir");
+
+        return dir == null ? "c:/ootp/history" : dir;
+    }
+
+    public static History create() {
+        try {
+            return new History(Config.createDefault());
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    public static History create(Config config) {
+        return new History(config);
     }
 
 }
