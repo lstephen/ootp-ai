@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public class BestStartersSelection implements Selection {
 
-	private Multiset<Slot> slots;
+	private final Multiset<Slot> slots;
 
 	private final TeamStats<BattingStats> predictions;
 
@@ -49,7 +49,9 @@ public class BestStartersSelection implements Selection {
 
 		Multiset<Slot> remaining = assignments.getRemainingSlots();
 
-		if (!remaining.isEmpty()) {
+        if (remaining.isEmpty()) {
+            return assignments.toMap();
+        } else {
 			return SlotSelection
 				.builder()
 				.slots(slots)
@@ -57,9 +59,6 @@ public class BestStartersSelection implements Selection {
 				.size(slots.size())
 				.build()
 				.select(assignments.getAssignedPlayers(), available);
-
-		} else {
-			return assignments.toMap();
 		}
 	}
 

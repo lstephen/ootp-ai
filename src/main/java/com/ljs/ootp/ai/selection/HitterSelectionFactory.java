@@ -11,14 +11,24 @@ import org.fest.assertions.api.Assertions;
 
 public final class HitterSelectionFactory implements SelectionFactory {
 
+    private final TeamStats<BattingStats> predictions;
+
     private final Function<Player, Integer> value;
 
-    private HitterSelectionFactory(Function<Player, Integer> value) {
+    private HitterSelectionFactory(TeamStats<BattingStats> predictions, Function<Player, Integer> value) {
+        this.predictions = predictions;
         this.value = value;
     }
 
     @Override
     public Selection create(Mode mode) {
+        return new BestStartersSelection(
+            mode.getHittingSlots(),
+            predictions,
+            value);
+    }
+
+    public Selection slot(Mode mode) {
         return SlotSelection
             .builder()
             .ordering(byOverall())
@@ -43,12 +53,13 @@ public final class HitterSelectionFactory implements SelectionFactory {
     public static HitterSelectionFactory using(
         TeamStats<BattingStats> stats) {
 
-        return using(defaultValueFunction(stats));
+        return using(stats, defaultValueFunction(stats));
     }
 
     public static HitterSelectionFactory using(
+        TeamStats<BattingStats> predictions,
         final Function<Player, Integer> value) {
-        return new HitterSelectionFactory(value);
+        return new HitterSelectionFactory(predictions, value);
     }
 
     private static Function<Player, Integer> defaultValueFunction(

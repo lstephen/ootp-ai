@@ -538,6 +538,7 @@ public class Main {
 
         TeamReport now = TeamReport.create(
             "Now",
+            ps,
             site,
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getNowValue());
@@ -554,6 +555,7 @@ public class Main {
         LOG.info("Team Medium Term Report...");
         TeamReport future = TeamReport.create(
             "Medium Term",
+            ps,
             site,
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getFutureValue());

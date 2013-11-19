@@ -32,8 +32,8 @@ public class ReplacementValue {
         this.value = value;
 
         Selection hitterSelection = HitterSelectionFactory
-            .using(selectionValue)
-            .create(Mode.REGULAR_SEASON);
+            .using(ps.getAllBatting(), selectionValue)
+            .slot(Mode.REGULAR_SEASON);
 
         Selection pitcherSelection = PitcherSelectionFactory
             .using(selectionValue)

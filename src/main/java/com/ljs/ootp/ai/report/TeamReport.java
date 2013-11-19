@@ -11,6 +11,7 @@ import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.selection.HitterSelectionFactory;
 import com.ljs.ootp.ai.selection.Mode;
@@ -57,9 +58,12 @@ public final class TeamReport implements Printable, RecordPredictor {
 
     private Ordering<TeamScore> ordering;
 
-    private TeamReport(String title, Site site, Function<Player, Integer> value) {
+    private Predictions ps;
+
+    private TeamReport(String title, Site site, Predictions ps, Function<Player, Integer> value) {
         this.title = title;
         this.site = site;
+        this.ps = ps;
         this.value = value;
         this.leaguePitching = site.getLeaguePitching();
     }
@@ -276,10 +280,8 @@ public final class TeamReport implements Printable, RecordPredictor {
     }
 
     private Double calculateBatting(Iterable<Player> players) {
-        // TODO:
-        // Try using SlotSelection to select just 9 players
         return calculateScore(
-            HitterSelectionFactory.using(value),
+            HitterSelectionFactory.using(ps.getAllBatting(), value).slot(Mode.REGULAR_SEASON),
             Selections.onlyHitters(players));
     }
 
@@ -344,8 +346,8 @@ public final class TeamReport implements Printable, RecordPredictor {
         }
     }
 
-    public static TeamReport create(String title, Site site, Function<Player, Integer> value) {
-        return new TeamReport(title, site, value);
+    public static TeamReport create(String title, Predictions ps, Site site, Function<Player, Integer> value) {
+        return new TeamReport(title, site, ps, value);
     }
 
     private static final class TeamScore {
