@@ -1,6 +1,5 @@
 package com.ljs.ootp.ai.roster;
 
-import com.ljs.ootp.ai.config.Changes;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
@@ -9,7 +8,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
+import com.ljs.ootp.ai.config.Changes;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
@@ -19,7 +20,6 @@ import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.PitcherSelectionFactory;
 import com.ljs.ootp.ai.selection.Selection;
 import com.ljs.ootp.ai.selection.Selections;
-import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.SlotSelection;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;

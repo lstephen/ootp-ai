@@ -1,5 +1,6 @@
 package com.ljs.ootp.ai.config;
 
+import com.google.common.base.Optional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -16,8 +17,8 @@ public class Config {
         this.properties = properties;
     }
 
-    public String getValue(String key) {
-        return properties.getProperty(key);
+    public Optional<String> getValue(String key) {
+        return Optional.fromNullable(properties.getProperty(key));
     }
 
     public static Config createDefault() throws IOException {

@@ -6,7 +6,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
-import com.ljs.ootp.ai.config.Directories;
 import com.ljs.ootp.ai.ootp5.site.PlayerList;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
@@ -62,16 +61,20 @@ public final class Changes {
         }
     }
 
+    private static String getChangesDir() throws IOException {
+        return Config.createDefault().getValue("changes.dir").or(Directories.OUT);
+    }
+
     public static Changes load(Site site) {
         Changes changes = new Changes();
 
-        File src = new File(Directories.OUT, site.getName() + ".changes.txt");
-
-        if (!src.exists()) {
-            return changes;
-        }
-
         try {
+            File src = new File(getChangesDir(), site.getName() + ".changes.txt");
+
+            if (!src.exists()) {
+                return changes;
+            }
+
             Iterable<Player> draftList = null;
             Iterable<Player> faList = null;
             Iterable<Player> team = null;

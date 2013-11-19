@@ -282,11 +282,20 @@ public class Main {
 
         LOG.log(Level.INFO, "Selecting new rosters...");
 
+        Mode selectionMode = mode;
+
+        if (site.getType() == Version.OOTPX
+            && (site.getDate().getMonthOfYear() >= DateTimeConstants.NOVEMBER
+                || site.getDate().getMonthOfYear() < DateTimeConstants.APRIL)) {
+
+            selectionMode = Mode.EXPANDED;
+        }
+
         //if (def.getName().equals("TWML")) {
         //    mode = Mode.PLAYOFFS;
         //}
 
-        Roster newRoster = selection.select(mode, changes);
+        Roster newRoster = selection.select(selectionMode, changes);
 
         newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);

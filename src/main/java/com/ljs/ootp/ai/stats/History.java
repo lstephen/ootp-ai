@@ -98,9 +98,7 @@ public final class History {
     }
 
     private String getHistoryDir() {
-        String dir = config.getValue("history.dir");
-
-        return dir == null ? "c:/ootp/history" : dir;
+        return config.getValue("history.dir").or("c:/ootp/history");
     }
 
     public static History create() {

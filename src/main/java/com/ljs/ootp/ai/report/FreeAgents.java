@@ -10,6 +10,7 @@ import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.site.Site;
+import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.value.FreeAgentAcquisition;
 import com.ljs.ootp.ai.value.TradeValue;
 import java.util.Set;
@@ -142,7 +143,7 @@ public final class FreeAgents {
             if (skipPlayer(p)) {
                 continue;
             }
-            if (mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
+            if (site.getType() != Version.OOTPX && mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
                 continue;
             }
 
