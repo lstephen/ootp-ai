@@ -341,28 +341,6 @@ public class Main {
 
         Printables.print(lineups).to(out);
 
-		/*AllLineups best = new LineupSelection(ps.getAllBatting()).select(newRoster.getAllPlayers());
-		Printables.print(best).to(out);
-
-		ImmutableMultimap<Slot, Player> bss =
-			new BestStartersSelection(
-				mode.getHittingSlots(),
-				ps.getAllBatting(),
-				new PlayerValue(ps, battingRegression, pitchingRegression).getNowAbility())
-			.select(ImmutableSet.<Player>of(), newRoster.getAllPlayers());
-
-		for (Slot s : bss.keySet()) {
-			out.write(String.format("%s%n", s).getBytes(Charsets.ISO_8859_1));
-			for (Player p : bss.get(s)) {
-				out.write(String.format("%s%n", p.getShortName()).getBytes(Charsets.ISO_8859_1));
-			}
-		}
-
-		AllLineups bsslu = new LineupSelection(ps.getAllBatting()).select(bss.values());
-
-		Printables.print(bsslu).to(out);*/
-
-
         LOG.log(Level.INFO, "Choosing Depth Charts...");
 
         AllDepthCharts depthCharts = DepthChartSelection
@@ -382,6 +360,9 @@ public class Main {
                 .select(newRoster.getPlayers(Status.ML));
 
         rotation.print(out);
+
+
+
 
         if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH && site.getType() != Version.OOTPX) {
             LOG.log(Level.INFO, "Spring training...");

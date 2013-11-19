@@ -45,9 +45,10 @@ public class StarterSelection {
 
     private Player selectDh(Lineup.VsHand vs, Iterable<Player> available) {
         for (Player p : byWoba(vs).sortedCopy(available)) {
-            if (!p.getSlots().contains(Slot.C) || containsCatcher(
-                Sets.difference(ImmutableSet.copyOf(available),
-                ImmutableSet.of(p)))) {
+            if ((!p.getSlots().contains(Slot.C))
+                || containsCatcher(
+                    Sets.difference(ImmutableSet.copyOf(available),
+                    ImmutableSet.of(p)))) {
 
                 return p;
             }
