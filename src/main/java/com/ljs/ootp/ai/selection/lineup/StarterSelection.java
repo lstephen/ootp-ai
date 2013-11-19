@@ -8,7 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.ratings.BattingRatings;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.stats.BattingStats;
@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.fest.assertions.api.Assertions;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection.lineup:
 //            Lineup
@@ -46,7 +45,7 @@ public class StarterSelection {
 
     private Player selectDh(Lineup.VsHand vs, Iterable<Player> available) {
         for (Player p : byWoba(vs).sortedCopy(available)) {
-            if (containsCatcher(
+            if (!p.getSlots().contains(Slot.C) || containsCatcher(
                 Sets.difference(ImmutableSet.copyOf(available),
                 ImmutableSet.of(p)))) {
 
@@ -144,31 +143,11 @@ public class StarterSelection {
 
     private Ordering<Player> byWoba(final Lineup.VsHand vs) {
         return Ordering.natural().reverse().onResultOf(
-            new Function<Player, Double>() {
-            public Double apply(Player p) {
-                return Double.valueOf(vs.getStats(predictions, p).getWoba());
+            new Function<Player, Integer>() {
+            public Integer apply(Player p) {
+                return vs.getStats(predictions, p).getWobaPlus();
             }
-        }).compound(byWeightedRating(vs));
-    }
-
-    public static Ordering byWeightedRating(final Lineup.VsHand vs) {
-        return Ordering.natural().reverse().onResultOf(
-            new Function<Player, Double>() {
-            public Double apply(Player p) {
-                Assertions.assertThat(p).isNotNull();
-
-                BattingRatings ratings = p.getBattingRatings().getVsRight();
-
-                if (vs == Lineup.VsHand.VS_LHP) {
-                    ratings = (BattingRatings) p.getBattingRatings().getVsLeft();
-                }
-
-                return Double.valueOf(0.7 * ratings.getEye()
-                    + 0.9 * ratings.getContact()
-                    + 1.3 * ratings.getGap()
-                    + 2.0 * ratings.getPower());
-            }
-        });
+        }).compound(Player.byTieBreak());
     }
 
 }

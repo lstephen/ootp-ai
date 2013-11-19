@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.config.Directories;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.draft.DraftReport;
@@ -29,6 +28,7 @@ import com.ljs.ootp.ai.report.SalaryRegression;
 import com.ljs.ootp.ai.report.SalaryReport;
 import com.ljs.ootp.ai.report.TeamReport;
 import com.ljs.ootp.ai.report.Trade;
+import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.roster.FourtyManRoster;
 import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Roster.Status;
@@ -341,6 +341,28 @@ public class Main {
 
         Printables.print(lineups).to(out);
 
+		/*AllLineups best = new LineupSelection(ps.getAllBatting()).select(newRoster.getAllPlayers());
+		Printables.print(best).to(out);
+
+		ImmutableMultimap<Slot, Player> bss =
+			new BestStartersSelection(
+				mode.getHittingSlots(),
+				ps.getAllBatting(),
+				new PlayerValue(ps, battingRegression, pitchingRegression).getNowAbility())
+			.select(ImmutableSet.<Player>of(), newRoster.getAllPlayers());
+
+		for (Slot s : bss.keySet()) {
+			out.write(String.format("%s%n", s).getBytes(Charsets.ISO_8859_1));
+			for (Player p : bss.get(s)) {
+				out.write(String.format("%s%n", p.getShortName()).getBytes(Charsets.ISO_8859_1));
+			}
+		}
+
+		AllLineups bsslu = new LineupSelection(ps.getAllBatting()).select(bss.values());
+
+		Printables.print(bsslu).to(out);*/
+
+
         LOG.log(Level.INFO, "Choosing Depth Charts...");
 
         AllDepthCharts depthCharts = DepthChartSelection
@@ -348,9 +370,6 @@ public class Main {
             .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         depthCharts.print(out);
-
-        //LOG.log(Level.INFO, "New lineups test...");
-        //new LineupScoreSelection(pcts, ps, out).select(changes.get(ChangeType.FORCE_ML), Selections.onlyHitters(newRoster.getAllPlayers()));
 
         LOG.log(Level.INFO, "Choosing rotation...");
 

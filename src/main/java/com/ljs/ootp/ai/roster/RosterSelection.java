@@ -14,6 +14,7 @@ import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.roster.Roster.Status;
+import com.ljs.ootp.ai.selection.BestStartersSelection;
 import com.ljs.ootp.ai.selection.HitterSelectionFactory;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.PitcherSelectionFactory;
@@ -24,6 +25,7 @@ import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
+import com.ljs.ootp.ai.value.PlayerValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -116,7 +118,11 @@ public final class RosterSelection {
     public Roster select(Mode mode, Changes changes) {
         return select(
             changes,
-            hitterSelectionFactory.create(mode),
+			new BestStartersSelection(
+				mode.getHittingSlots(),
+				predictions.getAllBatting(),
+				new PlayerValue(predictions, batting, pitching).getNowAbility()),
+            //hitterSelectionFactory.create(mode),
             pitcherSelectionFactory.create(mode));
     }
 
