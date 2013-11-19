@@ -1,12 +1,11 @@
 package com.ljs.scratch.ootp.ootp5.site
 
+import com.ljs.ootp.ai.ootp5.SiteImpl
+import com.ljs.ootp.ai.rating.Scale
+import com.ljs.ootp.ai.site.Site
+import com.ljs.ootp.ai.site.SiteDefinition
+import com.ljs.ootp.ai.site.Version
 import com.ljs.ootp.extract.html.Page
-
-import com.ljs.scratch.ootp.ootp5.SiteImpl
-import com.ljs.scratch.ootp.rating.Scale
-import com.ljs.scratch.ootp.site.Site
-import com.ljs.scratch.ootp.site.SiteDefinition
-import com.ljs.scratch.ootp.site.Version
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document

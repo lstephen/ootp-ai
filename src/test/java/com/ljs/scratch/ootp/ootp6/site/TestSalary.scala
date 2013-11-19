@@ -1,11 +1,10 @@
 package com.ljs.scratch.ootp.ootp6.site
 
-import com.ljs.scratch.ootp.data.Id
+import com.ljs.ootp.ai.data.Id
+import com.ljs.ootp.ai.player.Player
+import com.ljs.ootp.ai.player.PlayerId
+import com.ljs.ootp.ai.ootp5.site.SalaryImpl
 import com.ljs.scratch.ootp.ootp5.site.MockSite
-import com.ljs.scratch.ootp.ootp5.site.SalaryImpl
-import com.ljs.scratch.ootp.player.Player
-import com.ljs.scratch.ootp.player.PlayerId
-
 import org.apache.commons.lang3.RandomStringUtils._
 
 import org.fest.assertions.api.Assertions._

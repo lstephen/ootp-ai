@@ -421,6 +421,15 @@ public class Main {
         generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()));
         generic.print(out);
 
+        LOG.info("Arbitration report...");
+        generic.setTitle("Arbitration");
+        generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), new Predicate<Player>() {
+            public boolean apply(Player p) {
+                return p.getSalary().endsWith("a");
+            }
+        }));
+        generic.print(out);
+
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site);
         Printables.print(salary).to(out);
