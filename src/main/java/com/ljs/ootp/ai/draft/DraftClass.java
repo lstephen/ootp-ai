@@ -65,7 +65,7 @@ public final class DraftClass {
                 DraftClass dc = Jackson.getMapper(site.getSite()).readValue(f, DraftClass.class);
 
                 for (Player p : dc.getPlayers()) {
-                    p.setSite(site);
+                    p.setRatingsDefinition(site);
                 }
 
                 return dc;

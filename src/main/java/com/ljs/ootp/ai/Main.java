@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.config.Changes;
+import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.config.Directories;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.draft.DraftReport;

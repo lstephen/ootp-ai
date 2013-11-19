@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.config.Changes;
+import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.Mode;

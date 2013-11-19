@@ -1,4 +1,4 @@
-package com.ljs.ootp.ai.config;
+package com.ljs.ootp.ai.roster;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -6,7 +6,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
-import com.ljs.ootp.ai.ootp5.site.PlayerList;
+import com.ljs.ootp.ai.config.Config;
+import com.ljs.ootp.ai.config.Directories;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.site.Site;
@@ -43,7 +44,11 @@ public final class Changes {
 
     private final Multimap<ChangeType, Player> changes = HashMultimap.create();
 
-    private Changes() { }
+    private final Site site;
+
+    private Changes(Site site) {
+        this.site = site;
+    }
 
     public Iterable<Player> get(ChangeType type) {
         return changes.get(type);
@@ -66,7 +71,7 @@ public final class Changes {
     }
 
     public static Changes load(Site site) {
-        Changes changes = new Changes();
+        Changes changes = new Changes(site);
 
         try {
             File src = new File(getChangesDir(), site.getName() + ".changes.txt");
@@ -100,13 +105,13 @@ public final class Changes {
                     switch (type) {
                         case PICKED:
                             if (draftList == null) {
-                                draftList = PlayerList.draft(site).extract();
+                                draftList = site.getDraft();
                             }
                             changes.add(type, raw, draftList);
                             break;
                         case DONT_ACQUIRE:
                             if (faList == null) {
-                                faList = PlayerList.freeAgents(site).extract();
+                                faList = site.getFreeAgents();
                             }
                             changes.add(type, raw, faList);
                             break;

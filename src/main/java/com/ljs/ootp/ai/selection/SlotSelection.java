@@ -1,31 +1,35 @@
 package com.ljs.ootp.ai.selection;
 
-import com.ljs.ootp.ai.player.Slot;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
-import com.ljs.scratch.builder.ValidatingBuilder;
 import com.ljs.ootp.ai.player.Player;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import com.ljs.ootp.ai.player.Slot;
+import org.fest.assertions.api.Assertions;
 
 public final class SlotSelection implements Selection {
 
-    @NotNull
-    private Multiset<Slot> slots;
+    private final Multiset<Slot> slots;
 
-    @NotNull @Min(0)
-    private Integer size;
+    private final Integer size;
 
-    @NotNull
-    private Ordering<Player> ordering;
+    private final Ordering<Player> ordering;
 
-    private Slot fillToSize;
+    private final Slot fillToSize;
 
-    private SlotSelection() { }
+    private SlotSelection(Builder builder) {
+        Assertions.assertThat(builder.slots).isNotNull();
+        Assertions.assertThat(builder.size).isNotNull().isNotNegative();
+        Assertions.assertThat(builder.ordering).isNotNull();
+
+        slots = builder.slots;
+        size = builder.size;
+        ordering = builder.ordering;
+        fillToSize = builder.fillToSize;
+    }
 
     @Override
     public ImmutableMultimap<Slot, Player> select(
@@ -71,50 +75,54 @@ public final class SlotSelection implements Selection {
         return ImmutableMultimap.copyOf(selected);
     }
 
-    private static SlotSelection create() {
-        return new SlotSelection();
-    }
-
     public static Builder builder() {
         return Builder.create();
     }
 
-    public static final class Builder
-        implements com.ljs.scratch.builder.Builder<SlotSelection> {
+    private static SlotSelection build(Builder builder) {
+        return new SlotSelection(builder);
 
-        private final ValidatingBuilder<SlotSelection> delegate =
-            ValidatingBuilder.build(SlotSelection.create());
+    }
+
+    public static final class Builder {
+
+        private Multiset<Slot> slots;
+
+        private Integer size;
+
+        private Ordering<Player> ordering;
+
+        private Slot fillToSize;
+
 
         private Builder() { }
 
         public Builder ordering(Ordering<Player> ordering) {
-            delegate.getBuilding().ordering = ordering;
+            this.ordering = ordering;
             return this;
         }
 
-        public Builder slots(Multiset<Slot> slots) {
-            delegate.getBuilding().slots = slots;
+        public Builder slots(Iterable<Slot> slots) {
+            this.slots = HashMultiset.create(slots);
             return this;
         }
 
         public Builder size(Integer size) {
-            delegate.getBuilding().size = size;
+            this.size = size;
             return this;
         }
 
         public Builder fillToSize(Slot slot) {
-            delegate.getBuilding().fillToSize = slot;
+            this.fillToSize = slot;
             return this;
         }
 
-        @Override
         public SlotSelection build() {
-            return delegate.build();
+            return SlotSelection.build(this);
         }
 
         private static Builder create() {
             return new Builder();
         }
-
     }
 }

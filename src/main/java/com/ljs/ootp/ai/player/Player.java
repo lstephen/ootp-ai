@@ -12,7 +12,7 @@ import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
-import com.ljs.ootp.ai.site.SiteDefinition;
+import com.ljs.ootp.ai.player.ratings.RatingsDefinition;
 import com.ljs.ootp.ai.splits.Splits;
 import java.util.Arrays;
 import java.util.List;
@@ -62,8 +62,8 @@ public final class Player {
         return this.id.equals(id);
     }
 
-    public void setSite(SiteDefinition site) {
-        ratings.setDefinition(site);
+    public void setRatingsDefinition(RatingsDefinition definition) {
+        ratings.setDefinition(definition);
     }
 
     public String getName() { return name; }

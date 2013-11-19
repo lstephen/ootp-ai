@@ -1,6 +1,5 @@
 package com.ljs.ootp.ai.roster;
 
-import com.ljs.ootp.ai.config.Changes;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
