@@ -3,12 +3,12 @@ package com.ljs.ootp.ai.ootp5;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.extract.html.Page;
-import com.ljs.ootp.extract.html.PageFactory;
+import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.ootp5.report.PowerRankingsReport;
@@ -40,6 +40,12 @@ import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
+import com.ljs.ootp.extract.html.Page;
+import com.ljs.ootp.extract.html.PageFactory;
+import com.ljs.ootp.extract.html.loader.DiskCachingLoader;
+import com.ljs.ootp.extract.html.loader.PageLoader;
+import com.ljs.ootp.extract.html.loader.PageLoaderBuilder;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.joda.time.LocalDate;
@@ -106,7 +112,21 @@ public class SiteImpl implements Site, SalarySource {
 
     @Override
     public Page getPage(String url, Object... args) {
-        return PageFactory.create(definition.getSiteRoot(), String.format(url, args));
+        try {
+            PageLoader loader = PageLoaderBuilder
+                .create()
+                .diskCache(Config.createDefault().getValue("cache.dir").or(DiskCachingLoader.DEFAULT_CACHE_DIR))
+                .inMemoryCache()
+                .build();
+
+
+
+            return PageFactory
+                .create(loader)
+                .getPage(definition.getSiteRoot(), String.format(url, args));
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     @Override

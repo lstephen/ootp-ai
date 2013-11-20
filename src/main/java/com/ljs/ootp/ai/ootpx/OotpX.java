@@ -8,8 +8,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.extract.html.Page;
-import com.ljs.ootp.extract.html.PageFactory;
+import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.ootpx.report.PowerRankingsReport;
@@ -41,7 +40,13 @@ import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
+import com.ljs.ootp.extract.html.Page;
+import com.ljs.ootp.extract.html.PageFactory;
+import com.ljs.ootp.extract.html.loader.DiskCachingLoader;
+import com.ljs.ootp.extract.html.loader.PageLoader;
+import com.ljs.ootp.extract.html.loader.PageLoaderBuilder;
 import com.ljs.scratch.util.ElementsUtil;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
@@ -177,7 +182,21 @@ public class OotpX implements Site {
 
     @Override
     public Page getPage(String url, Object... args) {
-        return PageFactory.create(definition.getSiteRoot(), String.format(url, args));
+        try {
+            PageLoader loader = PageLoaderBuilder
+                .create()
+                .diskCache(Config.createDefault().getValue("cache.dir").or(DiskCachingLoader.DEFAULT_CACHE_DIR))
+                .inMemoryCache()
+                .build();
+
+
+
+            return PageFactory
+                .create(loader)
+                .getPage(definition.getSiteRoot(), String.format(url, args));
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     @Override
