@@ -114,7 +114,13 @@ public class OotpX implements Site {
                 base = base * 1000000;
             }
 
-            return base.intValue();
+            if (p.getSalary().endsWith("r")) {
+                return Math.max(base.intValue(), getCurrentSalary(p));
+            } else if (p.getSalary().endsWith("a")) {
+                return Math.max(base.intValue(), (int) (getCurrentSalary(p) * 1.05));
+            } else {
+                return base.intValue();
+            }
         } catch (ParseException e) {
             throw Throwables.propagate(e);
         }
