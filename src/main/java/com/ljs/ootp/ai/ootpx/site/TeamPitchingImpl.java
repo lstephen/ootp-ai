@@ -2,10 +2,9 @@ package com.ljs.ootp.ai.ootpx.site;
 
 import com.google.common.collect.Maps;
 import com.ljs.ootp.ai.data.Id;
-import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.ai.site.TeamPitching;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.roster.Team;
+import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.TeamStats;
@@ -19,7 +18,7 @@ import org.jsoup.select.Elements;
  *
  * @author lstephen
  */
-public class TeamPitchingImpl implements TeamPitching {
+public class TeamPitchingImpl {
 
     private Site site;
 
@@ -33,12 +32,6 @@ public class TeamPitchingImpl implements TeamPitching {
         this.team = team;
     }
 
-    @Override
-    public Integer getYear() {
-        return 1999;
-    }
-
-    @Override
     public TeamStats<PitchingStats> extract() {
         Map<Player, SplitStats<PitchingStats>> stats = Maps.newHashMap();
 

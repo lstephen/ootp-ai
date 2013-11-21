@@ -57,8 +57,8 @@ public final class SplitPercentages {
     }
 
     private void load() {
-        loadBatting(site.getTeamBatting().extract());
-        loadPitching(site.getTeamPitching().extract());
+        loadBatting(site.getTeamBatting());
+        loadPitching(site.getTeamPitching());
 
         History history = History.create();
 

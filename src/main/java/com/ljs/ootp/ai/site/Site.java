@@ -2,7 +2,6 @@ package com.ljs.ootp.ai.site;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.ljs.ootp.extract.html.Page;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
@@ -13,6 +12,8 @@ import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
+import com.ljs.ootp.ai.stats.TeamStats;
+import com.ljs.ootp.extract.html.Page;
 import org.joda.time.LocalDate;
 
 /**
@@ -73,9 +74,9 @@ public interface Site {
 
     Standings getStandings();
 
-    TeamBatting getTeamBatting();
+    TeamStats<BattingStats> getTeamBatting();
 
-    TeamPitching getTeamPitching();
+    TeamStats<PitchingStats> getTeamPitching();
 
     Optional<Integer> getTeamTopProspectPosition(PlayerId id);
 

@@ -35,11 +35,11 @@ import com.ljs.ootp.ai.site.RecordPredictor;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.SiteDefinition;
 import com.ljs.ootp.ai.site.Standings;
-import com.ljs.ootp.ai.site.TeamPitching;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
+import com.ljs.ootp.ai.stats.TeamStats;
 import com.ljs.ootp.extract.html.Page;
 import com.ljs.ootp.extract.html.PageFactory;
 import com.ljs.ootp.extract.html.loader.DiskCachingLoader;
@@ -234,13 +234,13 @@ public class SiteImpl implements Site, SalarySource {
     }
 
     @Override
-    public TeamBattingImpl getTeamBatting() {
-        return new TeamBattingImpl(this, definition.getTeam());
+    public TeamStats<BattingStats> getTeamBatting() {
+        return new TeamBattingImpl(this, definition.getTeam()).extract();
     }
 
     @Override
-    public TeamPitching getTeamPitching() {
-        return new TeamPitchingImpl(this, definition.getTeam());
+    public TeamStats<PitchingStats> getTeamPitching() {
+        return new TeamPitchingImpl(this, definition.getTeam()).extract();
     }
 
     public TopProspects getTopProspects(Integer teamId) {

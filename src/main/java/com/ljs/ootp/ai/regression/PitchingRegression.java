@@ -5,7 +5,6 @@ import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.ai.site.TeamPitching;
 import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.History;
 import com.ljs.ootp.ai.stats.PitchingStats;
@@ -195,16 +194,13 @@ public final class PitchingRegression {
     }
 
     private void runRegression(Site site) {
-        TeamPitching teamPitching = site.getTeamPitching();
-
-        TeamStats<PitchingStats> pitchingStats =
-            teamPitching.extract();
+        TeamStats<PitchingStats> pitchingStats = site.getTeamPitching();
 
         addData(pitchingStats);
 
         History history = History.create();
 
-        int season = teamPitching.getYear();
+        int season = site.getDate().getYear();
 
         history.savePitching(pitchingStats, site, season);
 

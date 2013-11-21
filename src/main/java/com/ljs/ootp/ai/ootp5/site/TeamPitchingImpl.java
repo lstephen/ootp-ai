@@ -2,10 +2,9 @@ package com.ljs.ootp.ai.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.ootp.ai.data.Id;
-import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.ai.site.TeamPitching;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.roster.Team;
+import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.scratch.util.ElementsUtil;
 import org.jsoup.nodes.Document;
@@ -15,9 +14,7 @@ import org.jsoup.select.Elements;
  *
  * @author lstephen
  */
-public class TeamPitchingImpl
-    extends SingleTeamStats<PitchingStats>
-    implements TeamPitching {
+public class TeamPitchingImpl extends SingleTeamStats<PitchingStats> {
 
     private static final int ATBAT_IDX = 1;
     private static final int HITS_IDX = 2;
@@ -65,7 +62,5 @@ public class TeamPitchingImpl
         Elements vRhpStats = doc.select("tr:has(td:contains(vs. RHB)) + tr");
         return extractStats(vRhpStats);
     }
-
-
 
 }

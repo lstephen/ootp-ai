@@ -1,5 +1,8 @@
 package com.ljs.ootp.ai.player.ratings;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
@@ -53,6 +56,7 @@ public class FieldingRatings {
         return Builder.create();
     }
 
+    @JsonCreator
     private static FieldingRatings build(Builder builder) {
         return new FieldingRatings(builder);
     }
@@ -80,9 +84,19 @@ public class FieldingRatings {
             return this;
         }
 
+        @JsonProperty("range")
+        private void range(ObjectNode range) {
+            range(range.get("reference").asInt());
+        }
+
         public Builder errors(Integer errors) {
             this.errors = Optional.of(errors);
             return this;
+        }
+
+        @JsonProperty("errors")
+        private void errors(ObjectNode errors) {
+            errors(errors.get("reference").asInt());
         }
 
         public Builder arm(Integer arm) {
@@ -90,9 +104,19 @@ public class FieldingRatings {
             return this;
         }
 
+        @JsonProperty("arm")
+        private void arm(ObjectNode arm) {
+            arm(arm.get("reference").asInt());
+        }
+
         public Builder dp(Integer dp) {
             this.dp = Optional.of(dp);
             return this;
+        }
+
+        @JsonProperty("dp")
+        private void dp(ObjectNode dp) {
+            dp(dp.get("reference").asInt());
         }
 
         public Builder ability(Integer ability) {
@@ -100,6 +124,10 @@ public class FieldingRatings {
             return this;
         }
 
+        @JsonProperty("ability")
+        private void ability(ObjectNode ability) {
+            ability(ability.get("reference").asInt());
+        }
 
         public FieldingRatings build() {
             return FieldingRatings.build(this);

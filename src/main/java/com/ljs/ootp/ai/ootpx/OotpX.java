@@ -4,6 +4,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -35,11 +36,12 @@ import com.ljs.ootp.ai.site.SingleTeam;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.SiteDefinition;
 import com.ljs.ootp.ai.site.Standings;
-import com.ljs.ootp.ai.site.TeamBatting;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
+import com.ljs.ootp.ai.stats.SplitStats;
+import com.ljs.ootp.ai.stats.TeamStats;
 import com.ljs.ootp.extract.html.Page;
 import com.ljs.ootp.extract.html.PageFactory;
 import com.ljs.ootp.extract.html.loader.DiskCachingLoader;
@@ -53,6 +55,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Strings;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.jsoup.nodes.Document;
@@ -295,6 +298,22 @@ public class OotpX implements Site {
 
     @Override
     public Standings getStandings() {
+        if (getDate().getMonthOfYear() < DateTimeConstants.APRIL) {
+            return new Standings() {
+                public Integer getWins(Id<Team> team) {
+                    return 0;
+                }
+
+                public Integer getLosses(Id<Team> team) {
+                    return 0;
+                }
+
+                public Record getRecord(Id<Team> team) {
+                    return Record.create(0, 0);
+                }
+            };
+        }
+
         final Document doc = Pages.standings(this).load();
 
         final Elements standings = doc.select("tr.title3 + tr");
@@ -317,13 +336,21 @@ public class OotpX implements Site {
     }
 
     @Override
-    public TeamBatting getTeamBatting() {
-        return TeamBattingImpl.create(this, definition.getTeam());
+    public TeamStats<BattingStats> getTeamBatting() {
+        if (getDate().getMonthOfYear() < DateTimeConstants.APRIL) {
+            return TeamStats.create(ImmutableMap.<Player, SplitStats<BattingStats>>of());
+        } else {
+            return TeamBattingImpl.create(this, definition.getTeam()).extract();
+        }
     }
 
     @Override
-    public TeamPitchingImpl getTeamPitching() {
-        return TeamPitchingImpl.create(this, definition.getTeam());
+    public TeamStats<PitchingStats> getTeamPitching() {
+        if (getDate().getMonthOfYear() < DateTimeConstants.APRIL) {
+            return TeamStats.create(ImmutableMap.<Player, SplitStats<PitchingStats>>of());
+        } else {
+            return TeamPitchingImpl.create(this, definition.getTeam()).extract();
+        }
     }
 
     @Override

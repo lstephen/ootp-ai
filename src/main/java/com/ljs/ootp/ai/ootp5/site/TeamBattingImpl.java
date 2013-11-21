@@ -5,7 +5,6 @@ import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.ai.site.TeamBatting;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.scratch.util.ElementsUtil;
 import org.jsoup.nodes.Document;
@@ -15,9 +14,7 @@ import org.jsoup.select.Elements;
  *
  * @author lstephen
  */
-public class TeamBattingImpl
-    extends SingleTeamStats<BattingStats>
-    implements TeamBatting {
+public class TeamBattingImpl extends SingleTeamStats<BattingStats> {
 
     private static final int HOMERUN_IDX = 5;
     private static final int ATBAT_IDX = 1;
