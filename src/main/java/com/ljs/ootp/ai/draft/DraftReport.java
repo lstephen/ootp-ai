@@ -1,13 +1,16 @@
 package com.ljs.ootp.ai.draft;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.value.TradeValue;
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
@@ -42,7 +45,12 @@ public final class DraftReport implements Printable {
     }
 
     private File getDraftClassFile(int year) {
-        return new File("c:/ootp/history/" + site.getName() + year + ".draft.json");
+        try {
+            String historyDirectory = Config.createDefault().getValue("history.dir").or("c:/ootp/history");
+            return new File(historyDirectory + "/" + site.getName() + year + ".draft.json");
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     private RoundValue getRoundValue(int round) {
