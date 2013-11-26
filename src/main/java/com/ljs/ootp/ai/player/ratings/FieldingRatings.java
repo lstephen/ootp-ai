@@ -1,7 +1,6 @@
 package com.ljs.ootp.ai.player.ratings;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -84,19 +83,9 @@ public class FieldingRatings {
             return this;
         }
 
-        @JsonProperty("range")
-        private void range(ObjectNode range) {
-            range(range.get("reference").asInt());
-        }
-
         public Builder errors(Integer errors) {
             this.errors = Optional.of(errors);
             return this;
-        }
-
-        @JsonProperty("errors")
-        private void errors(ObjectNode errors) {
-            errors(errors.get("reference").asInt());
         }
 
         public Builder arm(Integer arm) {
@@ -104,29 +93,14 @@ public class FieldingRatings {
             return this;
         }
 
-        @JsonProperty("arm")
-        private void arm(ObjectNode arm) {
-            arm(arm.get("reference").asInt());
-        }
-
         public Builder dp(Integer dp) {
             this.dp = Optional.of(dp);
             return this;
         }
 
-        @JsonProperty("dp")
-        private void dp(ObjectNode dp) {
-            dp(dp.get("reference").asInt());
-        }
-
         public Builder ability(Integer ability) {
             this.ability = Optional.of(ability);
             return this;
-        }
-
-        @JsonProperty("ability")
-        private void ability(ObjectNode ability) {
-            ability(ability.get("reference").asInt());
         }
 
         public FieldingRatings build() {
@@ -135,6 +109,22 @@ public class FieldingRatings {
 
         private static Builder create() {
             return new Builder();
+        }
+
+        @JsonCreator
+        public static Builder fromJson(ObjectNode node) {
+            Integer range = node.get("range").get("reference").asInt();
+            Integer errors = node.get("errors").get("reference").asInt();
+            Integer arm = node.get("arm").get("reference").asInt();
+            Integer dp = node.get("dp").get("reference").asInt();
+            Integer ability = node.get("ability").get("reference").asInt();
+
+            return create()
+                .range(range)
+                .errors(errors)
+                .arm(arm)
+                .dp(dp)
+                .ability(ability);
         }
 
     }

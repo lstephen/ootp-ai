@@ -39,7 +39,7 @@ public enum BackupPlayingTime {
 
             if (pct > (previous.pct + current.pct) / 2) {
                 return previous;
-            };
+            }
             previous = current;
         }
 
