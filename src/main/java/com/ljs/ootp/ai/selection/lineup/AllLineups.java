@@ -3,7 +3,6 @@ package com.ljs.ootp.ai.selection.lineup;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.io.Printable;
-import com.ljs.ootp.ai.selection.All;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;

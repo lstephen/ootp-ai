@@ -10,7 +10,7 @@ import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.selection.All;
+import com.ljs.ootp.ai.selection.lineup.All;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Defense;
 import com.ljs.ootp.ai.selection.lineup.Lineup;

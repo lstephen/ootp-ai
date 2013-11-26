@@ -1,6 +1,6 @@
 package com.ljs.ootp.ai.selection.depthchart;
 
-import com.ljs.ootp.ai.selection.All;
+import com.ljs.ootp.ai.selection.lineup.All;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import org.fest.assertions.api.Assertions;

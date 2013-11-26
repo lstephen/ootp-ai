@@ -1,4 +1,4 @@
-package com.ljs.ootp.ai.selection;
+package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;

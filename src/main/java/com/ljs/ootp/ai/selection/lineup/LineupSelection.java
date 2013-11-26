@@ -3,7 +3,6 @@ package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableSet;
 import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.selection.All;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
 
