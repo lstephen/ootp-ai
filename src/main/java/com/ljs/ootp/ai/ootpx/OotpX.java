@@ -199,7 +199,6 @@ public class OotpX implements Site {
                 .build();
 
 
-
             return PageFactory
                 .create(loader)
                 .getPage(definition.getSiteRoot(), String.format(url, args));

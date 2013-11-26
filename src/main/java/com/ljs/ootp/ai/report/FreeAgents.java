@@ -5,9 +5,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.Version;
@@ -103,7 +103,7 @@ public final class FreeAgents {
             Set<Slot> needsFulfilled = Sets.intersection(ImmutableSet.copyOf(Slot.getPlayerSlots(r)), needed);
 
             boolean fillsNeed = !needsFulfilled.isEmpty();
-            boolean fillsReplaceableNeed = needsFulfilled.size() == 1 && needsFulfilled.iterator().next() == Slot.getPrimarySlot(fa);
+            boolean fillsReplaceableNeed = needsFulfilled.size() == 1 && fa.getSlots().contains(needsFulfilled.iterator().next());
             boolean occupiesSameSlot = Slot.getPrimarySlot(fa) == Slot.getPrimarySlot(r);
 
             if (fillsNeed && !fillsReplaceableNeed && !occupiesSameSlot) {

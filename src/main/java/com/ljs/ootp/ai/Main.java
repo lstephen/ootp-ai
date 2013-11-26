@@ -284,13 +284,6 @@ public class Main {
 
         Mode selectionMode = mode;
 
-        if (site.getType() == Version.OOTPX
-            && (site.getDate().getMonthOfYear() >= DateTimeConstants.NOVEMBER
-                || site.getDate().getMonthOfYear() < DateTimeConstants.APRIL)) {
-
-            selectionMode = Mode.EXPANDED;
-        }
-
         //if (def.getName().equals("TWML")) {
         //    mode = Mode.PLAYOFFS;
         //}

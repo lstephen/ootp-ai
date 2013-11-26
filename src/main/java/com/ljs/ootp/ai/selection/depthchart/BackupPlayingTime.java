@@ -11,12 +11,8 @@ package com.ljs.ootp.ai.selection.depthchart;
 public enum BackupPlayingTime {
     EVERY_2ND_DAY("2", 100/2),
     EVERY_3RD_DAY("3", 100/3),
-    EVERY_4TH_DAY("4", 100/4),
     EVERY_5TH_DAY("5", 100/5),
-    EVERY_6TH_DAY("6", 100/6),
-    EVERY_7TH_DAY("7", 100/7),
     EVERY_10TH_DAY("10", 100/10),
-    EVERY_15TH_DAY("15" ,100/15),
     EVERY_20TH_DAY("20", 100/20),
     WHEN_STARTER_TIRED("T", 1);
 
