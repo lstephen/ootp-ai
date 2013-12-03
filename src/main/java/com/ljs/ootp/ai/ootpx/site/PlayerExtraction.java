@@ -272,7 +272,8 @@ public class PlayerExtraction {
         vsR.setGap(vsR.getMovement());
 
         //System.out.println(doc.select("td:containsOwn(Suggested Role) + td").text());
-        if (doc.select("td:containsOwn(Suggested Role) + td").text().contains("Starter")) {
+        String suggestedRole = doc.select("td:containsOwn(Suggested Role) + td").text();
+        if (suggestedRole.contains("Starter") || suggestedRole.contains("SP")) {
             vsL.setEndurance(8);
             vsR.setEndurance(8);
         } else {
