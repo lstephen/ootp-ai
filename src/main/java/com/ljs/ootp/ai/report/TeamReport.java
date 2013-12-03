@@ -132,11 +132,12 @@ public final class TeamReport implements Printable, RecordPredictor {
         w.println(String.format("**%-18s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", getExpectedRunsPerGame()));
 
         for (LeagueStructure.League league : site.getLeagueStructure().getLeagues()) {
+            w.println();
             w.println(league.getName());
 
             for (LeagueStructure.Division division : league.getDivisions()) {
                 if (!Strings.isNullOrEmpty(division.getName())) {
-                    w.println(division.getName());
+                    w.println(StringUtils.rightPad(division.getName() + " ", 21, '-') + "+");
                 }
 
                 Set<TeamScore> divisionScores = Sets.newHashSet();
@@ -148,8 +149,6 @@ public final class TeamReport implements Printable, RecordPredictor {
                 for (TeamScore s : getOrdering().sortedCopy(divisionScores)) {
                     printTeamScore(s, w);
                 }
-
-                w.println();
             }
         }
 
