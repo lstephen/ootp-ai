@@ -72,6 +72,28 @@ public class SalaryRegression implements SalaryPredictor, Printable {
             : salary;
     }
 
+    private Integer getErrorRange(Player p) {
+        Double pctError = Math.pow(1.0 - vsReplacement.getRSquare(), 2);
+
+        return (int) (predict(p) * pctError);
+    }
+
+    public Integer predictMinimum(Player p) {
+        Integer min = predict(p) - getErrorRange(p);
+
+        return min > 0 && min < leagueMinimum()
+            ? leagueMinimum()
+            : min;
+    }
+
+    public Integer predictMaximum(Player p) {
+        Integer max = predict(p) + getErrorRange(p);
+
+        return max > 0 && max < leagueMinimum()
+            ? leagueMinimum()
+            : max;
+    }
+
     @Override
     public void print(PrintWriter w) {
 

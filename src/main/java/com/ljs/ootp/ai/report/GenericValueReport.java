@@ -144,7 +144,12 @@ public class GenericValueReport {
 
     public void print(PrintWriter w) {
         w.println();
-        w.println(String.format("**%-16s** | %7s %7s %7s ", StringUtils.abbreviate(title, 16), "OVR", "vL/vR", "vRpl"));
+        w.format(
+            "**%-16s** | %10s %7s %7s | %n",
+                StringUtils.abbreviate(title, 16),
+                StringUtils.center("OVR", 10),
+                StringUtils.center("vL/vR", 7),
+                StringUtils.center("vRpl", 7));
 
         Iterable<Player> ps = Ordering
             .natural()
@@ -197,7 +202,7 @@ public class GenericValueReport {
                     Joiner.on(',').join(p.getSlots()),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 8),
-                    SalaryFormat.prettyPrint(salary.predict(p)),
+                    SalaryFormat.prettyPrint(salary.predictMaximum(p)),
                     p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getListedPosition().or(""),
                     p.getId().unwrap(),
                     p.getTeam() == null ? "" : p.getTeam()));
