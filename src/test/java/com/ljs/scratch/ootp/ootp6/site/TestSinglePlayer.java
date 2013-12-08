@@ -1,7 +1,7 @@
 package com.ljs.scratch.ootp.ootp6.site;
 
-import com.ljs.ootp.ai.ootp6.site.TwoToEight;
-import com.ljs.ootp.ai.ootp6.site.OneToTwenty;
+import com.ljs.ootp.extract.html.ootp6.rating.TwoToEight;
+import com.ljs.ootp.extract.html.ootp6.rating.OneToTwenty;
 import com.google.common.base.Optional;
 import com.ljs.scratch.ootp.ootp5.site.MockSite;
 import com.ljs.ootp.ai.ootp5.site.SinglePlayer;

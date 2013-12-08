@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Objects;
 import com.ljs.ootp.ai.player.ratings.json.BattingPotentialSerializer;
-import com.ljs.ootp.ai.rating.OneToOneHundred;
-import com.ljs.ootp.ai.rating.Rating;
+import com.ljs.ootp.extract.html.rating.OneToOneHundred;
+import com.ljs.ootp.extract.html.rating.Rating;
 import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 

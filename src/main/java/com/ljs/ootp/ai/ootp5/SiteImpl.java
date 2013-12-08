@@ -27,7 +27,7 @@ import com.ljs.ootp.ai.ootp5.site.TopProspects;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.player.PlayerSource;
-import com.ljs.ootp.ai.rating.Scale;
+import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.LeagueStructure;

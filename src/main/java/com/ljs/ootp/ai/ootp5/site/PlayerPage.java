@@ -2,8 +2,8 @@ package com.ljs.ootp.ai.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
-import com.ljs.ootp.ai.rating.Rating;
-import com.ljs.ootp.ai.rating.Scale;
+import com.ljs.ootp.extract.html.rating.Rating;
+import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.site.Site;
 import static com.ljs.ootp.ai.site.Version.OOTP5;
 import static com.ljs.ootp.ai.site.Version.OOTP6;

@@ -12,7 +12,7 @@ import com.ljs.ootp.ai.player.ratings.FieldingRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.rating.Scale;
+import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.splits.Splits;
 import java.text.NumberFormat;

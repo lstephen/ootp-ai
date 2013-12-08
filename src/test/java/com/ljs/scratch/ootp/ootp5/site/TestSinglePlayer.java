@@ -1,8 +1,8 @@
 package com.ljs.scratch.ootp.ootp5.site;
 
 import com.ljs.ootp.ai.ootp5.site.SinglePlayer;
-import com.ljs.ootp.ai.ootp5.site.PotentialRating;
-import com.ljs.ootp.ai.ootp5.site.ZeroToTen;
+import com.ljs.ootp.extract.html.ootp5.rating.PotentialRating;
+import com.ljs.ootp.extract.html.ootp5.rating.ZeroToTen;
 import com.google.common.base.Optional;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
