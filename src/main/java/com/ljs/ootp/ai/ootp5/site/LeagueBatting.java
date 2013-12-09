@@ -52,7 +52,7 @@ public class LeagueBatting {
     private File getHistoricalFile() {
         try {
             String historyDirectory = Config.createDefault().getValue("history.dir").or("c:/ootp/history/");
-            return new File(historyDirectory + site.getName() + "league.batting.json");
+            return new File(historyDirectory + "/" + site.getName() + "league.batting.json");
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
