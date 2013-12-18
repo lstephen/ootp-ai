@@ -1,6 +1,8 @@
 package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.ljs.ai.search.State;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
@@ -17,12 +19,33 @@ import java.util.Map;
  *
  * @author lstephen
  */
-public final class Defense {
+public final class Defense implements State {
 
     private final ImmutableMap<Player, Position> defense;
 
     private Defense(Map<Player, Position> defense) {
         this.defense = ImmutableMap.copyOf(defense);
+    }
+
+    public Boolean isValid() {
+        return true;
+    }
+
+    public Defense swap(Player lhs, Player rhs) {
+        Map<Player, Position> d = Maps.newHashMap(defense);
+
+        if (!defense.containsKey(lhs)) {
+            d.put(lhs, defense.get(rhs));
+            d.remove(rhs);
+        } else if (!defense.containsKey(rhs)) {
+            d.put(rhs, defense.get(lhs));
+            d.remove(lhs);
+        } else {
+            d.put(lhs, defense.get(rhs));
+            d.put(rhs, defense.get(lhs));
+        }
+
+        return new Defense(d);
     }
 
     public boolean contains(Player p) {

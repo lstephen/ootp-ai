@@ -44,6 +44,10 @@ public class StarterSelection {
     }
 
     private Player selectDh(Lineup.VsHand vs, Iterable<Player> available) {
+        if (Iterables.size(available) == 1) {
+            return available.iterator().next();
+        }
+
         for (Player p : byWoba(vs).sortedCopy(available)) {
             if ((!p.getSlots().contains(Slot.C))
                 || containsCatcher(
@@ -81,7 +85,7 @@ public class StarterSelection {
         }
 
         if (result.size() != 8) {
-            LOG.warning("Could not find selection with valid defense");
+            //LOG.warning("Could not find selection with valid defense");
 
             while (result.size() < 8) {
                 result.add(

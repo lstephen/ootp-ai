@@ -12,6 +12,7 @@ import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
+import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.player.ratings.RatingsDefinition;
 import com.ljs.ootp.ai.splits.Splits;
 import java.util.Arrays;
@@ -211,6 +212,12 @@ public final class Player {
     @JsonIgnore
     public boolean isPitcher() {
         return hasPitchingRatings();
+    }
+
+    public Boolean canPlay(Position pos) {
+        return pos == Position.DESIGNATED_HITTER
+            || pos == Position.FIRST_BASE
+            || getDefensiveRatings().getPositionScore(pos) > 0;
     }
 
     public DefensiveRatings getDefensiveRatings() {

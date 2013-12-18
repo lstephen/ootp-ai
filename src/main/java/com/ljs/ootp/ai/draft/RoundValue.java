@@ -17,13 +17,22 @@ public final class RoundValue {
 
     private final DescriptiveStatistics acquisition = new DescriptiveStatistics();
 
+    private final DescriptiveStatistics historicalOverall = new DescriptiveStatistics();
+
+    private final DescriptiveStatistics historicalAcquisition = new DescriptiveStatistics();
+
     private RoundValue(TradeValue value) {
         this.value = value;
+    }
+
+    public boolean isEmpty() {
+        return overall.getN() == 0 && historicalOverall.getN() == 0;
     }
 
     public void add(Player p) {
         overall.addValue(value.getOverall(p));
         acquisition.addValue(value.getTradeTargetValue(p));
+        addHistorical(p);
     }
 
     public void add(Iterable<Player> ps) {
@@ -32,11 +41,22 @@ public final class RoundValue {
         }
     }
 
-    public DescriptiveStatistics getOverallStats() {
+    public void addHistorical(Player p) {
+        historicalOverall.addValue(value.getOverall(p));
+        historicalAcquisition.addValue(value.getTradeTargetValue(p));
+    }
+
+    public void addHistorical(Iterable<Player> ps) {
+        for (Player p : ps) {
+            addHistorical(p);
+        }
+    }
+
+    private DescriptiveStatistics getOverallStats() {
         return overall;
     }
 
-    public DescriptiveStatistics getAcquisitionStats() {
+    private DescriptiveStatistics getAcquisitionStats() {
         return acquisition;
     }
 
@@ -45,7 +65,7 @@ public final class RoundValue {
     }
 
     public void print(PrintWriter w, String label) {
-        w.println(
+        w.print(
             String.format(
             "%2s | %3.0f (%3.0f-%3.0f) | %3.0f (%3.0f-%3.0f) %3.0f/%3.0f | %3d/%3d",
             label,
@@ -59,6 +79,21 @@ public final class RoundValue {
             getAcquisitionStats().getPercentile(50) * 1.1,
             getOverallStats().getN(),
             getAcquisitionStats().getN()));
+
+        w.print(
+            String.format(
+            "| %3.0f (%3.0f-%3.0f) | %3.0f (%3.0f-%3.0f) %3.0f/%3.0f | %3d/%3d",
+            historicalOverall.getPercentile(50),
+            historicalOverall.getMin(),
+            historicalOverall.getMax(),
+            historicalAcquisition.getPercentile(50),
+            historicalAcquisition.getMin(),
+            historicalAcquisition.getMax(),
+            historicalAcquisition.getPercentile(50) / 1.1,
+            historicalAcquisition.getPercentile(50) * 1.1,
+            historicalOverall.getN(),
+            historicalAcquisition.getN()));
+        w.println();
         w.flush();
     }
 

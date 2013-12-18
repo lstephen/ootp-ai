@@ -3,6 +3,7 @@ package com.ljs.ootp.ai.draft;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.io.Printables;
@@ -13,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Set;
 
 /**
  *
@@ -25,6 +27,8 @@ public final class DraftReport implements Printable {
     private final TradeValue value;
 
     private DraftClass current;
+
+    private Set<DraftClass> historical = Sets.newHashSet();
 
     private DraftReport(Site site, TradeValue value) {
         this.site = site;
@@ -40,6 +44,14 @@ public final class DraftReport implements Printable {
         }
 
         current.save(site, getDraftClassFile(site.getDate().getYear()));
+
+        for (int i = 1; i < 5; i++) {
+            File dcFile = getDraftClassFile(site.getDate().getYear() - i);
+
+            if (dcFile.exists()) {
+                historical.add(DraftClass.load(dcFile, site.getDefinition()));
+            }
+        }
 
         // TODO: Historical
     }
@@ -71,11 +83,20 @@ public final class DraftReport implements Printable {
         players = Iterables.skip(players, start);
         players = Iterables.limit(players, n);
 
-        if (Iterables.isEmpty(players)) {
-            return null;
+        if (!Iterables.isEmpty(players)) {
+            rv.add(players);
         }
 
-        rv.add(players);
+        for (DraftClass dc : historical) {
+            Iterable<Player> ps = byOverall().sortedCopy(dc.getPlayers());
+
+            ps = Iterables.skip(ps, start);
+            ps = Iterables.limit(ps, n);
+
+            if (!Iterables.isEmpty(ps)) {
+                rv.addHistorical(ps);
+            }
+        }
 
         return rv;
     }
@@ -135,7 +156,7 @@ public final class DraftReport implements Printable {
         int round = 1;
         rv = getRoundValue(round);
 
-        while (rv != null) {
+        while (!rv.isEmpty()) {
             rv.print(w, String.format("%2d", round));
 
             round++;

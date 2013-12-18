@@ -359,6 +359,30 @@ public class Main {
         rotation.print(out);
 
 
+        /*SelectedPlayers.predictions = Predictions.predict(newRoster.getAllPlayers()).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod()).getAllBatting();
+        SelectedPlayers.splits = pcts;
+
+        Iterable<Player> hcs = new HillClimbingSelection()
+            .select(
+                Selections.onlyHitters(changes.get(ChangeType.FORCE_ML)),
+                Selections.onlyHitters(newRoster.getAllPlayers()))
+            .values();
+
+        AllLineups hclineups =
+            new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
+                .select(Selections.onlyHitters(hcs));
+
+        Printables.print(hclineups).to(out);
+
+        AllDepthCharts hcdepthCharts = DepthChartSelection
+            .create(battingRegression.predict(newRoster.getAllPlayers()))
+            .select(hclineups, Selections.onlyHitters(hcs));
+
+        hcdepthCharts.print(out);
+
+        for (Player p : hcs) {
+            out.write(String.format("%s%n", p.getShortName()).getBytes(Charsets.ISO_8859_1));
+        }*/
 
 
         if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH && site.getType() != Version.OOTPX) {
