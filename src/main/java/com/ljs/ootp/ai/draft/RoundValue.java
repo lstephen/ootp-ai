@@ -67,7 +67,7 @@ public final class RoundValue {
     public void print(PrintWriter w, String label) {
         w.print(
             String.format(
-            "%2s | %3.0f (%3.0f-%3.0f) | %3.0f (%3.0f-%3.0f) %3.0f/%3.0f | %3d/%3d",
+            "%2s | %3.0f (%3.0f-%3.0f) | %3.0f (%3.0f-%3.0f) %3.0f/%3.0f | %3d/%3d |",
             label,
             getOverallStats().getPercentile(50),
             getOverallStats().getMin(),
