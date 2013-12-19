@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.config.Directories;
+import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.draft.DraftReport;
 import com.ljs.ootp.ai.io.Printables;
@@ -153,9 +153,12 @@ public class Main {
     }
 
     private void run(SiteDefinition def) throws IOException {
+        File outputDirectory =
+            new File(Config.createDefault().getValue("output.dir").or("c:/ootp"));
+
         try (
             FileOutputStream out =
-                new FileOutputStream(new File(Directories.OUT + def.getName() + ".txt"), false)) {
+                new FileOutputStream(new File(outputDirectory, def.getName() + ".txt"), false)) {
             run(def, out);
         }
     }

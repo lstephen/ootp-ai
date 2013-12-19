@@ -7,7 +7,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import com.ljs.ootp.ai.config.Config;
-import com.ljs.ootp.ai.config.Directories;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.site.Site;
@@ -67,7 +66,11 @@ public final class Changes {
     }
 
     private static String getChangesDir() throws IOException {
-        return Config.createDefault().getValue("changes.dir").or(Directories.OUT);
+        Config config = Config.createDefault();
+
+        return config
+            .getValue("changes.dir")
+            .or(config.getValue("output.dir").or("c:/ootp"));
     }
 
     public static Changes load(Site site) {
