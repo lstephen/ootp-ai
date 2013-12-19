@@ -68,7 +68,7 @@ public class PlayerValue {
             case IF:
             case OF:
             case H:
-                if (predictions.containsPlayer(p)) {
+                if (predictions.containsHitter(p)) {
                     return predictions.getOverallHitting(p);
                 } else {
                     return batting.predict(p).getOverall().getWobaPlus();
@@ -76,7 +76,7 @@ public class PlayerValue {
             case SP:
             case MR:
                 Integer value;
-                if (predictions.containsPlayer(p)) {
+                if (predictions.containsPitcher(p)) {
                     value = predictions.getOverallPitching(p);
                 } else {
                     value = predictions.getPitcherOverall().getPlus(pitching.predict(p));

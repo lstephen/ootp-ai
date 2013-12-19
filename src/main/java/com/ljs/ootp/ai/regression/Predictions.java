@@ -30,6 +30,14 @@ public class Predictions {
         return hitting.contains(p) || pitching.contains(p);
     }
 
+    public boolean containsPitcher(Player p) {
+        return pitching.contains(p);
+    }
+
+    public boolean containsHitter(Player p) {
+        return hitting.contains(p);
+    }
+
     public TeamStats<BattingStats> getAllBatting() {
         return hitting;
     }
