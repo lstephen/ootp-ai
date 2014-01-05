@@ -10,9 +10,9 @@ import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.Version;
+import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.scratch.util.ElementsUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -193,6 +193,7 @@ public class SinglePlayer implements PlayerSource {
         ImmutableMap<String, String> ps = ImmutableMap
             .<String, String>builder()
             .put("Starting Pitcher", "SP")
+			.put("Pitcher", "P")
             .put("Reliever", "MR")
             .put("Closer", "CL")
             .put("Catcher", "C")
