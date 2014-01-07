@@ -34,8 +34,10 @@ import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Roster.Status;
 import com.ljs.ootp.ai.roster.RosterSelection;
 import com.ljs.ootp.ai.roster.Team;
+import com.ljs.ootp.ai.selection.BestStartersSelection;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.Selections;
+import com.ljs.ootp.ai.selection.bench.Bench;
 import com.ljs.ootp.ai.selection.depthchart.AllDepthCharts;
 import com.ljs.ootp.ai.selection.depthchart.DepthChartSelection;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
@@ -186,6 +188,8 @@ public class Main {
 
         SplitStats.setPercentages(pcts);
         PlayerRatings.setPercentages(pcts);
+        BestStartersSelection.setPercentages(pcts);
+        Bench.setPercentages(pcts);
 
         LOG.info("Loading manual changes...");
         Changes changes = Changes.load(site);
@@ -300,8 +304,8 @@ public class Main {
         newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);
 
-        selection.printBattingSelectionTable(out, changes);
-        selection.printPitchingSelectionTable(out, changes);
+        selection.printBattingSelectionTable(out, newRoster);
+        selection.printPitchingSelectionTable(out, newRoster);
 
         Printables.print(newRoster).to(out);
 

@@ -1,6 +1,7 @@
 package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -17,12 +18,23 @@ import java.util.concurrent.Callable;
 
 public class DefenseSelection {
 
+    private static final Map<ImmutableSet<Player>, Defense> CACHE = Maps.newHashMap();
+
     public Defense select(Iterable<Player> selected) {
-        return new RepeatedHillClimbing<Defense>(
-            Defense.class,
-            initialStateFunction(selected),
-            actionsFunction(selected))
-            .search();
+        return select(ImmutableSet.copyOf(selected));
+    }
+
+    private Defense select(ImmutableSet<Player> selected) {
+        if (!CACHE.containsKey(selected)) {
+            CACHE.put(
+                selected,
+                new RepeatedHillClimbing<Defense>(
+                    Defense.class,
+                    initialStateFunction(selected),
+                    actionsFunction(selected))
+                    .search());
+        }
+        return CACHE.get(selected);
     }
 
     private Callable<Defense> initialStateFunction(final Iterable<Player> selected) {

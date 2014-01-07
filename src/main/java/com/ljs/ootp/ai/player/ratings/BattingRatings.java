@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.extract.html.rating.Rating;
 import com.ljs.ootp.extract.html.rating.Scale;
-import com.ljs.ootp.ai.site.Site;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.fest.assertions.api.Assertions;
 
 /**
@@ -66,7 +66,14 @@ public final class BattingRatings<T> {
 
     @Override
     public String toString() {
-        return ReflectionToStringBuilder.reflectionToString(this);
+        return Objects
+            .toStringHelper(this)
+            .add("scale", scale)
+            .add("contact", contact)
+            .add("gap", gap)
+            .add("power", power)
+            .add("eye", eye)
+            .toString();
     }
 
     @Override

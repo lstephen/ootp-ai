@@ -8,7 +8,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.regression.Predictions;
-import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Roster.Status;
 import com.ljs.ootp.ai.selection.HitterSelectionFactory;
 import com.ljs.ootp.ai.selection.Mode;
@@ -29,6 +28,10 @@ public class FourtyManRoster {
     private final Predictions predictions;
 
     private final Function<Player, Integer> value;
+
+    private ImmutableSet<Player> desired25Man;
+
+    private ImmutableSet<Player> desired40Man;
 
     public FourtyManRoster(Roster roster, Predictions ps, Function<Player, Integer> value) {
         this.roster = roster;
@@ -67,6 +70,10 @@ public class FourtyManRoster {
 
 
     private ImmutableSet<Player> getDesired40ManRoster() {
+        if (desired40Man != null) {
+            return desired40Man;
+        }
+
         Set<Player> fourtyMan = Sets.newHashSet();
 
         Iterable<Player> available = Iterables.filter(
@@ -108,10 +115,16 @@ public class FourtyManRoster {
             }
         }
 
-        return ImmutableSet.copyOf(fourtyMan);
+        desired40Man = ImmutableSet.copyOf(fourtyMan);
+
+        return desired40Man;
     }
 
     private ImmutableSet<Player> getDesired25ManRoster() {
+        if (desired25Man != null) {
+            return desired25Man;
+        }
+
         Set<Player> ml = Sets.newHashSet();
 
         ml.addAll(
@@ -132,7 +145,8 @@ public class FourtyManRoster {
                     Selections.onlyPitchers(roster.getAllPlayers()))
                 .values());
 
-        return ImmutableSet.copyOf(ml);
+        desired25Man = ImmutableSet.copyOf(ml);
+        return desired25Man;
     }
 
     public Iterable<Player> getPlayersToRemove() {

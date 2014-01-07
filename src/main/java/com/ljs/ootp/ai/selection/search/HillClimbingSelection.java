@@ -63,7 +63,7 @@ public class HillClimbingSelection implements Selection {
             public ImmutableSet<Add> adds(SelectedPlayers sps) {
                 Set<Add> as = Sets.newHashSet();
 
-                for (Player p : available) {
+                for (Player p : Player.byWeightedBattingRating().sortedCopy(available)) {
                     if (!sps.contains(p)) {
                         as.add(new Add(p));
                     }

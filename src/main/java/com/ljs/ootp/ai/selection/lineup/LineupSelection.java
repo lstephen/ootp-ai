@@ -32,7 +32,7 @@ public class LineupSelection {
         ImmutableSet<Player> withoutDhStarters =
             ImmutableSet.copyOf(ss.select(vs, available));
 
-        return arrange(vs, withoutDhStarters);
+        return arrange(vs, available, withoutDhStarters);
     }
 
     private Lineup selectWithDh(Lineup.VsHand vs, Iterable<Player> available) {
@@ -41,10 +41,10 @@ public class LineupSelection {
         ImmutableSet<Player> withDhStarters =
             ImmutableSet.copyOf(ss.selectWithDh(vs, available));
 
-        return arrange(vs, withDhStarters);
+        return arrange(vs, available, withDhStarters);
     }
 
-    private Lineup arrange(Lineup.VsHand vs, Iterable<Player> selected) {
+    private Lineup arrange(Lineup.VsHand vs, Iterable<Player> available, Iterable<Player> selected) {
         Lineup lineup = new Lineup();
         lineup.setOrder(new LineupOrdering(predictions).order(vs, selected));
         lineup.setDefense(new DefenseSelection().select(selected));

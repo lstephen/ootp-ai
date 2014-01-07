@@ -99,13 +99,24 @@ public class StarterSelection {
     }
 
     private boolean hasValidDefense(Iterable selected, Iterable bench) {
-        if (!containsCatcher(bench)) {
+        if (isMoreThanOneCatcher(selected, bench) && !containsCatcher(bench)) {
             return false;
         } else {
             return hasValidDefense(
                 ((Collection) (ImmutableSet.copyOf(selected))),
                 ((Map) (ImmutableMap.of())));
         }
+    }
+
+    private boolean isMoreThanOneCatcher(Iterable<Player> selected, Iterable<Player> bench) {
+        Integer ccount = 0;
+        for (Player p : Iterables.concat(selected, bench)) {
+            if (p.getSlots().contains(Slot.C)) {
+                ccount++;
+            }
+        }
+
+        return ccount > 1;
     }
 
     private boolean containsCatcher(Iterable bench) {

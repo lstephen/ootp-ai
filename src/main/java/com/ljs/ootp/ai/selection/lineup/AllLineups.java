@@ -1,8 +1,9 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.io.Printable;
+import com.ljs.ootp.ai.player.Player;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Set;
@@ -42,7 +43,7 @@ public final class AllLineups implements Iterable<Lineup>, Printable {
         return all.iterator();
     }
 
-    public Iterable<Player> getAllPlayers() {
+    public ImmutableSet<Player> getAllPlayers() {
         Set<Player> players = Sets.newHashSet();
 
         for (Lineup l : this) {
@@ -53,7 +54,7 @@ public final class AllLineups implements Iterable<Lineup>, Printable {
             }
         }
 
-        return players;
+        return ImmutableSet.copyOf(players);
     }
 
     /**

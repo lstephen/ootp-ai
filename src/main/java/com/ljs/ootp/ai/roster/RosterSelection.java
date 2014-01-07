@@ -52,6 +52,8 @@ public final class RosterSelection {
     private List<Status> remainingLevels =
         Lists.newArrayList(Status.AAA, Status.AA, Status.A);
 
+    private FourtyManRoster fourtyManRoster;
+
     private RosterSelection(
         Team team, Predictions predictions, Function<Player, Integer> value) {
 
@@ -90,16 +92,8 @@ public final class RosterSelection {
     private Set<Player> getToBeRemoved(Iterable<Player> available) {
         Set<Player> toRemove = Sets.newHashSet();
         if (previous != null) {
-            FourtyManRoster fourtyMan =
-                new FourtyManRoster(
-                    previous,
-                    Predictions
-                        .predict(previous.getAllPlayers())
-                        .using(batting, pitching, predictions.getPitcherOverall()),
-                value);
-
             ImmutableSet<Player> toRemoveFromFourtyMan =
-                ImmutableSet.copyOf(fourtyMan.getPlayersToRemove());
+                ImmutableSet.copyOf(getFourtyManRoster().getPlayersToRemove());
 
             for (Player p : available) {
                 if (p.getClearedWaivers().or(Boolean.FALSE)
@@ -111,6 +105,19 @@ public final class RosterSelection {
 
         }
         return toRemove;
+    }
+
+    private FourtyManRoster getFourtyManRoster() {
+        if (fourtyManRoster == null) {
+            fourtyManRoster =
+                new FourtyManRoster(
+                    previous,
+                    Predictions
+                        .predict(previous.getAllPlayers())
+                        .using(batting, pitching, predictions.getPitcherOverall()),
+                value);
+        }
+        return fourtyManRoster;
     }
 
     public Roster select(Mode mode, Changes changes) {
@@ -232,13 +239,12 @@ public final class RosterSelection {
         return forced;
     }
 
-    public void printBattingSelectionTable(OutputStream out, Changes changes) {
-        printBattingSelectionTable(new PrintWriter(out), changes);
+    public void printBattingSelectionTable(OutputStream out, Roster roster) {
+        printBattingSelectionTable(new PrintWriter(out), roster);
     }
 
-    public void printBattingSelectionTable(PrintWriter w, Changes changes) {
+    public void printBattingSelectionTable(PrintWriter w, Roster roster) {
         w.println();
-        Roster roster = select(Mode.REGULAR_SEASON, changes);
         TeamStats<BattingStats> batting = predictions.getAllBatting();
 
         for (Player p :
@@ -265,13 +271,12 @@ public final class RosterSelection {
         w.flush();
     }
 
-    public void printPitchingSelectionTable(OutputStream out, Changes changes) {
-        printPitchingSelectionTable(new PrintWriter(out), changes);
+    public void printPitchingSelectionTable(OutputStream out, Roster roster) {
+        printPitchingSelectionTable(new PrintWriter(out), roster);
     }
 
-    public void printPitchingSelectionTable(PrintWriter w, Changes changes) {
+    public void printPitchingSelectionTable(PrintWriter w, Roster roster) {
         w.println();
-        Roster roster = select(Mode.REGULAR_SEASON, changes);
         TeamStats<PitchingStats> pitching = predictions.getAllPitching();
         PitcherOverall method = predictions.getPitcherOverall();
 

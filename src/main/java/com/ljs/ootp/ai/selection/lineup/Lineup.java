@@ -4,10 +4,10 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.PrintWriter;
@@ -93,11 +93,7 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             return new Entry(Position.PITCHER, null);
         } else {
             Player p = order.get(entry);
-            return new Entry(
-                defense.contains(p)
-                    ? defense.getPosition(p)
-                    : Position.DESIGNATED_HITTER,
-                p);
+            return new Entry(getPosition(p), p);
         }
     }
 
@@ -113,8 +109,16 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             .iterator();
     }
 
+    public Boolean contains(Player p) {
+        return order.contains(p);
+    }
+
     public Set<Player> playerSet() {
         return ImmutableSet.copyOf(order);
+    }
+
+    public Position getPosition(Player p) {
+        return defense.contains(p)  ? defense.getPosition(p) : Position.DESIGNATED_HITTER;
     }
 
     @Override
