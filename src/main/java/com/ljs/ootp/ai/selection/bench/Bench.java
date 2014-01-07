@@ -1,7 +1,6 @@
 package com.ljs.ootp.ai.selection.bench;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -95,10 +94,10 @@ public class Bench {
 
         for (Lineup.Entry entry : lineup) {
             if (!entry.getPositionEnum().equals(Position.PITCHER)) {
-                Optional<Player> p = selectBenchPlayer(vs, entry.getPositionEnum());
-
-                if (p.isPresent()) {
-                    score += vs.getStats(predictions, p.get()).getWobaPlus();
+                Integer count = 0;
+                for (Player p : selectBenchPlayer(lineup, vs, entry.getPositionEnum())) {
+                    count++;
+                    score += (int) ((1.0 / count) * vs.getStats(predictions, p).getWobaPlus());
                 }
             }
         }
@@ -106,7 +105,12 @@ public class Bench {
         return score;
     }
 
-    private Optional<Player> selectBenchPlayer(final Lineup.VsHand vs, Position pos) {
+    private ImmutableList<Player> selectBenchPlayer(Lineup lineup, final Lineup.VsHand vs, Position pos) {
+        Set<Player> bench = ImmutableSet.copyOf(
+            Iterables.concat(
+                Sets.difference(lineups.getAllPlayers(), lineup.playerSet()),
+                players));
+
         ImmutableList<Player> sortedBench = Ordering
             .natural()
             .reverse()
@@ -118,13 +122,14 @@ public class Bench {
             .compound(Player.byTieBreak())
             .immutableSortedCopy(players);
 
+        List<Player> ps = Lists.newArrayList();
+
         for (Player p : sortedBench) {
             if (p.canPlay(pos)) {
-                return Optional.of(p);
+                ps.add(p);
             }
         }
-
-        return Optional.absent();
+        return ImmutableList.copyOf(ps);
     }
 
     private Integer totalAge() {
@@ -186,11 +191,6 @@ public class Bench {
 
             @Override
             public Iterable<Action<Bench>> apply(Bench b) {
-                System.out.print("sc:" + b.score() + " ");
-                for (Player p : b.players) {
-                    System.out.print(p.getShortName() + "/");
-                }
-                System.out.println();
                 Set<Action<Bench>> actions = Sets.newHashSet();
 
                 Set<Add> adds = adds(b);

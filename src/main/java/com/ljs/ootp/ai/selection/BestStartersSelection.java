@@ -25,7 +25,6 @@ import com.ljs.ootp.ai.selection.lineup.StarterSelection;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.TeamStats;
-import java.io.PrintWriter;
 import java.util.Set;
 
 /**
@@ -66,11 +65,6 @@ public class BestStartersSelection implements Selection {
             return assignments.toMap();
         } else {
             AllLineups lineups = new LineupSelection(predictions).select(assignments.getAssignedPlayers());
-
-            PrintWriter w = new PrintWriter(System.out);
-            lineups.print(w);
-            w.println(lineups.getAllPlayers().size() + " "  + assignments.toMap().size() + assignments.getAssignedPlayers().size());
-            w.flush();
 
             Multimap<Slot, Player> result = HashMultimap.create(assignments.toMap());
 

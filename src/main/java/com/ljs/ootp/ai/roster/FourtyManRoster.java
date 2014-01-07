@@ -80,7 +80,7 @@ public class FourtyManRoster {
             roster.getAllPlayers(),
             new Predicate<Player>() {
                 public boolean apply(Player p) {
-                    return roster.getStatus(p) != Status.DL || p.getOn40Man().or(false);
+                    return roster.getStatus(p) != Status.DL || p.getOn40Man().or(true);
                 }
             });
 
