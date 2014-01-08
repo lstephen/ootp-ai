@@ -97,7 +97,7 @@ public class Bench {
                 Integer count = 0;
                 for (Player p : selectBenchPlayer(lineup, vs, entry.getPositionEnum())) {
                     count++;
-                    score += (int) ((1.0 / count) * vs.getStats(predictions, p).getWobaPlus());
+                    score += (int) ((1.0 / (count * count)) * vs.getStats(predictions, p).getWobaPlus());
                 }
             }
         }
@@ -241,7 +241,7 @@ public class Bench {
     public static Bench select(AllLineups lineups, TeamStats<BattingStats> predictions, Iterable<Player> available, Integer maxSize) {
         HillClimbing.Builder<Bench> builder = HillClimbing
             .<Bench>builder()
-            .heurisitic(heuristic())
+            .heuristic(heuristic())
             .validator(validator())
             .actionGenerator(actionGenerator(available));
 

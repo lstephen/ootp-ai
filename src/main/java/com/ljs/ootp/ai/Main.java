@@ -59,6 +59,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -213,8 +214,8 @@ public class Main {
             mode = Mode.EXPANDED;
         }
 
-        Optional<FreeAgentAcquisition> fa = Optional.absent();
-        Optional<FreeAgentAcquisition> nfa = Optional.absent();
+        LOG.info("Loading FAS...");
+        Iterable<FreeAgentAcquisition> faas = Collections.emptyList();
 
         Set<Player> released = Sets.newHashSet();
 
@@ -253,24 +254,18 @@ public class Main {
             LOG.info("Determining FA acquisition...");
 
             if (oldRoster.size() <= maxRosterSize) {
-                fa = fas.getTopAcquisition(team);
+                Integer n = 2;
 
-                if (fa.isPresent()) {
-                    fas.skip(fa.get().getFreeAgent());
-
-                    if (oldRoster.size() > minRosterSize) {
-                        team.remove(fa.get().getRelease());
-                    }
+                if (site.getName().equals("BTH")) {
+                    n = 1;
                 }
 
-                nfa = fas.getNeedAcquisition(team);
+                faas = FreeAgentAcquisition.select(site, team, fas.all(), tv, n);
 
-                if (nfa.isPresent()) {
-                    if (oldRoster.size() > minRosterSize) {
-                        team.remove(nfa.get().getRelease());
+                for (FreeAgentAcquisition faa : faas) {
+                    if (oldRoster.size() >= minRosterSize) {
+                        team.remove(faa.getRelease());
                     }
-
-                    fas.skip(nfa.get().getFreeAgent());
                 }
             }
         }
@@ -313,20 +308,8 @@ public class Main {
 
         Printables.print(newRoster.getChangesFrom(oldRoster)).to(out);
 
-        if (fa.isPresent() && newRoster.size() < maxRosterSize) {
-            Player player = fa.get().getFreeAgent();
-            out.write(
-                String.format(
-                    "%4s -> %-4s %2s %s%n",
-                    "FA",
-                    "",
-                    player.getPosition(),
-                    player.getShortName())
-                .getBytes(Charsets.ISO_8859_1));
-        }
-
-        if (nfa.isPresent() && newRoster.size() < maxRosterSize) {
-            Player player = nfa.get().getFreeAgent();
+        for (FreeAgentAcquisition faa : faas) {
+            Player player = faa.getFreeAgent();
             out.write(
                 String.format(
                     "%4s -> %-4s %2s %s%n",
@@ -528,7 +511,7 @@ public class Main {
             Iterables.concat(
                 newRoster.getAllPlayers(),
                 Iterables.transform(
-                    Optional.presentInstances(ImmutableSet.of(fa, nfa)),
+                    faas,
                     FreeAgentAcquisition.Meta.getRelease()),
                 released));
         generic.setLimit(200);

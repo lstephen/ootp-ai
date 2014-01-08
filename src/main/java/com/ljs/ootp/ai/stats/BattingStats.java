@@ -50,6 +50,14 @@ public class BattingStats implements Stats<BattingStats> {
         return perPlateAppearance(hits);
     }
 
+    public double getDoublesPerPlateAppearance() {
+        return perPlateAppearance(doubles);
+    }
+
+    public double getTriplesPerPlateAppearance() {
+        return perPlateAppearance(triples);
+    }
+
     public double getExtraBaseHitsPerPlateAppearance() {
         return perPlateAppearance(doubles + triples);
     }
@@ -68,6 +76,10 @@ public class BattingStats implements Stats<BattingStats> {
 
     public double getWalksPerPlateAppearance() {
         return perPlateAppearance(walks);
+    }
+
+    public double getOutsPerPlateAppearance() {
+        return perPlateAppearance(atBats - hits);
     }
 
     public double getAverage() {

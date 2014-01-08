@@ -11,7 +11,6 @@ import com.ljs.ootp.ai.roster.Changes;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.Version;
-import com.ljs.ootp.ai.value.FreeAgentAcquisition;
 import com.ljs.ootp.ai.value.TradeValue;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ public final class FreeAgents {
 
     private final Set<Player> skipped = Sets.newHashSet();
 
-    private final Iterable<Player> fas;
+    private final ImmutableSet<Player> fas;
 
     private final Function<Player, Integer> value;
 
@@ -33,9 +32,13 @@ public final class FreeAgents {
 
     private FreeAgents(Site site, Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
         this.site = site;
-        this.fas = fas;
+        this.fas = ImmutableSet.copyOf(fas);
         this.value = value;
         this.tv = tv;
+    }
+
+    public Iterable<Player> all() {
+        return fas;
     }
 
     public void skip(Player p) {
@@ -48,82 +51,11 @@ public final class FreeAgents {
         }
     }
 
-    public Optional<FreeAgentAcquisition> getTopAcquisition(
-        Iterable<Player> roster) {
-
-        for (Player fa : byValue(value).sortedCopy(fas)) {
-            if (skipPlayer(fa)) {
-                continue;
-            }
-
-            Optional<Player> release = getPlayerToReleaseFor(roster, fa);
-
-            if (release.isPresent()) {
-                return Optional.of(
-                    FreeAgentAcquisition.create(fa, release.get()));
-            }
-        }
-
-        return Optional.absent();
-    }
-
-    public Optional<FreeAgentAcquisition> getNeedAcquisition(
-        Iterable<Player> roster) {
-
-        Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
-
-        for (Player fa : byValue(value).sortedCopy(fas)) {
-            if (skipPlayer(fa)) {
-                continue;
-            }
-
-            if (needed.contains(Slot.getPrimarySlot(fa))) {
-                Optional<Player> release = getPlayerToReleaseFor(roster, fa);
-
-                if (release.isPresent()) {
-                    return Optional.of(
-                        FreeAgentAcquisition.create(fa, release.get()));
-                }
-            }
-        }
-
-        return Optional.absent();
-    }
-
-    private Optional<Player> getPlayerToReleaseFor(
-        Iterable<Player> roster, Player fa) {
-
-        Set<Slot> surplus = RosterReport.create(site, roster).getSurplusSlots();
-        Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
-
-        for (Player r : byValue(value).reverse().sortedCopy(roster)) {
-            if (!fa.getSlots().contains(Slot.getPrimarySlot(r)) && !surplus.contains(Slot.getPrimarySlot(r))) {
-                continue;
-            }
-            Set<Slot> needsFulfilled = Sets.intersection(ImmutableSet.copyOf(Slot.getPlayerSlots(r)), needed);
-
-            boolean fillsNeed = !needsFulfilled.isEmpty();
-            boolean fillsReplaceableNeed = needsFulfilled.size() == 1 && fa.getSlots().contains(needsFulfilled.iterator().next());
-            boolean occupiesSameSlot = Slot.getPrimarySlot(fa) == Slot.getPrimarySlot(r);
-
-            if (fillsNeed && !fillsReplaceableNeed && !occupiesSameSlot) {
-                continue;
-            }
-            if ((int) (value.apply(r) * 1.1) > value.apply(fa)) {
-                break;
-            }
-
-            return Optional.of(r);
-        }
-
-        return Optional.absent();
-    }
-
     public Optional<Player> getPlayerToRelease(Iterable<Player> roster) {
 
         Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
 
-        for (Player r : byValue(value).reverse().sortedCopy(roster)) {
+        for (Player r : byValue(value).sortedCopy(fas)) {
             if (!Sets.intersection(ImmutableSet.copyOf(r.getSlots()), needed).isEmpty()) {
                 continue;
             }
@@ -137,12 +69,18 @@ public final class FreeAgents {
     public Iterable<Player> getTopTargets(Mode mode) {
         Set<Player> targets = Sets.newHashSet();
 
+        Set<Player> ps = Sets.newHashSet(fas);
         Set<Slot> remaining = Sets.newHashSet(Slot.values());
 
-        for (Player p : byValue(value).sortedCopy(fas)) {
+        while (!remaining.isEmpty() && !ps.isEmpty()) {
+            Player p = byValue(value).max(ps);
+
+            ps.remove(p);
+
             if (skipPlayer(p)) {
                 continue;
             }
+
             if (site.getType() != Version.OOTPX && mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
                 continue;
             }
@@ -162,7 +100,6 @@ public final class FreeAgents {
     private static Ordering<Player> byValue(Function<Player, Integer> value) {
         return Ordering
             .natural()
-            .reverse()
             .onResultOf(value)
             .compound(Player.byTieBreak());
     }

@@ -5,9 +5,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.selection.Mode;
-import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.site.Site;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -24,6 +24,10 @@ public final class RosterReport implements Printable {
 
     private RosterReport(Iterable<Player> roster) {
         this.roster = roster;
+    }
+
+    public Integer getTargetRatio() {
+        return targetRatio;
     }
 
     private void setTargetRatio(Integer ratio) {
@@ -50,7 +54,7 @@ public final class RosterReport implements Printable {
         return count;
     }
 
-    private int getRatio(Slot s) {
+    public Integer getRatio(Slot s) {
         return getPrimaryCount(s) * 10
             / Math.max(
                 Mode.REGULAR_SEASON.getHittingSlots().count(s),
