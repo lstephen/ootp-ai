@@ -10,6 +10,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
@@ -53,29 +54,23 @@ public class BestStartersSelection implements Selection {
 
 	@Override
 	public ImmutableMultimap<Slot, Player> select(Iterable<Player> forced, Iterable<Player> available) {
-		SlotAssignments assignments = SlotAssignments.create(slots);
 
-		assignments.assign(Selections.onlyHitters(forced));
+        ImmutableSet<Player> best = ImmutableSet.copyOf(Iterables.concat(selectStarters(available), forced));
 
-		assignBestStarters(assignments, Selections.onlyHitters(available));
+        AllLineups lineups = new LineupSelection(predictions).select(best);
 
-		Multiset<Slot> remaining = assignments.getRemainingSlots();
+        // TODO: Handle forced players here. We just want to trim from the optional ones
+        best = ImmutableSet.copyOf(Iterables.limit(byValueProvided(lineups).sortedCopy(best), slots.size()));
 
-        if (remaining.isEmpty()) {
-            return assignments.toMap();
-        } else {
-            AllLineups lineups = new LineupSelection(predictions).select(assignments.getAssignedPlayers());
+        Multimap<Slot, Player> result = HashMultimap.create();
 
-            Multimap<Slot, Player> result = HashMultimap.create(assignments.toMap());
+        Bench bench = Bench.select(lineups, predictions, available, slots.size());
 
-            Bench bench = Bench.select(lineups, predictions, available, slots.size());
+        for (Player p : Iterables.concat(best, bench.players())) {
+            result.put(Slot.getPrimarySlot(p), p);
+        }
 
-            for (Player p : bench.players()) {
-                result.put(Slot.getPrimarySlot(p), p);
-            }
-
-            return ImmutableMultimap.copyOf(result);
-		}
+        return ImmutableMultimap.copyOf(result);
 	}
 
 	private void assignBestStarters(SlotAssignments assignments, Iterable<Player> available) {
@@ -83,10 +78,7 @@ public class BestStartersSelection implements Selection {
 
 		StarterSelection starters = new StarterSelection(predictions);
 
-		Set<Player> selected = Sets.newHashSet(
-			Iterables.concat(
-				starters.selectWithDh(Lineup.VsHand.VS_LHP, remaining),
-				starters.selectWithDh(Lineup.VsHand.VS_RHP, remaining)));
+		Set<Player> selected = selectStarters(remaining);
 
         AllLineups lineups = new LineupSelection(predictions).select(selected);
 
@@ -100,6 +92,15 @@ public class BestStartersSelection implements Selection {
 			}
 		}
 	}
+
+    private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
+		StarterSelection starters = new StarterSelection(predictions);
+
+		return ImmutableSet.copyOf(
+			Iterables.concat(
+				starters.selectWithDh(Lineup.VsHand.VS_LHP, ps),
+				starters.selectWithDh(Lineup.VsHand.VS_RHP, ps)));
+    }
 
 	private Ordering<Player> byOverall() {
 		return Ordering
