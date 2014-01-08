@@ -50,10 +50,6 @@ public class BattingStats implements Stats<BattingStats> {
         return perPlateAppearance(hits);
     }
 
-    public double getSinglesPerPlateAppearance() {
-        return perPlateAppearance(hits - doubles - triples - homeRuns);
-    }
-
     public double getDoublesPerPlateAppearance() {
         return perPlateAppearance(doubles);
     }
