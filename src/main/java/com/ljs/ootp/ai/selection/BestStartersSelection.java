@@ -18,6 +18,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.selection.bench.Bench;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
@@ -52,6 +53,10 @@ public class BestStartersSelection implements Selection {
         BestStartersSelection.pcts = pcts;
     }
 
+    private Integer getTargetSize() {
+        return slots.size();
+    }
+
 	@Override
 	public ImmutableMultimap<Slot, Player> select(Iterable<Player> forced, Iterable<Player> available) {
 
@@ -59,39 +64,100 @@ public class BestStartersSelection implements Selection {
 
         AllLineups lineups = new LineupSelection(predictions).select(best);
 
-        // TODO: Handle forced players here. We just want to trim from the optional ones
-        best = ImmutableSet.copyOf(Iterables.limit(byValueProvided(lineups).sortedCopy(best), slots.size()));
+        best = optimize(best, forced, available);
 
         Multimap<Slot, Player> result = HashMultimap.create();
 
-        Bench bench = Bench.select(lineups, predictions, available, slots.size());
-
-        for (Player p : Iterables.concat(best, bench.players())) {
+        for (Player p : best) {
             result.put(Slot.getPrimarySlot(p), p);
         }
 
         return ImmutableMultimap.copyOf(result);
 	}
 
-	private void assignBestStarters(SlotAssignments assignments, Iterable<Player> available) {
-		Set<Player> remaining = Sets.newHashSet(Iterables.concat(assignments.getAssignedPlayers(), available));
+    private ImmutableSet<Player> optimize(Iterable<Player> best, Iterable<Player> forced, Iterable<Player> available) {
+        return optimize(ImmutableSet.copyOf(best), ImmutableSet.copyOf(forced), ImmutableSet.copyOf(available));
 
-		StarterSelection starters = new StarterSelection(predictions);
+    }
 
-		Set<Player> selected = selectStarters(remaining);
+    private ImmutableSet<Player> optimize(ImmutableSet<Player> best, ImmutableSet<Player> forced, ImmutableSet<Player> available) {
+
+        if (best.size() > getTargetSize()) {
+            return optimize(limit(best, forced, getTargetSize()), forced, available);
+        }
+
+        Double bestScore = 0.0;
+        ImmutableSet<Player> bestPlayers = null;
+
+        Integer limit = best.size();
+
+        while (limit >= 9) {
+            ImmutableSet<Player> ps = limit(best, forced, limit);
+
+            ps = fill(ps, available);
+            System.out.print("Filled: ");
+            for (Player p : Player.byShortName().sortedCopy(ps)) {
+                System.out.print(p.getShortName() + "/");
+            }
+            System.out.println();
+
+            Double score = SelectedPlayers.create(ps, predictions, pcts).score();
+
+            System.out.println("limit:" + limit + " score:" + score);
+
+            if (score < bestScore || ps.equals(bestPlayers)) {
+                return bestPlayers;
+            }
+
+            bestScore = score;
+            bestPlayers = ps;
+
+            limit--;
+        }
+
+        return bestPlayers;
+    }
+
+    private ImmutableSet<Player> fill(ImmutableSet<Player> partial, ImmutableSet<Player> available) {
+        if (partial.size() == getTargetSize()) {
+            return partial;
+        }
+
+        AllLineups lineups = new LineupSelection(predictions).select(partial);
+
+        Bench bench = Bench.select(lineups, partial, predictions, available, getTargetSize());
+
+        return ImmutableSet.copyOf(Iterables.concat(partial, bench.players()));
+    }
+
+    private ImmutableSet<Player> limit(ImmutableSet<Player> best, ImmutableSet<Player> forced, Integer size) {
+
+        Set<Player> selected = Sets.newHashSet(best);
+
+        while (selected.size() > size) {
+            AllLineups lineups = new LineupSelection(predictions).select(selected);
+            Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
+            Iterables.removeAll(ps, forced);
+
+            System.out.print("Selected:");
+            for (Player p : byValueProvided(lineups, Iterables.concat(forced, ps)).reverse().sortedCopy(selected)) {
+                System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, Iterables.concat(forced, ps))) + "/");
+            }
+            System.out.println();
+
+            selected.remove(byValueProvided(lineups, selected).min(ps));
+        }
 
         AllLineups lineups = new LineupSelection(predictions).select(selected);
 
-		assignments.attemptToAssign(byValueProvided(lineups).sortedCopy(selected));
+        System.out.print("Limited:");
+        for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
+            System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, selected)) + "/");
+        }
+        System.out.println();
 
-		if (!assignments.containsAll(selected) && !assignments.getRemainingSlots().isEmpty()) {
-			remaining.removeAll(selected);
-
-			if (!remaining.isEmpty()) {
-				assignBestStarters(assignments, remaining);
-			}
-		}
-	}
+        return ImmutableSet.copyOf(selected);
+    }
 
     private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
 		StarterSelection starters = new StarterSelection(predictions);
@@ -110,31 +176,30 @@ public class BestStartersSelection implements Selection {
 			.compound(Player.byTieBreak());
 	}
 
-    private Ordering<Player> byValueProvided(final AllLineups lineups) {
+    private Ordering<Player> byValueProvided(final AllLineups lineups, final Iterable<Player> selected) {
         return Ordering
             .natural()
-            .reverse()
-            .onResultOf(new Function<Player, Integer>() {
-                public Integer apply(Player p) {
-                    return getValueProvided(p, lineups);
+            .onResultOf(new Function<Player, Double>() {
+                public Double apply(Player p) {
+                    return getValueProvided(p, lineups, selected);
                 }
             })
             .compound(Player.byTieBreak());
     }
 
-    private Integer getValueProvided(Player p, AllLineups lineups) {
-        Integer score = value.apply(p);
+    private Double getValueProvided(Player p, AllLineups lineups, Iterable<Player> selected) {
+        Double score = 0.0;
 
-        score += getValueProvided(p, lineups.getVsLhp(), pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
-        score += getValueProvided(p, lineups.getVsLhpPlusDh(), pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
-        score += getValueProvided(p, lineups.getVsRhp(), pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
-        score += getValueProvided(p, lineups.getVsRhpPlusDh(), pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
+        score += getValueProvided(p, lineups.getVsLhp(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
+        score += getValueProvided(p, lineups.getVsLhpPlusDh(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
+        score += getValueProvided(p, lineups.getVsRhp(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
+        score += getValueProvided(p, lineups.getVsRhpPlusDh(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
 
         return score;
     }
 
-    private Integer getValueProvided(Player p, Lineup l, Double pct, Lineup.VsHand vs) {
-        Integer score = 0;
+    private Double getValueProvided(Player p, Lineup l, Iterable<Player> selected, Double pct, Lineup.VsHand vs) {
+        Double score = 0.0;
         Integer wobaPlus = vs.getStats(predictions, p).getWobaPlus();
 
         if (l.contains(p)) {
@@ -142,10 +207,29 @@ public class BestStartersSelection implements Selection {
 
             if (p.canPlay(l.getPosition(p))) {
                 score += wobaPlus;
+                //score += (getPositionFactor(l.getPosition(p)) * wobaPlus);
             }
         }
 
-        return (int) (pct * score);
+        return pct * score;
+    }
+
+    private Integer getPositionFactor(Position pos) {
+        switch (pos) {
+            case CATCHER:
+            case SHORTSTOP:
+                return 10;
+            case THIRD_BASE:
+            case SECOND_BASE:
+                return 9;
+            case CENTER_FIELD:
+                return 8;
+            case LEFT_FIELD:
+            case RIGHT_FIELD:
+                return 7;
+            default:
+                return 6;
+        }
     }
 
 }

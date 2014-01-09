@@ -25,7 +25,7 @@ public final class SalaryFormat {
             displayDigits += 1;
         }
 
-        int exp = (int) (Math.log(salary) / Math.log(10));
+        int exp = (int) (Math.log(salary) / Math.log(10) + 1.0E-6);
 
         String display;
         String suffix;

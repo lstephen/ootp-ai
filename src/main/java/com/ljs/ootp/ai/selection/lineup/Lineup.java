@@ -9,11 +9,13 @@ import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.stats.BattingStats;
+import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.fest.assertions.api.Assertions;
 
 public class Lineup implements Iterable<Lineup.Entry>, Printable {
 
@@ -64,8 +66,12 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             }
         },
         VS_RHP {
-            public BattingStats getStats(TeamStats predictions, Player p) {
-                return (BattingStats) predictions.getSplits(p).getVsRight();
+            public BattingStats getStats(TeamStats<BattingStats> predictions, Player p) {
+                SplitStats<BattingStats> splits = predictions.getSplits(p);
+
+                Assertions.assertThat(splits).isNotNull().as("Expected to find splits for " + p.getShortName());
+
+                return splits.getVsRight();
             }
 
             public BattingRatings getRatings(Player p) {
@@ -73,7 +79,7 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             }
         };
 
-        public abstract BattingStats getStats(TeamStats teamstats, Player player);
+        public abstract BattingStats getStats(TeamStats<BattingStats> teamstats, Player player);
 
         public abstract BattingRatings getRatings(Player player);
     }

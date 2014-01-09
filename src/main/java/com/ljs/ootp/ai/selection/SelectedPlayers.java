@@ -1,19 +1,14 @@
-package com.ljs.ootp.ai.selection.search;
+package com.ljs.ootp.ai.selection;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ai.search.State;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.Position;
+import com.ljs.ootp.ai.selection.bench.BenchScorer;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
 import com.ljs.ootp.ai.selection.lineup.Lineup.VsHand;
@@ -21,22 +16,23 @@ import com.ljs.ootp.ai.selection.lineup.LineupSelection;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.TeamStats;
-import java.util.Set;
 
 /**
  *
  * @author lstephen
  */
-public class SelectedPlayers implements State {
+public class SelectedPlayers {
 
     private final ImmutableSet<Player> players;
 
-    public static TeamStats<BattingStats> predictions;
+    private final TeamStats<BattingStats> predictions;
 
-    public static SplitPercentages splits;
+    private final SplitPercentages splits;
 
-    private SelectedPlayers(Iterable<Player> players) {
+    private SelectedPlayers(Iterable<Player> players, TeamStats<BattingStats> predictions, SplitPercentages splits) {
         this.players = ImmutableSet.copyOf(players);
+        this.predictions = predictions;
+        this.splits = splits;
     }
 
     public ImmutableMultimap<Slot, Player> selection() {
@@ -57,35 +53,21 @@ public class SelectedPlayers implements State {
         return players.contains(p);
     }
 
-    public SelectedPlayers with(Player p) {
-        return new SelectedPlayers(Iterables.concat(players, ImmutableList.of(p)));
-    }
-
-    public SelectedPlayers without(Player p) {
-        Set<Player> players = Sets.newHashSet(this.players);
-        players.remove(p);
-        return new SelectedPlayers(players);
-    }
-
-    public Boolean isValid() {
-        return players.size() >= 9 && players.size() <= 14;
-    }
-
     public Double score() {
         AllLineups lineups = new LineupSelection(predictions).select(players);
 
         return
-            //splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp())
-            splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh())
-            //+ splits.getVsLhpPercentage() * score(VsHand.VS_LHP, lineups.getVsLhp())
+            splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp())
+            + splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh())
+            + splits.getVsLhpPercentage() * score(VsHand.VS_LHP, lineups.getVsLhp())
             + splits.getVsLhpPercentage() * score(VsHand.VS_LHP, lineups.getVsLhpPlusDh())
             - players.size()
             - (double) ageScore() / 100000;
 
     }
 
-    private Integer score(Lineup.VsHand vs, Lineup lineup) {
-        return hittingScore(vs, lineup) + hittingWithDefenseScore(vs, lineup) + benchScore(vs, lineup);
+    private Double score(Lineup.VsHand vs, Lineup lineup) {
+        return 2 * hittingScore(vs, lineup) + hittingWithDefenseScore(vs, lineup) + benchScore(vs, lineup);
     }
 
     private Integer hittingScore(Lineup.VsHand vs, Lineup lineup) {
@@ -110,41 +92,8 @@ public class SelectedPlayers implements State {
         return score;
     }
 
-    private Integer benchScore(Lineup.VsHand vs, Lineup lineup) {
-        Set<Player> bench = Sets.difference(players, lineup.playerSet());
-
-        Integer score = 0;
-
-        for (Lineup.Entry entry : lineup) {
-            Optional<Player> p = selectBenchPlayer(bench, vs, entry.getPositionEnum());
-
-            if (p.isPresent()) {
-                score += vs.getStats(predictions, p.get()).getWobaPlus();
-            }
-        }
-
-        return score;
-    }
-
-    private Optional<Player> selectBenchPlayer(Iterable<Player> bench, final Lineup.VsHand vs, Position pos) {
-        ImmutableList<Player> sortedBench = Ordering
-            .natural()
-            .reverse()
-            .onResultOf(new Function<Player, Integer>() {
-                public Integer apply(Player p) {
-                    return vs.getStats(predictions, p).getWobaPlus();
-                }
-            })
-            .compound(Player.byTieBreak())
-            .immutableSortedCopy(bench);
-
-        for (Player p : sortedBench) {
-            if (p.canPlay(pos)) {
-                return Optional.of(p);
-            }
-        }
-
-        return Optional.absent();
+    private Double benchScore(Lineup.VsHand vs, Lineup lineup) {
+        return new BenchScorer(predictions).score(Sets.difference(players, lineup.playerSet()), lineup, vs);
     }
 
     private Integer overallHittingScore() {
@@ -164,8 +113,8 @@ public class SelectedPlayers implements State {
         return score;
     }
 
-    public static SelectedPlayers create(Iterable<Player> ps) {
-        return new SelectedPlayers(ps);
+    public static SelectedPlayers create(Iterable<Player> ps, TeamStats<BattingStats> predictions, SplitPercentages pcts) {
+        return new SelectedPlayers(ps, predictions, pcts);
     }
 
 }

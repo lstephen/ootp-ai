@@ -34,6 +34,8 @@ public class Bench {
 
     private final AllLineups lineups;
 
+    private final ImmutableSet<Player> selected;
+
     private final ImmutableSet<Player> players;
 
     private final Integer maxSize;
@@ -42,9 +44,10 @@ public class Bench {
 
     private static SplitPercentages pcts;
 
-    private Bench(AllLineups lineups, Iterable<Player> players, Integer maxSize, TeamStats<BattingStats> predictions) {
+    private Bench(AllLineups lineups, Iterable<Player> selected, Iterable<Player> players, Integer maxSize, TeamStats<BattingStats> predictions) {
         this.lineups = lineups;
         this.players = ImmutableSet.copyOf(players);
+        this.selected = ImmutableSet.copyOf(selected);
         this.maxSize = maxSize;
         this.predictions = predictions;
     }
@@ -56,6 +59,7 @@ public class Bench {
     private Bench with(Player p) {
         return new Bench(
             lineups,
+            selected,
             Iterables.concat(players, ImmutableSet.of(p)),
             maxSize,
             predictions);
@@ -64,6 +68,7 @@ public class Bench {
     private Bench without(Player p) {
         return new Bench(
             lineups,
+            selected,
             Iterables.filter(players, Predicates.not(Predicates.equalTo(p))),
             maxSize,
             predictions);
@@ -73,42 +78,34 @@ public class Bench {
         return players;
     }
 
-    private Integer score() {
-        Integer score = 0;
+    private Double score() {
+        Double score = 0.0;
 
         for (Player p : players()) {
             score += predictions.getOverall(p).getWobaPlus();
         }
 
-        score += (int) (pcts.getVsLhpPercentage() * score(lineups.getVsLhp(), Lineup.VsHand.VS_LHP));
-        score += (int) (pcts.getVsLhpPercentage() * score(lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP));
-        score += (int) (pcts.getVsRhpPercentage() * score(lineups.getVsRhp(), Lineup.VsHand.VS_RHP));
-        score += (int) (pcts.getVsRhpPercentage() * score(lineups.getVsRhpPlusDh(), Lineup.VsHand.VS_RHP));
+        score += (pcts.getVsLhpPercentage() * score(lineups.getVsLhp(), Lineup.VsHand.VS_LHP));
+        score += (pcts.getVsLhpPercentage() * score(lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP));
+        score += (pcts.getVsRhpPercentage() * score(lineups.getVsRhp(), Lineup.VsHand.VS_RHP));
+        score += (pcts.getVsRhpPercentage() * score(lineups.getVsRhpPlusDh(), Lineup.VsHand.VS_RHP));
 
         return score;
     }
 
-    private Integer score(Lineup lineup, Lineup.VsHand vs) {
-
-        Integer score = 0;
-
-        for (Lineup.Entry entry : lineup) {
-            if (!entry.getPositionEnum().equals(Position.PITCHER)) {
-                Integer count = 0;
-                for (Player p : selectBenchPlayer(lineup, vs, entry.getPositionEnum())) {
-                    count++;
-                    score += (int) ((1.0 / (count * count)) * vs.getStats(predictions, p).getWobaPlus());
-                }
-            }
-        }
-
-        return score;
+    private Double score(Lineup lineup, Lineup.VsHand vs) {
+        return new BenchScorer(predictions)
+            .score(
+                Iterables.concat(
+                    Sets.difference(selected, lineup.playerSet()), players),
+                    lineup,
+                    vs);
     }
 
     private ImmutableList<Player> selectBenchPlayer(Lineup lineup, final Lineup.VsHand vs, Position pos) {
         Set<Player> bench = ImmutableSet.copyOf(
             Iterables.concat(
-                Sets.difference(lineups.getAllPlayers(), lineup.playerSet()),
+                Sets.difference(selected, lineup.playerSet()),
                 players));
 
         ImmutableList<Player> sortedBench = Ordering
@@ -146,7 +143,7 @@ public class Bench {
         return new Validator<Bench>() {
             @Override
             public Boolean apply(Bench b) {
-                if (b.lineups.getAllPlayers().size() + b.players.size() > b.maxSize) {
+                if (b.selected.size() + b.players.size() > b.maxSize) {
                     return false;
                 }
 
@@ -164,8 +161,8 @@ public class Bench {
     private static Ordering<Bench> byScore() {
         return Ordering
             .natural()
-            .onResultOf(new Function<Bench, Integer>() {
-                public Integer apply(Bench b) {
+            .onResultOf(new Function<Bench, Double>() {
+                public Double apply(Bench b) {
                     return b.score();
             }});
     }
@@ -223,7 +220,7 @@ public class Bench {
         };
     }
 
-    private static Callable<Bench> initialStateGenerator(final AllLineups lineups, final TeamStats<BattingStats> predictions, final Iterable<Player> available, final Integer maxSize) {
+    private static Callable<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final TeamStats<BattingStats> predictions, final Iterable<Player> available, final Integer maxSize) {
         return new Callable<Bench>() {
             public Bench call() {
                 List<Player> candidates = Lists.newArrayList(
@@ -233,19 +230,19 @@ public class Bench {
 
                 Collections.shuffle(candidates);
 
-                return new Bench(lineups, Iterables.limit(candidates, maxSize - lineups.getAllPlayers().size()), maxSize, predictions);
+                return new Bench(lineups, selected, Iterables.limit(candidates, maxSize - Iterables.size(selected)), maxSize, predictions);
             }
         };
     }
 
-    public static Bench select(AllLineups lineups, TeamStats<BattingStats> predictions, Iterable<Player> available, Integer maxSize) {
+    public static Bench select(AllLineups lineups, Iterable<Player> selected, TeamStats<BattingStats> predictions, Iterable<Player> available, Integer maxSize) {
         HillClimbing.Builder<Bench> builder = HillClimbing
             .<Bench>builder()
             .heuristic(heuristic())
             .validator(validator())
             .actionGenerator(actionGenerator(available));
 
-        return new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, predictions, available, maxSize), builder).search();
+        return new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictions, available, maxSize), builder).search();
     }
 
     private static class Add implements Action<Bench> {
