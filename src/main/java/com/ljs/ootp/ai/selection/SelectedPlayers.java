@@ -67,7 +67,7 @@ public class SelectedPlayers {
     }
 
     private Double score(Lineup.VsHand vs, Lineup lineup) {
-        return 2 * hittingScore(vs, lineup) + hittingWithDefenseScore(vs, lineup) + benchScore(vs, lineup);
+        return hittingScore(vs, lineup) + hittingWithDefenseScore(vs, lineup) + benchScore(vs, lineup);
     }
 
     private Integer hittingScore(Lineup.VsHand vs, Lineup lineup) {
