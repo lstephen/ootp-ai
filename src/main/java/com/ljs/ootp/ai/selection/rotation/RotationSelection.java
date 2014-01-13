@@ -81,7 +81,12 @@ public final class RotationSelection {
             .difference(ImmutableSet.copyOf(available), ImmutableSet.copyOf(
             starters)))).subList(0, definition.getRelieversSize().intValue());
 
-        return Rotation.create(starters, relievers);
+        return Rotation.create(
+            starters,
+            relievers,
+            Sets.difference(
+                ImmutableSet.copyOf(available),
+                ImmutableSet.copyOf(Iterables.concat(starters, relievers))));
     }
 
     public Ordering byOverall() {

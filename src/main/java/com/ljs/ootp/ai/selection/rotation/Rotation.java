@@ -1,11 +1,8 @@
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   Rotation.java
-
 package com.ljs.ootp.ai.selection.rotation;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.ljs.ootp.ai.player.Player;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -14,12 +11,13 @@ public final class Rotation {
 
     private final ImmutableList<Player> sps;
     private final ImmutableList<Player> mrs;
+    private final ImmutableSet<Player> rest;
 
-    private Rotation(Iterable<Player> sps, Iterable<Player> mrs) {
+    private Rotation(Iterable<Player> sps, Iterable<Player> mrs, Iterable<Player> rest) {
         this.sps = ImmutableList.copyOf(sps);
         this.mrs = ImmutableList.copyOf(mrs);
+        this.rest = ImmutableSet.copyOf(rest);
     }
-
 
     public void print(OutputStream out) {
         print(new PrintWriter(out));
@@ -38,8 +36,8 @@ public final class Rotation {
         w.flush();
     }
 
-    public static final Rotation create(Iterable<Player> sps, Iterable<Player> mrs) {
-        return new Rotation(sps, mrs);
+    public static final Rotation create(Iterable<Player> sps, Iterable<Player> mrs, Iterable<Player> rest) {
+        return new Rotation(sps, mrs, rest);
     }
 
 }
