@@ -7,9 +7,9 @@ package com.ljs.ootp.ai.selection.rotation;
 import com.google.common.base.Function;
 import com.google.common.collect.*;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.Selections;
-import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
@@ -62,8 +62,7 @@ public final class RotationSelection {
     }
 
     public Rotation select(Iterable available) {
-        Rotation rotation = new Rotation();
-        List starters = Lists.newArrayList();
+        List<Player> starters = Lists.newArrayList();
         Iterator i$ = byOverall().compound(method.byWeightedRating()).compound(
             Player.byAge()).sortedCopy(Selections.onlyPitchers(available))
             .iterator();
@@ -77,13 +76,12 @@ public final class RotationSelection {
                 starters.add(p);
             }
         } while (true);
-        rotation.setStarters(starters);
-        List relievers = byOverall().compound(method.byWeightedRating())
+        List<Player> relievers = byOverall().compound(method.byWeightedRating())
             .compound(Player.byAge()).sortedCopy(Selections.onlyPitchers(Sets
             .difference(ImmutableSet.copyOf(available), ImmutableSet.copyOf(
             starters)))).subList(0, definition.getRelieversSize().intValue());
-        rotation.setMiddleRelievers(relievers);
-        return rotation;
+
+        return Rotation.create(starters, relievers);
     }
 
     public Ordering byOverall() {

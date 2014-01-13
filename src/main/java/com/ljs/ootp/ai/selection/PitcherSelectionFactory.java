@@ -26,6 +26,10 @@ public final class PitcherSelectionFactory implements SelectionFactory {
 
     @Override
     public Selection create(Mode mode) {
+        return slot(mode);
+    }
+
+    public Selection slot(Mode mode) {
         return SlotSelection
             .builder()
             .ordering(byOverall())

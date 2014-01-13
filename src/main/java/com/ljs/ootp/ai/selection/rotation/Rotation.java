@@ -6,50 +6,40 @@
 package com.ljs.ootp.ai.selection.rotation;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.ljs.ootp.ai.player.Player;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.List;
 
-public class Rotation
-{
+public final class Rotation {
 
-    public Rotation()
-    {
-        starters = Lists.newArrayList();
-        middleRelievers = Lists.newArrayList();
+    private final ImmutableList<Player> sps;
+    private final ImmutableList<Player> mrs;
+
+    private Rotation(Iterable<Player> sps, Iterable<Player> mrs) {
+        this.sps = ImmutableList.copyOf(sps);
+        this.mrs = ImmutableList.copyOf(mrs);
     }
 
-    public void setStarters(Iterable ps)
-    {
-        starters = ImmutableList.copyOf(ps);
-    }
 
-    public void setMiddleRelievers(Iterable middleRelievers)
-    {
-        this.middleRelievers = ImmutableList.copyOf(middleRelievers);
-    }
-
-    public void print(OutputStream out)
-    {
+    public void print(OutputStream out) {
         print(new PrintWriter(out));
     }
 
-    public void print(PrintWriter w)
-    {
+    public void print(PrintWriter w) {
         w.println();
         w.println(String.format("   %-15s %-15s %-15s %-15s %-15s", new Object[] {
             "SP", "LR", "MR", "SU", "CL"
         }));
         for(int i = 0; i < 5; i++)
             w.println(String.format("%d. %-15s %-15s %-15s %-15s %-15s", new Object[] {
-                Integer.valueOf(i + 1), i >= starters.size() ? "" : ((Player)starters.get(i)).getShortName(), "", i >= middleRelievers.size() ? "" : ((Player)middleRelievers.get(i)).getShortName(), "", ""
+                Integer.valueOf(i + 1), i >= sps.size() ? "" : sps.get(i).getShortName(), "", i >= mrs.size() ? "" : mrs.get(i).getShortName(), "", ""
             }));
 
         w.flush();
     }
 
-    private List starters;
-    private List middleRelievers;
+    public static final Rotation create(Iterable<Player> sps, Iterable<Player> mrs) {
+        return new Rotation(sps, mrs);
+    }
+
 }
