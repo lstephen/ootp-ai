@@ -137,6 +137,7 @@ public class BestStartersSelection implements Selection {
         while (selected.size() > size) {
             AllLineups lineups = new LineupSelection(predictions).select(selected);
             Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
+
             Iterables.removeAll(ps, forced);
 
             System.out.print("Selected:");

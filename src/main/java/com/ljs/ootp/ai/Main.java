@@ -50,6 +50,7 @@ import com.ljs.ootp.ai.site.SiteDefinition;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.site.impl.SiteDefinitionFactory;
 import com.ljs.ootp.ai.stats.SplitPercentages;
+import com.ljs.ootp.ai.stats.SplitPercentagesHolder;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.value.FreeAgentAcquisition;
 import com.ljs.ootp.ai.value.LeagueReplacementLevel;
@@ -188,6 +189,8 @@ public class Main {
         SplitPercentages pcts = SplitPercentages.create(site);
         pcts.print(out);
 
+        SplitPercentagesHolder.set(pcts);
+
         SplitStats.setPercentages(pcts);
         PlayerRatings.setPercentages(pcts);
         BestStartersSelection.setPercentages(pcts);
@@ -261,7 +264,7 @@ public class Main {
                     n = 1;
                 }
 
-                faas = FreeAgentAcquisition.select(site, team, fas.all(), tv, n);
+                faas = FreeAgentAcquisition.select(site, changes, team, fas.all(), tv, n);
 
                 for (FreeAgentAcquisition faa : faas) {
                     if (oldRoster.size() >= minRosterSize) {
@@ -345,36 +348,9 @@ public class Main {
                     mode,
                     pitchingRegression.predict(team),
                     site.getPitcherSelectionMethod())
-                .select(newRoster.getPlayers(Status.ML));
+                .selectRotation(ImmutableSet.<Player>of(), Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));
 
         rotation.print(out);
-
-
-        /*SelectedPlayers.predictions = Predictions.predict(newRoster.getAllPlayers()).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod()).getAllBatting();
-        SelectedPlayers.splits = pcts;
-
-        Iterable<Player> hcs = new HillClimbingSelection()
-            .select(
-                Selections.onlyHitters(changes.get(ChangeType.FORCE_ML)),
-                Selections.onlyHitters(newRoster.getAllPlayers()))
-            .values();
-
-        AllLineups hclineups =
-            new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
-                .select(Selections.onlyHitters(hcs));
-
-        Printables.print(hclineups).to(out);
-
-        AllDepthCharts hcdepthCharts = DepthChartSelection
-            .create(battingRegression.predict(newRoster.getAllPlayers()))
-            .select(hclineups, Selections.onlyHitters(hcs));
-
-        hcdepthCharts.print(out);
-
-        for (Player p : hcs) {
-            out.write(String.format("%s%n", p.getShortName()).getBytes(Charsets.ISO_8859_1));
-        }*/
-
 
         if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH && site.getType() != Version.OOTPX) {
             LOG.log(Level.INFO, "Spring training...");

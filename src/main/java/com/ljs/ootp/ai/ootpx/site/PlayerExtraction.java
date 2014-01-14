@@ -12,9 +12,9 @@ import com.ljs.ootp.ai.player.ratings.FieldingRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.splits.Splits;
+import com.ljs.ootp.extract.html.rating.Scale;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import org.apache.commons.lang3.StringUtils;
@@ -280,6 +280,20 @@ public class PlayerExtraction {
             vsL.setEndurance(3);
             vsR.setEndurance(3);
         };
+
+        Integer stamina = Integer.parseInt(doc.select("td:containsOwn(Stamina) + td").text());
+
+        Integer endurance = stamina;
+
+        if (stamina >= 25) {
+            endurance = (int) (5 + Math.round((double) (stamina - 25) / 19 + 1));
+        } else {
+            endurance = stamina / 5 + 1;
+        }
+
+        vsL.setEndurance(endurance);
+        vsR.setEndurance(endurance);
+
 
         return Splits.create(vsL, vsR);
     }

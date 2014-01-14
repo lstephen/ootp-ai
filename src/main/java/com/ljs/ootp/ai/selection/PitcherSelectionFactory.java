@@ -6,6 +6,7 @@ import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.Predictions;
+import com.ljs.ootp.ai.selection.rotation.RotationSelection;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
@@ -16,17 +17,23 @@ import com.ljs.ootp.ai.stats.TeamStats;
  */
 public final class PitcherSelectionFactory implements SelectionFactory {
 
+    private final TeamStats<PitchingStats> predictions;
+
+    private final PitcherOverall overall;
+
     private final Function<Player, Integer> value;
 
     private PitcherSelectionFactory(
-        Function<Player, Integer> value) {
+        TeamStats<PitchingStats> predictions, PitcherOverall overall, Function<Player, Integer> value) {
 
         this.value = value;
+        this.predictions = predictions;
+        this.overall = overall;
     }
 
     @Override
     public Selection create(Mode mode) {
-        return slot(mode);
+        return RotationSelection.forMode(mode, predictions, overall);
     }
 
     public Selection slot(Mode mode) {
@@ -56,13 +63,13 @@ public final class PitcherSelectionFactory implements SelectionFactory {
     public static PitcherSelectionFactory using(
         TeamStats<PitchingStats> stats, PitcherOverall overall) {
 
-        return using(defaultValueFunction(stats, overall));
+        return new PitcherSelectionFactory(stats, overall, defaultValueFunction(stats, overall));
     }
 
     public static PitcherSelectionFactory using(
         final Function<Player, Integer> value) {
 
-        return new PitcherSelectionFactory(value);
+        return new PitcherSelectionFactory(null, null, value);
     }
 
     private static Function<Player, Integer> defaultValueFunction(

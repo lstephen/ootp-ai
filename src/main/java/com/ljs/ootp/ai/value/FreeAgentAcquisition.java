@@ -17,6 +17,8 @@ import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.report.RosterReport;
+import com.ljs.ootp.ai.roster.Changes;
+import com.ljs.ootp.ai.roster.Changes.ChangeType;
 import com.ljs.ootp.ai.site.Site;
 import java.util.Collections;
 import java.util.List;
@@ -91,11 +93,13 @@ public final class FreeAgentAcquisition {
 
     }
 
-    public static ImmutableSet<FreeAgentAcquisition> select(Site site, Iterable<Player> roster, Iterable<Player> fas, TradeValue value, Integer n) {
+    public static ImmutableSet<FreeAgentAcquisition> select(Site site, Changes changes, Iterable<Player> roster, Iterable<Player> fas, TradeValue value, Integer n) {
         Set<FreeAgentAcquisition> faas = Sets.newHashSet();
 
         Set<Player> rroster = Sets.newHashSet(roster);
         Set<Player> rfas = Sets.newHashSet(fas);
+
+        rfas.removeAll(ImmutableSet.copyOf(changes.get(ChangeType.DONT_ACQUIRE)));
 
         for (int i = 0; i < n; i++) {
             Optional<FreeAgentAcquisition> faa = select(site, rroster, rfas, value);
@@ -113,7 +117,7 @@ public final class FreeAgentAcquisition {
         return ImmutableSet.copyOf(faas);
     }
 
-    public static Optional<FreeAgentAcquisition> select(Site site, Iterable<Player> roster, Iterable<Player> fas, TradeValue value) {
+    private static Optional<FreeAgentAcquisition> select(Site site, Iterable<Player> roster, Iterable<Player> fas, TradeValue value) {
         if (Iterables.isEmpty(fas)) {
             return Optional.absent();
         }

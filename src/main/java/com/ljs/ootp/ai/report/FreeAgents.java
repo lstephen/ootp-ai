@@ -104,7 +104,7 @@ public final class FreeAgents {
             .compound(Player.byTieBreak());
     }
 
-    private Boolean skipPlayer(Player fa) {
+    public Boolean skipPlayer(Player fa) {
         if (skipped.contains(fa)) {
             return true;
         }
