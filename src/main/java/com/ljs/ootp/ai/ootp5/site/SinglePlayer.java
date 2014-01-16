@@ -306,7 +306,9 @@ public class SinglePlayer implements PlayerSource {
                     endurance = 5 - (reliever.charAt(0) - 'A');
                     break;
                 }
-                throw new IllegalStateException();
+
+                endurance = 1;
+                break;
             default:
                 throw new IllegalStateException();
         }

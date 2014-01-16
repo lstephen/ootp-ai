@@ -58,7 +58,9 @@ public final class Rotation {
         Integer vsL = 0;
         Integer vsR = 0;
 
-        for (Player p : get(Role.MR, Role.NONE)) {
+        ImmutableList<Player> bp = get(Role.MR, Role.NONE);
+
+        for (Player p : bp) {
             SplitStats<PitchingStats> stats = predictions.getSplits(p);
 
             score += spFactor * overall.getPlus(stats.getOverall());
@@ -73,7 +75,7 @@ public final class Rotation {
         Double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
         Double actBalance = (double) (vsL * vsR);
 
-        Double balanceFactor = actBalance / maxBalance;
+        Double balanceFactor = Math.pow(actBalance / maxBalance, bp.size());
 
         return score * balanceFactor;
     }

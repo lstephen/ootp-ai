@@ -109,7 +109,7 @@ public class Main {
     private static final SiteDefinition LBB =
         //SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
         // Restart
-        SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.x10.mx/lgreport/Leaguesite/", Id.<Team>valueOf(4), "AL", 30);
+        SiteDefinitionFactory.ootp5("LBB", "http://bbs56.net/LBB/Site/Leaguesite/", Id.<Team>valueOf(4), "AL", 20);
 
     //private static final SiteDefinition GABL =
     //    SiteDefinition.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", new TeamId("10"), "American", 30);
