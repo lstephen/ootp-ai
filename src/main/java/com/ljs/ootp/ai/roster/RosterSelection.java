@@ -92,14 +92,18 @@ public final class RosterSelection {
     private Set<Player> getToBeRemoved(Iterable<Player> available) {
         Set<Player> toRemove = Sets.newHashSet();
         if (previous != null) {
-            ImmutableSet<Player> toRemoveFromFourtyMan =
-                ImmutableSet.copyOf(getFourtyManRoster().getPlayersToRemove());
+            ImmutableSet<Player> toRemoveFromFourtyMan = null;
 
             for (Player p : available) {
-                if (p.getClearedWaivers().or(Boolean.FALSE)
-                    && toRemoveFromFourtyMan.contains(p)) {
+                if (p.getClearedWaivers().or(Boolean.FALSE)) {
+					if (toRemoveFromFourtyMan == null) {
+						toRemoveFromFourtyMan =
+							ImmutableSet.copyOf(getFourtyManRoster().getPlayersToRemove());
+					}
 
-                    toRemove.add(p);
+                    if (toRemoveFromFourtyMan.contains(p)) {
+						toRemove.add(p);
+					}
                 }
             }
 
