@@ -30,6 +30,11 @@ public class BattingStats implements Stats<BattingStats> {
     public int getHits() { return hits; }
     public void setHits(int hits) { this.hits = hits; }
 
+    public int getSingles() { return hits - doubles - triples - homeRuns; }
+    public double getSinglesPerPlateAppearance() {
+        return perPlateAppearance(getSingles());
+    }
+
     public int getDoubles() { return doubles; }
     public void setDoubles(int doubles) { this.doubles = doubles; }
 
@@ -99,7 +104,7 @@ public class BattingStats implements Stats<BattingStats> {
     public double getWoba() {
         return perPlateAppearance(
               0.7 * walks
-            + 0.9 * (hits - doubles - triples - homeRuns)
+            + 0.9 * (getSingles())
             + 1.3 * (doubles + triples)
             + 2.0 * homeRuns);
     }
