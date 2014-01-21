@@ -85,7 +85,7 @@ public class LineupOrdering {
         return score;
     }
 
-    public Ordering<Order> byScore(final Lineup.VsHand vs) {
+    private Ordering<Order> byScore(final Lineup.VsHand vs) {
         return Ordering
             .natural()
             .onResultOf(

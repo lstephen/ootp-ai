@@ -157,6 +157,7 @@ public class PlayerExtraction {
             .gap(doc.select("td:containsOwn(Gap) + td + td").text())
             .power(doc.select("td:containsOwn(Power) + td + td").text())
             .eye(doc.select("td:containsOwn(Eye) + td + td").text())
+            .k(doc.select("td:containsOwn(Avoid K's) + td + td").text())
             .build();
 
         BattingRatings<?> vsR = BattingRatings
@@ -165,6 +166,7 @@ public class PlayerExtraction {
             .gap(doc.select("td:containsOwn(Gap) + td + td + td").text())
             .power(doc.select("td:containsOwn(Power) + td + td + td").text())
             .eye(doc.select("td:containsOwn(Eye) + td + td + td").text())
+            .k(doc.select("td:containsOwn(Avoid K's) + td + td + td").text())
             .build();
 
         return Splits.create(vsL, vsR);
@@ -183,6 +185,7 @@ public class PlayerExtraction {
             .gap(doc.select("td:containsOwn(Gap) + td + td + td + td").text())
             .power(doc.select("td:containsOwn(Power) + td + td + td + td").text())
             .eye(doc.select("td:containsOwn(Eye) + td + td + td + td").text())
+            .k(doc.select("td:containsOwn(Avoid K's) + td + td + td + td").text())
             .build();
     }
 

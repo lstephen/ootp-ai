@@ -256,7 +256,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s | %3d | %8s | %s ",
+                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s || %3d | %8s | %s ",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -285,15 +285,13 @@ public final class RosterSelection {
         TeamStats<PitchingStats> pitching = predictions.getAllPitching();
         PitcherOverall method = predictions.getPitcherOverall();
 
-        w.format("%27s|    vL   |    vR   | OVR  MR |%n", "");
-
         for (Player p : pitcherSelectionFactory
             .byOverall()
             .sortedCopy(Selections.onlyPitchers(pitching.getPlayers()))) {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %3d %3s | %3d %3s | %3d %3s | %5.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),

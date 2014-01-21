@@ -74,6 +74,7 @@ public class TeamBattingImpl {
         stats.setTriples(ElementsUtil.getInteger(line, 5));
         stats.setHomeRuns(ElementsUtil.getInteger(line, 6));
         stats.setWalks(ElementsUtil.getInteger(line, 9));
+        stats.setKs(ElementsUtil.getInteger(line, 10));
         return stats;
     }
 
