@@ -67,6 +67,7 @@ public class TeamPitchingImpl {
 
     private PitchingStats extractStats(Elements line) {
         PitchingStats stats = new PitchingStats();
+        stats.setLeaguePitching(site.getLeaguePitching());
         stats.setAtBats(ElementsUtil.getInteger(line, 1));
         stats.setHits(ElementsUtil.getInteger(line, 2));
         stats.setDoubles(ElementsUtil.getInteger(line, 3));

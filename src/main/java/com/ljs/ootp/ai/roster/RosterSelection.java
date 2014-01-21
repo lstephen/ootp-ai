@@ -243,11 +243,11 @@ public final class RosterSelection {
         return forced;
     }
 
-    public void printBattingSelectionTable(OutputStream out, Roster roster) {
-        printBattingSelectionTable(new PrintWriter(out), roster);
+    public void printBattingSelectionTable(OutputStream out, Roster roster, TeamStats<BattingStats> stats) {
+        printBattingSelectionTable(new PrintWriter(out), roster, stats);
     }
 
-    public void printBattingSelectionTable(PrintWriter w, Roster roster) {
+    public void printBattingSelectionTable(PrintWriter w, Roster roster, TeamStats<BattingStats> stats) {
         w.println();
         TeamStats<BattingStats> batting = predictions.getAllBatting();
 
@@ -256,7 +256,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %14s %3d | %14s %3d | %3d | %8s | %s ",
+                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s | %3d | %8s | %s ",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -264,25 +264,28 @@ public final class RosterSelection {
                     p.getAge(),
                     batting.getSplits(p).getVsLeft().getSlashLine(),
                     batting.getSplits(p).getVsLeft().getWobaPlus(),
+                    stats.contains(p) ? stats.getSplits(p).getVsLeft().getWobaPlus() : "",
                     batting.getSplits(p).getVsRight().getSlashLine(),
                     batting.getSplits(p).getVsRight().getWobaPlus(),
+                    stats.contains(p) ? stats.getSplits(p).getVsRight().getWobaPlus() : "",
                     batting.getOverall(p).getWobaPlus(),
                     p.getDefensiveRatings().getPositionScores(),
                     Joiner.on(',').join(Slot.getPlayerSlots(p))));
-
         }
 
         w.flush();
     }
 
-    public void printPitchingSelectionTable(OutputStream out, Roster roster) {
-        printPitchingSelectionTable(new PrintWriter(out), roster);
+    public void printPitchingSelectionTable(OutputStream out, Roster roster, TeamStats<PitchingStats> stats) {
+        printPitchingSelectionTable(new PrintWriter(out), roster, stats);
     }
 
-    public void printPitchingSelectionTable(PrintWriter w, Roster roster) {
+    public void printPitchingSelectionTable(PrintWriter w, Roster roster, TeamStats<PitchingStats> stats) {
         w.println();
         TeamStats<PitchingStats> pitching = predictions.getAllPitching();
         PitcherOverall method = predictions.getPitcherOverall();
+
+        w.format("%27s|    vL   |    vR   | OVR  MR |%n", "");
 
         for (Player p : pitcherSelectionFactory
             .byOverall()
@@ -290,14 +293,16 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %3d %3d | %3d %3s | %5.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %3d %3s | %3d %3s | %3d %3s | %5.2f | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
                     roster.getStatus(p) == null ? "" : roster.getStatus(p),
                     Integer.valueOf(p.getAge()),
                     method.getPlus(pitching.getSplits(p).getVsLeft()),
+                    stats.contains(p) ? method.getPlus(stats.getSplits(p).getVsLeft()) : "",
                     method.getPlus(pitching.getSplits(p).getVsRight()),
+                    stats.contains(p) ? method.getPlus(stats.getSplits(p).getVsRight()) : "",
                     method.getPlus(pitching.getOverall(p)),
                     p.getPosition().equals("MR")
                         ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))

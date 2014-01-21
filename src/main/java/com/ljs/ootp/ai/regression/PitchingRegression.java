@@ -1,5 +1,7 @@
 package com.ljs.ootp.ai.regression;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
@@ -34,6 +36,8 @@ public final class PitchingRegression {
     private final SimpleRegression walks = new SimpleRegression();
 
     private final SimpleRegression homeRuns = new SimpleRegression();
+
+    private final SimpleRegression era = new SimpleRegression();
 
     private final Site site;
 
@@ -204,8 +208,35 @@ public final class PitchingRegression {
 
         history.savePitching(pitchingStats, site, season);
 
-        for (TeamStats<PitchingStats> h : history.loadPitching(site, season, 5)) {
+        Iterable<TeamStats<PitchingStats>> historical = history.loadPitching(site, season, 5);
+
+        for (TeamStats<PitchingStats> h : historical) {
             addData(h);
+        }
+
+        Iterable<TeamStats<PitchingStats>> all =
+            Iterables.concat(ImmutableList.of(pitchingStats), historical);
+
+        for (TeamStats<PitchingStats> tss : all) {
+            for (Player p : tss.getPlayers()) {
+                SplitStats<PitchingStats> splits = tss.getSplits(p);
+                SplitStats<PitchingStats> predicted = predict(p);
+
+                for (int i = 0; i < splits.getVsLeft().getPlateAppearances(); i++) {
+                    if (splits.getVsLeft().getInningsPitched() > 0) {
+                        era.addData(
+                            site.getPitcherSelectionMethod().getEraEstimate(splits.getVsLeft()),
+                            site.getPitcherSelectionMethod().getEraEstimate(predicted.getVsLeft()));
+                    }
+                }
+                for (int i = 0; i < splits.getVsRight().getPlateAppearances(); i++) {
+                    if (splits.getVsRight().getInningsPitched() > 0) {
+                        era.addData(
+                            site.getPitcherSelectionMethod().getEraEstimate(splits.getVsRight()),
+                            site.getPitcherSelectionMethod().getEraEstimate(predicted.getVsRight()));
+                    }
+                }
+            }
         }
     }
 
@@ -225,16 +256,17 @@ public final class PitchingRegression {
 
         @Override
         public void print(PrintWriter w) {
-            w.println("  |   K%  |  BB%  |  HR%  |   H%  |  2B%  |");
+            w.println("  |   K%  |  BB%  |  HR%  |   H%  |  2B%  |  ERA  |");
 
             w.println(
                 String.format(
-                    "R2| %.3f | %.3f | %.3f | %.3f | %.3f |",
+                    "R2| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
                     regression.strikeouts.getRSquare(),
                     regression.walks.getRSquare(),
                     regression.homeRuns.getRSquare(),
                     regression.hits.getRSquare(),
-                    regression.doubles.getRSquare()));
+                    regression.doubles.getRSquare(),
+                    regression.era.getRSquare()));
         }
 
         public static CorrelationReport create(PitchingRegression regression) {

@@ -122,7 +122,7 @@ public final class DraftReport implements Printable {
         int n = not / 3;
 
         RoundValue rv = getValueOfPicks(n);
-        if (rv == null) {
+        if (rv == null || rv.isEmpty()) {
             return;
         }
 

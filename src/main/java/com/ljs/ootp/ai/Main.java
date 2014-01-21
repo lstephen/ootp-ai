@@ -263,6 +263,9 @@ public class Main {
                 if (site.getName().equals("BTH")) {
                     n = 1;
                 }
+                if (site.getName().equals("TWML")) {
+                    n = 0;
+                }
 
                 faas = FreeAgentAcquisition.select(site, changes, team, fas.all(), tv, n);
 
@@ -303,8 +306,8 @@ public class Main {
         newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);
 
-        selection.printBattingSelectionTable(out, newRoster);
-        selection.printPitchingSelectionTable(out, newRoster);
+        selection.printBattingSelectionTable(out, newRoster, site.getTeamBatting());
+        selection.printPitchingSelectionTable(out, newRoster, site.getTeamPitching());
 
         Printables.print(newRoster).to(out);
 

@@ -1,5 +1,7 @@
 package com.ljs.ootp.ai.regression;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
@@ -32,6 +34,8 @@ public final class BattingRegression {
     private final SimpleRegression homeRuns = new SimpleRegression();
 
     private final SimpleRegression walks = new SimpleRegression();
+
+    private final SimpleRegression woba = new SimpleRegression();
 
     private final BattingStats leagueBatting;
 
@@ -179,8 +183,28 @@ public final class BattingRegression {
 
         history.saveBatting(battingStats, site, currentSeason);
 
-        for (TeamStats<BattingStats> h : history.loadBatting(site, currentSeason, 5)) {
+        Iterable<TeamStats<BattingStats>> historical =
+            history.loadBatting(site, currentSeason, 5);
+
+        for (TeamStats<BattingStats> h : historical) {
             addData(h);
+        }
+
+        Iterable<TeamStats<BattingStats>> all =
+            Iterables.concat(ImmutableList.of(battingStats), historical);
+
+        for (TeamStats<BattingStats> tss : all) {
+            for (Player p : tss.getPlayers()) {
+                SplitStats<BattingStats> splits = tss.getSplits(p);
+                SplitStats<BattingStats> predicted = predict(p);
+
+                for (int i = 0; i < splits.getVsLeft().getPlateAppearances(); i++) {
+                    woba.addData(splits.getVsLeft().getWoba(), predicted.getVsLeft().getWoba());
+                }
+                for (int i = 0; i < splits.getVsRight().getPlateAppearances(); i++) {
+                    woba.addData(splits.getVsRight().getWoba(), predicted.getVsRight().getWoba());
+                }
+            }
         }
     }
 
@@ -200,15 +224,16 @@ public final class BattingRegression {
 
         @Override
         public void print(PrintWriter w) {
-            w.println("  |   H%  |  XB%  |  HR%  |  BB%  |");
+            w.println("  |   H%  |  XB%  |  HR%  |  BB%  |  wOBA |");
 
             w.println(
                 String.format(
-                "R2| %.3f | %.3f | %.3f | %.3f |",
+                "R2| %.3f | %.3f | %.3f | %.3f | %.3f |",
                 regression.hits.getRSquare(),
                 regression.extraBaseHits.getRSquare(),
                 regression.homeRuns.getRSquare(),
-                regression.walks.getRSquare()));
+                regression.walks.getRSquare(),
+                regression.woba.getRSquare()));
         }
 
         public static CorrelationReport create(BattingRegression regression) {

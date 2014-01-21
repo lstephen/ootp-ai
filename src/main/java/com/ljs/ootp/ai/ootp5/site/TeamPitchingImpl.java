@@ -24,18 +24,24 @@ public class TeamPitchingImpl extends SingleTeamStats<PitchingStats> {
     private static final int WALKS_IDX = 7;
     private static final int HOMERUN_IDX = 5;
 
+    private PitchingStats leaguePitching;
+
     public TeamPitchingImpl(Site site, Id<Team> team) {
         super(site.extractTeam(), site.getPage("team" + team.get() + "p.html"));
+
+        leaguePitching = site.getLeaguePitching();
     }
 
     @Override
     protected PitchingStats zero() {
-        return new PitchingStats();
+        PitchingStats zero = new PitchingStats();
+        zero.setLeaguePitching(leaguePitching);
+        return zero;
     }
 
     @Override
     protected PitchingStats extractStatsRow(Elements data) {
-        PitchingStats pitching = new PitchingStats();
+        PitchingStats pitching = zero();
         pitching.setAtBats(ElementsUtil.getInteger(data, ATBAT_IDX));
         pitching.setHits(ElementsUtil.getInteger(data, HITS_IDX));
         pitching.setDoubles(ElementsUtil.getInteger(data, DOUBLES_IDX));
