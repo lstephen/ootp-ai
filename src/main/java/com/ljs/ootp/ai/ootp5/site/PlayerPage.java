@@ -2,12 +2,12 @@ package com.ljs.ootp.ai.ootp5.site;
 
 import com.google.common.collect.ImmutableMap;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
-import com.ljs.ootp.extract.html.rating.Rating;
-import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.site.Site;
 import static com.ljs.ootp.ai.site.Version.OOTP5;
 import static com.ljs.ootp.ai.site.Version.OOTP6;
 import com.ljs.ootp.ai.splits.Splits;
+import com.ljs.ootp.extract.html.rating.Rating;
+import com.ljs.ootp.extract.html.rating.Scale;
 import javax.annotation.Nonnull;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,21 +19,23 @@ import org.jsoup.select.Elements;
  */
 public final class PlayerPage {
 
-    private static enum BattingRatingsType { CONTACT, GAP, POWER, EYE }
+    private static enum BattingRatingsType { CONTACT, GAP, POWER, EYE, K }
 
     private static final ImmutableMap<BattingRatingsType, Integer> OOTP6_HITTING =
         ImmutableMap.of(
             BattingRatingsType.CONTACT, 1,
             BattingRatingsType.GAP, 2,
             BattingRatingsType.POWER, 3,
-            BattingRatingsType.EYE, 4);
+            BattingRatingsType.EYE, 4,
+            BattingRatingsType.K, 5);
 
     private static final ImmutableMap<BattingRatingsType, Integer> OOTP5_HITTING =
         ImmutableMap.of(
             BattingRatingsType.CONTACT, 1,
             BattingRatingsType.GAP, 2,
             BattingRatingsType.POWER, 4,
-            BattingRatingsType.EYE, 5);
+            BattingRatingsType.EYE, 5,
+            BattingRatingsType.K, 6);
 
     private static final ImmutableMap<String, Integer> OOTP5_POTENTIAL =
         ImmutableMap.of(
@@ -104,6 +106,7 @@ public final class PlayerPage {
             .gap(line.get(idx.get(BattingRatingsType.GAP)).text())
             .power(line.get(idx.get(BattingRatingsType.POWER)).text())
             .eye(line.get(idx.get(BattingRatingsType.EYE)).text())
+            .k(line.get(idx.get(BattingRatingsType.K)).text())
             .build();
     }
 

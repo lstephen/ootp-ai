@@ -30,6 +30,7 @@ public class LineupOrdering {
     private static final int WEIGHT_3B = 2;
     private static final int WEIGHT_HR = 3;
     private static final int WEIGHT_BB = 4;
+    private static final int WEIGHT_K = 7;
     private static final int WEIGHT_OUT = 8;
 
     private static final double[][] WEIGHTS = {
@@ -59,19 +60,27 @@ public class LineupOrdering {
         int pos = 0;
 
         for (Player p : order.get()) {
-            double[] ws = WEIGHTS[pos];
-
-            BattingStats ps = vs.getStats(predictions, p);
-
-            score += ws[WEIGHT_1B] * ps.getSingles();
-            score += ws[WEIGHT_2B] * ps.getDoublesPerPlateAppearance();
-            score += ws[WEIGHT_3B] * ps.getTriplesPerPlateAppearance();
-            score += ws[WEIGHT_HR] * ps.getHomeRunsPerPlateAppearance();
-            score += ws[WEIGHT_BB] * ps.getWalksPerPlateAppearance();
-            score += ws[WEIGHT_OUT] * ps.getOutsPerPlateAppearance();
-
+            score += score(p, pos, vs);
             pos++;
         }
+
+        return score;
+    }
+
+    private Double score(Player p, int pos, Lineup.VsHand vs) {
+        Double score = 0.0;
+
+        double[] ws = WEIGHTS[pos];
+
+        BattingStats ps = vs.getStats(predictions, p);
+
+        score += ws[WEIGHT_1B] * ps.getSinglesPerPlateAppearance();
+        score += ws[WEIGHT_2B] * ps.getDoublesPerPlateAppearance();
+        score += ws[WEIGHT_3B] * ps.getTriplesPerPlateAppearance();
+        score += ws[WEIGHT_HR] * ps.getHomeRunsPerPlateAppearance();
+        score += ws[WEIGHT_BB] * ps.getWalksPerPlateAppearance();
+        score += ws[WEIGHT_K] * ps.getKsPerPlateAppearance();
+        score += ws[WEIGHT_OUT] * (ps.getOutsPerPlateAppearance() - ps.getKsPerPlateAppearance());
 
         return score;
     }

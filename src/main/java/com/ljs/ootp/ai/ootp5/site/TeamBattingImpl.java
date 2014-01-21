@@ -22,6 +22,7 @@ public class TeamBattingImpl extends SingleTeamStats<BattingStats> {
     private static final int DOUBLES_IDX = 3;
     private static final int TRIPLES_IDX = 4;
     private static final int WALKS_IDX = 8;
+    private static final int KS_IDX = 9;
 
     private final BattingStats leagueBatting;
 
@@ -48,6 +49,7 @@ public class TeamBattingImpl extends SingleTeamStats<BattingStats> {
         batting.setDoubles(ElementsUtil.getInteger(data, DOUBLES_IDX));
         batting.setTriples(ElementsUtil.getInteger(data, TRIPLES_IDX));
         batting.setWalks(ElementsUtil.getInteger(data, WALKS_IDX));
+        batting.setKs(ElementsUtil.getInteger(data, KS_IDX));
         return batting;
     }
 

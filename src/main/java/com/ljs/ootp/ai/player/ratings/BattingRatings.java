@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.extract.html.rating.Rating;
@@ -30,6 +31,8 @@ public final class BattingRatings<T> {
 
     private final Rating<T, ?> eye;
 
+    private final Rating<T, ?> k;
+
     private BattingRatings(Builder<T> builder) {
         Assertions.assertThat(builder.scale).isNotNull();
         Preconditions.checkNotNull(builder.contact);
@@ -42,6 +45,7 @@ public final class BattingRatings<T> {
         this.gap = builder.gap;
         this.power = builder.power;
         this.eye = builder.eye;
+        this.k = builder.k;
     }
 
     public Integer getContact() {
@@ -58,6 +62,12 @@ public final class BattingRatings<T> {
 
     public Integer getEye() {
         return eye.normalize().get();
+    }
+
+    public Optional<Integer> getK() {
+        return k == null
+            ? Optional.<Integer>absent()
+            : Optional.of(k.normalize().get());
     }
 
     public BattingRatings<T> build() {
@@ -131,6 +141,8 @@ public final class BattingRatings<T> {
 
         private Rating<T, ? extends Scale<T>> eye;
 
+        private Rating<T, ? extends Scale<T>> k;
+
         private Builder(Scale<T> scale) {
             this.scale = scale;
         }
@@ -199,6 +211,21 @@ public final class BattingRatings<T> {
         public Builder<T> eye(T value) {
             return eye(Rating.create(value, scale));
         }
+
+        public Builder<T> k(Rating<T, ?> k) {
+            this.k = k;
+            return this;
+        }
+
+        @JsonProperty("k")
+        public Builder<T> k(String s) {
+            return k(scale.parse(s));
+        }
+
+        public Builder<T> k(T value) {
+            return k(Rating.create(value, scale));
+        }
+
 
         public BattingRatings<T> build() {
             return BattingRatings.build(this);

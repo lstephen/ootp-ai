@@ -22,6 +22,8 @@ public class BattingStats implements Stats<BattingStats> {
 
     private int walks;
 
+    private int ks;
+
     @JsonIgnore
     private BattingStats leagueBatting;
 
@@ -44,6 +46,8 @@ public class BattingStats implements Stats<BattingStats> {
     public void setHomeRuns(int homeRuns) { this.homeRuns = homeRuns; }
 
     public void setWalks(int walks) { this.walks = walks; }
+
+    public void setKs(int ks) { this.ks = ks; }
 
     public void setLeagueBatting(BattingStats leagueBatting) {
         this.leagueBatting = leagueBatting;
@@ -81,6 +85,10 @@ public class BattingStats implements Stats<BattingStats> {
 
     public double getWalksPerPlateAppearance() {
         return perPlateAppearance(walks);
+    }
+
+    public double getKsPerPlateAppearance() {
+        return perPlateAppearance(ks);
     }
 
     public double getOutsPerPlateAppearance() {
@@ -145,6 +153,7 @@ public class BattingStats implements Stats<BattingStats> {
         stats.triples = (int) (triples * d);
         stats.homeRuns = (int) (homeRuns * d);
         stats.walks = (int) (walks * d);
+        stats.ks = (int) (ks * d);
         return stats;
     }
 
@@ -157,6 +166,7 @@ public class BattingStats implements Stats<BattingStats> {
         stats.triples = triples + rhs.triples;
         stats.homeRuns = homeRuns + rhs.homeRuns;
         stats.walks = walks + rhs.walks;
+        stats.ks = ks + rhs.ks;
         return stats;
     }
 

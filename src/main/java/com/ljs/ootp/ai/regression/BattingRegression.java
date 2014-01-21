@@ -23,7 +23,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
  */
 public final class BattingRegression {
 
-    private enum Predicting { HITS, EXTRA_BASE_HITS, HOME_RUNS, WALKS }
+    private enum Predicting { HITS, EXTRA_BASE_HITS, HOME_RUNS, WALKS, KS }
 
     private static final int DEFAULT_PLATE_APPEARANCES = 700;
 
@@ -34,6 +34,8 @@ public final class BattingRegression {
     private final SimpleRegression homeRuns = new SimpleRegression();
 
     private final SimpleRegression walks = new SimpleRegression();
+
+    private final SimpleRegression ks = new SimpleRegression();
 
     private final SimpleRegression woba = new SimpleRegression();
 
@@ -58,7 +60,7 @@ public final class BattingRegression {
        }
     }
 
-    private void addData(BattingStats stats, BattingRatings ratings) {
+    private void addData(BattingStats stats, BattingRatings<?> ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
             hits.addData(
                 ratings.getContact(), stats.getHitsPerPlateAppearance());
@@ -67,6 +69,10 @@ public final class BattingRegression {
             homeRuns.addData(
                 ratings.getPower(), stats.getHomeRunsPerPlateAppearance());
             walks.addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
+
+            if (ratings.getK().isPresent()) {
+                ks.addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
+            }
         }
     }
 
@@ -86,6 +92,9 @@ public final class BattingRegression {
                 break;
             case WALKS:
                 regression = walks;
+                break;
+            case KS:
+                regression = ks;
                 break;
             default:
                 throw new IllegalStateException();
@@ -134,7 +143,7 @@ public final class BattingRegression {
         return predict(ratings, DEFAULT_PLATE_APPEARANCES);
     }
 
-    public BattingStats predict(BattingRatings ratings, int plateAppearances) {
+    public BattingStats predict(BattingRatings<?> ratings, int plateAppearances) {
         int predictedHits =
             (int) (plateAppearances
                 * predict(Predicting.HITS, ratings.getContact()));
@@ -156,6 +165,11 @@ public final class BattingRegression {
             (int) (plateAppearances
                 * predict(Predicting.WALKS, ratings.getEye()));
 
+        int predictedKs = ratings.getK().isPresent()
+            ? (int) (plateAppearances
+                * predict(Predicting.KS, ratings.getK().get()))
+            : 0;
+
         BattingStats predicted = new BattingStats();
         predicted.setLeagueBatting(leagueBatting);
         predicted.setAtBats(plateAppearances - predictedWalks);
@@ -164,6 +178,7 @@ public final class BattingRegression {
         predicted.setTriples(predictedTriples);
         predicted.setHomeRuns(predictedHomeRuns);
         predicted.setWalks(predictedWalks);
+        predicted.setKs(predictedKs);
 
         return predicted;
     }
@@ -224,15 +239,16 @@ public final class BattingRegression {
 
         @Override
         public void print(PrintWriter w) {
-            w.println("  |   H%  |  XB%  |  HR%  |  BB%  |  wOBA |");
+            w.println("  |   H%  |  XB%  |  HR%  |  BB%  |   K%  |  wOBA |");
 
             w.println(
                 String.format(
-                "R2| %.3f | %.3f | %.3f | %.3f | %.3f |",
+                "R2| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
                 regression.hits.getRSquare(),
                 regression.extraBaseHits.getRSquare(),
                 regression.homeRuns.getRSquare(),
                 regression.walks.getRSquare(),
+                regression.ks.getRSquare(),
                 regression.woba.getRSquare()));
         }
 
