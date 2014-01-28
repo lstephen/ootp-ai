@@ -18,7 +18,6 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
-import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.selection.bench.Bench;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
@@ -61,8 +60,6 @@ public class BestStartersSelection implements Selection {
 	public ImmutableMultimap<Slot, Player> select(Iterable<Player> forced, Iterable<Player> available) {
 
         ImmutableSet<Player> best = ImmutableSet.copyOf(Iterables.concat(selectStarters(available), forced));
-
-        AllLineups lineups = new LineupSelection(predictions).select(best);
 
         best = optimize(best, forced, available);
 
@@ -163,10 +160,10 @@ public class BestStartersSelection implements Selection {
     private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
 		StarterSelection starters = new StarterSelection(predictions);
 
-		return ImmutableSet.copyOf(
-			Iterables.concat(
-				starters.selectWithDh(Lineup.VsHand.VS_LHP, ps),
-				starters.selectWithDh(Lineup.VsHand.VS_RHP, ps)));
+        return ImmutableSet.copyOf(
+            Iterables.concat(
+                starters.selectWithDh(Lineup.VsHand.VS_LHP, ps),
+                starters.selectWithDh(Lineup.VsHand.VS_RHP, ps)));
     }
 
 	private Ordering<Player> byOverall() {
@@ -191,10 +188,11 @@ public class BestStartersSelection implements Selection {
     private Double getValueProvided(Player p, AllLineups lineups, Iterable<Player> selected) {
         Double score = 0.0;
 
-        score += getValueProvided(p, lineups.getVsLhp(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
         score += getValueProvided(p, lineups.getVsLhpPlusDh(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
-        score += getValueProvided(p, lineups.getVsRhp(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
+        score += getValueProvided(p, lineups.getVsLhp(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
+
         score += getValueProvided(p, lineups.getVsRhpPlusDh(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
+        score += getValueProvided(p, lineups.getVsRhp(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
 
         return score;
     }
@@ -208,29 +206,10 @@ public class BestStartersSelection implements Selection {
 
             if (p.canPlay(l.getPosition(p))) {
                 score += wobaPlus;
-                //score += (getPositionFactor(l.getPosition(p)) * wobaPlus);
             }
         }
 
         return pct * score;
-    }
-
-    private Integer getPositionFactor(Position pos) {
-        switch (pos) {
-            case CATCHER:
-            case SHORTSTOP:
-                return 10;
-            case THIRD_BASE:
-            case SECOND_BASE:
-                return 9;
-            case CENTER_FIELD:
-                return 8;
-            case LEFT_FIELD:
-            case RIGHT_FIELD:
-                return 7;
-            default:
-                return 6;
-        }
     }
 
 }

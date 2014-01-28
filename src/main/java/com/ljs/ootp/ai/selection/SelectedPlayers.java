@@ -56,14 +56,12 @@ public class SelectedPlayers {
     public Double score() {
         AllLineups lineups = new LineupSelection(predictions).select(players);
 
-        return
-            splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp())
-            + splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh())
-            + splits.getVsLhpPercentage() * score(VsHand.VS_LHP, lineups.getVsLhp())
+        return splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh())
+            + splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp())
             + splits.getVsLhpPercentage() * score(VsHand.VS_LHP, lineups.getVsLhpPlusDh())
+            + splits.getVsLhpPercentage() * score(VsHand.VS_LHP, lineups.getVsLhp())
             - players.size()
             - (double) ageScore() / 100000;
-
     }
 
     private Double score(Lineup.VsHand vs, Lineup lineup) {

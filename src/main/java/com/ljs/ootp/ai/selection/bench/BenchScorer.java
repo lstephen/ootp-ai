@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.Position;
@@ -39,10 +40,10 @@ public class BenchScorer {
         for (Lineup.Entry entry : lineup) {
             if (!entry.getPositionEnum().equals(Position.PITCHER)) {
                 Integer count = 0;
-                for (Player p : selectBenchPlayer(bench, lineup, vs, entry.getPositionEnum())) {
+                for (Player p : Iterables.limit(selectBenchPlayer(bench, lineup, vs, entry.getPositionEnum()), 2)) {
                     count++;
                     if (predicate.apply(p)) {
-                        Double countFactor = 1.0 / Math.pow(count, 3);
+                        Double countFactor = 1.0 / Math.pow(count, 2);
                         score += (getPositionFactor(entry.getPositionEnum()) * countFactor * vs.getStats(predictions, p).getWobaPlus());
                     }
                 }

@@ -2,20 +2,20 @@ package com.ljs.ootp.ai.site.impl;
 
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.ootp5.Ootp5;
-import com.ljs.ootp.extract.html.ootp5.rating.PotentialRating;
-import com.ljs.ootp.extract.html.ootp5.rating.ZeroToTen;
-import com.ljs.ootp.extract.html.ootp6.rating.OneToTen;
-import com.ljs.ootp.extract.html.ootp6.rating.OneToTwenty;
 import com.ljs.ootp.ai.ootp6.Ootp6;
-import com.ljs.ootp.extract.html.ootp6.rating.TwoToEight;
 import com.ljs.ootp.ai.ootpx.OotpX;
-import com.ljs.ootp.extract.html.rating.OneToOneHundred;
-import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.SiteDefinition;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.stats.PitcherOverall;
+import com.ljs.ootp.extract.html.ootp5.rating.PotentialRating;
+import com.ljs.ootp.extract.html.ootp5.rating.ZeroToTen;
+import com.ljs.ootp.extract.html.ootp6.rating.OneToTen;
+import com.ljs.ootp.extract.html.ootp6.rating.OneToTwenty;
+import com.ljs.ootp.extract.html.ootp6.rating.TwoToEight;
+import com.ljs.ootp.extract.html.rating.OneToOneHundred;
+import com.ljs.ootp.extract.html.rating.Scale;
 
 /**
  *

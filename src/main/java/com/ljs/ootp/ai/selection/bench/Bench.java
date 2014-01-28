@@ -2,7 +2,6 @@ package com.ljs.ootp.ai.selection.bench;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
@@ -14,7 +13,6 @@ import com.ljs.ai.search.hillclimbing.action.Action;
 import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
 import com.ljs.ai.search.hillclimbing.action.SequencedAction;
 import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
 import com.ljs.ootp.ai.stats.BattingStats;
@@ -102,33 +100,6 @@ public class Bench {
                     vs);
     }
 
-    private ImmutableList<Player> selectBenchPlayer(Lineup lineup, final Lineup.VsHand vs, Position pos) {
-        Set<Player> bench = ImmutableSet.copyOf(
-            Iterables.concat(
-                Sets.difference(selected, lineup.playerSet()),
-                players));
-
-        ImmutableList<Player> sortedBench = Ordering
-            .natural()
-            .reverse()
-            .onResultOf(new Function<Player, Integer>() {
-                public Integer apply(Player p) {
-                    return vs.getStats(predictions, p).getWobaPlus();
-                }
-            })
-            .compound(Player.byTieBreak())
-            .immutableSortedCopy(players);
-
-        List<Player> ps = Lists.newArrayList();
-
-        for (Player p : sortedBench) {
-            if (p.canPlay(pos)) {
-                ps.add(p);
-            }
-        }
-        return ImmutableList.copyOf(ps);
-    }
-
     private Integer totalAge() {
         Integer age = 0;
 
@@ -167,6 +138,15 @@ public class Bench {
             }});
     }
 
+    private static Ordering<Bench> bySize() {
+        return Ordering
+            .natural()
+            .onResultOf(new Function<Bench, Integer>() {
+                public Integer apply(Bench b) {
+                    return b.players.size();
+            }});
+    }
+
     private static Ordering<Bench> byAge() {
         return Ordering
             .natural()
@@ -180,6 +160,7 @@ public class Bench {
 
     private static Ordering<Bench> heuristic() {
         return byScore()
+            .compound(bySize().reverse())
             .compound(byAge());
     }
 

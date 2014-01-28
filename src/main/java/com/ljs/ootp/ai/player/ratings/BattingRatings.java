@@ -219,7 +219,9 @@ public final class BattingRatings<T> {
 
         @JsonProperty("k")
         public Builder<T> k(String s) {
-            return k(scale.parse(s));
+            return s == null || s.equals("null")
+                ? this
+                : k(scale.parse(s));
         }
 
         public Builder<T> k(T value) {

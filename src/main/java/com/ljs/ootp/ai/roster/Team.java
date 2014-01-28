@@ -72,6 +72,10 @@ public final class Team implements Iterable<Player>, PlayerSource {
         injured.remove(p);
     }
 
+    public Integer size() {
+        return players.size();
+    }
+
 
     @Override
     public Iterator<Player> iterator() {

@@ -2,9 +2,9 @@ package com.ljs.ootp.ai.site;
 
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.player.ratings.RatingsDefinition;
-import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.stats.PitcherOverall;
+import com.ljs.ootp.extract.html.rating.Scale;
 
 /**
  *

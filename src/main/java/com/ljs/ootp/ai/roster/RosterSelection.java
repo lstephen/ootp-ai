@@ -133,8 +133,10 @@ public final class RosterSelection {
 
     private Roster select(Changes changes, Selection hitting, Selection pitching) {
         Roster roster = Roster.create(team);
-        Iterable<Player> forced = getForced(changes);
+        Set<Player> forced = Sets.newHashSet(getForced(changes));
         assignToDisabledList(roster, team.getInjuries());
+
+        forced.removeAll(roster.getPlayers(Status.DL));
 
         roster.assign(
             Roster.Status.ML,
@@ -222,7 +224,7 @@ public final class RosterSelection {
 
     }
 
-    private Iterable<Player> getForced(Changes changes) {
+    private ImmutableSet<Player> getForced(Changes changes) {
         Set<Player> forced = Sets.newHashSet();
 
         for (Player p : changes.get(Changes.ChangeType.FORCE_ML)) {
@@ -240,7 +242,7 @@ public final class RosterSelection {
                 }
             }
         }
-        return forced;
+        return ImmutableSet.copyOf(forced);
     }
 
     public void printBattingSelectionTable(OutputStream out, Roster roster, TeamStats<BattingStats> stats) {
@@ -298,9 +300,9 @@ public final class RosterSelection {
                     roster.getStatus(p) == null ? "" : roster.getStatus(p),
                     Integer.valueOf(p.getAge()),
                     method.getPlus(pitching.getSplits(p).getVsLeft()),
-                    stats.contains(p) ? method.getPlus(stats.getSplits(p).getVsLeft()) : "",
+                    stats.contains(p) ? Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999) : "",
                     method.getPlus(pitching.getSplits(p).getVsRight()),
-                    stats.contains(p) ? method.getPlus(stats.getSplits(p).getVsRight()) : "",
+                    stats.contains(p) ? Math.min(method.getPlus(stats.getSplits(p).getVsRight()), 999) : "",
                     method.getPlus(pitching.getOverall(p)),
                     p.getPosition().equals("MR")
                         ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))

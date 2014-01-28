@@ -269,8 +269,8 @@ public class Main {
 
                 faas = FreeAgentAcquisition.select(site, changes, team, fas.all(), tv, n);
 
-                for (FreeAgentAcquisition faa : faas) {
-                    if (oldRoster.size() >= minRosterSize) {
+                if (oldRoster.size() > minRosterSize) {
+                    for (FreeAgentAcquisition faa : faas) {
                         team.remove(faa.getRelease());
                     }
                 }

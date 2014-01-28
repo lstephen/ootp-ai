@@ -25,7 +25,6 @@ import com.ljs.ootp.ai.ootpx.site.TeamExtraction;
 import com.ljs.ootp.ai.ootpx.site.TeamPitchingImpl;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
-import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.LeagueStructure;
@@ -47,6 +46,7 @@ import com.ljs.ootp.extract.html.PageFactory;
 import com.ljs.ootp.extract.html.loader.DiskCachingLoader;
 import com.ljs.ootp.extract.html.loader.PageLoader;
 import com.ljs.ootp.extract.html.loader.PageLoaderBuilder;
+import com.ljs.ootp.extract.html.rating.Scale;
 import com.ljs.scratch.util.ElementsUtil;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -319,12 +319,12 @@ public class OotpX implements Site {
 
         return new Standings() {
             public Integer getWins(Id<Team> team) {
-                Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + "]) > td");
+                Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + ".html]) > td");
                 return ElementsUtil.getInteger(els, 1);
             }
 
             public Integer getLosses(Id<Team> team) {
-                Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + "]) > td");
+                Elements els = standings.select("tbody > tr:has(a[href~=team_" + team.get() + ".html]) > td");
                 return ElementsUtil.getInteger(els, 2);
             }
 
