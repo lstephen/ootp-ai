@@ -14,6 +14,7 @@ import com.ljs.ai.search.hillclimbing.action.Action;
 import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
 import com.ljs.ai.search.hillclimbing.action.SequencedAction;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.selection.lineup.Lineup.VsHand;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
 import java.util.Collections;
@@ -55,6 +56,23 @@ public class LineupOrdering {
         this.predictions = predictions;
     }
 
+	private Double score(Order order) {
+		Double vsL = score(order, VsHand.VS_LHP);
+		Double vsR = score(order, VsHand.VS_RHP);
+
+        return (vsL + vsR) * getBalanceFactor(order);
+	}
+
+	private Double getBalanceFactor(Order order) {
+		Double vsL = score(order, VsHand.VS_LHP) + 1;
+		Double vsR = score(order, VsHand.VS_RHP) + 1;
+
+        Double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
+        Double actBalance = (double) (vsL * vsR);
+
+        return Math.pow(actBalance / maxBalance, order.size());
+	}
+
     private Double score(Order order, Lineup.VsHand vs) {
         Double score = 0.0;
         int pos = 0;
@@ -91,7 +109,7 @@ public class LineupOrdering {
             .onResultOf(
                 new Function<Order, Double>() {
                     public Double apply(Order o) {
-                        return score(o, vs);
+						return 2 * score(o, vs) + score(o);
                     }
                 });
     }
