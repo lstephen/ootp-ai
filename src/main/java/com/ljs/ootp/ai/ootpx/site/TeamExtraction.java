@@ -1,5 +1,6 @@
 package com.ljs.ootp.ai.ootpx.site;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.data.Id;
@@ -39,8 +40,20 @@ public final class TeamExtraction {
 
     }
 
-    public Iterable<PlayerId> getInjuries(Id<Team> id) {
+	public Iterable<PlayerId> getInjuries(Id<Team> id) {
+		Set<PlayerId> injured = Sets.newHashSet();
+
+		for (Id<Team> t : Iterables.concat(ImmutableSet.of(id), getMinorLeagueTeams(id))) {
+			Iterables.addAll(injured, getSingleTeamInjuries(t));
+		}
+
+		return injured;
+	}
+
+    private Iterable<PlayerId> getSingleTeamInjuries(Id<Team> id) {
         Document doc = Pages.team(site, id).load();
+
+
 
         Elements els = doc.select("tr.title:has(td:containsOwn(Injuries)) ~ tr + tr");
 
@@ -63,6 +76,22 @@ public final class TeamExtraction {
 
         return injured;
     }
+
+	private Set<Id<Team>> getMinorLeagueTeams(Id<Team> id) {
+		Document doc = Pages.team(site, id).load();
+
+		Elements els = doc.select("tr.capt1:has(td:containsOwn(Minor League System)) ~ tr");
+
+		Elements as = els.select("a[href~=team]");
+
+		Set<Id<Team>> ids = Sets.newHashSet();
+
+		for (Element a : as) {
+			ids.add(Id.<Team>valueOf(StringUtils.substringBetween(a.attr("href"), "team_", ".html")));
+		}
+
+		return ids;
+	}
 
     public static TeamExtraction create(Site site) {
         return new TeamExtraction(site);
