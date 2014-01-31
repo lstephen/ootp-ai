@@ -1,6 +1,7 @@
 package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -144,6 +145,12 @@ public class LineupOrdering {
 
         public ImmutableList<Player> get() {
             return order;
+        }
+
+        public Optional<Player> get(Integer idx) {
+            return idx >= 0 && idx < size()
+                ? Optional.of(order.get(idx))
+                : Optional.<Player>absent();
         }
 
         public int size() {

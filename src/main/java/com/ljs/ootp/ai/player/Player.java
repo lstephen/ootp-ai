@@ -2,7 +2,6 @@ package com.ljs.ootp.ai.player;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -26,7 +25,6 @@ import org.fest.assertions.api.Assertions;
  *
  * @author lstephen
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Player {
 
     private static final Integer MAX_SURNAME_LENGTH = 12;
@@ -43,12 +41,13 @@ public final class Player {
 
     private final PlayerRatings ratings;
 
+    private BattingHand battingHand;
+
     @JsonIgnore
     private Optional<String> listedPosition = Optional.absent();
 
     @JsonIgnore
     private RosterStatus rosterStatus = RosterStatus.create();
-
 
     @JsonIgnore
     private ImmutableList<Slot> slots;
@@ -97,6 +96,12 @@ public final class Player {
 
     public String getSalary() { return salary; }
     public void setSalary(String salary) { this.salary = salary; }
+
+    public BattingHand getBattingHand() { return battingHand; }
+    public void setBattingHand(BattingHand battingHand) {
+        this.battingHand = battingHand;
+    }
+
 
     public Optional<Boolean> getOn40Man() {
         return rosterStatus.getOn40Man();

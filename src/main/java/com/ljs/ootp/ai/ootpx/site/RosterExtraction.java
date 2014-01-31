@@ -7,6 +7,7 @@ import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Roster.Status;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.Site;
+import java.util.Map;
 import org.fest.assertions.api.Assertions;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -31,7 +32,7 @@ public final class RosterExtraction {
 
         Roster roster = Roster.create(team);
 
-        roster.assign(Status.ML, PlayerList.ratingsReport(site, id).extract());
+        assignTeam(Status.ML, roster, id);
 
         assignMinorLeagues(roster, id);
 
@@ -40,18 +41,19 @@ public final class RosterExtraction {
         // But, this is the only place that DL'd players can be associated with
         // a team.
         roster.assign(Status.DL, PlayerList.roster(site, id).extract());
+        roster.assign(Status.DL, PlayerList.minorLeagues(site, id).extract());
 
         return roster;
     }
 
     private void assignMinorLeagues(Roster roster, Id<Team> id) {
-        Document doc = Pages.minorLeagues(site, id).load();
+        for (Map.Entry<Id<Team>, Status> mls : TeamExtraction.create(site).getMinorLeagueTeams(id).entrySet()) {
+            assignTeam(mls.getValue(), roster, mls.getKey());
+        }
+    }
 
-        roster.assign(Status.AAA, getPlayers(doc, "Triple A"));
-        roster.assign(Status.AA, getPlayers(doc, "Double A"));
-        roster.assign(Status.A, getPlayers(doc, "Single A"));
-        roster.assign(Status.SA, getPlayers(doc, "Short Season A"));
-        roster.assign(Status.R, getPlayers(doc, "Rookie League"));
+    private void assignTeam(Status status, Roster roster, Id<Team> id) {
+        roster.assign(status, PlayerList.ratingsReport(site, id).extract());
     }
 
     private Iterable<Player> getPlayers(Document doc, String needle) {

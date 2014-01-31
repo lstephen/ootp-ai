@@ -49,7 +49,11 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
         }
 
         public String format(String fmt) {
-            return String.format(fmt, getPosition(), getShortName());
+            return String.format(
+                fmt,
+                getPosition(),
+                player == null ? "" : player.getBattingHand().getCode(),
+                getShortName());
         }
 
     }
@@ -64,6 +68,8 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             public BattingRatings getRatings(Player p) {
                 return (BattingRatings) p.getBattingRatings().getVsLeft();
             }
+
+            public VsHand getOther() { return VS_RHP; }
         },
         VS_RHP {
             public BattingStats getStats(TeamStats<BattingStats> predictions, Player p) {
@@ -77,11 +83,15 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             public BattingRatings getRatings(Player p) {
                 return (BattingRatings) p.getBattingRatings().getVsRight();
             }
+
+            public VsHand getOther() { return VS_LHP; }
         };
 
         public abstract BattingStats getStats(TeamStats<BattingStats> teamstats, Player player);
 
         public abstract BattingRatings getRatings(Player player);
+
+        public abstract VsHand getOther();
     }
 
     public Lineup() { }

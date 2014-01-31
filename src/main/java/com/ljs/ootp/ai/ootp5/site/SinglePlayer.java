@@ -3,6 +3,7 @@ package com.ljs.ootp.ai.ootp5.site;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.ljs.ootp.ai.player.BattingHand;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.player.PlayerSource;
@@ -119,9 +120,9 @@ public class SinglePlayer implements PlayerSource {
         String name = Parser.unescapeEntities(splitInfo[0], false);
         Integer age = Integer.valueOf(splitInfo[3]);
 
-         String listedPosition = getListedPosition(splitInfo[8]);
+        String listedPosition = getListedPosition(splitInfo[8]);
 
-         PlayerPage page = PlayerPage.create(doc, site);
+        PlayerPage page = PlayerPage.create(doc, site);
 
         PlayerRatings ratings =
             PlayerRatings.create(
@@ -141,6 +142,7 @@ public class SinglePlayer implements PlayerSource {
         player.setAge(age);
         player.setTeam(team);
         player.setListedPosition(listedPosition);
+        player.setBattingHand(BattingHand.fromCode(splitInfo[9]));
 
         if (site.isInjured(player)) {
             player.setTeam("*INJ* " + player.getTeam());

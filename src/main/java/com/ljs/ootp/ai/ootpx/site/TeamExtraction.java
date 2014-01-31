@@ -1,12 +1,16 @@
 package com.ljs.ootp.ai.ootpx.site;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.player.PlayerId;
+import com.ljs.ootp.ai.roster.Roster.Status;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.Site;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.assertions.api.Assertions;
@@ -43,7 +47,7 @@ public final class TeamExtraction {
 	public Iterable<PlayerId> getInjuries(Id<Team> id) {
 		Set<PlayerId> injured = Sets.newHashSet();
 
-		for (Id<Team> t : Iterables.concat(ImmutableSet.of(id), getMinorLeagueTeams(id))) {
+		for (Id<Team> t : Iterables.concat(ImmutableSet.of(id), getMinorLeagueTeams(id).keySet())) {
 			Iterables.addAll(injured, getSingleTeamInjuries(t));
 		}
 
@@ -52,8 +56,6 @@ public final class TeamExtraction {
 
     private Iterable<PlayerId> getSingleTeamInjuries(Id<Team> id) {
         Document doc = Pages.team(site, id).load();
-
-
 
         Elements els = doc.select("tr.title:has(td:containsOwn(Injuries)) ~ tr + tr");
 
@@ -77,20 +79,32 @@ public final class TeamExtraction {
         return injured;
     }
 
-	private Set<Id<Team>> getMinorLeagueTeams(Id<Team> id) {
+	public ImmutableMap<Id<Team>, Status> getMinorLeagueTeams(Id<Team> id) {
 		Document doc = Pages.team(site, id).load();
 
 		Elements els = doc.select("tr.capt1:has(td:containsOwn(Minor League System)) ~ tr");
 
 		Elements as = els.select("a[href~=team]");
 
-		Set<Id<Team>> ids = Sets.newHashSet();
+        Map<Id<Team>, Status> teams = Maps.newHashMap();
 
 		for (Element a : as) {
-			ids.add(Id.<Team>valueOf(StringUtils.substringBetween(a.attr("href"), "team_", ".html")));
+            Id<Team> teamId = Id.<Team>valueOf(StringUtils.substringBetween(a.attr("href"), "team_", ".html"));
+
+            if (a.html().contains("(AAA)")) {
+                teams.put(teamId, Status.AAA);
+            } else if (a.html().contains("(AA)")) {
+                teams.put(teamId, Status.AA);
+            } else if (a.html().contains("(A)")) {
+                teams.put(teamId, Status.A);
+            } else if (a.html().contains("(S A)")) {
+                teams.put(teamId, Status.SA);
+            } else if (a.html().contains("(R)")) {
+                teams.put(teamId, Status.R);
+            }
 		}
 
-		return ids;
+		return ImmutableMap.copyOf(teams);
 	}
 
     public static TeamExtraction create(Site site) {

@@ -4,6 +4,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.ljs.ootp.ai.io.SalaryFormat;
+import com.ljs.ootp.ai.player.BattingHand;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
@@ -47,6 +48,7 @@ public class PlayerExtraction {
 
         player.setAge(Integer.parseInt(StringUtils.substringAfterLast(doc.select("td:containsOwn(Age:)").text(), " ")));
         player.setTeam(doc.select("a.title3[href~=teams]").text());
+        player.setBattingHand(BattingHand.fromCode(StringUtils.substringAfterLast(doc.select("td:containsOwn(Bats:)").text(), " ")));
 
         player.setSalary(extractSalary(doc, player));
 

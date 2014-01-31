@@ -12,7 +12,7 @@ import org.fest.assertions.api.Assertions;
 public final class AllLineups implements Iterable<Lineup>, Printable {
 
     private static final Integer LINEUP_SIZE = 9;
-    private static final String LINEUP_ENTRY_FORMAT = "%2s %-15s";
+    private static final String LINEUP_ENTRY_FORMAT = "%2s %1s %-15s";
 
     private final All<Lineup> all;
 
@@ -78,7 +78,7 @@ public final class AllLineups implements Iterable<Lineup>, Printable {
         w.println();
         w.println(
             String.format(
-                "   %-19s %-19s %-19s %-19s",
+                "   %-21s %-21s %-21s %-21s",
                 "vsRHP",
                 "vsRHP+DH",
                 "vsLHP",
@@ -88,7 +88,7 @@ public final class AllLineups implements Iterable<Lineup>, Printable {
         for (int i = 0; i < LINEUP_SIZE; i++) {
             w.println(
                 String.format(
-                    "%d. %-19s %-19s %-19s %-19s",
+                    "%d. %-21s %-21s %-21s %-21s",
                     Integer.valueOf(i + 1),
                     all.getVsRhp().getEntry(i).format(LINEUP_ENTRY_FORMAT),
                     all.getVsRhpPlusDh().getEntry(i).format(LINEUP_ENTRY_FORMAT),
