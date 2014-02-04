@@ -2,12 +2,14 @@ package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.ljs.ai.search.Action;
 import com.ljs.ai.search.ActionsFunction;
 import com.ljs.ai.search.RepeatedHillClimbing;
+import com.ljs.ai.search.SequencedAction;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.Position;
 import java.util.Collections;
@@ -73,7 +75,7 @@ public class DefenseSelection {
         return new ActionsFunction<Defense>() {
             @Override
             public Iterable<? extends Action<Defense>> getActions(Defense state) {
-                return swaps;
+                return Iterables.concat(swaps, SequencedAction.allPairs(swaps));
 
             }
         };
