@@ -225,7 +225,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> k(T value) {
-            return k(Rating.create(value, scale));
+            return value == null ? this : k(Rating.create(value, scale));
         }
 
 

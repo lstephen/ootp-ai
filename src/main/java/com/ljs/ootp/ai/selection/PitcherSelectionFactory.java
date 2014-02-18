@@ -2,6 +2,7 @@ package com.ljs.ootp.ai.selection;
 
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
@@ -10,6 +11,7 @@ import com.ljs.ootp.ai.selection.rotation.RotationSelection;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
+import java.util.Arrays;
 
 /**
  *
@@ -37,11 +39,19 @@ public final class PitcherSelectionFactory implements SelectionFactory {
     }
 
     public Selection slot(Mode mode) {
+        return slot(mode.getPitchingSlots());
+    }
+
+    public Selection slot(Slot... slots) {
+        return slot(Arrays.asList(slots));
+    }
+
+    public Selection slot(Iterable<Slot> slots) {
         return SlotSelection
             .builder()
             .ordering(byOverall())
-            .slots(mode.getPitchingSlots())
-            .size(mode.getPitchingSlots().size())
+            .slots(slots)
+            .size(Iterables.size(slots))
             .fillToSize(Slot.P)
             .build();
     }

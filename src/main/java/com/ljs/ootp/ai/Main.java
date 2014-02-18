@@ -263,7 +263,7 @@ public class Main {
                 if (site.getName().equals("BTH")) {
                     n = 1;
                 }
-                if (site.getName().equals("TWML")) {
+                if (site.getName().equals("TWML") || site.getName().equals("SAVOY")) {
                     n = 0;
                 }
 
@@ -348,7 +348,7 @@ public class Main {
         Rotation rotation =
             RotationSelection
                 .forMode(
-                    mode,
+                    selectionMode,
                     pitchingRegression.predict(team),
                     site.getPitcherSelectionMethod())
                 .selectRotation(ImmutableSet.<Player>of(), Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));

@@ -137,6 +137,10 @@ public class BestStartersSelection implements Selection {
 
             Iterables.removeAll(ps, forced);
 
+            if (ps.isEmpty()) {
+                break;
+            }
+
             System.out.print("Selected:");
             for (Player p : byValueProvided(lineups, Iterables.concat(forced, ps)).reverse().sortedCopy(selected)) {
                 System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, Iterables.concat(forced, ps))) + "/");

@@ -55,7 +55,11 @@ public class ReplacementValue {
         List<Integer> values = Lists.newArrayList();
 
         for (Slot s : p.getSlots()) {
-            values.add(value.apply(p) - getReplacementLevel(s));
+            if (Slot.getPrimarySlot(p) == Slot.MR && s == Slot.P) {
+                values.add((int) (value.apply(p) / PlayerValue.MR_CONSTANT - getReplacementLevel(s)));
+            } else {
+                values.add(value.apply(p) - getReplacementLevel(s));
+            }
         }
 
         return Ordering.natural().max(values);
@@ -63,9 +67,6 @@ public class ReplacementValue {
 
     public void print(PrintWriter w) {
         for (Slot s : Slot.values()) {
-            if (s == Slot.P) {
-                continue;
-            }
             w.print(String.format(" %s:%3d ", s, getReplacementLevel(s)));
         }
         w.println();
@@ -85,23 +86,9 @@ public class ReplacementValue {
                 break;
             case SP:
             case MR:
-                switch (s) {
-                    case SP:
-                        slotSelections = pitcherSlotSelections.get(Slot.SP);
-                        break;
-
-                    case MR:
-                        slotSelections = Iterables.concat(
-                            pitcherSlotSelections.get(Slot.MR),
-                            pitcherSlotSelections.get(Slot.P));
-                        break;
-                    default:
-                        throw new IllegalStateException();
-                }
-
-                break;
             case P:
-                return Integer.MAX_VALUE;
+                slotSelections = pitcherSlotSelections.get(s);
+                break;
             default:
                 throw new IllegalStateException();
         }
@@ -119,6 +106,8 @@ public class ReplacementValue {
                     public Integer apply(Player p) {
                         if (s == Slot.MR && Slot.getPrimarySlot(p) == Slot.SP) {
                             return (int) (PlayerValue.MR_CONSTANT * value.apply(p));
+                        } else if (s == Slot.P && Slot.getPrimarySlot(p) == Slot.MR) {
+                            return (int) (value.apply(p) / PlayerValue.MR_CONSTANT);
                         }
                         return value.apply(p);
                     }

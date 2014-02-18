@@ -1,6 +1,7 @@
 package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.ljs.ai.search.State;
 import com.ljs.ootp.ai.player.Player;
@@ -28,7 +29,12 @@ public final class Defense implements State {
     }
 
     public Boolean isValid() {
-        return true;
+        return defense.values().size() == 8
+            && defense.values().containsAll(
+                ImmutableSet.of(
+                    Position.CATCHER,
+                    Position.FIRST_BASE, Position.SECOND_BASE, Position.THIRD_BASE, Position.SHORTSTOP,
+                    Position.LEFT_FIELD, Position.CENTER_FIELD, Position.RIGHT_FIELD));
     }
 
     public Defense swap(Player lhs, Player rhs) {

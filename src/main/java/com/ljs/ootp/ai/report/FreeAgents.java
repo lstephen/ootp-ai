@@ -12,6 +12,7 @@ import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.value.TradeValue;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -69,11 +70,11 @@ public final class FreeAgents {
     public Iterable<Player> getTopTargets(Mode mode) {
         Set<Player> targets = Sets.newHashSet();
 
-        Set<Player> ps = Sets.newHashSet(fas);
+        List<Player> ps = byValue(value).reverse().sortedCopy(fas);
         Set<Slot> remaining = Sets.newHashSet(Slot.values());
 
         while (!remaining.isEmpty() && !ps.isEmpty()) {
-            Player p = byValue(value).max(ps);
+            Player p = ps.get(0);
 
             ps.remove(p);
 
