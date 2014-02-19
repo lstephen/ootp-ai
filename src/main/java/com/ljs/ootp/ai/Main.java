@@ -84,7 +84,7 @@ public class Main {
     // WCH, TF
     private static final SiteDefinition CBL =
         SiteDefinitionFactory.ootp5(
-            "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(24), "National", 24);
+            "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(24), "National", 20);
 
     // DET, TF
     private static final SiteDefinition HFTC =
@@ -277,14 +277,14 @@ public class Main {
             }
         }
 
-        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
+        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression, tv);
 
         if (site.getType() == Version.OOTP5) {
-            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
+            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression, tv);
         }
 
         if (site.getType() == Version.OOTPX) {
-            selection = RosterSelection.ootpx(team, battingRegression, pitchingRegression, tv.getTradeTargetValue());
+            selection = RosterSelection.ootpx(team, battingRegression, pitchingRegression, tv);
         }
 
         selection.setPrevious(oldRoster);
@@ -433,7 +433,7 @@ public class Main {
                 Predictions
                     .predict(newRoster.getAllPlayers())
                     .using(battingRegression, pitchingRegression, ps.getPitcherOverall()),
-                tv.getTradeTargetValue());
+                tv);
 
             fourtyMan.printReport(out);
 
@@ -443,10 +443,11 @@ public class Main {
 
             generic.setTitle("-40");
             generic.setPlayers(fourtyMan.getPlayersToRemove());
-            generic.setReverse(true);
             generic.print(out);
 
-            generic.setReverse(false);
+            generic.setTitle("Waive");
+            generic.setPlayers(fourtyMan.getPlayersToWaive());
+            generic.print(out);
         }
 
         if (battingRegression.isEmpty() || pitchingRegression.isEmpty()) {

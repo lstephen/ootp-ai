@@ -120,7 +120,9 @@ public final class RotationSelection implements Selection {
                 mrs.addAll(ps.subList(0, definition.getRelieversSize() - mrs.size()));
                 ps.removeAll(mrs);
 
-                List<Player> rest = ps.subList(0, slots.size() - definition.getRotationSize() - definition.getRelieversSize());
+                Iterable<Player> rest = FluentIterable
+                    .from(ps)
+                    .limit(slots.size() - definition.getRotationSize() - definition.getRelieversSize());
 
                 return Rotation.create(sps, mrs, rest);
             }

@@ -74,17 +74,6 @@ public class TradeValue {
                 int future = playerValue.getFutureValue(p) + futureRepl;
 
                 return Math.max(now, future) - getAgingFactor(p);
-
-                /*Integer now = playerValue.getNowValue(p);
-                Integer future = playerValue.getFutureValue(p);
-
-                Double chanceOfCeiling = (double) now / future;
-
-                Integer futureValueIncludingRisk = (int)
-                    (chanceOfCeiling * future + (1 - chanceOfCeiling) * now);
-
-
-                return futureValueIncludingRisk + futureReplacementValue.getValueVsReplacement(p);*/
             }
         };
     }

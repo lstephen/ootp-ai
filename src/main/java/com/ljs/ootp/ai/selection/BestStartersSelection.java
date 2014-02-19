@@ -79,6 +79,10 @@ public class BestStartersSelection implements Selection {
 
     private ImmutableSet<Player> optimize(ImmutableSet<Player> best, ImmutableSet<Player> forced, ImmutableSet<Player> available) {
 
+        if (forced.size() >= getTargetSize()) {
+            return forced;
+        }
+
         if (best.size() > getTargetSize()) {
             return optimize(limit(best, forced, getTargetSize()), forced, available);
         }

@@ -1,6 +1,5 @@
 package com.ljs.ootp.ai.roster;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -13,6 +12,7 @@ import com.ljs.ootp.ai.selection.HitterSelectionFactory;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.PitcherSelectionFactory;
 import com.ljs.ootp.ai.selection.Selections;
+import com.ljs.ootp.ai.value.TradeValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -27,13 +27,13 @@ public class FourtyManRoster {
 
     private final Predictions predictions;
 
-    private final Function<Player, Integer> value;
+    private final TradeValue value;
 
     private ImmutableSet<Player> desired25Man;
 
     private ImmutableSet<Player> desired40Man;
 
-    public FourtyManRoster(Roster roster, Predictions ps, Function<Player, Integer> value) {
+    public FourtyManRoster(Roster roster, Predictions ps, TradeValue value) {
         this.roster = roster;
         this.predictions = ps;
         this.value = value;
@@ -105,7 +105,7 @@ public class FourtyManRoster {
 
         Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
 
-        for (Player p : Ordering.natural().reverse().onResultOf(value).compound(Player.byAge()).sortedCopy(roster.getAllPlayers())) {
+        for (Player p : Ordering.natural().reverse().onResultOf(value.getTradeTargetValue()).compound(Player.byAge()).sortedCopy(roster.getAllPlayers())) {
             if (!fourtyMan.contains(p) && p.getYearsOfProService().or(0) >= 3) {
                 fourtyMan.add(p);
             }
@@ -149,12 +149,28 @@ public class FourtyManRoster {
         return desired25Man;
     }
 
+    public Iterable<Player> getPlayersToWaive() {
+        Set<Player> toWaive = Sets.newHashSet();
+
+        for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
+            if (value.getCurrentValueVsReplacement(p) <= 0
+                && value.getFutureValueVsReplacement(p) <= 0
+                && !p.getClearedWaivers().or(Boolean.TRUE)
+                && !getDesired25ManRoster().contains(p)) {
+
+                toWaive.add(p);
+            }
+        }
+
+        return toWaive;
+    }
+
     public Iterable<Player> getPlayersToRemove() {
         return
             Iterables.limit(
                 Ordering
                     .natural()
-                    .onResultOf(value)
+                    .onResultOf(value.getTradeTargetValue())
                     .sortedCopy(
                         ImmutableSet.copyOf(
                             Sets.difference(

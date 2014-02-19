@@ -1,12 +1,12 @@
 package com.ljs.ootp.ai.roster;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
@@ -24,6 +24,7 @@ import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
+import com.ljs.ootp.ai.value.TradeValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -41,7 +42,7 @@ public final class RosterSelection {
 
     private final Predictions predictions;
 
-    private final Function<Player, Integer> value;
+    private final TradeValue value;
 
     private Roster previous;
 
@@ -55,7 +56,7 @@ public final class RosterSelection {
     private FourtyManRoster fourtyManRoster;
 
     private RosterSelection(
-        Team team, Predictions predictions, Function<Player, Integer> value) {
+        Team team, Predictions predictions, TradeValue value) {
 
         this.team = team;
         this.predictions = predictions;
@@ -126,30 +127,38 @@ public final class RosterSelection {
 
     public Roster select(Mode mode, Changes changes) {
         return select(
+            mode,
             changes,
             hitterSelectionFactory.create(mode),
             pitcherSelectionFactory.create(mode));
     }
 
-    private Roster select(Changes changes, Selection hitting, Selection pitching) {
+    private Roster select(Mode mode, Changes changes, Selection hitting, Selection pitching) {
         Roster roster = Roster.create(team);
         Set<Player> forced = Sets.newHashSet(getForced(changes));
+        Set<Player> ml = Sets.newHashSet();
         assignToDisabledList(roster, team.getInjuries());
 
         forced.removeAll(roster.getPlayers(Status.DL));
 
-        roster.assign(
-            Roster.Status.ML,
+        ml.addAll(
             hitting.select(
                 Selections.onlyHitters(forced),
                 getAvailableHitters(roster)).values());
 
-        roster.assign(
-            Roster.Status.ML,
+        ml.addAll(
             pitching.select(
                 Selections.onlyPitchers(forced),
                 getAvailablePitchers(roster)).values());
 
+        while (ml.size() > mode.getMajorLeagueRosterLimit()) {
+            ml.remove(Ordering
+                .natural()
+                .onResultOf(value.getTradeTargetValue())
+                .min(Sets.difference(ml, forced)));
+        }
+
+        roster.assign(Roster.Status.ML, ml);
         assignMinors(roster);
 
         return roster;
@@ -316,7 +325,7 @@ public final class RosterSelection {
     }
 
     public static RosterSelection ootpx(Team team, BattingRegression batting,
-        PitchingRegression pitching, Function<Player, Integer> value) {
+        PitchingRegression pitching, TradeValue value) {
 
         RosterSelection selection = new RosterSelection(
             team,
@@ -333,7 +342,7 @@ public final class RosterSelection {
     }
 
     public static RosterSelection ootp6(Team team, BattingRegression batting,
-        PitchingRegression pitching, Function<Player, Integer> value) {
+        PitchingRegression pitching, TradeValue value) {
 
         RosterSelection selection = new RosterSelection(
             team,
@@ -348,7 +357,7 @@ public final class RosterSelection {
     }
 
     public static RosterSelection ootp5(Team team, BattingRegression batting,
-        PitchingRegression pitching, Function<Player, Integer> value) {
+        PitchingRegression pitching, TradeValue value) {
 
         RosterSelection selection = new RosterSelection(
             team,

@@ -1,13 +1,13 @@
 package com.ljs.ootp.ai.selection;
 
-import com.ljs.ootp.ai.player.Slot;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
+import com.ljs.ootp.ai.player.Slot;
 
 public enum Mode {
-    PRESEASON {
+    PRESEASON(25) {
         @Override
         public ImmutableMultiset<Slot> getHittingSlots() {
             return REGULAR_SEASON.getHittingSlots();
@@ -18,7 +18,7 @@ public enum Mode {
             return REGULAR_SEASON.getPitchingSlots();
         }
     },
-    REGULAR_SEASON {
+    REGULAR_SEASON(25) {
         @Override
         public ImmutableMultiset<Slot> getHittingSlots() {
             return ImmutableMultiset.of(
@@ -36,7 +36,7 @@ public enum Mode {
                 Slot.P, Slot.P);
         }
     },
-    EXPANDED {
+    EXPANDED(40) {
         @Override
         public ImmutableMultiset<Slot> getHittingSlots() {
             Multiset<Slot> expanded =
@@ -63,7 +63,7 @@ public enum Mode {
             return ImmutableMultiset.copyOf(expanded);
         }
     },
-    PLAYOFFS {
+    PLAYOFFS(25) {
         @Override
         public ImmutableMultiset<Slot> getHittingSlots() {
             Multiset<Slot> playoffs =
@@ -84,6 +84,16 @@ public enum Mode {
             return ImmutableMultiset.copyOf(playoffs);
         }
     };
+
+    private final Integer rosterSize;
+
+    Mode(Integer rosterSize) {
+        this.rosterSize = rosterSize;
+    }
+
+    public Integer getMajorLeagueRosterLimit() {
+        return rosterSize;
+    }
 
     public abstract ImmutableMultiset<Slot> getHittingSlots();
 
