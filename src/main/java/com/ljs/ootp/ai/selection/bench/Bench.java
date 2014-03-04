@@ -79,10 +79,6 @@ public class Bench {
     private Double score() {
         Double score = 0.0;
 
-        for (Player p : players()) {
-            score += predictions.getOverall(p).getWobaPlus();
-        }
-
         score += (pcts.getVsLhpPercentage() * score(lineups.getVsLhp(), Lineup.VsHand.VS_LHP));
         score += (pcts.getVsLhpPercentage() * score(lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP));
         score += (pcts.getVsRhpPercentage() * score(lineups.getVsRhp(), Lineup.VsHand.VS_RHP));

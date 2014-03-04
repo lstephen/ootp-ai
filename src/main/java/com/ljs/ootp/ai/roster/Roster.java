@@ -33,7 +33,7 @@ public final class Roster implements Printable {
 
     private final PlayerSource source;
 
-    private final Iterable<Player> available;
+    private final Set<Player> available;
 
     private final Multimap<Status, Player> assignments =
         ArrayListMultimap.create();
@@ -47,7 +47,7 @@ public final class Roster implements Printable {
         Preconditions.checkNotNull(available);
 
         this.source = source;
-        this.available = available;
+        this.available = Sets.newHashSet(available);
     }
 
     public ImmutableSet<Player> getPlayers(Status status) {
@@ -60,6 +60,11 @@ public final class Roster implements Printable {
 
     public void remove(Player p) {
         assignments.remove(getStatus(p), p);
+    }
+
+    public void release(Player p) {
+        remove(p);
+        available.remove(p);
     }
 
     public Iterable<Player> getAllPlayers() {

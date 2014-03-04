@@ -10,6 +10,7 @@ import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.History;
 import com.ljs.ootp.ai.stats.PitchingStats;
+import com.ljs.ootp.ai.stats.SplitPercentagesHolder;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.PrintWriter;
@@ -25,7 +26,9 @@ public final class PitchingRegression {
 
     private enum Predicting { HITS, DOUBLES, STRIKEOUTS, WALKS, HOME_RUNS }
 
-    private static final int DEFAULT_PLATE_APPEARANCES = 700;
+    private static final Long DEFAULT_PLATE_APPEARANCES = 700L;
+
+    private TeamStats<PitchingStats> stats;
 
     private final SimpleRegression hits = new SimpleRegression();
 
@@ -115,10 +118,23 @@ public final class PitchingRegression {
     }
 
     public SplitStats<PitchingStats> predict(Player p) {
-        return SplitStats.create(
-            predict(p.getPitchingRatings().getVsLeft()),
-            predict(p.getPitchingRatings().getVsRight()));
+        Long vsRightPa = Math.round(1200 * SplitPercentagesHolder.get().getVsRhbPercentage());
+        Long vsLeftPa = 1200 - vsRightPa;
 
+        PitchingStats vsLeft = predict(p.getPitchingRatings().getVsLeft(), vsLeftPa);
+        PitchingStats vsRight = predict(p.getPitchingRatings().getVsRight(), vsRightPa);
+
+        if (stats.contains(p)) {
+            SplitStats<PitchingStats> splits = stats.getSplits(p);
+
+            vsLeft = vsLeft.add(splits.getVsLeft());
+            vsRight = vsRight.add(splits.getVsRight());
+        } else {
+            
+        }
+
+
+        return SplitStats.create(vsLeft, vsRight);
     }
 
     public TeamStats<PitchingStats> predictFuture(Iterable<Player> ps) {
@@ -141,7 +157,7 @@ public final class PitchingRegression {
         return predict(ratings, DEFAULT_PLATE_APPEARANCES);
     }
 
-    public PitchingStats predict(PitchingRatings ratings, int plateAppearances) {
+    public PitchingStats predict(PitchingRatings ratings, Long plateAppearances) {
         int predictedStrikeouts =
             (int) (plateAppearances
                 * predict(Predicting.STRIKEOUTS, ratings.getStuff()));
@@ -183,7 +199,7 @@ public final class PitchingRegression {
 
         PitchingStats predicted = new PitchingStats();
         predicted.setLeaguePitching(leaguePitching);
-        predicted.setAtBats(plateAppearances - predictedWalks);
+        predicted.setAtBats((int) (plateAppearances - predictedWalks));
         predicted.setHits(predictedHits);
         predicted.setDoubles(predictedDoubles);
         predicted.setHomeRuns(predictedHomeRuns);
@@ -198,15 +214,15 @@ public final class PitchingRegression {
     }
 
     private void runRegression(Site site) {
-        TeamStats<PitchingStats> pitchingStats = site.getTeamPitching();
+        stats = site.getTeamPitching();
 
-        addData(pitchingStats);
+        addData(stats);
 
         History history = History.create();
 
         int season = site.getDate().getYear();
 
-        history.savePitching(pitchingStats, site, season);
+        history.savePitching(stats, site, season);
 
         Iterable<TeamStats<PitchingStats>> historical = history.loadPitching(site, season, 5);
 
@@ -215,7 +231,7 @@ public final class PitchingRegression {
         }
 
         Iterable<TeamStats<PitchingStats>> all =
-            Iterables.concat(ImmutableList.of(pitchingStats), historical);
+            Iterables.concat(ImmutableList.of(stats), historical);
 
         for (TeamStats<PitchingStats> tss : all) {
             for (Player p : tss.getPlayers()) {

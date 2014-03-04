@@ -222,9 +222,9 @@ public class GenericValueReport {
             }
         } else {
             if (Selections.isHitter(p)) {
-                return batting.predict(p.getBattingRatings().getVsLeft()).getWobaPlus();
+                return batting.predict(p).getVsLeft().getWobaPlus();
             } else  {
-                return now.getPitcherOverall().getPlus(pitching.predict(p.getPitchingRatings().getVsLeft()));
+                return now.getPitcherOverall().getPlus(pitching.predict(p).getVsLeft());
             }
         }
     }
@@ -240,9 +240,9 @@ public class GenericValueReport {
             }
         } else {
             if (Selections.isHitter(p)) {
-                return batting.predict(p.getBattingRatings().getVsRight()).getWobaPlus();
+                return batting.predict(p).getVsRight().getWobaPlus();
             } else  {
-                return now.getPitcherOverall().getPlus(pitching.predict(p.getPitchingRatings().getVsRight()));
+                return now.getPitcherOverall().getPlus(pitching.predict(p).getVsRight());
             }
         }
     }

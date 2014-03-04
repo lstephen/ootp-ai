@@ -13,6 +13,7 @@ import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
+import com.ljs.ootp.ai.roster.Changes.ChangeType;
 import com.ljs.ootp.ai.roster.Roster.Status;
 import com.ljs.ootp.ai.selection.HitterSelectionFactory;
 import com.ljs.ootp.ai.selection.Mode;
@@ -137,6 +138,13 @@ public final class RosterSelection {
         Roster roster = Roster.create(team);
         Set<Player> forced = Sets.newHashSet(getForced(changes));
         Set<Player> ml = Sets.newHashSet();
+
+        for (Player p : changes.get(ChangeType.FORCE_ML)) {
+            if (Iterables.contains(getFourtyManRoster().getPlayersToRemove(), p)) {
+                roster.release(p);
+            }
+        }
+
         assignToDisabledList(roster, team.getInjuries());
 
         forced.removeAll(roster.getPlayers(Status.DL));

@@ -84,7 +84,7 @@ public class Main {
     // WCH, TF
     private static final SiteDefinition CBL =
         SiteDefinitionFactory.ootp5(
-            "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(24), "National", 20);
+            "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(20), "National", 20);
 
     // DET, TF
     private static final SiteDefinition HFTC =
@@ -180,16 +180,16 @@ public class Main {
 
         LOG.log(Level.INFO, "Running regressions...");
 
+        SplitPercentages pcts = SplitPercentages.create(site);
+        SplitPercentagesHolder.set(pcts);
+
         final BattingRegression battingRegression = BattingRegression.run(site);
         Printables.print(battingRegression.correlationReport()).to(out);
 
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
         Printables.print(pitchingRegression.correlationReport()).to(out);
 
-        SplitPercentages pcts = SplitPercentages.create(site);
         pcts.print(out);
-
-        SplitPercentagesHolder.set(pcts);
 
         SplitStats.setPercentages(pcts);
         PlayerRatings.setPercentages(pcts);
