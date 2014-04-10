@@ -118,8 +118,10 @@ public final class PitchingRegression {
     }
 
     public SplitStats<PitchingStats> predict(Player p) {
-        Long vsRightPa = Math.round(1200 * SplitPercentagesHolder.get().getVsRhbPercentage());
-        Long vsLeftPa = 1200 - vsRightPa;
+        Long paToProject = Math.round(DEFAULT_PLATE_APPEARANCES + DEFAULT_PLATE_APPEARANCES * era.getRSquare());
+
+        Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhbPercentage());
+        Long vsLeftPa = paToProject - vsRightPa;
 
         PitchingStats vsLeft = predict(p.getPitchingRatings().getVsLeft(), vsLeftPa);
         PitchingStats vsRight = predict(p.getPitchingRatings().getVsRight(), vsRightPa);
@@ -151,6 +153,12 @@ public final class PitchingRegression {
         }
 
         return TeamStats.create(results);
+    }
+
+    public SplitStats<PitchingStats> predict(Splits<PitchingRatings> ratings) {
+        return SplitStats.create(
+            predict(ratings.getVsLeft()), predict(ratings.getVsRight()));
+
     }
 
     public PitchingStats predict(PitchingRatings ratings) {
@@ -236,7 +244,7 @@ public final class PitchingRegression {
         for (TeamStats<PitchingStats> tss : all) {
             for (Player p : tss.getPlayers()) {
                 SplitStats<PitchingStats> splits = tss.getSplits(p);
-                SplitStats<PitchingStats> predicted = predict(p);
+                SplitStats<PitchingStats> predicted = predict(p.getPitchingRatings());
 
                 for (int i = 0; i < splits.getVsLeft().getPlateAppearances(); i++) {
                     if (splits.getVsLeft().getInningsPitched() > 0) {

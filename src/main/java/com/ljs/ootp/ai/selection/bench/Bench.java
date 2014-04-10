@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ai.search.hillclimbing.HillClimbing;
@@ -12,14 +13,18 @@ import com.ljs.ai.search.hillclimbing.Validator;
 import com.ljs.ai.search.hillclimbing.action.Action;
 import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
 import com.ljs.ai.search.hillclimbing.action.SequencedAction;
+import com.ljs.ootp.ai.io.Printable;
+import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.TeamStats;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import org.fest.util.Lists;
@@ -28,7 +33,7 @@ import org.fest.util.Lists;
  *
  * @author lstephen
  */
-public class Bench {
+public class Bench implements Printable {
 
     private final AllLineups lineups;
 
@@ -87,9 +92,30 @@ public class Bench {
         return score;
     }
 
+    private Double score(Player p) {
+        Double score = 0.0;
+
+        score += (pcts.getVsLhpPercentage() * score(p, lineups.getVsLhp(), Lineup.VsHand.VS_LHP));
+        score += (pcts.getVsLhpPercentage() * score(p, lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP));
+        score += (pcts.getVsRhpPercentage() * score(p, lineups.getVsRhp(), Lineup.VsHand.VS_RHP));
+        score += (pcts.getVsRhpPercentage() * score(p, lineups.getVsRhpPlusDh(), Lineup.VsHand.VS_RHP));
+
+        return score;
+    }
+
     private Double score(Lineup lineup, Lineup.VsHand vs) {
         return new BenchScorer(predictions)
             .score(
+                Iterables.concat(
+                    Sets.difference(selected, lineup.playerSet()), players),
+                    lineup,
+                    vs);
+    }
+
+    private Double score(Player p, Lineup lineup, Lineup.VsHand vs) {
+        return new BenchScorer(predictions)
+            .score(
+                p,
                 Iterables.concat(
                     Sets.difference(selected, lineup.playerSet()), players),
                     lineup,
@@ -104,6 +130,28 @@ public class Bench {
         }
 
         return age;
+    }
+
+    public void print(PrintWriter w) {
+        final Map<Player, Double> scores = Maps.newHashMap();
+       for (Player p : players()) {
+           scores.put(p, score(p));
+       }
+
+       w.print("Bench:");
+       for (Player p : Ordering
+           .natural()
+           .reverse()
+           .onResultOf(new Function<Player, Double>() {
+               public Double apply(Player p) {
+                   return scores.get(p);
+               }
+           })
+           .sortedCopy(scores.keySet())) {
+
+           w.print(p.getShortName() + "-" + Math.round(scores.get(p)) + "/");
+       }
+       w.println();
     }
 
     private static Validator<Bench> validator() {
@@ -219,7 +267,11 @@ public class Bench {
             .validator(validator())
             .actionGenerator(actionGenerator(available));
 
-        return new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictions, available, maxSize), builder).search();
+       Bench result = new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictions, available, maxSize), builder).search();
+
+       Printables.print(result).to(System.out);
+
+       return result;
     }
 
     private static class Add implements Action<Bench> {

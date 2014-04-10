@@ -8,6 +8,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.site.SiteHolder;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.SplitStats;
@@ -91,6 +93,14 @@ public final class Rotation {
                 .size()) {
 
             return false;
+        }
+
+        if (SiteHolder.get().getName().equals("CBL")) {
+            for (Player p : rotation.get(Role.SP)) {
+                if (!p.getSlots().contains(Slot.SP)) {
+                    return false;
+                }
+            }
         }
 
         return true;

@@ -47,6 +47,7 @@ import com.ljs.ootp.ai.selection.rotation.RotationSelection;
 import com.ljs.ootp.ai.site.SingleTeam;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.SiteDefinition;
+import com.ljs.ootp.ai.site.SiteHolder;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.site.impl.SiteDefinitionFactory;
 import com.ljs.ootp.ai.stats.SplitPercentages;
@@ -173,6 +174,8 @@ public class Main {
 
         final Site site = def.getSite();
 
+        SiteHolder.set(site);
+
         LOG.log(Level.INFO, "Extracting current roster and team...");
 
         Roster oldRoster = site.extractRoster();
@@ -297,8 +300,8 @@ public class Main {
             selectionMode = Mode.EXPANDED;
         }
 
-        //if (def.getName().equals("TWML")) {
-        //    mode = Mode.PLAYOFFS;
+        //if (def.getName().equals("BTH")) {
+        //    selectionMode = Mode.PLAYOFFS;
         //}
 
         Roster newRoster = selection.select(selectionMode, changes);

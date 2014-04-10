@@ -119,8 +119,10 @@ public final class BattingRegression {
     }
 
     public SplitStats<BattingStats> predict(Player p) {
-        Long vsRightPa = Math.round(1200 * SplitPercentagesHolder.get().getVsRhpPercentage());
-        Long vsLeftPa = 1200 - vsRightPa;
+        Long paToProject = Math.round(DEFAULT_PLATE_APPEARANCES + DEFAULT_PLATE_APPEARANCES * woba.getRSquare());
+
+        Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhpPercentage());
+        Long vsLeftPa = paToProject - vsRightPa;
 
         BattingStats vsLeft = predict(p.getBattingRatings().getVsLeft(), vsLeftPa);
         BattingStats vsRight = predict(p.getBattingRatings().getVsRight(), vsRightPa);
@@ -152,11 +154,19 @@ public final class BattingRegression {
         return TeamStats.create(results);
     }
 
-    public BattingStats predict(BattingRatings ratings) {
+    public SplitStats<BattingStats> predict(Splits<BattingRatings<?>> ratings) {
+        return SplitStats.create(
+            predict(ratings.getVsLeft()),
+            predict(ratings.getVsRight()));
+    }
+
+    public BattingStats predict(BattingRatings<?> ratings) {
         return predict(ratings, DEFAULT_PLATE_APPEARANCES);
     }
 
-    public BattingStats predict(BattingRatings<?> ratings, Long plateAppearances) {
+    public BattingStats predict(
+        BattingRatings<?> ratings, Long plateAppearances) {
+
         int predictedHits =
             (int) (plateAppearances
                 * predict(Predicting.HITS, ratings.getContact()));
@@ -224,7 +234,7 @@ public final class BattingRegression {
         for (TeamStats<BattingStats> tss : all) {
             for (Player p : tss.getPlayers()) {
                 SplitStats<BattingStats> splits = tss.getSplits(p);
-                SplitStats<BattingStats> predicted = predict(p);
+                SplitStats<BattingStats> predicted = predict(p.getBattingRatings());
 
                 for (int i = 0; i < splits.getVsLeft().getPlateAppearances(); i++) {
                     woba.addData(splits.getVsLeft().getWoba(), predicted.getVsLeft().getWoba());
@@ -242,7 +252,7 @@ public final class BattingRegression {
         return regression;
     }
 
-    public static class CorrelationReport implements Printable {
+    public static final class CorrelationReport implements Printable {
 
         private final BattingRegression regression;
 

@@ -1,6 +1,6 @@
 package com.ljs.ootp.ai.io;
 
-import java.math.BigDecimal;
+import humanize.Humanize;
 
 /**
  *
@@ -15,35 +15,7 @@ public final class SalaryFormat {
     }
 
     public static String prettyPrint(Integer salary) {
-        if (salary <= 0) {
-            return "";
-        }
-
-        Integer displayDigits = Integer.parseInt(salary.toString().substring(0, 3));
-
-        if (salary.toString().charAt(3) != '0') {
-            displayDigits += 1;
-        }
-
-        int exp = (int) (Math.log(salary) / Math.log(10) + 1.0E-6);
-
-        String display;
-        String suffix;
-
-        if (exp < 3) {
-            display = displayDigits.toString();
-            suffix = " ";
-        } else if (exp < 6) {
-            suffix = "k";
-            display = BigDecimal.valueOf(displayDigits).movePointLeft(5 - exp).toPlainString();
-        } else if (exp < 9) {
-            suffix = "m";
-            display = BigDecimal.valueOf(displayDigits).movePointLeft(8 - exp).toPlainString();
-        } else {
-            throw new IllegalStateException();
-        }
-
-        return String.format("$%s%s", display, suffix);
+        return salary > 0 ? "$" + Humanize.metricPrefix(salary) : "";
     }
 
 }

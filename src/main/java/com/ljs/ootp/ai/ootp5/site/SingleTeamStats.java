@@ -3,13 +3,13 @@ package com.ljs.ootp.ai.ootp5.site;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.extract.html.Page;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.Stats;
 import com.ljs.ootp.ai.stats.TeamStats;
+import com.ljs.ootp.extract.html.Page;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +70,9 @@ public abstract class SingleTeamStats<S extends Stats<S>> {
                         .replaceAll(".html", ""));
 
 
-            stats.put(team.get(id), extractStatsRow(row.children()));
+            if (team.containsPlayer(id)) {
+                stats.put(team.get(id), extractStatsRow(row.children()));
+            }
         }
 
         return stats.build();

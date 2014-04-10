@@ -88,6 +88,10 @@ public final class Defense implements State {
             Double ageScore = (double) (100 - ply.getAge()) / 100000;
 
             total += Math.pow(getPositionFactor(pos), 2) * (r.getPositionScore(pos) + ageScore);
+
+            if (!ply.canPlay(pos)) {
+                total -= Math.pow(getPositionFactor(pos), 2);
+            }
         }
 
         return total;

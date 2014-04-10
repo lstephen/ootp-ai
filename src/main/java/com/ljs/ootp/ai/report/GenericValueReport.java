@@ -185,7 +185,7 @@ public class GenericValueReport {
 
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %8s | %6s | %2s %5s | %s",
+                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %9s | %7s | %2s %5s | %s",
                     p.getPosition(),
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
@@ -201,7 +201,7 @@ public class GenericValueReport {
                     Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
                     Joiner.on(',').join(p.getSlots()),
                     p.getRosterStatus(),
-                    StringUtils.abbreviate(p.getSalary(), 8),
+                    StringUtils.abbreviate(p.getSalary(), 9),
                     SalaryFormat.prettyPrint(salary.predictMaximum(p)),
                     p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getListedPosition().or(""),
                     p.getId().unwrap(),

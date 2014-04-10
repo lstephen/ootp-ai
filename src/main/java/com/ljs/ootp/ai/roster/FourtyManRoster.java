@@ -59,9 +59,11 @@ public class FourtyManRoster {
     }
 
     public Integer getNumberToRemove() {
-        return getCurrent40ManSize()
-            + Iterables.size(getPlayersToAdd())
-            - getMaxDesiredOn40Man();
+        return Math.max(
+            getCurrent40ManSize()
+                + Iterables.size(getPlayersToAdd())
+                - getMaxDesiredOn40Man(),
+            0);
     }
 
     private Integer getMaxDesiredOn40Man() {
@@ -69,7 +71,7 @@ public class FourtyManRoster {
     }
 
 
-    private ImmutableSet<Player> getDesired40ManRoster() {
+    public ImmutableSet<Player> getDesired40ManRoster() {
         if (desired40Man != null) {
             return desired40Man;
         }

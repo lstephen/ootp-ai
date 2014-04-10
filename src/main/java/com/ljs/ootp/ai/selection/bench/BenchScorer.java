@@ -43,8 +43,15 @@ public class BenchScorer {
                 for (Player p : Iterables.limit(selectBenchPlayer(bench, lineup, vs, entry.getPositionEnum()), 2)) {
                     count++;
                     if (predicate.apply(p)) {
-                        Double countFactor = 1.0 / Math.pow(count, 2);
-                        score += (getPositionFactor(entry.getPositionEnum()) * countFactor * vs.getStats(predictions, p).getWobaPlus());
+                        Double countFactor = 1.0;
+                        Double positionFactor = getPositionFactor(entry.getPositionEnum());
+
+                        if (count > 1) {
+                            countFactor = 0.2;
+                            positionFactor = .04;
+                        }
+
+                        score += (positionFactor * countFactor * vs.getStats(predictions, p).getWobaPlus());
                     }
                 }
             }
@@ -65,9 +72,9 @@ public class BenchScorer {
                 return .12;
             case LEFT_FIELD:
             case RIGHT_FIELD:
-                return .8;
+                return .08;
             default:
-                return .4;
+                return .04;
         }
     }
 

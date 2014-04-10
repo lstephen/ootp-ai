@@ -5,6 +5,7 @@
 package com.ljs.ootp.ai.selection.rotation;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.ljs.ai.search.hillclimbing.HillClimbing;
 import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
@@ -83,10 +84,16 @@ public final class RotationSelection implements Selection {
                 }))
             .actionGenerator(actionGenerator(forced, available));
 
-        return new RepeatedHillClimbing<Rotation>(
+        Rotation r = new RepeatedHillClimbing<Rotation>(
                 initialStateGenerator(forced, available),
                 builder)
             .search();
+
+        for (Player p : Player.byShortName().sortedCopy(r.getAll())) {
+            System.out.print(p.getShortName() + "/");
+        }
+        System.out.println();
+        return r;
     }
 
     private Callable<Rotation> initialStateGenerator(final Iterable<Player> forced, final Iterable<Player> available) {
@@ -99,32 +106,46 @@ public final class RotationSelection implements Selection {
                 Collections.shuffle(ps);
 
                 List<Player> sps = Lists.newArrayList();
+                List<Player> mrs = Lists.newArrayList();
+                List<Player> rest = Lists.newArrayList();
 
                 for (Player p : forced) {
-                    if (p.getSlots().contains(Slot.SP)) {
+                    if (p.getSlots().contains(Slot.SP) && sps.size() < definition.getRotationSize()) {
+                        sps.add(p);
+                    } else if (mrs.size() < definition.getRelieversSize()) {
+                        mrs.add(p);
+                    } else {
+                        rest.add(p);
+                    }
+                }
+
+                for (Player p : ps) {
+                    if (p.getSlots().contains(Slot.SP) && sps.size() < definition.getRotationSize()) {
                         sps.add(p);
                     }
                 }
 
+                ps.removeAll(sps);
                 sps.addAll(ps.subList(0, definition.getRotationSize() - sps.size()));
                 ps.removeAll(sps);
-
-                List<Player> mrs = Lists.newArrayList();
-
-                for (Player p : forced) {
-                    if (!sps.contains(p)) {
-                        mrs.add(p);
-                    }
-                }
 
                 mrs.addAll(ps.subList(0, definition.getRelieversSize() - mrs.size()));
                 ps.removeAll(mrs);
 
-                Iterable<Player> rest = FluentIterable
+                rest.addAll(FluentIterable
                     .from(ps)
-                    .limit(slots.size() - definition.getRotationSize() - definition.getRelieversSize());
+                    .limit(slots.size() - sps.size() - mrs.size() - rest.size())
+                    .toList());
 
-                return Rotation.create(sps, mrs, rest);
+                Rotation initial = Rotation.create(sps, mrs, rest);
+
+                if (!initial.isValid()) {
+                    initial.print(System.out);
+                }
+
+                Preconditions.checkState(initial.isValid());
+
+                return initial;
             }
         };
     }
