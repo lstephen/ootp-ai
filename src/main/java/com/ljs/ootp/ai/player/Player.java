@@ -14,6 +14,7 @@ import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.player.ratings.RatingsDefinition;
+import com.ljs.ootp.ai.player.ratings.StarRating;
 import com.ljs.ootp.ai.splits.Splits;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +52,9 @@ public final class Player {
 
     @JsonIgnore
     private ImmutableList<Slot> slots;
+
+    @JsonIgnore
+    private Optional<StarRating> stars = Optional.absent();
 
     private Player(PlayerId id, String name, PlayerRatings ratings) {
         this.id = id;
@@ -100,6 +104,14 @@ public final class Player {
     public BattingHand getBattingHand() { return battingHand; }
     public void setBattingHand(BattingHand battingHand) {
         this.battingHand = battingHand;
+    }
+
+    public Optional<StarRating> getStars() {
+        return stars;
+    }
+
+    public void setStars(StarRating stars) {
+        this.stars = Optional.of(stars);
     }
 
 
@@ -243,11 +255,11 @@ public final class Player {
         return ratings.hasPitching();
     }
 
-    public Splits<PitchingRatings> getPitchingRatings() {
+    public Splits<PitchingRatings<?>> getPitchingRatings() {
         return ratings.getPitching();
     }
 
-    public Splits<PitchingRatings> getPitchingPotentialRatings() {
+    public Splits<PitchingRatings<Integer>> getPitchingPotentialRatings() {
         return ratings.getPitchingPotential(age);
     }
 

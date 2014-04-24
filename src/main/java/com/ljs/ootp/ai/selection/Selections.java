@@ -15,8 +15,7 @@ public final class Selections {
 
     private Selections() { }
 
-    public static ImmutableMultimap<Slot, Player> select(Selection selection, Iterable available)
-    {
+    public static ImmutableMultimap<Slot, Player> select(Selection selection, Iterable available) {
         return selection.select(ImmutableSet.<Player>of(), available);
     }
 

@@ -68,6 +68,10 @@ public final class RotationSelection implements Selection {
 
     public Rotation selectRotation(Iterable<Player> forced, Iterable<Player> available) {
 
+        System.out.println("Selecting rotation...");
+        System.out.println("Forced:" + Iterables.size(forced));
+        System.out.println("Available:" + Iterables.size(available));
+
         HillClimbing.Builder<Rotation> builder = HillClimbing
             .<Rotation>builder()
             .validator(new Validator<Rotation>() {

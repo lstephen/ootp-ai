@@ -140,7 +140,7 @@ public final class RosterSelection {
         Set<Player> ml = Sets.newHashSet();
 
         for (Player p : changes.get(ChangeType.FORCE_ML)) {
-            if (!Iterables.contains(getFourtyManRoster().getDesired40ManRoster(), p)) {
+            if (!getFourtyManRoster().getDesired40ManRoster().contains(p)) {
                 roster.release(p);
                 forced.remove(p);
             }

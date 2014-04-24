@@ -30,7 +30,7 @@ public class BattingStats implements Stats<BattingStats> {
     public void setAtBats(int atBats) { this.atBats = atBats; }
 
     public int getHits() { return hits; }
-    public void setHits(int hits) { this.hits = hits; }
+    public void setHits(long hits) { this.hits = (int) hits; }
 
     public int getSingles() { return hits - doubles - triples - homeRuns; }
     public double getSinglesPerPlateAppearance() {
@@ -38,16 +38,16 @@ public class BattingStats implements Stats<BattingStats> {
     }
 
     public int getDoubles() { return doubles; }
-    public void setDoubles(int doubles) { this.doubles = doubles; }
+    public void setDoubles(long doubles) { this.doubles = (int) doubles; }
 
     public int getTriples() { return triples; }
-    public void setTriples(int triples) { this.triples = triples; }
+    public void setTriples(long triples) { this.triples = (int) triples; }
 
-    public void setHomeRuns(int homeRuns) { this.homeRuns = homeRuns; }
+    public void setHomeRuns(long homeRuns) { this.homeRuns = (int) homeRuns; }
 
-    public void setWalks(int walks) { this.walks = walks; }
+    public void setWalks(long walks) { this.walks = (int) walks; }
 
-    public void setKs(int ks) { this.ks = ks; }
+    public void setKs(long ks) { this.ks = (int) ks; }
 
     public void setLeagueBatting(BattingStats leagueBatting) {
         this.leagueBatting = leagueBatting;

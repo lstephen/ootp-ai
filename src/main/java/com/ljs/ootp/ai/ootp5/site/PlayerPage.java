@@ -117,7 +117,6 @@ public final class PlayerPage {
     }
 
     private Rating<?, ?> parseOotp6PotentialRating(String s) {
-        site.getPotentialRatingScale();
         return site.getPotentialRatingScale().parse(s);
     }
 

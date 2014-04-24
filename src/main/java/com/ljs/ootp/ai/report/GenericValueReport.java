@@ -185,7 +185,7 @@ public class GenericValueReport {
 
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %9s | %7s | %2s %5s | %s",
+                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %9s | %7s | %2s %5s | %-20s | %s",
                     p.getPosition(),
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
@@ -205,7 +205,8 @@ public class GenericValueReport {
                     SalaryFormat.prettyPrint(salary.predictMaximum(p)),
                     p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getListedPosition().or(""),
                     p.getId().unwrap(),
-                    p.getTeam() == null ? "" : p.getTeam()));
+                    StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),
+                    p.getStars().isPresent() ? p.getStars().get().getFormattedText() : ""));
         }
 
         w.flush();
@@ -247,6 +248,11 @@ public class GenericValueReport {
         }
     }
 
+    private String roundRating(Integer rating) {
+        Long rounded = Math.round(rating / 10.0);
+
+        return rounded >= 10 ? "T" : rounded.toString();
+    }
 
 
     public void printReplacementLevelReport(OutputStream out) {

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Objects;
 import com.ljs.ootp.ai.player.ratings.json.BattingPotentialSerializer;
-import com.ljs.ootp.extract.html.rating.OneToOneHundred;
-import com.ljs.ootp.extract.html.rating.Rating;
 import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.SplitPercentages;
+import com.ljs.ootp.extract.html.rating.OneToOneHundred;
+import com.ljs.ootp.extract.html.rating.Rating;
 
 /**
  *
@@ -23,7 +23,7 @@ public final class PlayerRatings {
 
     private final DefensiveRatings defensive;
 
-    private final Splits<PitchingRatings> pitching;
+    private final Splits<PitchingRatings<?>> pitching;
 
     @JsonSerialize(using = BattingPotentialSerializer.class)
     private BattingRatings battingPotential;
@@ -40,7 +40,7 @@ public final class PlayerRatings {
     private PlayerRatings(
         @JsonProperty("batting") Splits<BattingRatings<?>> batting,
         @JsonProperty("defensive") DefensiveRatings defensive,
-        @JsonProperty("pitching") Splits<PitchingRatings> pitching) {
+        @JsonProperty("pitching") Splits<PitchingRatings<?>> pitching) {
 
         this.batting = batting;
         this.defensive = defensive;
@@ -59,7 +59,7 @@ public final class PlayerRatings {
 
     public Splits<BattingRatings<?>> getBatting() { return batting; }
 
-    public Splits<PitchingRatings> getPitching() { return pitching; }
+    public Splits<PitchingRatings<?>> getPitching() { return pitching; }
 
     public boolean hasPitching() { return pitching != null; }
 
@@ -98,33 +98,42 @@ public final class PlayerRatings {
         return Splits.create(potVsLeft, potVsRight);
     }
 
-    public Splits<PitchingRatings> getPitchingPotential(int age) {
-        PitchingRatings ovr = getOverallPitching(getPitching());
+    public Splits<PitchingRatings<Integer>> getPitchingPotential(int age) {
+        PitchingRatings<?> ovr = getOverallPitching(getPitching());
 
-        PitchingRatings capped = new PitchingRatings();
-        capped.setStuff(capPitchingPotential(age, ovr.getStuff(), pitchingPotential.getStuff()));
-        capped.setControl(capPitchingPotential(age, ovr.getControl(), pitchingPotential.getControl()));
-        capped.setMovement(capPitchingPotential(age, ovr.getMovement(), pitchingPotential.getMovement()));
-        capped.setHits(capPitchingPotential(age, ovr.getHits(), pitchingPotential.getHits()));
-        capped.setGap(capPitchingPotential(age, ovr.getGap(), pitchingPotential.getGap()));
+        PitchingRatings<Integer> capped = PitchingRatings
+            .builder(OneToOneHundred.scale())
+            .stuff(capPitchingPotential(age, ovr.getStuff(), pitchingPotential.getStuff()))
+            .control(capPitchingPotential(age, ovr.getControl(), pitchingPotential.getControl()))
+            .movement(capPitchingPotential(age, ovr.getMovement(), pitchingPotential.getMovement()))
+            .hits(capPitchingPotential(age, ovr.getHits(), pitchingPotential.getHits()))
+            .gap(capPitchingPotential(age, ovr.getGap(), pitchingPotential.getGap()))
+            .endurance(ovr.getEndurance())
+            .build();
 
-        PitchingRatings potVsLeft = new PitchingRatings();
         PitchingRatings curVsLeft = getPitching().getVsLeft();
 
-        potVsLeft.setStuff(capPitching(age, curVsLeft.getStuff(), capped.getStuff(), ovr.getStuff()));
-        potVsLeft.setControl(capPitching(age, curVsLeft.getControl(), capped.getControl(), ovr.getControl()));
-        potVsLeft.setMovement(capPitching(age, curVsLeft.getMovement(), capped.getMovement(), ovr.getMovement()));
-        potVsLeft.setHits(capPitching(age, curVsLeft.getHits(), capped.getHits(), ovr.getHits()));
-        potVsLeft.setGap(capPitching(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()));
+        PitchingRatings<Integer> potVsLeft = PitchingRatings
+            .builder(OneToOneHundred.scale())
+            .stuff(capPitching(age, curVsLeft.getStuff(), capped.getStuff(), ovr.getStuff()))
+            .control(capPitching(age, curVsLeft.getControl(), capped.getControl(), ovr.getControl()))
+            .movement(capPitching(age, curVsLeft.getMovement(), capped.getMovement(), ovr.getMovement()))
+            .hits(capPitching(age, curVsLeft.getHits(), capped.getHits(), ovr.getHits()))
+            .gap(capPitching(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
+            .endurance(ovr.getEndurance())
+            .build();
 
-        PitchingRatings potVsRight = new PitchingRatings();
         PitchingRatings curVsRight = getPitching().getVsRight();
 
-        potVsRight.setStuff(capPitching(age, curVsRight.getStuff(), capped.getStuff(), ovr.getStuff()));
-        potVsRight.setControl(capPitching(age, curVsRight.getControl(), capped.getControl(), ovr.getControl()));
-        potVsRight.setMovement(capPitching(age, curVsRight.getMovement(), capped.getMovement(), ovr.getMovement()));
-        potVsRight.setHits(capPitching(age, curVsRight.getHits(), capped.getHits(), ovr.getHits()));
-        potVsRight.setGap(capPitching(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()));
+        PitchingRatings<Integer> potVsRight = PitchingRatings
+            .builder(OneToOneHundred.scale())
+            .stuff(capPitching(age, curVsRight.getStuff(), capped.getStuff(), ovr.getStuff()))
+            .control(capPitching(age, curVsRight.getControl(), capped.getControl(), ovr.getControl()))
+            .movement(capPitching(age, curVsRight.getMovement(), capped.getMovement(), ovr.getMovement()))
+            .hits(capPitching(age, curVsRight.getHits(), capped.getHits(), ovr.getHits()))
+            .gap(capPitching(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
+            .endurance(ovr.getEndurance())
+            .build();
 
         return Splits.create(potVsLeft, potVsRight);
     }
@@ -144,38 +153,40 @@ public final class PlayerRatings {
         }
 
         //Double factor = definition.getYearlyRatingsIncrease();
-        Double factor = 8.0;
+        Integer factor = 8;
 
         Integer value = Math.max(
             current,
             Math.min(
                 potential,
-                (int) (current + factor * Math.max(PEAK_AGE - age, 0))));
+                current + factor * Math.max(PEAK_AGE - age, 0)));
 
         return OneToOneHundred.valueOf(value);
     }
 
-    private Integer capPitching(int age, int current, int capped, int overall) {
+    private Rating<Integer, OneToOneHundred> capPitching(int age, int current, int capped, int overall) {
         return capPitchingPotential(age, current, capped + (current - overall));
     }
 
-    private Integer capPitchingPotential(int age, int current, int potential) {
+    private Rating<Integer, OneToOneHundred> capPitchingPotential(int age, int current, int potential) {
 
-        if (definition.isFreezeOneRatings() && current == 1) {
-            return 1;
+        if (definition.isFreezeOneRatings() && current < 10) {
+            return OneToOneHundred.valueOf(current);
         }
 
         if (current == 0) {
-            return 0;
+            OneToOneHundred.valueOf(current);
         }
 
-        Double factor = definition.getYearlyRatingsIncrease();
+        Integer factor = 8;
 
-        return Math.max(
+        Integer value = Math.max(
             current,
             Math.min(
                 potential,
-                (int) (current + factor * Math.max(PEAK_AGE - age, 0))));
+                current + factor * Math.max(PEAK_AGE - age, 0)));
+
+        return OneToOneHundred.valueOf(value);
     }
 
     public void setBattingPotential(BattingRatings ratings) {
@@ -210,24 +221,25 @@ public final class PlayerRatings {
         return ovr;
     }
 
-    public static PitchingRatings getOverallPitching(Splits<PitchingRatings> splits) {
+    public static PitchingRatings getOverallPitching(Splits<PitchingRatings<?>> splits) {
         Integer vR = (int) Math.round(splitPercentages.getVsRhbPercentage() * 1000);
         Integer vL = 1000 - vR;
 
-        PitchingRatings ovr = new PitchingRatings();
-        ovr.setStuff((vR * splits.getVsRight().getStuff() + vL * splits.getVsLeft().getStuff()) / 1000);
-        ovr.setControl((vR * splits.getVsRight().getControl() + vL * splits.getVsLeft().getControl()) / 1000);
-        ovr.setMovement((vR * splits.getVsRight().getMovement() + vL * splits.getVsLeft().getMovement()) / 1000);
-        ovr.setHits((vR * splits.getVsRight().getHits() + vL * splits.getVsLeft().getHits()) / 1000);
-        ovr.setGap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 1000);
-
-        return ovr;
+        return PitchingRatings
+            .builder(OneToOneHundred.scale())
+            .stuff((vR * splits.getVsRight().getStuff() + vL * splits.getVsLeft().getStuff()) / 1000)
+            .control((vR * splits.getVsRight().getControl() + vL * splits.getVsLeft().getControl()) / 1000)
+            .movement((vR * splits.getVsRight().getMovement() + vL * splits.getVsLeft().getMovement()) / 1000)
+            .hits((vR * splits.getVsRight().getHits() + vL * splits.getVsLeft().getHits()) / 1000)
+            .gap((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 1000)
+            .endurance(splits.getVsLeft().getEndurance())
+            .build();
     }
 
     public static PlayerRatings create(
         Splits<BattingRatings<?>> batting,
         DefensiveRatings defensive,
-        Splits<PitchingRatings> pitching,
+        Splits<PitchingRatings<?>> pitching,
         RatingsDefinition definition) {
 
         PlayerRatings pr = new PlayerRatings(batting, defensive, pitching);

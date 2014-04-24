@@ -84,7 +84,7 @@ public final class DepthChartSelection {
             .max(bench);
 
         return candidate.getDefensiveRatings().getPositionScore(position)
-            > starter.getDefensiveRatings().getPositionScore(position)
+            > starter.getDefensiveRatings().getPositionScore(position) * 1.1
             ? Optional.of(candidate)
             : Optional.<Player>absent();
     }

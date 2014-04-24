@@ -256,35 +256,10 @@ public class PlayerExtraction {
         return !doc.select("td:containsOwn(Stuff):not(.sl,.slg)").isEmpty();
 
     }
-    private Splits<PitchingRatings> extractPitchingRatings(Document doc) {
+    private Splits<PitchingRatings<?>> extractPitchingRatings(Document doc) {
         if (!hasPitchingRatings(doc)) {
             return null;
         }
-        PitchingRatings vsL = new PitchingRatings();
-        vsL.setStuff(Integer.parseInt(doc.select("td:containsOwn(Stuff) + td + td").text()));
-        vsL.setControl(Integer.parseInt(doc.select("td:containsOwn(Control) + td + td").text()));
-        vsL.setMovement(Integer.parseInt(doc.select("td:containsOwn(Movement) + td + td").text()));
-
-        vsL.setHits(vsL.getStuff());
-        vsL.setGap(vsL.getMovement());
-
-        PitchingRatings vsR = new PitchingRatings();
-        vsR.setStuff(Integer.parseInt(doc.select("td:containsOwn(Stuff) + td + td + td").text()));
-        vsR.setControl(Integer.parseInt(doc.select("td:containsOwn(Control) + td + td + td").text()));
-        vsR.setMovement(Integer.parseInt(doc.select("td:containsOwn(Movement) + td + td + td").text()));
-
-        vsR.setHits(vsR.getStuff());
-        vsR.setGap(vsR.getMovement());
-
-        //System.out.println(doc.select("td:containsOwn(Suggested Role) + td").text());
-        String suggestedRole = doc.select("td:containsOwn(Suggested Role) + td").text();
-        if (suggestedRole.contains("Starter") || suggestedRole.contains("SP")) {
-            vsL.setEndurance(8);
-            vsR.setEndurance(8);
-        } else {
-            vsL.setEndurance(3);
-            vsR.setEndurance(3);
-        };
 
         Integer stamina = Integer.parseInt(doc.select("td:containsOwn(Stamina) + td").text());
 
@@ -296,27 +271,45 @@ public class PlayerExtraction {
             endurance = stamina / 5 + 1;
         }
 
-        vsL.setEndurance(endurance);
-        vsR.setEndurance(endurance);
+        PitchingRatings<?> vsL = PitchingRatings
+            .builder(site.getAbilityRatingScale())
+            .stuff(doc.select("td:containsOwn(Stuff) + td + td").text())
+            .control(doc.select("td:containsOwn(Control) + td + td").text())
+            .movement(doc.select("td:containsOwn(Movement) + td + td").text())
+            .hits(doc.select("td:containsOwn(Stuff) + td + td").text())
+            .gap(doc.select("td:containsOwn(Movement) + td + td").text())
+            .endurance(endurance)
+            .build();
 
+        PitchingRatings<?> vsR = PitchingRatings
+            .builder(site.getAbilityRatingScale())
+            .stuff(doc.select("td:containsOwn(Stuff) + td + td + td").text())
+            .control(doc.select("td:containsOwn(Control) + td + td + td").text())
+            .movement(doc.select("td:containsOwn(Movement) + td + td + td").text())
+            .hits(doc.select("td:containsOwn(Stuff) + td + td + td").text())
+            .gap(doc.select("td:containsOwn(Movement) + td + td + td").text())
+            .endurance(endurance)
+            .build();
 
         return Splits.create(vsL, vsR);
     }
 
-    private PitchingRatings extractPitchingPotential(Document doc) {
+    private PitchingRatings<?> extractPitchingPotential(Document doc) {
         if (!hasPitchingRatings(doc)) {
             return null;
         }
-        PitchingRatings potential = new PitchingRatings();
-        potential.setStuff(Integer.parseInt(doc.select("td:containsOwn(Stuff) + td + td + td + td").text()));
-        potential.setControl(Integer.parseInt(doc.select("td:containsOwn(Control) + td + td + td + td").text()));
-        potential.setMovement(Integer.parseInt(doc.select("td:containsOwn(Movement) + td + td + td + td").text()));
 
-        potential.setHits(potential.getStuff());
-        potential.setGap(potential.getMovement());
+        PitchingRatings<?> potential = PitchingRatings
+            .builder(site.getPotentialRatingScale())
+            .stuff(doc.select("td:containsOwn(Stuff) + td + td + td + td").text())
+            .control(doc.select("td:containsOwn(Control) + td + td + td + td").text())
+            .movement(doc.select("td:containsOwn(Movement) + td + td + td + td").text())
+            .hits(doc.select("td:containsOwn(Stuff) + td + td + td + td").text())
+            .gap(doc.select("td:containsOwn(Movement) + td + td + td + td").text())
+            .endurance(extractPitchingRatings(doc).getVsLeft().getEndurance())
+            .build();
 
         return potential;
-
     }
 
     public static PlayerExtraction create(Site site) {

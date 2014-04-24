@@ -8,13 +8,16 @@ import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.player.PlayerSource;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
+import com.ljs.ootp.ai.player.ratings.FieldingRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
+import com.ljs.ootp.ai.player.ratings.StarRating;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.splits.Splits;
-import com.ljs.scratch.util.ElementsUtil;
+import com.ljs.ootp.extract.html.rating.Rating;
+import com.ljs.ootp.extract.html.rating.Scale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
@@ -144,6 +147,8 @@ public class SinglePlayer implements PlayerSource {
         player.setListedPosition(listedPosition);
         player.setBattingHand(BattingHand.fromCode(splitInfo[9]));
 
+        player.setStars(StarRating.extractFrom(doc));
+
         if (site.isInjured(player)) {
             player.setTeam("*INJ* " + player.getTeam());
         }
@@ -251,8 +256,8 @@ public class SinglePlayer implements PlayerSource {
         return split[idx];
     }
 
-    private Integer getOotp5Potential(Elements els, int idx) {
-        return OOTP5_POTENTIAL.get(els.get(idx).text().trim());
+    private Rating<?, ?> getOotp5Potential(Elements els, int idx) {
+        return site.getPotentialRatingScale().parse(els.get(idx).text());
     }
 
     private DefensiveRatings extractDefensiveRatings(Document doc) {
@@ -271,10 +276,12 @@ public class SinglePlayer implements PlayerSource {
             }
         }
 
+        ratings.setCatcher(extractCatcherRating(raw));
+
         return ratings;
     }
 
-    private Splits<PitchingRatings> extractPitchingRatings(Document doc) {
+    private Splits<PitchingRatings<?>> extractPitchingRatings(Document doc) {
         Elements vsLhb = doc.select("tr.g:has(td:contains(Versus LHB))");
         Elements vsRhb = doc.select("tr.g2:has(td:contains(Versus RHB))");
 
@@ -315,57 +322,76 @@ public class SinglePlayer implements PlayerSource {
                 throw new IllegalStateException();
         }
 
-        PitchingRatings l = extractPitchingRatings(vsLhb.get(0));
-        PitchingRatings r = extractPitchingRatings(vsRhb.get(0));
-
-        l.setEndurance(endurance);
-        r.setEndurance(endurance);
+        PitchingRatings<?> l = extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance);
+        PitchingRatings<?> r = extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance);
 
         return Splits.create(l, r);
     }
 
-    private PitchingRatings extractPitchingPotential(Document doc) {
+    private PitchingRatings<?> extractPitchingPotential(Document doc) {
         Elements talent = doc.select("tr.g:has(td:contains(Talent))");
 
-        if (site.getType() == Version.OOTP5) {
-            PitchingRatings ratings = new PitchingRatings();
+        return extractPitchingRatings(
+            talent.get(0),
+            site.getPotentialRatingScale(),
+            extractPitchingRatings(doc).getVsLeft().getEndurance());
+    }
 
-            Elements els = talent.get(0).children();
-
-            ratings.setHits(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.HITS)));
-            ratings.setGap(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.GAP)));
-            ratings.setStuff(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.STUFF)));
-            ratings.setMovement(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.MOVEMENT)));
-            ratings.setControl(getOotp5Potential(els, OOTP5_PITCHING.get(PitchingRatingsType.CONTROL)));
-
-            ratings.setEndurance(extractPitchingRatings(doc).getVsLeft().getEndurance());
-
-            return ratings;
-        } else {
-            PitchingRatings unscaled = extractPitchingRatings(talent.get(0));
-
-            PitchingRatings scaled = new PitchingRatings();
-            scaled.setStuff(scaleOotp6PotentialRating(unscaled.getStuff()));
-            scaled.setControl(scaleOotp6PotentialRating(unscaled.getControl()));
-            scaled.setMovement(scaleOotp6PotentialRating(unscaled.getMovement()));
-            scaled.setHits(scaleOotp6PotentialRating(unscaled.getHits()));
-            scaled.setGap(scaleOotp6PotentialRating(unscaled.getGap()));
-
-            scaled.setEndurance(extractPitchingRatings(doc).getVsLeft().getEndurance());
-
-            return scaled;
+    private Integer extractRange(String raw, String position) {
+        if (!raw.contains(position + " :")) {
+            return 0;
         }
+        return ratingFromString(StringUtils.substringBetween(raw, position + " :", "(Range)").trim());
     }
 
     private Double extractPositionRating(String raw, String position) {
         String rawPosStr = StringUtils.substringBetween(raw, position + " :", "(Fielding Pct.)");
 
-        Integer range = ratingFromString(StringUtils.substringBefore(rawPosStr, "(Range)").trim());
-        //Integer range = ratingFromString(StringUtils.substringBetween(rawPosStr, position + " :", "(Range)").trim());
-
         Double fpct = Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
 
-        return range.doubleValue() + fpct;
+        return extractRange(raw, position).doubleValue() + fpct;
+    }
+
+    private FieldingRatings extractCatcherRating(String raw) {
+        return FieldingRatings
+            .builder()
+            .ability(extractRange(raw, "C") * 10)
+            .arm(ratingFromString(StringUtils.substringBetween(raw, "Catcher Arm :", raw.contains("Infield") ? "Infield" : "Outfield")) * 10)
+            .build();
+    }
+
+    private FieldingRatings extractInfieldRating(String raw) {
+        Integer second = extractRange(raw, "2B");
+        Integer third = extractRange(raw, "3B");
+        Integer shortstop = extractRange(raw, "SS");
+
+        Integer range = (int) Math.round((4*second + 4*third + 5*shortstop) / 13.0 * 10);
+        Integer arm = ratingFromString(StringUtils.substringBetween(raw, "Infield Arm :", "Outfield")) * 10;
+
+        Integer posCount = (second > 0 ? 1 : 0) + (third > 0 ? 1 : 0) + (shortstop > 0 ? 1 : 0);
+
+        return FieldingRatings
+            .builder()
+            .range(range)
+            .arm(arm)
+            .errors(posCount * 25)
+            .dp(50)
+            .build();
+    }
+
+    private FieldingRatings extractOutfieldRating(String raw) {
+        Integer lf = extractRange(raw, "LF");
+        Integer cf = extractRange(raw, "CF");
+        Integer rf = extractRange(raw, "RF");
+
+        Integer range = (int) Math.round((2*lf + 3*cf + 2*rf) / 7.0 * 10);
+        Integer arm = ratingFromString(StringUtils.substringAfter(raw, "Outfield Arm :")) * 10;
+
+        return FieldingRatings
+            .builder()
+            .range(range)
+            .arm(arm)
+            .build();
     }
 
     private Integer ratingFromString(String s) {
@@ -373,6 +399,9 @@ public class SinglePlayer implements PlayerSource {
 
         switch (site.getType()) {
             case OOTP6:
+                if (s.trim().equals("-")) {
+                    return 0;
+                }
                 return Integer.parseInt(s.trim());
             case OOTP5:
                 switch (s.trim()) {
@@ -389,7 +418,7 @@ public class SinglePlayer implements PlayerSource {
         }
     }
 
-    private PitchingRatings extractPitchingRatings(Element el) {
+    private <T> PitchingRatings<T> extractPitchingRatings(Element el, Scale<T> scale, int endurance) {
         Elements line = el.children();
 
         ImmutableMap<PitchingRatingsType, Integer> idx;
@@ -404,12 +433,16 @@ public class SinglePlayer implements PlayerSource {
                 throw new IllegalStateException();
         }
 
-        PitchingRatings ratings = new PitchingRatings();
-        ratings.setHits(ElementsUtil.getInteger(line, idx.get(PitchingRatingsType.HITS)));
-        ratings.setGap(ElementsUtil.getInteger(line, idx.get(PitchingRatingsType.GAP)));
-        ratings.setStuff(ElementsUtil.getInteger(line, idx.get(PitchingRatingsType.STUFF)));
-        ratings.setControl(ElementsUtil.getInteger(line, idx.get(PitchingRatingsType.CONTROL)));
-        ratings.setMovement(ElementsUtil.getInteger(line, idx.get(PitchingRatingsType.MOVEMENT)));
+        PitchingRatings<T> ratings = PitchingRatings
+            .builder(scale)
+            .hits(line.get(idx.get(PitchingRatingsType.HITS)).text())
+            .gap(line.get(idx.get(PitchingRatingsType.GAP)).text())
+            .stuff(line.get(idx.get(PitchingRatingsType.STUFF)).text())
+            .control(line.get(idx.get(PitchingRatingsType.CONTROL)).text())
+            .movement(line.get(idx.get(PitchingRatingsType.MOVEMENT)).text())
+            .endurance(endurance)
+            .build();
+
         return ratings;
     }
 

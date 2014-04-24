@@ -58,7 +58,7 @@ public final class PitchingRegression {
     private void addData(TeamStats<PitchingStats> teamStats) {
        for (Player p : teamStats.getPlayers()) {
            Splits<PitchingStats> stats = teamStats.getSplits(p);
-           Splits<PitchingRatings> ratings = p.getPitchingRatings();
+           Splits<PitchingRatings<?>> ratings = p.getPitchingRatings();
 
            if (stats != null && ratings != null) {
                addData(stats.getVsLeft(), ratings.getVsLeft());
@@ -123,18 +123,18 @@ public final class PitchingRegression {
         Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhbPercentage());
         Long vsLeftPa = paToProject - vsRightPa;
 
-        PitchingStats vsLeft = predict(p.getPitchingRatings().getVsLeft(), vsLeftPa);
-        PitchingStats vsRight = predict(p.getPitchingRatings().getVsRight(), vsRightPa);
+        SplitStats<PitchingStats> base = predict(p.getPitchingRatings(), paToProject * 100);
+        PitchingStats vsLeft = base.getVsLeft();
+        PitchingStats vsRight = base.getVsRight();
 
         if (stats.contains(p)) {
             SplitStats<PitchingStats> splits = stats.getSplits(p);
 
-            vsLeft = vsLeft.add(splits.getVsLeft());
-            vsRight = vsRight.add(splits.getVsRight());
+            vsLeft = vsLeft.add(splits.getVsLeft().multiply(100.0));
+            vsRight = vsRight.add(splits.getVsRight().multiply(100.0));
         } else {
             
         }
-
 
         return SplitStats.create(vsLeft, vsRight);
     }
@@ -155,43 +155,50 @@ public final class PitchingRegression {
         return TeamStats.create(results);
     }
 
-    public SplitStats<PitchingStats> predict(Splits<PitchingRatings> ratings) {
-        return SplitStats.create(
-            predict(ratings.getVsLeft()), predict(ratings.getVsRight()));
-
+    public SplitStats<PitchingStats> predict(Splits<? extends PitchingRatings<?>> ratings) {
+        return predict(ratings, DEFAULT_PLATE_APPEARANCES * 100);
     }
 
-    public PitchingStats predict(PitchingRatings ratings) {
+    private SplitStats<PitchingStats> predict(Splits<? extends PitchingRatings<?>> ratings, Long pa) {
+        Long vsRightPa = Math.round(pa * SplitPercentagesHolder.get().getVsRhbPercentage());
+        Long vsLeftPa = pa - vsRightPa;
+
+        return SplitStats.create(
+            predict(ratings.getVsLeft(), vsLeftPa),
+            predict(ratings.getVsRight(), vsRightPa));
+    }
+
+    public PitchingStats predict(PitchingRatings<?> ratings) {
         return predict(ratings, DEFAULT_PLATE_APPEARANCES);
     }
 
-    public PitchingStats predict(PitchingRatings ratings, Long plateAppearances) {
-        int predictedStrikeouts =
-            (int) (plateAppearances
+    public PitchingStats predict(PitchingRatings<?> ratings, Long plateAppearances) {
+        long predictedStrikeouts =
+            Math.round(plateAppearances
                 * predict(Predicting.STRIKEOUTS, ratings.getStuff()));
 
-        int predictedHomeRuns =
-            (int) (plateAppearances
+        long predictedHomeRuns =
+            Math.round(plateAppearances
                 * predict(Predicting.HOME_RUNS, ratings.getMovement()));
 
-        int predictedWalks =
-            (int) (plateAppearances
+        long predictedWalks =
+            Math.round(plateAppearances
                 * predict(Predicting.WALKS, ratings.getControl()));
 
-        int predictedHits;
-        int predictedDoubles;
+        long predictedHits;
+        long predictedDoubles;
         switch (site.getType()) {
             case OOTP5:
                 predictedHits =
-                    (int) (plateAppearances * predict(Predicting.HITS, ratings.getHits()));
+                    Math.round(plateAppearances * predict(Predicting.HITS, ratings.getHits()));
                 predictedDoubles =
-                    (int) (plateAppearances * predict(Predicting.DOUBLES, ratings.getGap()));
+                    Math.round(plateAppearances * predict(Predicting.DOUBLES, ratings.getGap()));
                 break;
             case OOTP6:
             case OOTPX:
                 predictedDoubles = 0;
                 predictedHits =
-                    (int) (
+                    Math.round(
                         (plateAppearances
                             - predictedWalks
                             - predictedStrikeouts
@@ -201,9 +208,6 @@ public final class PitchingRegression {
             default:
                 throw new IllegalStateException();
         }
-
-
-
 
         PitchingStats predicted = new PitchingStats();
         predicted.setLeaguePitching(leaguePitching);

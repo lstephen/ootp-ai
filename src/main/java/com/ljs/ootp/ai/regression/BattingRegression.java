@@ -1,5 +1,6 @@
 package com.ljs.ootp.ai.regression;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -119,19 +120,30 @@ public final class BattingRegression {
     }
 
     public SplitStats<BattingStats> predict(Player p) {
+        return predict(
+            p.getBattingRatings(),
+            stats.contains(p)
+                ? Optional.of(stats.getSplits(p))
+                : Optional.<SplitStats<BattingStats>>absent());
+    }
+
+    private SplitStats<BattingStats> predict(
+        Splits<? extends BattingRatings<?>> ratings,
+        Optional<SplitStats<BattingStats>> stats) {
+
         Long paToProject = Math.round(DEFAULT_PLATE_APPEARANCES + DEFAULT_PLATE_APPEARANCES * woba.getRSquare());
 
         Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhpPercentage());
         Long vsLeftPa = paToProject - vsRightPa;
 
-        BattingStats vsLeft = predict(p.getBattingRatings().getVsLeft(), vsLeftPa);
-        BattingStats vsRight = predict(p.getBattingRatings().getVsRight(), vsRightPa);
+        BattingStats vsLeft = predict(ratings.getVsLeft(), vsLeftPa * 100);
+        BattingStats vsRight = predict(ratings.getVsRight(), vsRightPa * 100);
 
-        if (stats.contains(p)) {
-            SplitStats<BattingStats> splits = stats.getSplits(p);
+        if (stats.isPresent()) {
+            SplitStats<BattingStats> splits = stats.get();
 
-            vsLeft = vsLeft.add(splits.getVsLeft());
-            vsRight = vsRight.add(splits.getVsRight());
+            vsLeft = vsLeft.add(splits.getVsLeft().multiply(100.0));
+            vsRight = vsRight.add(splits.getVsRight().multiply(100.0));
         }
 
         return SplitStats.create(vsLeft, vsRight);
@@ -154,10 +166,15 @@ public final class BattingRegression {
         return TeamStats.create(results);
     }
 
-    public SplitStats<BattingStats> predict(Splits<BattingRatings<?>> ratings) {
+    public SplitStats<BattingStats> predict(Splits<? extends BattingRatings<?>> ratings) {
+        Long paToProject = DEFAULT_PLATE_APPEARANCES;
+
+        Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhpPercentage());
+        Long vsLeftPa = paToProject - vsRightPa;
+
         return SplitStats.create(
-            predict(ratings.getVsLeft()),
-            predict(ratings.getVsRight()));
+            predict(ratings.getVsLeft(), vsLeftPa * 100),
+            predict(ratings.getVsRight(), vsRightPa * 100));
     }
 
     public BattingStats predict(BattingRatings<?> ratings) {
@@ -167,29 +184,29 @@ public final class BattingRegression {
     public BattingStats predict(
         BattingRatings<?> ratings, Long plateAppearances) {
 
-        int predictedHits =
-            (int) (plateAppearances
+        long predictedHits =
+            Math.round(plateAppearances
                 * predict(Predicting.HITS, ratings.getContact()));
 
-        int predictedExtraBaseHits =
-            (int) (plateAppearances
+        long predictedExtraBaseHits =
+            Math.round(plateAppearances
                 * predict(Predicting.EXTRA_BASE_HITS, ratings.getGap()));
 
         double triplesPercentage = (double) leagueBatting.getTriples()
             / (leagueBatting.getDoubles() + leagueBatting.getTriples());
-        int predictedTriples = (int) (predictedExtraBaseHits * triplesPercentage);
-        int predictedDoubles = predictedExtraBaseHits - predictedTriples;
+        long predictedTriples = Math.round(predictedExtraBaseHits * triplesPercentage);
+        long predictedDoubles = predictedExtraBaseHits - predictedTriples;
 
-        int predictedHomeRuns =
-            (int) (plateAppearances
+        long predictedHomeRuns =
+             Math.round(plateAppearances
                 * predict(Predicting.HOME_RUNS, ratings.getPower()));
 
-        int predictedWalks =
-            (int) (plateAppearances
+        long predictedWalks =
+            Math.round(plateAppearances
                 * predict(Predicting.WALKS, ratings.getEye()));
 
-        int predictedKs = ratings.getK().isPresent()
-            ? (int) (plateAppearances
+        long predictedKs = ratings.getK().isPresent()
+            ? Math.round(plateAppearances
                 * predict(Predicting.KS, ratings.getK().get()))
             : 0;
 

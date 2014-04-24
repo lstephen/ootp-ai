@@ -9,9 +9,6 @@ import com.ljs.ootp.ai.regression.BattingRegression;
 import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.splits.Splits;
-import com.ljs.ootp.ai.stats.BattingStats;
-import com.ljs.ootp.ai.stats.PitchingStats;
-import com.ljs.ootp.ai.stats.SplitStats;
 
 /**
  *
@@ -136,18 +133,14 @@ public class PlayerValue {
             case OF:
             case H:
                 Splits<BattingRatings<Integer>> splitsB = p.getBattingPotentialRatings();
-                BattingStats vsLeftB = batting.predict(splitsB.getVsLeft());
-                BattingStats vsRightB = batting.predict(splitsB.getVsRight());
 
-                value = SplitStats.create(vsLeftB, vsRightB).getOverall().getWobaPlus();
+                value = batting.predict(splitsB).getOverall().getWobaPlus();
                 break;
             case SP:
             case MR:
-                Splits<PitchingRatings> splitsP = p.getPitchingPotentialRatings();
-                PitchingStats vsLeftP = pitching.predict(splitsP.getVsLeft());
-                PitchingStats vsRightP = pitching.predict(splitsP.getVsRight());
+                Splits<PitchingRatings<Integer>> splitsP = p.getPitchingPotentialRatings();
 
-                value = predictions.getPitcherOverall().getPlus(SplitStats.create(vsLeftP, vsRightP));
+                value = predictions.getPitcherOverall().getPlus(pitching.predict(splitsP).getOverall());
                 break;
             default:
                 throw new IllegalStateException();
