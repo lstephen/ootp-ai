@@ -54,6 +54,10 @@ public class PitchingStats implements Stats<PitchingStats> {
         return perPlateAppearance(hits);
     }
 
+    public double getHitsPerNine() {
+        return perInnings(hits) * 9;
+    }
+
     public double getDoublesPerPlateAppearance() {
         return perPlateAppearance(doubles);
     }
@@ -66,8 +70,16 @@ public class PitchingStats implements Stats<PitchingStats> {
         return perPlateAppearance(strikeouts);
     }
 
+    public double getStrikeoutsPerNine() {
+        return perInnings(strikeouts) * 9;
+    }
+
     public double getWalksPerPlateAppearance() {
         return perPlateAppearance(walks);
+    }
+
+    public double getWalksPerNine() {
+        return perInnings(walks) * 9;
     }
 
     public double getHomeRunsPerPlateAppearance() {
@@ -116,6 +128,10 @@ public class PitchingStats implements Stats<PitchingStats> {
 
     private double perHit(double value) {
         return getHits() == 0 ? 0 : value / getHits();
+    }
+
+    private double perInnings(double value) {
+        return getInningsPitched() == 0 ? 0 : value / getInningsPitched();
     }
 
     @Override

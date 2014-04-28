@@ -311,12 +311,15 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %3.1f %3.1f %3.1f | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
                     roster.getStatus(p) == null ? "" : roster.getStatus(p),
                     Integer.valueOf(p.getAge()),
+                    pitching.getSplits(p).getOverall().getHitsPerNine(),
+                    pitching.getSplits(p).getOverall().getStrikeoutsPerNine(),
+                    pitching.getSplits(p).getOverall().getWalksPerNine(),
                     method.getPlus(pitching.getSplits(p).getVsLeft()),
                     stats.contains(p) ? Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999) : "",
                     method.getPlus(pitching.getSplits(p).getVsRight()),

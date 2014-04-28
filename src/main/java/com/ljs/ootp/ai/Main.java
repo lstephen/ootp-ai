@@ -300,9 +300,9 @@ public class Main {
             selectionMode = Mode.EXPANDED;
         }
 
-        //if (def.getName().equals("BTH")) {
-        //    selectionMode = Mode.PLAYOFFS;
-        //}
+        if (def.getName().equals("PSD")) {
+            selectionMode = Mode.PLAYOFFS;
+        }
 
         Roster newRoster = selection.select(selectionMode, changes);
 
