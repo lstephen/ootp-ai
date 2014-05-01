@@ -155,8 +155,8 @@ public class FourtyManRoster {
         Set<Player> toWaive = Sets.newHashSet();
 
         for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
-            if (value.getCurrentValueVsReplacement(p) <= 0
-                && value.getFutureValueVsReplacement(p) <= 0
+            if (value.getCurrentValueVsReplacement(p) < 0
+                && value.getFutureValueVsReplacement(p) < 0
                 && !p.getClearedWaivers().or(Boolean.TRUE)
                 && !getDesired25ManRoster().contains(p)) {
 

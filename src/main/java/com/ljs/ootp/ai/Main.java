@@ -92,6 +92,10 @@ public class Main {
         SiteDefinitionFactory.ootp5(
             "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(8), "American", 32);
 
+    //private static final SiteDefinition HFTC_CHC =
+    //    SiteDefinitionFactory.ootp5(
+    //        "HFTC_CHC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(22), "National", 32);
+
     //private static final SiteDefinition TWIB =
     //    SiteDefinition.ootp6("TWIB", "http://twib.us/reports/", new TeamId("16"), "National", 16);
 
@@ -130,6 +134,7 @@ public class Main {
             .put("TWML", TWML)
             .put("CBL", CBL)
             .put("HFTC", HFTC)
+            //.put("HFTC_CHC", HFTC_CHC)
             .put("BTH", BTH)
             .put("LBB", LBB)
             .put("SAVOY", SAVOY)
@@ -300,9 +305,9 @@ public class Main {
             selectionMode = Mode.EXPANDED;
         }
 
-        if (def.getName().equals("PSD")) {
-            selectionMode = Mode.PLAYOFFS;
-        }
+        //if (def.getName().equals("PSD")) {
+        //    selectionMode = Mode.PLAYOFFS;
+        //}
 
         Roster newRoster = selection.select(selectionMode, changes);
 

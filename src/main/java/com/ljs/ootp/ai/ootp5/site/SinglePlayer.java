@@ -277,6 +277,8 @@ public class SinglePlayer implements PlayerSource {
         }
 
         ratings.setCatcher(extractCatcherRating(raw));
+        //ratings.setInfield(extractInfieldRating(raw));
+        //ratings.setOutfield(extractOutfieldRating(raw));
 
         return ratings;
     }
@@ -349,7 +351,7 @@ public class SinglePlayer implements PlayerSource {
 
         Double fpct = Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
 
-        return extractRange(raw, position).doubleValue() + fpct;
+        return extractRange(raw, position).doubleValue() + (fpct - .8);
     }
 
     private FieldingRatings extractCatcherRating(String raw) {
@@ -374,8 +376,8 @@ public class SinglePlayer implements PlayerSource {
             .builder()
             .range(range)
             .arm(arm)
-            .errors(posCount * 25)
-            .dp(50)
+            .errors(50)
+            .dp(arm)
             .build();
     }
 
@@ -391,6 +393,7 @@ public class SinglePlayer implements PlayerSource {
             .builder()
             .range(range)
             .arm(arm)
+            .errors(50)
             .build();
     }
 

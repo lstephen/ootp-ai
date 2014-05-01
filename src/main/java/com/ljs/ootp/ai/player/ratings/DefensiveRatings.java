@@ -131,10 +131,10 @@ public class DefensiveRatings {
     }
 
     private Character getFormattedValue(Double value) {
-        return getFormattedValue(value.intValue());
+        return getFormattedValue(Math.round(value));
     }
 
-    private Character getFormattedValue(Integer value) {
+    private Character getFormattedValue(Long value) {
         if (value == null || value <= 0) { return '-'; }
         if (value >= 10) { return 'T'; }
 

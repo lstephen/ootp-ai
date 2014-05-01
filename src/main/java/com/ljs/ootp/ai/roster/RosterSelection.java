@@ -311,7 +311,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %3.1f %3.1f %3.1f | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %4.1f %3.1f %3.1f | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -321,9 +321,9 @@ public final class RosterSelection {
                     pitching.getSplits(p).getOverall().getStrikeoutsPerNine(),
                     pitching.getSplits(p).getOverall().getWalksPerNine(),
                     method.getPlus(pitching.getSplits(p).getVsLeft()),
-                    stats.contains(p) ? Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999) : "",
+                    stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999)) : "",
                     method.getPlus(pitching.getSplits(p).getVsRight()),
-                    stats.contains(p) ? Math.min(method.getPlus(stats.getSplits(p).getVsRight()), 999) : "",
+                    stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsRight()), 999)) : "",
                     method.getPlus(pitching.getOverall(p)),
                     p.getPosition().equals("MR")
                         ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
