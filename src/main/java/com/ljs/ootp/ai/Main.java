@@ -3,6 +3,8 @@ package com.ljs.ootp.ai;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +31,7 @@ import com.ljs.ootp.ai.report.SalaryReport;
 import com.ljs.ootp.ai.report.TeamReport;
 import com.ljs.ootp.ai.report.Trade;
 import com.ljs.ootp.ai.roster.Changes;
+import com.ljs.ootp.ai.roster.Changes.ChangeType;
 import com.ljs.ootp.ai.roster.FourtyManRoster;
 import com.ljs.ootp.ai.roster.Roster;
 import com.ljs.ootp.ai.roster.Roster.Status;
@@ -446,7 +449,13 @@ public class Main {
             fourtyMan.printReport(out);
 
             generic.setTitle("+40");
-            generic.setPlayers(fourtyMan.getPlayersToAdd());
+            generic.setPlayers(ImmutableSet
+                .<Player>builder()
+                .addAll(fourtyMan.getPlayersToAdd())
+                .addAll(FluentIterable
+                    .from(changes.get(ChangeType.FOURTY_MAN))
+                    .filter(Predicates.in(newRoster.getAllPlayers())))
+                .build());
             generic.print(out);
 
             generic.setTitle("-40");

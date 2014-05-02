@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Changes {
 
     public static enum ChangeType {
-        ACQUISITION('a'), RELEASE('r'), FORCE_ML('m'), DONT_ACQUIRE('d'), PICKED('p');
+        ACQUISITION('a'), RELEASE('r'), FORCE_ML('m'), DONT_ACQUIRE('d'), PICKED('p'), FOURTY_MAN('f');
 
         private final Character code;
 
@@ -120,6 +120,7 @@ public final class Changes {
                             break;
                         case RELEASE:
                         case FORCE_ML:
+                        case FOURTY_MAN:
                             if (team == null) {
                                 team = site.getSingleTeam().getRoster().getAllPlayers();
                             }

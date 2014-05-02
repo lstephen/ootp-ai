@@ -62,6 +62,15 @@ public final class Team implements Iterable<Player>, PlayerSource {
             players.add(p);
         }
 
+        for (Player p : changes.get(Changes.ChangeType.FOURTY_MAN)) {
+            if (containsPlayer(p)) {
+                Player updated = get(p.getId());
+                remove(p);
+                updated.setOn40Man(Boolean.TRUE);
+                players.add(updated);
+            }
+        }
+
         for (Player p : changes.get(Changes.ChangeType.RELEASE)) {
             remove(p);
         }

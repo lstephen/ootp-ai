@@ -14,6 +14,7 @@ import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.player.PlayerSource;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +30,7 @@ public final class Roster implements Printable {
 
     private static final Integer DEFAULT_TARGET_MINIMUM = 90;
 
-    public static enum Status { ML, AAA, AA, A, SA, R, DL }
+    public static enum Status { ML, AAA, AA, A, SA, R, DL, UNK }
 
     private final PlayerSource source;
 
@@ -54,6 +55,10 @@ public final class Roster implements Printable {
         return ImmutableSet.copyOf(assignments.get(status));
     }
 
+    public Boolean contains(Player p) {
+        return assignments.containsValue(p);
+    }
+
     public Integer size() {
         return assignments.size();
     }
@@ -67,7 +72,7 @@ public final class Roster implements Printable {
         available.remove(p);
     }
 
-    public Iterable<Player> getAllPlayers() {
+    public Collection<Player> getAllPlayers() {
         return assignments.values();
     }
 

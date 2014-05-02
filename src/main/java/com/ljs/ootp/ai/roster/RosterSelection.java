@@ -140,6 +140,12 @@ public final class RosterSelection {
         Set<Player> ml = Sets.newHashSet();
 
         for (Player p : changes.get(ChangeType.FORCE_ML)) {
+            if (!previous.contains(p)) {
+                previous.assign(Status.UNK, p);
+            }
+        }
+
+        for (Player p : changes.get(ChangeType.FORCE_ML)) {
             if (!getFourtyManRoster().getDesired40ManRoster().contains(p)) {
                 roster.release(p);
                 forced.remove(p);
@@ -305,13 +311,17 @@ public final class RosterSelection {
         TeamStats<PitchingStats> pitching = predictions.getAllPitching();
         PitcherOverall method = predictions.getPitcherOverall();
 
+        Integer statusLength = Iterables.getFirst(roster.getAllPlayers(), null).getRosterStatus().length();
+
+        w.format("%" + (25 + statusLength) + "s |  H/9  K/9 BB/9 |%n", "");
+
         for (Player p : pitcherSelectionFactory
             .byOverall()
             .sortedCopy(Selections.onlyPitchers(pitching.getPlayers()))) {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %4.1f %3.1f %3.1f | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),

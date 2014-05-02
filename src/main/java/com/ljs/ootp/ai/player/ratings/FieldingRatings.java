@@ -1,6 +1,7 @@
 package com.ljs.ootp.ai.player.ratings;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -113,18 +114,18 @@ public class FieldingRatings {
 
         @JsonCreator
         public static Builder fromJson(ObjectNode node) {
-            Integer range = node.get("range").get("reference").asInt();
-            Integer errors = node.get("errors").get("reference").asInt();
-            Integer arm = node.get("arm").get("reference").asInt();
-            Integer dp = node.get("dp").get("reference").asInt();
-            Integer ability = node.get("ability").get("reference").asInt();
+            JsonNode range = node.get("range").get("reference");
+            JsonNode errors = node.get("errors").get("reference");
+            JsonNode arm = node.get("arm").get("reference");
+            JsonNode dp = node.get("dp").get("reference");
+            JsonNode ability = node.get("ability").get("reference");
 
             return create()
-                .range(range)
-                .errors(errors)
-                .arm(arm)
-                .dp(dp)
-                .ability(ability);
+                .range(range == null ? 0 : range.asInt())
+                .errors(errors == null ? 0 : errors.asInt())
+                .arm(arm == null ? 0 : arm.asInt())
+                .dp(dp == null ? 0 : dp.asInt())
+                .ability(ability == null ? 0 : ability.asInt());
         }
 
     }
