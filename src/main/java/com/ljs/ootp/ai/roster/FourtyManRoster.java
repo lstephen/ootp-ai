@@ -108,7 +108,7 @@ public class FourtyManRoster {
         Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
 
         for (Player p : Ordering.natural().reverse().onResultOf(value.getTradeTargetValue()).compound(Player.byAge()).sortedCopy(roster.getAllPlayers())) {
-            if (!fourtyMan.contains(p) && p.getYearsOfProService().or(0) >= 3) {
+            if (!fourtyMan.contains(p) && (p.getYearsOfProService().or(0) >= 3 || p.isUpcomingFreeAgent())) {
                 fourtyMan.add(p);
             }
 
@@ -155,7 +155,8 @@ public class FourtyManRoster {
         Set<Player> toWaive = Sets.newHashSet();
 
         for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
-            if (value.getCurrentValueVsReplacement(p) < 0
+            if (p.getAge() > 25
+                && value.getCurrentValueVsReplacement(p) < 0
                 && value.getFutureValueVsReplacement(p) < 0
                 && !p.getClearedWaivers().or(Boolean.TRUE)
                 && !getDesired25ManRoster().contains(p)) {

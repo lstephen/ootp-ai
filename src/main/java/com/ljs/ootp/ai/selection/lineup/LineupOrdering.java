@@ -2,6 +2,7 @@ package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -55,6 +56,10 @@ public class LineupOrdering {
 
     public LineupOrdering(TeamStats<BattingStats> predictions) {
         this.predictions = predictions;
+    }
+
+    private Boolean isValid(Order order) {
+        return order.get().size() == ImmutableSet.copyOf(order.get()).size();
     }
 
 	private Double score(Order order) {
@@ -116,12 +121,14 @@ public class LineupOrdering {
     }
 
     public ImmutableList<Player> order(Lineup.VsHand vs, Iterable<Player> ps) {
+        Preconditions.checkArgument(Iterables.size(ps) == 8 || Iterables.size(ps) == 9);
+        Preconditions.checkArgument(Iterables.size(ps) == ImmutableSet.copyOf(ps).size());
+
         Pair<Lineup.VsHand, ImmutableSet<Player>> key = Pair.of(vs, ImmutableSet.copyOf(ps));
 
         if (CACHE.containsKey(key)) {
             return CACHE.get(key);
         }
-
 
         HillClimbing.Builder<Order> builder = HillClimbing
             .<Order>builder()

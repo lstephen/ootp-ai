@@ -82,7 +82,7 @@ public class Main {
     // PAM, MWF
     private static final SiteDefinition TWML =
         SiteDefinitionFactory.ootp6(
-           "TWML", "http://www.darowski.com/twml/OOTP6Reports/", Id.<Team>valueOf(22), "Splendid Splinter", 24);
+           "TWML", "http://www.darowski.com/twml/OOTP6Reports/", Id.<Team>valueOf(19), "Splendid Splinter", 20);
         //    "TWML", "http://www.darowski.com/twml/2033/", new TeamId("22"), "Splendid Splinter", 24);
 
     // WCH, TF

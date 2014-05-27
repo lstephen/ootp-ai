@@ -150,7 +150,7 @@ public class SinglePlayer implements PlayerSource {
         player.setStars(StarRating.extractFrom(doc));
 
         if (site.isInjured(player)) {
-            player.setTeam("*INJ* " + player.getTeam());
+            player.setInjured(Boolean.TRUE);
         }
 
         if (doc.html().contains("out for entire career")) {
@@ -158,7 +158,7 @@ public class SinglePlayer implements PlayerSource {
         }
 
         if (site.isFutureFreeAgent(player)) {
-            player.setTeam("*FA* " + player.getTeam());
+            player.setUpcomingFreeAgent(Boolean.TRUE);
         }
 
         if (doc.html().contains("Rule 5 Draft Eligibility")) {

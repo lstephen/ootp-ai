@@ -53,11 +53,11 @@ public class PlayerExtraction {
         player.setSalary(extractSalary(doc, player));
 
         if (site.isInjured(player)) {
-            player.setTeam("*INJ* " + player.getTeam());
+            player.setInjured(Boolean.TRUE);
         }
 
         if (site.isFutureFreeAgent(player)) {
-            player.setTeam("*FA* " + player.getTeam());
+            player.setUpcomingFreeAgent(Boolean.TRUE);
         }
 
         player.setListedPosition(StringUtils.substringBefore(

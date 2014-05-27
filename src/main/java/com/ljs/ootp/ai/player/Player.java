@@ -163,6 +163,22 @@ public final class Player {
         rosterStatus.setTeamTopProspectPosition(position);
     }
 
+    public Boolean isInjured() {
+        return rosterStatus.isInjured();
+    }
+
+    public void setInjured(Boolean injured) {
+        rosterStatus.setInjured(injured);
+    }
+
+    public Boolean isUpcomingFreeAgent() {
+        return rosterStatus.isUpcomingFreeAgent();
+    }
+
+    public void setUpcomingFreeAgent(Boolean ufa) {
+        rosterStatus.setUpcomingFreeAgent(ufa);
+    }
+
     public ImmutableList<Slot> getSlots() {
         if (slots == null) {
             slots = Slot.getPlayerSlots(this);
@@ -172,6 +188,9 @@ public final class Player {
 
     public String getRosterStatus() {
         StringBuilder str = new StringBuilder();
+
+        str.append(isInjured() ? "I" : " ");
+        str.append(isUpcomingFreeAgent() ? "F" : " ");
 
         Optional<Integer> pos = getTeamTopProspectPosition();
         if (pos.isPresent()) {

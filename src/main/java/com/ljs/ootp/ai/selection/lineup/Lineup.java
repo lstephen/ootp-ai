@@ -140,13 +140,9 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
     @Override
     public void print(PrintWriter w) {
         int idx = 1;
-        for (Iterator i$ = order.iterator(); i$.hasNext();) {
-            Player p = (Player) i$.next();
-            String pos = defense.contains(p) ? ((Position) defense.getPosition(p))
-                .getAbbreviation() : "DH";
-            w.println(String.format("%d. %2s %-15s", new Object[]{
-                Integer.valueOf(idx), pos, p.getShortName()
-            }));
+        for (Player p : order) {
+            String pos = defense.contains(p) ? defense.getPosition(p).getAbbreviation() : "DH";
+            w.format("%d. %2s %-15s%n", idx, pos, p.getShortName());
             idx++;
         }
 
