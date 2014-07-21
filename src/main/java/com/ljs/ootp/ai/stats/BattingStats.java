@@ -10,6 +10,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class BattingStats implements Stats<BattingStats> {
 
+    private Integer runs;
+
     private int atBats;
 
     private int hits;
@@ -27,6 +29,15 @@ public class BattingStats implements Stats<BattingStats> {
     @JsonIgnore
     private BattingStats leagueBatting;
 
+    public Integer getRuns() {
+        return runs;
+    }
+
+    public void setRuns(Integer runs) {
+        this.runs = runs;
+    }
+
+    public int getAtBats() { return atBats; }
     public void setAtBats(int atBats) { this.atBats = atBats; }
 
     public int getHits() { return hits; }
@@ -43,8 +54,10 @@ public class BattingStats implements Stats<BattingStats> {
     public int getTriples() { return triples; }
     public void setTriples(long triples) { this.triples = (int) triples; }
 
+    public int getHomeRuns() { return homeRuns; }
     public void setHomeRuns(long homeRuns) { this.homeRuns = (int) homeRuns; }
 
+    public int getWalks() { return walks; }
     public void setWalks(long walks) { this.walks = (int) walks; }
 
     public void setKs(long ks) { this.ks = (int) ks; }
@@ -75,6 +88,10 @@ public class BattingStats implements Stats<BattingStats> {
         return perHit(doubles);
     }
 
+    public double getTriplesPerHit() {
+        return perHit(triples);
+    }
+
     public double getHomeRunsPerPlateAppearance() {
         return perPlateAppearance(homeRuns);
     }
@@ -91,8 +108,16 @@ public class BattingStats implements Stats<BattingStats> {
         return perPlateAppearance(ks);
     }
 
+    public Integer getOuts() {
+        return atBats - hits;
+    }
+
     public double getOutsPerPlateAppearance() {
-        return perPlateAppearance(atBats - hits);
+        return perPlateAppearance(getOuts());
+    }
+
+    public Integer getTotalBases() {
+        return hits + doubles + 2 * triples + 3 * homeRuns;
     }
 
     public double getAverage() {
@@ -109,12 +134,22 @@ public class BattingStats implements Stats<BattingStats> {
             : (double) (hits + doubles + 2 * triples + 3 * homeRuns) / atBats;
     }
 
+    public double getBabip() {
+        if (atBats - ks - homeRuns == 0) {
+            return 0;
+        } else {
+            return (double) (hits - homeRuns)
+                / (atBats - ks - homeRuns);
+        }
+    }
+
     public double getWoba() {
-        return perPlateAppearance(
+        return Woba.get().calculate(this);
+        /*return perPlateAppearance(
               0.7 * walks
             + 0.9 * (getSingles())
             + 1.3 * (doubles + triples)
-            + 2.0 * homeRuns);
+            + 2.0 * homeRuns);*/
     }
 
     public int getWobaPlus() {
@@ -147,6 +182,7 @@ public class BattingStats implements Stats<BattingStats> {
     public BattingStats multiply(double d) {
         BattingStats stats = new BattingStats();
         stats.leagueBatting = leagueBatting;
+        stats.runs = (int) (runs == null ? 0 : (runs * d));
         stats.atBats = (int) (atBats * d);
         stats.hits = (int) (hits * d);
         stats.doubles = (int) (doubles * d);
@@ -160,6 +196,7 @@ public class BattingStats implements Stats<BattingStats> {
     public BattingStats add(BattingStats rhs) {
         BattingStats stats = new BattingStats();
         stats.leagueBatting = leagueBatting;
+        stats.runs = (runs == null ? 0 : runs) + (rhs.runs == null ? 0 : rhs.runs);
         stats.atBats = atBats + rhs.atBats;
         stats.hits = hits + rhs.hits;
         stats.doubles = doubles + rhs.doubles;

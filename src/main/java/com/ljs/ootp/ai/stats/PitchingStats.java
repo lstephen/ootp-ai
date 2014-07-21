@@ -34,10 +34,21 @@ public class PitchingStats implements Stats<PitchingStats> {
     public Integer getHits() { return hits; }
     public void setHits(long hits) { this.hits = (int) hits; }
 
+    public int getSingles() { return hits - doubles - triples - homeRuns; }
+
+    public int getDoubles() { return doubles; }
     public void setDoubles(long doubles) { this.doubles = (int) doubles; }
+
+    public int getTriples() { return triples; }
     public void setTriples(long triples) { this.triples = (int) triples; }
+
+    public int getStrikeouts() { return strikeouts; }
     public void setStrikeouts(long strikeouts) { this.strikeouts = (int) strikeouts; }
+
+    public int getWalks() { return walks; }
     public void setWalks(long walks) { this.walks = (int) walks; }
+
+    public int getHomeRuns() { return homeRuns; }
     public void setHomeRuns(long homeRuns) { this.homeRuns = (int) homeRuns; }
 
     public void setLeaguePitching(PitchingStats leaguePitching) {
@@ -45,6 +56,8 @@ public class PitchingStats implements Stats<PitchingStats> {
     }
 
     public int getPlateAppearances() { return atBats + walks; }
+
+    public int getOuts() { return atBats - hits; }
 
     public int getInningsPitched() {
         return (atBats - hits) / 3;
@@ -82,6 +95,10 @@ public class PitchingStats implements Stats<PitchingStats> {
         return perInnings(walks) * 9;
     }
 
+    public double getHomeRunsPerNine() {
+        return perInnings(homeRuns) * 9;
+    }
+
     public double getHomeRunsPerPlateAppearance() {
         return perPlateAppearance(homeRuns);
     }
@@ -99,6 +116,14 @@ public class PitchingStats implements Stats<PitchingStats> {
         }
     }
 
+    public Double getBaseRuns(BaseRuns brs) {
+        return brs.calculate(this);
+    }
+
+    public Integer getBaseRunsPlus(BaseRuns brs) {
+        return (int) (leaguePitching.getBaseRuns(brs) * 100 / getBaseRuns(brs));
+    }
+
     public double getFip() {
         return (double) (13 * homeRuns + 3 * walks - 2 * strikeouts)
             / getInningsPitched() + FIP_FUDGE_FACTOR;
@@ -109,11 +134,12 @@ public class PitchingStats implements Stats<PitchingStats> {
     }
 
     public double getWobaAgainst() {
-        return perPlateAppearance(
+        return Woba.get().calculate(this);
+        /*return perPlateAppearance(
               0.7 * walks
             + 0.9 * (hits - doubles - triples - homeRuns)
             + 1.3 * (doubles + triples)
-            + 2.0 * homeRuns);
+            + 2.0 * homeRuns);*/
     }
 
     public int getWobaPlusAgainst() {

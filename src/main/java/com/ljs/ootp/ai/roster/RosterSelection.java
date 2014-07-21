@@ -146,7 +146,11 @@ public final class RosterSelection {
         }
 
         for (Player p : changes.get(ChangeType.FORCE_ML)) {
-            if (!getFourtyManRoster().getDesired40ManRoster().contains(p)) {
+            FourtyManRoster fourtyMan = getFourtyManRoster();
+            fourtyMan.setChanges(changes);
+
+            if (!fourtyMan.getDesired40ManRoster().contains(p)) {
+                System.out.println("Not on desired 40 Man: " + p.getShortName());
                 roster.release(p);
                 forced.remove(p);
             }
@@ -166,11 +170,25 @@ public final class RosterSelection {
                 Selections.onlyPitchers(forced),
                 getAvailablePitchers(roster)).values());
 
-        while (ml.size() > mode.getMajorLeagueRosterLimit()) {
+        while (ml.size() > mode.getMajorLeagueRosterLimit()
+            && !Sets.difference(ml, forced).isEmpty()) {
             ml.remove(Ordering
                 .natural()
                 .onResultOf(value.getTradeTargetValue())
                 .min(Sets.difference(ml, forced)));
+        }
+
+        while (ml.size() > mode.getMajorLeagueRosterLimit()) {
+            Player p = Ordering
+                .natural()
+                .onResultOf(value.getTradeTargetValue())
+                .min(ml);
+
+            ml.remove(p);
+
+            if (forced.contains(p)) {
+                roster.release(p);
+            }
         }
 
         roster.assign(Roster.Status.ML, ml);
@@ -282,7 +300,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s || %3d | %8s | %s ",
+                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s || %3d | %8s | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -313,7 +331,7 @@ public final class RosterSelection {
 
         Integer statusLength = Iterables.getFirst(roster.getAllPlayers(), null).getRosterStatus().length();
 
-        w.format("%" + (25 + statusLength) + "s |  H/9  K/9 BB/9 |%n", "");
+        w.format("%" + (25 + statusLength) + "s |  H/9  K/9 BB/9 HR/9 |%n", "");
 
         for (Player p : pitcherSelectionFactory
             .byOverall()
@@ -321,7 +339,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f | %3d %3s | %3d %3s || %3d %3s | %5.2f | %s",
+                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s || %3d %3s | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -330,6 +348,7 @@ public final class RosterSelection {
                     pitching.getSplits(p).getOverall().getHitsPerNine(),
                     pitching.getSplits(p).getOverall().getStrikeoutsPerNine(),
                     pitching.getSplits(p).getOverall().getWalksPerNine(),
+                    pitching.getSplits(p).getOverall().getHomeRunsPerNine(),
                     method.getPlus(pitching.getSplits(p).getVsLeft()),
                     stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999)) : "",
                     method.getPlus(pitching.getSplits(p).getVsRight()),
@@ -338,7 +357,6 @@ public final class RosterSelection {
                     p.getPosition().equals("MR")
                         ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
                         : "",
-                    method.getEraEstimate(pitching.getOverall(p)),
                     Joiner.on(',').join(Slot.getPlayerSlots(p))
                 ));
         }

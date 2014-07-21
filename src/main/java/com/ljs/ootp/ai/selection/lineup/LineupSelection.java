@@ -10,8 +10,15 @@ public class LineupSelection {
 
     private final TeamStats<BattingStats> predictions;
 
+    private boolean requireBackupCatcher = true;
+
     public LineupSelection(TeamStats<BattingStats> predictions) {
         this.predictions = predictions;
+    }
+
+    public LineupSelection dontRequireBackupCatcher() {
+        requireBackupCatcher = false;
+        return this;
     }
 
     public AllLineups select(Iterable<Player> available) {
@@ -29,6 +36,10 @@ public class LineupSelection {
 
         StarterSelection ss = new StarterSelection(predictions);
 
+        if (!requireBackupCatcher) {
+            ss.dontRequireBackupCatcher();
+        }
+
         ImmutableSet<Player> withoutDhStarters =
             ImmutableSet.copyOf(ss.select(vs, available));
 
@@ -37,6 +48,10 @@ public class LineupSelection {
 
     private Lineup selectWithDh(Lineup.VsHand vs, Iterable<Player> available) {
         StarterSelection ss = new StarterSelection(predictions);
+
+        if (!requireBackupCatcher) {
+            ss.dontRequireBackupCatcher();
+        }
 
         ImmutableSet<Player> withDhStarters =
             ImmutableSet.copyOf(ss.selectWithDh(vs, available));

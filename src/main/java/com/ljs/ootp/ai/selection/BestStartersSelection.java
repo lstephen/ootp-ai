@@ -61,6 +61,13 @@ public class BestStartersSelection implements Selection {
 
         ImmutableSet<Player> best = ImmutableSet.copyOf(Iterables.concat(selectStarters(available), forced));
 
+        System.out.println("Best:");
+        for (Player p : Player.byShortName().sortedCopy(best)) {
+            System.out.print(p.getShortName() + "/");
+        }
+        System.out.println();
+
+
         best = optimize(best, forced, available);
 
         Multimap<Slot, Player> result = HashMultimap.create();
@@ -124,7 +131,7 @@ public class BestStartersSelection implements Selection {
             return partial;
         }
 
-        AllLineups lineups = new LineupSelection(predictions).select(partial);
+        AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(partial);
 
         Bench bench = Bench.select(lineups, partial, predictions, available, getTargetSize());
 
@@ -136,7 +143,7 @@ public class BestStartersSelection implements Selection {
         Set<Player> selected = Sets.newHashSet(best);
 
         while (selected.size() > size) {
-            AllLineups lineups = new LineupSelection(predictions).select(selected);
+            AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(selected);
             Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
 
             Iterables.removeAll(ps, forced);
@@ -154,7 +161,7 @@ public class BestStartersSelection implements Selection {
             selected.remove(byValueProvided(lineups, selected).min(ps));
         }
 
-        AllLineups lineups = new LineupSelection(predictions).select(selected);
+        AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(selected);
 
         System.out.print("Limited:");
         for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
@@ -167,6 +174,8 @@ public class BestStartersSelection implements Selection {
 
     private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
 		StarterSelection starters = new StarterSelection(predictions);
+
+        starters.dontRequireBackupCatcher();
 
         return ImmutableSet.copyOf(
             Iterables.concat(

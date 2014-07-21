@@ -145,7 +145,7 @@ public class GenericValueReport {
     public void print(PrintWriter w) {
         w.println();
         w.format(
-            "**%-16s** | %11s %7s %7s | %n",
+            "**%-16s** | %11s %7s %7s |%n",
                 StringUtils.abbreviate(title, 16),
                 StringUtils.center("OVR", 10),
                 StringUtils.center("vL/vR", 7),

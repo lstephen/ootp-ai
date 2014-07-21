@@ -45,6 +45,7 @@ public final class SlotSelection implements Selection {
                     remainingSlots.remove(s);
                     break;
                 }
+                selected.put(Slot.getPrimarySlot(p), p);
             }
         }
 

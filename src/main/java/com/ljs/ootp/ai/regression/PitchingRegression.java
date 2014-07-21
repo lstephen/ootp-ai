@@ -8,6 +8,8 @@ import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.splits.Splits;
+import com.ljs.ootp.ai.stats.EraBaseRuns;
+import com.ljs.ootp.ai.stats.FipBaseRuns;
 import com.ljs.ootp.ai.stats.History;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.SplitPercentagesHolder;
@@ -295,6 +297,11 @@ public final class PitchingRegression {
                     regression.hits.getRSquare(),
                     regression.doubles.getRSquare(),
                     regression.era.getRSquare()));
+
+            w.format(
+                "ERA: %.2f, FIP: %.2f%n",
+                EraBaseRuns.get().calculate(regression.leaguePitching),
+                FipBaseRuns.get().calculate(regression.leaguePitching));
         }
 
         public static CorrelationReport create(PitchingRegression regression) {

@@ -2,10 +2,14 @@ package com.ljs.ootp.ai.player.ratings;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -142,28 +146,30 @@ public class DefensiveRatings {
     }
 
     public String getPrimaryPosition() {
-        Position specialty = byRawScore(this).max(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD);
+        return Iterables
+            .getFirst(
+                Optional.presentInstances(
+                    ImmutableList.of(
+                        getPrimaryPosition(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD),
+                        getPrimaryPosition(Position.SECOND_BASE, Position.THIRD_BASE),
+                        getPrimaryPosition(Position.RIGHT_FIELD, Position.LEFT_FIELD),
+                        getPrimaryPosition(Position.FIRST_BASE))),
+                Position.DESIGNATED_HITTER)
+            .getAbbreviation();
 
-        if (getPositionScore(specialty) > 0) {
-            return specialty.getAbbreviation();
+    }
+
+    public Optional<Position> getPrimaryPosition(Position... ps) {
+        return getPrimaryPosition(Arrays.asList(ps));
+    }
+
+    public Optional<Position> getPrimaryPosition(Iterable<Position> ps) {
+        for (Position p : byRawScore(this).reverse().sortedCopy(ps)) {
+            if (getPositionScore(p) > 0 && positionRating.containsKey(p) && positionRating.get(p) > 0) {
+                return Optional.of(p);
+            }
         }
-
-        Position tierTwo = byRawScore(this).max(Position.SECOND_BASE, Position.THIRD_BASE);
-
-        if (getPositionScore(tierTwo) > 0) {
-            return tierTwo.getAbbreviation();
-        }
-
-        Position tierThree = byRawScore(this).max(Position.RIGHT_FIELD, Position.LEFT_FIELD);
-
-        if (getPositionScore(tierThree) > 0) {
-            return tierThree.getAbbreviation();
-        }
-
-        return getPositionScore(Position.FIRST_BASE) > 0
-            ? Position.FIRST_BASE.getAbbreviation()
-            : "DH";
-
+        return Optional.absent();
     }
 
     private Ordering<Position> byRawScore(final DefensiveRatings rs) {

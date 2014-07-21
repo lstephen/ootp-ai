@@ -1,9 +1,9 @@
 package com.ljs.ootp.ai.report;
 
-import com.ljs.ootp.ai.io.Printable;
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.annotation.ReturnTypesAreNonnullByDefault;
+import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.Salary;
@@ -65,16 +65,15 @@ public class SalaryReport implements Printable {
 
             nextTotal += nextS;
 
-            w.println(
-                String.format(
-                    "%2s %-15s %2d| %11s %11s",
-                    p.getPosition(),
-                    StringUtils.abbreviate(p.getShortName(), 15),
-                    p.getAge(),
-                    NumberFormat.getIntegerInstance().format(s),
-                    nextS == 0
-                        ? ""
-                        : NumberFormat.getIntegerInstance().format(nextS)));
+            w.format(
+                "%2s %-15s %2d| %11s %11s%n",
+                p.getPosition(),
+                StringUtils.abbreviate(p.getShortName(), 15),
+                p.getAge(),
+                NumberFormat.getIntegerInstance().format(s),
+                nextS == 0
+                    ? ""
+                    : NumberFormat.getIntegerInstance().format(nextS));
         }
 
         w.println(

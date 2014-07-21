@@ -18,40 +18,38 @@ public enum PitcherOverall {
     FIP {
         public Double get(
             TeamStats<PitchingStats> predictions, Player p) {
-            return predictions.getOverall(p).getFip();
+            return getEraEstimate(predictions.getOverall(p));
         }
 
         public Integer getPlus(
             TeamStats<PitchingStats> predictions, Player p) {
-            return predictions.getOverall(p).getFipPlus();
+            return getPlus(predictions.getOverall(p));
         }
 
         public Integer getPlus(PitchingStats stats) {
-            return stats.getFipPlus();
+            return stats.getBaseRunsPlus(FipBaseRuns.get());
         }
 
         public Double getEraEstimate(PitchingStats stats) {
-            return stats.getFip();
+            return stats.getBaseRuns(FipBaseRuns.get());
         }
     }, WOBA_AGAINST {
         public Double get(
             TeamStats<PitchingStats> predictions, Player p) {
-            return predictions.getOverall(p).getWobaAgainst();
+            return getEraEstimate(predictions.getOverall(p));
         }
 
         public Integer getPlus(
             TeamStats<PitchingStats> predictions, Player p) {
-            return predictions.getOverall(p).getWobaPlusAgainst();
+            return getPlus(predictions.getOverall(p));
         }
 
         public Integer getPlus(PitchingStats stats) {
-            return stats.getWobaPlusAgainst();
+            return stats.getBaseRunsPlus(EraBaseRuns.get());
         }
 
         public Double getEraEstimate(PitchingStats stats) {
-            double wobaa = stats.getWobaAgainst();
-
-            return Math.pow(wobaa / (1 - wobaa), 1.5) * 12;
+            return stats.getBaseRuns(EraBaseRuns.get());
         }
     };
 

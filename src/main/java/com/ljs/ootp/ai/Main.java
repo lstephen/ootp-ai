@@ -25,6 +25,7 @@ import com.ljs.ootp.ai.regression.PitchingRegression;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.report.FreeAgents;
 import com.ljs.ootp.ai.report.GenericValueReport;
+import com.ljs.ootp.ai.report.LeagueBattingReport;
 import com.ljs.ootp.ai.report.RosterReport;
 import com.ljs.ootp.ai.report.SalaryRegression;
 import com.ljs.ootp.ai.report.SalaryReport;
@@ -57,7 +58,6 @@ import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.SplitPercentagesHolder;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.value.FreeAgentAcquisition;
-import com.ljs.ootp.ai.value.LeagueReplacementLevel;
 import com.ljs.ootp.ai.value.PlayerValue;
 import com.ljs.ootp.ai.value.TradeValue;
 import java.io.File;
@@ -184,6 +184,8 @@ public class Main {
 
         SiteHolder.set(site);
 
+        Printables.print(LeagueBattingReport.create(site)).to(out);
+
         LOG.log(Level.INFO, "Extracting current roster and team...");
 
         Roster oldRoster = site.extractRoster();
@@ -201,6 +203,7 @@ public class Main {
         Printables.print(pitchingRegression.correlationReport()).to(out);
 
         pcts.print(out);
+
 
         SplitStats.setPercentages(pcts);
         PlayerRatings.setPercentages(pcts);
@@ -271,7 +274,7 @@ public class Main {
             if (oldRoster.size() <= maxRosterSize) {
                 Integer n = 2;
 
-                if (site.getName().equals("BTH")) {
+                if (site.getName().equals("BTH") || site.getName().equals("CBL")) {
                     n = 1;
                 }
                 if (site.getName().equals("TWML") || site.getName().equals("SAVOY")) {
@@ -338,22 +341,6 @@ public class Main {
                 .getBytes(Charsets.ISO_8859_1));
         }
 
-        LOG.log(Level.INFO, "Choosing lineups...");
-
-        AllLineups lineups =
-            new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
-                .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
-
-        Printables.print(lineups).to(out);
-
-        LOG.log(Level.INFO, "Choosing Depth Charts...");
-
-        AllDepthCharts depthCharts = DepthChartSelection
-            .create(battingRegression.predict(newRoster.getAllPlayers()))
-            .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
-
-        depthCharts.print(out);
-
         LOG.log(Level.INFO, "Choosing rotation...");
 
         Rotation rotation =
@@ -365,6 +352,22 @@ public class Main {
                 .selectRotation(ImmutableSet.<Player>of(), Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));
 
         rotation.print(out);
+
+        LOG.log(Level.INFO, "Choosing lineups...");
+
+        AllLineups lineups =
+            new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
+                .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
+
+        LOG.log(Level.INFO, "Choosing Depth Charts...");
+
+        AllDepthCharts depthCharts = DepthChartSelection
+            .create(battingRegression.predict(newRoster.getAllPlayers()))
+            .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
+
+        depthCharts.print(out);
+
+        Printables.print(lineups).to(out);
 
         if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH && site.getType() != Version.OOTPX) {
             LOG.log(Level.INFO, "Spring training...");
@@ -609,14 +612,6 @@ public class Main {
         }
 
         LOG.log(Level.INFO, "League wide replacement Level...");
-
-        Printables
-            .print(
-                LeagueReplacementLevel.create(
-                    site,
-                    new PlayerValue(ps, battingRegression, pitchingRegression),
-                    all))
-            .to(out);
 
         generic.setCustomValueFunction(tv.getTradeTargetValue());
 

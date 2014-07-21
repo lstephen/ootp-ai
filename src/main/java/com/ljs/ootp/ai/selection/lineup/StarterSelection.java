@@ -28,8 +28,15 @@ public class StarterSelection {
 
     private final TeamStats<BattingStats> predictions;
 
+    private boolean requireBackupCatcher = true;
+
     public StarterSelection(TeamStats<BattingStats> predictions) {
         this.predictions = predictions;
+    }
+
+    public StarterSelection dontRequireBackupCatcher() {
+        requireBackupCatcher = false;
+        return this;
     }
 
     public Iterable<Player> selectWithDh(
@@ -49,12 +56,16 @@ public class StarterSelection {
         }
 
         for (Player p : byWoba(vs).sortedCopy(available)) {
-            if ((!p.getSlots().contains(Slot.C))
-                || containsCatcher(
-                    Sets.difference(ImmutableSet.copyOf(available),
-                    ImmutableSet.of(p)))) {
-
+            if (!requireBackupCatcher) {
                 return p;
+            } else {
+                if ((!p.getSlots().contains(Slot.C))
+                    || containsCatcher(
+                        Sets.difference(ImmutableSet.copyOf(available),
+                        ImmutableSet.of(p)))) {
+
+                    return p;
+                }
             }
         }
 
@@ -99,7 +110,7 @@ public class StarterSelection {
     }
 
     private boolean hasValidDefense(Iterable selected, Iterable bench) {
-        if (isMoreThanOneCatcher(selected, bench) && !containsCatcher(bench)) {
+        if (requireBackupCatcher && isMoreThanOneCatcher(selected, bench) && !containsCatcher(bench)) {
             return false;
         } else {
             return hasValidDefense(

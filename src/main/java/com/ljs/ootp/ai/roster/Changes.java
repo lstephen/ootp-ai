@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import com.ljs.ootp.ai.config.Config;
@@ -49,8 +50,8 @@ public final class Changes {
         this.site = site;
     }
 
-    public Iterable<Player> get(ChangeType type) {
-        return changes.get(type);
+    public ImmutableSet<Player> get(ChangeType type) {
+        return ImmutableSet.copyOf(changes.get(type));
     }
 
     private void add(ChangeType type, Player p) {

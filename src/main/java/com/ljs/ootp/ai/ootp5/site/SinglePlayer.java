@@ -3,6 +3,7 @@ package com.ljs.ootp.ai.ootp5.site;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.BattingHand;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
@@ -37,6 +38,19 @@ public class SinglePlayer implements PlayerSource {
     private static enum BattingRatingsType { CONTACT, GAP, POWER, EYE }
 
     private static enum PitchingRatingsType { HITS, GAP, TRIPLES, STUFF, CONTROL, MOVEMENT }
+
+    private static final ImmutableMap<Position, Double> AVERAGE_FPCT =
+        ImmutableMap
+            .<Position, Double>builder()
+            .put(Position.CATCHER, .952)
+            .put(Position.FIRST_BASE, .993)
+            .put(Position.SECOND_BASE, .981)
+            .put(Position.THIRD_BASE, .953)
+            .put(Position.SHORTSTOP, .967)
+            .put(Position.LEFT_FIELD, .977)
+            .put(Position.CENTER_FIELD, .984)
+            .put(Position.RIGHT_FIELD, .981)
+            .build();
 
     private static final ImmutableMap<String, Integer> OOTP5_POTENTIAL =
         ImmutableMap.of(
@@ -119,6 +133,11 @@ public class SinglePlayer implements PlayerSource {
         String[] splitInfo =
             StringUtils.splitByWholeSeparatorPreserveAllTokens(
                 info.html(), "<br />");
+
+        if (splitInfo.length < 9) {
+            LOG.log(Level.WARNING, "Error extracting player. ID: {0}", id);
+            return null;
+        }
 
         String name = Parser.unescapeEntities(splitInfo[0], false);
         Integer age = Integer.valueOf(splitInfo[3]);
@@ -267,18 +286,18 @@ public class SinglePlayer implements PlayerSource {
 
         for (Position p : Position.values()) {
             if (raw.contains(p.getAbbreviation() + " :")) {
-                Double rating = extractPositionRating(raw, p.getAbbreviation());
+                Integer rating = extractPositionRating(raw, p.getAbbreviation());
 
                 if (p == Position.CATCHER && rating == 0) {
-                    rating = 1.0;
+                    rating = 0;
                 }
-                ratings.setPositionRating(p, rating);
+                ratings.setPositionRating(p, (double) rating);
             }
         }
 
         ratings.setCatcher(extractCatcherRating(raw));
-        //ratings.setInfield(extractInfieldRating(raw));
-        //ratings.setOutfield(extractOutfieldRating(raw));
+        ratings.setInfield(extractInfieldRating(raw));
+        ratings.setOutfield(extractOutfieldRating(raw));
 
         return ratings;
     }
@@ -346,12 +365,23 @@ public class SinglePlayer implements PlayerSource {
         return ratingFromString(StringUtils.substringBetween(raw, position + " :", "(Range)").trim());
     }
 
-    private Double extractPositionRating(String raw, String position) {
+    private Double extractFieldingPct(String raw, String position) {
+        if (!raw.contains(position + " :")) {
+            return 0.0;
+        }
+
         String rawPosStr = StringUtils.substringBetween(raw, position + " :", "(Fielding Pct.)");
+
+        return Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
+    }
+
+    private Integer extractPositionRating(String raw, String position) {
+        /*String rawPosStr = StringUtils.substringBetween(raw, position + " :", "(Fielding Pct.)");
 
         Double fpct = Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
 
-        return extractRange(raw, position).doubleValue() + (fpct - .8);
+        return extractRange(raw, position).doubleValue() + (fpct / 1000.0);*/
+        return extractRange(raw, position);
     }
 
     private FieldingRatings extractCatcherRating(String raw) {
@@ -363,38 +393,82 @@ public class SinglePlayer implements PlayerSource {
     }
 
     private FieldingRatings extractInfieldRating(String raw) {
-        Integer second = extractRange(raw, "2B");
-        Integer third = extractRange(raw, "3B");
-        Integer shortstop = extractRange(raw, "SS");
+        Integer first = 2 * extractRange(raw, "1B");
+        Integer second = 8 * extractRange(raw, "2B");
+        Integer third = 8 * extractRange(raw, "3B");
+        Integer shortstop = 10 * extractRange(raw, "SS");
 
-        Integer range = (int) Math.round((4*second + 4*third + 5*shortstop) / 13.0 * 10);
-        Integer arm = ratingFromString(StringUtils.substringBetween(raw, "Infield Arm :", "Outfield")) * 10;
+        Integer range = Ordering.natural().max(first, second, third, shortstop);
+        Integer arm = site.getType() == Version.OOTP5
+            ? 50
+            : ratingFromString(StringUtils.substringBetween(raw, "Infield Arm :", "Outfield")) * 10;
 
-        Integer posCount = (second > 0 ? 1 : 0) + (third > 0 ? 1 : 0) + (shortstop > 0 ? 1 : 0);
+
+        Integer firstErrors = extractAndAdapt(raw, Position.FIRST_BASE);
+        Integer secondErrors = extractAndAdapt(raw, Position.SECOND_BASE);
+        Integer thirdErrors = extractAndAdapt(raw, Position.THIRD_BASE);
+        Integer shortstopErrors = extractAndAdapt(raw, Position.SHORTSTOP);
+
+        Integer n = 2*firstErrors + 8*secondErrors + 8*thirdErrors + 10*shortstopErrors;
+
+        Integer d = (first == 0 ? 0 : 2)
+            + (second == 0 ? 0 : 8)
+            + (third == 0 ? 0 : 8)
+            + (shortstop == 0 ? 0 : 10);
+
+        Integer errors = d == 0 ? 0 : (int) Math.round((double) n / d);
 
         return FieldingRatings
             .builder()
             .range(range)
             .arm(arm)
-            .errors(50)
+            .errors(errors)
             .dp(arm)
             .build();
     }
 
     private FieldingRatings extractOutfieldRating(String raw) {
-        Integer lf = extractRange(raw, "LF");
-        Integer cf = extractRange(raw, "CF");
-        Integer rf = extractRange(raw, "RF");
+        Integer first = 3 * extractRange(raw, "1B");
+        Integer lf = 7 * extractRange(raw, "LF");
+        Integer cf = 10 * extractRange(raw, "CF");
+        Integer rf = 7 * extractRange(raw, "RF");
 
-        Integer range = (int) Math.round((2*lf + 3*cf + 2*rf) / 7.0 * 10);
+        Integer range = Ordering.natural().max(first, lf, cf, rf);
         Integer arm = ratingFromString(StringUtils.substringAfter(raw, "Outfield Arm :")) * 10;
+
+        Integer firstErrors = extractAndAdapt(raw, Position.FIRST_BASE);
+        Integer lfErrors = extractAndAdapt(raw, Position.LEFT_FIELD);
+        Integer cfErrors = extractAndAdapt(raw, Position.CENTER_FIELD);
+        Integer rfErrors = extractAndAdapt(raw, Position.RIGHT_FIELD);
+
+        Integer n = 3*firstErrors + 7*lfErrors + 10*cfErrors + 7*rfErrors;
+        Integer d = (first == 0 ? 0 : 3)
+            + (lf == 0 ? 0 : 7)
+            + (cf == 0 ? 0 : 10)
+            + (rf == 0 ? 0 : 7);
+
+        Integer errors = d == 0 ? 0 : (int) Math.round((double) n / d);
 
         return FieldingRatings
             .builder()
             .range(range)
             .arm(arm)
-            .errors(50)
+            .errors(errors)
             .build();
+    }
+
+    private Integer extractAndAdapt(String raw, Position p) {
+        return adaptFpct(p, extractFieldingPct(raw, p.getAbbreviation()));
+    }
+
+    private Integer adaptFpct(Position p, Double fpct) {
+        Double avg = AVERAGE_FPCT.get(p);
+
+        Double ptsPerPct = 50.0 / (1.0 - avg);
+
+        Double result = 50.0 + (fpct - avg) * ptsPerPct;
+
+        return (int) Math.max(0, Math.round(result));
     }
 
     private Integer ratingFromString(String s) {

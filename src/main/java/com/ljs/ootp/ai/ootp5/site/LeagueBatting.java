@@ -24,6 +24,7 @@ import org.jsoup.select.Elements;
 public class LeagueBatting {
 
     private static final int HOMERUN_IDX = 6;
+    private static final int RUNS_IDX = 7;
     private static final int ATBAT_IDX = 8;
     private static final int HITS_IDX = 9;
     private static final int DOUBLES_IDX = 10;
@@ -85,6 +86,7 @@ public class LeagueBatting {
 
         BattingStats batting = new BattingStats();
 
+        batting.setRuns(getInteger(total, RUNS_IDX));
         batting.setHomeRuns(getInteger(total, HOMERUN_IDX));
         batting.setAtBats(getInteger(total, ATBAT_IDX));
         batting.setHits(getInteger(total, HITS_IDX));
@@ -100,7 +102,9 @@ public class LeagueBatting {
 
         for (int i = 1; i < 5; i++) {
             if (historical.containsKey(currentSeason - i)) {
-                batting = batting.add(historical.get(currentSeason - i));
+                if (historical.get(currentSeason -i).getRuns() != null) {
+                    batting = batting.add(historical.get(currentSeason - i));
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.ljs.ootp.ai.roster;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -29,6 +30,8 @@ public class FourtyManRoster {
 
     private final TradeValue value;
 
+    private Optional<Changes> changes = Optional.absent();
+
     private ImmutableSet<Player> desired25Man;
 
     private ImmutableSet<Player> desired40Man;
@@ -38,6 +41,11 @@ public class FourtyManRoster {
         this.predictions = ps;
         this.value = value;
     }
+
+    public void setChanges(Changes changes) {
+        this.changes = Optional.of(changes);
+    }
+
 
     public void printReport(OutputStream out) {
         printReport(new PrintWriter(out));
@@ -76,13 +84,17 @@ public class FourtyManRoster {
             return desired40Man;
         }
 
+        System.out.println("Selecting Desired 40 man...");
+
         Set<Player> fourtyMan = Sets.newHashSet();
 
         Iterable<Player> available = Iterables.filter(
             roster.getAllPlayers(),
             new Predicate<Player>() {
                 public boolean apply(Player p) {
-                    return roster.getStatus(p) != Status.DL || p.getOn40Man().or(true);
+                    return roster.getStatus(p) != Status.DL
+                        || p.getOn40Man().or(true)
+                        || (changes.isPresent() && changes.get().get(Changes.ChangeType.FOURTY_MAN).contains(p));
                 }
             });
 
