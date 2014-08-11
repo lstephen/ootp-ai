@@ -19,16 +19,16 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DefensiveRatings {
 
-    private static final ImmutableMap<Position, Integer> MINIMUMS =
-        ImmutableMap.<Position, Integer>builder()
-            .put(Position.SHORTSTOP, 5) // C
-            .put(Position.SECOND_BASE, 4) // C
-            .put(Position.THIRD_BASE, 4) // C
-            .put(Position.CENTER_FIELD, 3)  // D
-            .put(Position.LEFT_FIELD, 2) // D
-            .put(Position.RIGHT_FIELD, 2) //D
-            .put(Position.CATCHER, 1)
-            .put(Position.FIRST_BASE, 1)
+    private static final ImmutableMap<Position, Double> MINIMUMS =
+        ImmutableMap.<Position, Double>builder()
+            .put(Position.SHORTSTOP, 5.0) // C
+            .put(Position.SECOND_BASE, 4.0) // C
+            .put(Position.THIRD_BASE, 4.0) // C
+            .put(Position.CENTER_FIELD, 3.0)  // D
+            .put(Position.LEFT_FIELD, 2.0) // D
+            .put(Position.RIGHT_FIELD, 2.0) //D
+            .put(Position.CATCHER, 1.0)
+            .put(Position.FIRST_BASE, 1.0)
             .build();
 
     private static final ImmutableMap<Position, FieldingRatings.Weighting> WEIGHTINGS =

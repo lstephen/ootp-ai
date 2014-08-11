@@ -67,6 +67,12 @@ public final class Roster implements Printable {
         assignments.remove(getStatus(p), p);
     }
 
+    public void release(Iterable<Player> ps) {
+        for (Player p : ps) {
+            release(p);
+        }
+    }
+
     public void release(Player p) {
         remove(p);
         available.remove(p);
@@ -195,6 +201,15 @@ public final class Roster implements Printable {
 
     public static Roster create(Team team) {
         return create(team, team);
+    }
+
+    public static Roster create(Roster src) {
+        Roster dest = new Roster(src.source, src.available);
+        dest.assignments.putAll(src.assignments);
+        dest.targetMaximum = src.targetMaximum;
+        dest.targetMinimum = src.targetMinimum;
+
+        return dest;
     }
 
 

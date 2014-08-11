@@ -76,6 +76,12 @@ public final class Team implements Iterable<Player>, PlayerSource {
         }
     }
 
+    public void remove(Iterable<Player> ps) {
+        for (Player p : ps) {
+            remove(p);
+        }
+    }
+
     public void remove(Player p) {
         players.remove(p);
         injured.remove(p);

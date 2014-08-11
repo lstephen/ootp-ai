@@ -115,11 +115,19 @@ public final class RosterSelection {
 
     private FourtyManRoster getFourtyManRoster() {
         if (fourtyManRoster == null) {
+            Roster roster = Roster.create(previous);
+
+            for (Player p : previous.getAllPlayers()) {
+                if (!team.containsPlayer(p)) {
+                    roster.release(p);
+                }
+            }
+
             fourtyManRoster =
                 new FourtyManRoster(
-                    previous,
+                    roster,
                     Predictions
-                        .predict(previous.getAllPlayers())
+                        .predict(team)
                         .using(batting, pitching, predictions.getPitcherOverall()),
                 value);
         }

@@ -48,9 +48,16 @@ public final class PitchingRegression {
 
     private final PitchingStats leaguePitching;
 
+    private Boolean ignoreStatsInPredictions = Boolean.FALSE;
+
     private PitchingRegression(Site site) {
         this.site = site;
         this.leaguePitching = site.getLeaguePitching();
+    }
+
+    public PitchingRegression ignoreStatsInPredictions() {
+        this.ignoreStatsInPredictions = true;
+        return this;
     }
 
     public Boolean isEmpty() {
@@ -129,7 +136,7 @@ public final class PitchingRegression {
         PitchingStats vsLeft = base.getVsLeft();
         PitchingStats vsRight = base.getVsRight();
 
-        if (stats.contains(p)) {
+        if (!ignoreStatsInPredictions && stats.contains(p)) {
             SplitStats<PitchingStats> splits = stats.getSplits(p);
 
             vsLeft = vsLeft.add(splits.getVsLeft().multiply(100.0));

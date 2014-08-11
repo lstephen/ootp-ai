@@ -29,7 +29,7 @@ public final class BattingRegression {
 
     private static final Long DEFAULT_PLATE_APPEARANCES = 700L;
 
-    private TeamStats<BattingStats> stats;
+    private final TeamStats<BattingStats> stats;
 
     private final SimpleRegression hits = new SimpleRegression();
 
@@ -45,9 +45,17 @@ public final class BattingRegression {
 
     private final BattingStats leagueBatting;
 
-    private BattingRegression(BattingStats leagueBatting) {
+    private Boolean ignoreStatsInPredictions = Boolean.FALSE;
+
+    private BattingRegression(BattingStats leagueBatting, TeamStats<BattingStats> stats) {
         super();
         this.leagueBatting = leagueBatting;
+        this.stats = stats;
+    }
+
+    public BattingRegression ignoreStatsInPredictions() {
+        this.ignoreStatsInPredictions = true;
+        return this;
     }
 
     public Boolean isEmpty() {
@@ -122,7 +130,7 @@ public final class BattingRegression {
     public SplitStats<BattingStats> predict(Player p) {
         return predict(
             p.getBattingRatings(),
-            stats.contains(p)
+            !ignoreStatsInPredictions && stats.contains(p)
                 ? Optional.of(stats.getSplits(p))
                 : Optional.<SplitStats<BattingStats>>absent());
     }
@@ -228,8 +236,6 @@ public final class BattingRegression {
     }
 
     private void runRegression(Site site) {
-        stats = site.getTeamBatting();
-
         addData(stats);
 
         History history = History.create();
@@ -264,7 +270,12 @@ public final class BattingRegression {
     }
 
     public static BattingRegression run(Site site) {
-        BattingRegression regression = new BattingRegression(site.getLeagueBatting());
+        return run(site, site.getTeamBatting());
+    }
+
+
+    private static BattingRegression run(Site site, TeamStats<BattingStats> stats) {
+        BattingRegression regression = new BattingRegression(site.getLeagueBatting(), stats);
         regression.runRegression(site);
         return regression;
     }

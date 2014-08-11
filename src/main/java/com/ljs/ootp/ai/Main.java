@@ -180,6 +180,14 @@ public class Main {
     private void run(SiteDefinition def, OutputStream out) throws IOException {
         LOG.log(Level.INFO, "Running for {0}...", def.getName());
 
+        Boolean isLookToNextSeason = Boolean.FALSE;
+        Boolean isPlayoffs = Boolean.FALSE;
+
+        if (def.getName().equals("CBL")
+            || def.getName().equals("SAVOY")) {
+            isLookToNextSeason = Boolean.TRUE;
+        }
+
         final Site site = def.getSite();
 
         SiteHolder.set(site);
@@ -201,6 +209,11 @@ public class Main {
 
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
         Printables.print(pitchingRegression.correlationReport()).to(out);
+
+        if (isLookToNextSeason) {
+            battingRegression.ignoreStatsInPredictions();
+            pitchingRegression.ignoreStatsInPredictions();
+        }
 
         pcts.print(out);
 
@@ -291,6 +304,22 @@ public class Main {
             }
         }
 
+        ImmutableSet<Player> futureFas = ImmutableSet.of();
+
+        if (isLookToNextSeason) {
+            futureFas =
+                ImmutableSet.copyOf(
+                    Iterables.filter(team, site.isFutureFreeAgent()));
+
+            System.out.print("Removing (FA):");
+            for (Player p : Player.byShortName().immutableSortedCopy(futureFas)) {
+                System.out.print(p.getShortName() + "/");
+            }
+            System.out.println();
+
+            team.remove(futureFas);
+        }
+
         RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression, tv);
 
         if (site.getType() == Version.OOTP5) {
@@ -311,9 +340,9 @@ public class Main {
             selectionMode = Mode.EXPANDED;
         }
 
-        //if (def.getName().equals("PSD")) {
-        //    selectionMode = Mode.PLAYOFFS;
-        //}
+        if (isPlayoffs) {
+            selectionMode = Mode.PLAYOFFS;
+        }
 
         Roster newRoster = selection.select(selectionMode, changes);
 
@@ -423,7 +452,10 @@ public class Main {
 
         LOG.info("Extensions report...");
         generic.setTitle("Extensions");
-        generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()));
+        generic.setPlayers(
+            Iterables.concat(
+                Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()),
+                futureFas));
         generic.print(out);
 
         LOG.info("Arbitration report...");
@@ -511,6 +543,7 @@ public class Main {
         generic.setPlayers(
             Iterables.concat(
                 newRoster.getAllPlayers(),
+                futureFas,
                 Iterables.transform(
                     faas,
                     FreeAgentAcquisition.Meta.getRelease()),
