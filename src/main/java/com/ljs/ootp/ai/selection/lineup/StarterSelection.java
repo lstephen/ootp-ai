@@ -1,23 +1,30 @@
 package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.ai.search.hillclimbing.HillClimbing;
+import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
+import com.ljs.ai.search.hillclimbing.Validator;
+import com.ljs.ai.search.hillclimbing.action.Action;
+import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
+import com.ljs.ai.search.hillclimbing.action.SequencedAction;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
-import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.tuple.Pair;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection.lineup:
 //            Lineup
@@ -29,6 +36,8 @@ public class StarterSelection {
     private final TeamStats<BattingStats> predictions;
 
     private boolean requireBackupCatcher = true;
+
+    private static final Map<Pair<Pair<Lineup.VsHand, Boolean>, ImmutableSet<Player>>, Defense> CACHE = Maps.newHashMap();
 
     public StarterSelection(TeamStats<BattingStats> predictions) {
         this.predictions = predictions;
@@ -75,59 +84,63 @@ public class StarterSelection {
     public Iterable<Player> select(
         Lineup.VsHand vs, Iterable<Player> available) {
 
-        Set<Player> result = Sets.newHashSet();
+        Pair<Pair<Lineup.VsHand, Boolean>, ImmutableSet<Player>> cacheKey =
+            Pair.of(Pair.of(vs, requireBackupCatcher), ImmutableSet.copyOf(available));
 
-        for (Player p : byWoba(vs).sortedCopy(available)) {
-            Set bench =
-                Sets.newHashSet(
-                    Sets.difference(
-                        ImmutableSet.copyOf(available), result));
+        if (!CACHE.containsKey(cacheKey)) {
 
-            bench.remove(p);
+            HillClimbing.Builder<Defense> builder = HillClimbing
+                .<Defense>builder()
+                .actionGenerator(actionsFunction(available))
+                .heuristic(heuristic(vs))
+                .validator(validator(available));
 
-            if (hasValidDefense(
-                Iterables.concat(result, ImmutableSet.of(p)), bench)) {
-                result.add(p);
-            }
-
-            if (result.size() == 8) {
-                break;
-            }
+            CACHE.put(
+                cacheKey,
+                new RepeatedHillClimbing<Defense>(
+                    Defense.randomGenerator(available),
+                    builder)
+                .search());
         }
 
-        if (result.size() != 8) {
-            //LOG.warning("Could not find selection with valid defense");
-
-            while (result.size() < 8) {
-                result.add(
-                    selectDh(
-                        vs,
-                        Sets.difference(ImmutableSet.copyOf(available), result)));
-            }
-        }
-
-        return result;
+        return CACHE.get(cacheKey).players();
     }
 
-    private boolean hasValidDefense(Iterable selected, Iterable bench) {
-        if (requireBackupCatcher && isMoreThanOneCatcher(selected, bench) && !containsCatcher(bench)) {
-            return false;
-        } else {
-            return hasValidDefense(
-                ((Collection) (ImmutableSet.copyOf(selected))),
-                ((Map) (ImmutableMap.of())));
-        }
+    private Validator<Defense> validator(final Iterable<Player> available) {
+        return new Validator<Defense>() {
+            @Override
+            public Boolean apply(Defense input) {
+                if (requireBackupCatcher) {
+                    return containsCatcher(
+                        FluentIterable
+                            .from(available)
+                            .filter(Predicates.not(Predicates.in(input.players()))));
+                } else {
+                    return true;
+                }
+            }
+        };
+
     }
 
-    private boolean isMoreThanOneCatcher(Iterable<Player> selected, Iterable<Player> bench) {
-        Integer ccount = 0;
-        for (Player p : Iterables.concat(selected, bench)) {
-            if (p.getSlots().contains(Slot.C)) {
-                ccount++;
-            }
-        }
+    private Ordering<Defense> heuristic(final Lineup.VsHand vs) {
+        return Ordering
+            .natural()
+            .onResultOf(new Function<Defense, Double>() {
+                public Double apply(Defense d) {
+                    Double score = 0.0;
 
-        return ccount > 1;
+                    for (Player p : d.players()) {
+                        score +=
+                            vs.getStats(predictions, p).getWobaPlus();
+                    }
+
+                    score += d.score() / 2.0;
+
+                    return score;
+                }
+            })
+            .compound(Defense.byAge().reverse());
     }
 
     private boolean containsCatcher(Iterable bench) {
@@ -142,32 +155,6 @@ public class StarterSelection {
         return false;
     }
 
-    private boolean hasValidDefense(Collection ps, Map assigned) {
-        Player p = (Player) Iterables.getFirst(ps, null);
-        if (p == null) {
-            return true;
-        }
-        DefensiveRatings def = p.getDefensiveRatings();
-        Set nextPlayers = Sets.newHashSet(ps);
-        nextPlayers.remove(p);
-        Position arr$[] = Position.values();
-        int len$ = arr$.length;
-        for (int i$ = 0; i$ < len$; i$++) {
-            Position pos = arr$[i$];
-            if (pos != Position.FIRST_BASE && def.getPositionScore(pos)
-                .doubleValue() <= 0.0D || assigned.containsKey(pos)) {
-                continue;
-            }
-            Map nextAssigned = Maps.newHashMap(assigned);
-            nextAssigned.put(pos, p);
-            if (hasValidDefense(((Collection) (nextPlayers)), nextAssigned)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private Ordering<Player> byWoba(final Lineup.VsHand vs) {
         return Ordering.natural().reverse().onResultOf(
             new Function<Player, Integer>() {
@@ -175,6 +162,50 @@ public class StarterSelection {
                 return vs.getStats(predictions, p).getWobaPlus();
             }
         }).compound(Player.byTieBreak());
+    }
+
+    private ActionGenerator<Defense> actionsFunction(final Iterable<Player> available) {
+
+        return new ActionGenerator<Defense>() {
+            @Override
+            public Iterable<Action<Defense>> apply(Defense state) {
+                final Set<Action<Defense>> swaps = Sets.newHashSet();
+                Set<Action<Defense>> internalSwaps = Sets.newHashSet();
+
+
+                for (Player lhs : state.players()) {
+                    for (Player rhs : state.players()) {
+                        internalSwaps.add(new Swap(lhs, rhs));
+                    }
+                    for (Player rhs : available) {
+                        swaps.add(new Swap(lhs, rhs));
+                    }
+                }
+
+                return Iterables.concat(
+                    swaps,
+                    internalSwaps,
+                    SequencedAction.merged(internalSwaps, swaps));
+            }
+        };
+    }
+
+    private static class Swap implements Action<Defense> {
+
+        private final Player lhs;
+        private final Player rhs;
+
+        public Swap(Player lhs, Player rhs) {
+            Preconditions.checkNotNull(lhs);
+            Preconditions.checkNotNull(rhs);
+
+            this.lhs = lhs;
+            this.rhs = rhs;
+        }
+
+        public Defense apply(Defense d) {
+            return d.swap(lhs, rhs);
+        }
     }
 
 }

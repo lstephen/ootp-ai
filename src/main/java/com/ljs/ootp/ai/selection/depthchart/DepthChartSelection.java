@@ -118,27 +118,32 @@ public final class DepthChartSelection {
     }
 
     private Double calculateBackupPct(Position p, Player primary, Player backup, Lineup.VsHand vs) {
-        Double factor = primary.getDefensiveRatings().getPositionScore(p) > 0
-            && backup.getDefensiveRatings().getPositionScore(p) == 0
-            ? 0.5
-            : 1.0;
+        Double factor =
+            primary.canPlay(p) && !backup.canPlay(p) ? 0.5 : 1.0;
 
-        Integer primaryAbility = vs.getStats(predictions, primary).getWobaPlus();
-        Integer backupAbility = Math.min(vs.getStats(predictions, backup).getWobaPlus(), primaryAbility);
+        Double primaryAbility = vs.getStats(predictions, primary).getWobaPlus()
+            + Defense.getPositionFactor(p) * primary.getDefensiveRatings().getPositionScore(p) / 2;
+        Double backupAbility = vs.getStats(predictions, backup).getWobaPlus()
+            + Defense.getPositionFactor(p) * backup.getDefensiveRatings().getPositionScore(p) / 2;
 
-        Double daysOff = (primaryAbility - backupAbility) / Defense.getPositionFactor(p) + 1;
+        if (backupAbility > primaryAbility) {
+            backupAbility = primaryAbility;
+        }
+
+        Double daysOff = (double) (primaryAbility - backupAbility) / Defense.getPositionFactor(p) + 1;
 
         return factor * 1 / (daysOff + 1);
     }
 
-    private Iterable<Player> selectBackups(Position position, Iterable<Player> bench, final Lineup.VsHand vs) {
+    private Iterable<Player> selectBackups(final Position position, Iterable<Player> bench, final Lineup.VsHand vs) {
 
         ImmutableList<Player> sortedBench = Ordering
             .natural()
             .reverse()
-            .onResultOf(new Function<Player, Integer>() {
-                public Integer apply(Player player) {
-                    return vs.getStats(predictions, player).getWobaPlus();
+            .onResultOf(new Function<Player, Double>() {
+                public Double apply(Player player) {
+                    return vs.getStats(predictions, player).getWobaPlus()
+                        + Defense.getPositionFactor(position) * player.getDefensiveRatings().getPositionScore(position) / 2;
                 }
             })
             .compound(Player.byTieBreak())

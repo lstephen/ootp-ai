@@ -52,6 +52,8 @@ public class BenchScorer {
                         }
 
                         score += (positionFactor * countFactor * vs.getStats(predictions, p).getWobaPlus());
+                        score +=
+                            (positionFactor * countFactor * p.getDefensiveRatings().getPositionScore(entry.getPositionEnum())) / 2;
                     }
                 }
             }

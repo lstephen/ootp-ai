@@ -255,7 +255,7 @@ public final class Player {
     public Boolean canPlay(Position pos) {
         return pos == Position.DESIGNATED_HITTER
             || pos == Position.FIRST_BASE
-            || getDefensiveRatings().getPositionScore(pos) > 0;
+            || getDefensiveRatings().getPositionScore(pos) > 1.0e-6;
     }
 
     public DefensiveRatings getDefensiveRatings() {

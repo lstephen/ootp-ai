@@ -3,20 +3,17 @@ package com.ljs.ootp.ai.selection.lineup;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ai.search.Action;
-import com.ljs.ai.search.ActionsFunction;
-import com.ljs.ai.search.RepeatedHillClimbing;
-import com.ljs.ai.search.SequencedAction;
+import com.ljs.ai.search.hillclimbing.HillClimbing;
+import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
+import com.ljs.ai.search.hillclimbing.action.Action;
+import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
+import com.ljs.ai.search.hillclimbing.action.SequencedAction;
 import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.ratings.Position;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public class DefenseSelection {
 
@@ -28,40 +25,27 @@ public class DefenseSelection {
 
     private Defense select(ImmutableSet<Player> selected) {
         if (!CACHE.containsKey(selected)) {
+            HillClimbing.Builder<Defense> builder = HillClimbing
+                .<Defense>builder()
+                .actionGenerator(actionsFunction(selected))
+                .heuristic(heuristic());
+
             CACHE.put(
                 selected,
                 new RepeatedHillClimbing<Defense>(
-                    Defense.class,
-                    initialStateFunction(selected),
-                    actionsFunction(selected))
-                    .search());
+                    Defense.randomGenerator(selected),
+                    builder)
+                .search());
         }
         return CACHE.get(selected);
     }
 
-    private Callable<Defense> initialStateFunction(final Iterable<Player> selected) {
-        return new Callable<Defense>() {
-            public Defense call() {
-                List<Player> ps = Lists.newArrayList(selected);
-                Collections.shuffle(ps);
-
-                Map<Player, Position> defense = Maps.newHashMap();
-
-                List<Position> pos = Lists.newArrayList(
-                    Position.CATCHER,
-                    Position.FIRST_BASE, Position.SECOND_BASE, Position.THIRD_BASE, Position.SHORTSTOP,
-                    Position.LEFT_FIELD, Position.CENTER_FIELD, Position.RIGHT_FIELD);
-
-                while (!pos.isEmpty() && !ps.isEmpty()) {
-                    defense.put(ps.remove(0), pos.remove(0));
-                }
-
-                return Defense.create(defense);
-            }
-        };
+    private Ordering<Defense> heuristic() {
+        return Defense.byScore()
+            .compound(Defense.byAge().reverse());
     }
 
-    private ActionsFunction<Defense> actionsFunction(final Iterable<Player> selected) {
+    private ActionGenerator<Defense> actionsFunction(final Iterable<Player> selected) {
         final Set<Swap> swaps = Sets.newHashSet();
 
         ImmutableList<Player> ps = ImmutableList.copyOf(selected);
@@ -72,16 +56,15 @@ public class DefenseSelection {
             }
         }
 
-        return new ActionsFunction<Defense>() {
+        return new ActionGenerator<Defense>() {
             @Override
-            public Iterable<? extends Action<Defense>> getActions(Defense state) {
+            public Iterable<Action<Defense>> apply(Defense state) {
                 return Iterables.concat(swaps, SequencedAction.allPairs(swaps));
-
             }
         };
     }
 
-    private static class Swap extends Action<Defense> {
+    private static class Swap implements Action<Defense> {
 
         private final Player lhs;
         private final Player rhs;

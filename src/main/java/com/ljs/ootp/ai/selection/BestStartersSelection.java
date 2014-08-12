@@ -18,8 +18,10 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.selection.bench.Bench;
 import com.ljs.ootp.ai.selection.lineup.AllLineups;
+import com.ljs.ootp.ai.selection.lineup.Defense;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
 import com.ljs.ootp.ai.selection.lineup.LineupSelection;
 import com.ljs.ootp.ai.selection.lineup.StarterSelection;
@@ -221,9 +223,12 @@ public class BestStartersSelection implements Selection {
         if (l.contains(p)) {
             score += wobaPlus;
 
-            if (p.canPlay(l.getPosition(p))) {
+            Position pos = l.getPosition(p);
+            score += (Defense.getPositionFactor(pos) * p.getDefensiveRatings().getPositionScore(pos)) / 2;
+
+            /*if (p.canPlay(l.getPosition(p))) {
                 score += wobaPlus;
-            }
+            }*/
         }
 
         return pct * score;

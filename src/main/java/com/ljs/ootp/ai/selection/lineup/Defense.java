@@ -1,9 +1,12 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.ljs.ai.search.State;
+import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
@@ -14,13 +17,16 @@ import static com.ljs.ootp.ai.player.ratings.Position.RIGHT_FIELD;
 import static com.ljs.ootp.ai.player.ratings.Position.SECOND_BASE;
 import static com.ljs.ootp.ai.player.ratings.Position.SHORTSTOP;
 import static com.ljs.ootp.ai.player.ratings.Position.THIRD_BASE;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  *
  * @author lstephen
  */
-public final class Defense implements State {
+public final class Defense {
 
     private final ImmutableMap<Player, Position> defense;
 
@@ -40,15 +46,17 @@ public final class Defense implements State {
     public Defense swap(Player lhs, Player rhs) {
         Map<Player, Position> d = Maps.newHashMap(defense);
 
-        if (!defense.containsKey(lhs)) {
-            d.put(lhs, defense.get(rhs));
+        if (!contains(lhs) && !contains(rhs)) {
+            return this;
+        } else if (!contains(lhs)) {
+            d.put(lhs, getPosition(rhs));
             d.remove(rhs);
-        } else if (!defense.containsKey(rhs)) {
-            d.put(rhs, defense.get(lhs));
+        } else if (!contains(rhs)) {
+            d.put(rhs, getPosition(lhs));
             d.remove(lhs);
         } else {
-            d.put(lhs, defense.get(rhs));
-            d.put(rhs, defense.get(lhs));
+            d.put(lhs, getPosition(rhs));
+            d.put(rhs, getPosition(lhs));
         }
 
         return new Defense(d);
@@ -58,7 +66,12 @@ public final class Defense implements State {
         return defense.containsKey(p);
     }
 
+    public ImmutableSet<Player> players() {
+        return defense.keySet();
+    }
+
     public Position getPosition(Player p) {
+        Preconditions.checkState(contains(p), "Does not contain player: %s\n%s", p, this);
         return defense.get(p);
     }
 
@@ -83,11 +96,10 @@ public final class Defense implements State {
             Player ply = entry.getKey();
             Position pos = entry.getValue();
 
+
             DefensiveRatings r = ply.getDefensiveRatings();
 
-            Double ageScore = (double) (100 - ply.getAge()) / 100000;
-
-            total += Math.pow(getPositionFactor(pos), 2) * (r.getPositionScore(pos) + ageScore);
+            total += getPositionFactor(pos) * r.getPositionScore(pos);
 
             if (!ply.canPlay(pos)) {
                 total -= Math.pow(getPositionFactor(pos), 2);
@@ -97,26 +109,88 @@ public final class Defense implements State {
         return total;
     }
 
-    public static Double getPositionFactor(Position p) {
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+
+        for (Position p : Ordering.natural().sortedCopy(defense.values())) {
+            str
+                .append(p.getAbbreviation())
+                .append("-")
+                .append(getPlayer(p).getShortName())
+                .append("/");
+        }
+
+        return str.toString();
+    }
+
+    public static Integer getPositionFactor(Position p) {
         switch (p) {
             case CATCHER:
             case SHORTSTOP:
-                return 5.0;
+                return 5;
 
             case SECOND_BASE:
             case THIRD_BASE:
-                return 4.0;
+                return 4;
 
             case CENTER_FIELD:
-                return 3.0;
+                return 3;
 
             case LEFT_FIELD:
             case RIGHT_FIELD:
-                return 2.0;
+                return 2;
 
             default:
-                return 1.0;
+                return 1;
         }
+    }
+
+    public static Ordering<Defense> byScore() {
+        return Ordering
+            .natural()
+            .onResultOf(new Function<Defense, Double>() {
+                public Double apply(Defense d) {
+                    return d.score();
+                }
+            });
+    }
+
+    public static Ordering<Defense> byAge() {
+        return Ordering
+            .natural()
+            .onResultOf(new Function<Defense, Integer>() {
+                public Integer apply(Defense d) {
+                    Integer age = 0;
+                    for (Map.Entry<Player, Position> entry : d.defense.entrySet()) {
+                        age += entry.getKey().getAge() * getPositionFactor(entry.getValue());
+                    }
+                    return age;
+                }
+            });
+    }
+
+    public static Callable<Defense> randomGenerator(final Iterable<Player> players) {
+        return new Callable<Defense>() {
+            @Override
+            public Defense call() {
+                List<Player> ps = Lists.newArrayList(players);
+                Collections.shuffle(ps);
+
+                Map<Player, Position> defense = Maps.newHashMap();
+
+                List<Position> pos = Lists.newArrayList(
+                    Position.CATCHER,
+                    Position.FIRST_BASE, Position.SECOND_BASE, Position.THIRD_BASE, Position.SHORTSTOP,
+                    Position.LEFT_FIELD, Position.CENTER_FIELD, Position.RIGHT_FIELD);
+
+                while (!pos.isEmpty() && !ps.isEmpty()) {
+                    defense.put(ps.remove(0), pos.remove(0));
+                }
+
+                return Defense.create(defense);
+            }
+        };
     }
 
 }
