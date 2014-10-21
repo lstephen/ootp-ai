@@ -170,6 +170,23 @@ public final class Defense {
             });
     }
 
+    public static Ordering<Defense> byRawRange() {
+        return Ordering
+            .natural()
+            .onResultOf(new Function<Defense, Double>() {
+                public Double apply(Defense d) {
+                    Double range = 0.0;
+
+                    for (Map.Entry<Player, Position> entry : d.defense.entrySet()) {
+                        range += (getPositionFactor(entry.getValue())
+                            * entry.getKey().getDefensiveRatings().getPositionRating(entry.getValue()));
+                    }
+
+                    return range;
+                }
+            });
+    }
+
     public static Callable<Defense> randomGenerator(final Iterable<Player> players) {
         return new Callable<Defense>() {
             @Override

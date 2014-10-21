@@ -17,12 +17,35 @@ public class LeagueBattingReport implements Printable {
 
     private final BattingStats stats;
 
+    private final Double bsrFactor;
+
     private LeagueBattingReport(BattingStats stats) {
         this.stats = stats;
+
+        Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
+
+        Double b =
+            .8 *stats.getSingles()
+            + 2.1 * stats.getDoubles()
+            + 3.4 * stats.getTriples()
+            + 1.8 * stats.getHomeRuns()
+            + .1 * stats.getWalks();
+
+        Double c = (double) stats.getOuts();
+
+        Double d = (double) stats.getHomeRuns();
+
+        Double z = (stats.getRuns() - d) / a;
+        bsrFactor = (z * c/(1 - z)) / b;
     }
 
     @Override
     public void print(PrintWriter w) {
+
+        w.format("bsf: %.2f%n", bsrFactor);
+        w.format("act: %d%n", stats.getRuns());
+        w.println();
+
         // TODO: Could these be calculated from baseruns instead?
         Double rperOut = (double) stats.getRuns() / stats.getOuts();
         Double runBB = rperOut + 0.14;
@@ -30,6 +53,20 @@ public class LeagueBattingReport implements Printable {
         Double run2B = run1B + 0.3;
         Double run3B = run2B + 0.27;
         Double runHR = 1.4;
+
+        w.println();
+        w.format("RperO: %.2f%n", rperOut);
+        w.format("runBB: %.2f%n", runBB);
+        w.format("run1B: %.2f%n", run1B);
+        w.format("run2B: %.2f%n", run2B);
+        w.format("run3B: %.2f%n", run3B);
+        w.format("runHR: %.2f%n", runHR);
+
+        runBB = getRunValueBB();
+        run1B = getRunValue1B();
+        run2B = getRunValue2B();
+        run3B = getRunValue3B();
+        runHR = getRunValueHR();
 
         w.println();
         w.format("RperO: %.2f%n", rperOut);
@@ -89,32 +126,73 @@ public class LeagueBattingReport implements Printable {
 
         w.println();
 
-
-        Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
-
-        Double b = 1.4 * stats.getTotalBases() - .6 * stats.getHits() - 3 * stats.getHomeRuns() + .1 * stats.getWalks();
-
-        Double c = (double) stats.getAtBats() - stats.getHits();
-
-        Double d = (double) stats.getHomeRuns();
-
-        Double z = (stats.getRuns() - d) / a;
-        Double bsrFactor = (z * c/(1 - z)) / b;
-        //Double bsrFactor = (((stats.getRuns() - d)*c)/(a - stats.getRuns() + d) / b);
-        b = bsrFactor * b;
-
-        Double bsr = a * b/(b + c) + d;
-
-        w.format("bsf: %.2f%n", bsrFactor);
-        w.format("bsr: %.2f%n", bsr);
-        w.format("act: %d%n", stats.getRuns());
-        w.println();
-
-
         FipBaseRuns.setFactor(bsrFactor);
         FipBaseRuns.setLeagueContext(stats);
         EraBaseRuns.setFactor(bsrFactor);
         EraBaseRuns.setLeagueContext(stats);
+    }
+
+    private Double getRunValueBB() {
+        BattingStats plusOne = new BattingStats();
+        plusOne.setWalks(1);
+
+        return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    }
+
+    private Double getRunValue1B() {
+        BattingStats plusOne = new BattingStats();
+        plusOne.setHits(1);
+        plusOne.setAtBats(1);
+
+        return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    }
+
+    private Double getRunValue2B() {
+        BattingStats plusOne = new BattingStats();
+        plusOne.setHits(1);
+        plusOne.setAtBats(1);
+        plusOne.setDoubles(1);
+
+        return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    }
+
+    private Double getRunValue3B() {
+        BattingStats plusOne = new BattingStats();
+        plusOne.setHits(1);
+        plusOne.setAtBats(1);
+        plusOne.setTriples(1);
+
+        return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    }
+
+    private Double getRunValueHR() {
+        BattingStats plusOne = new BattingStats();
+        plusOne.setHits(1);
+        plusOne.setAtBats(1);
+        plusOne.setHomeRuns(1);
+
+        return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    }
+
+
+    private Double baseRuns(BattingStats stats) {
+
+        Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
+
+        Double b =
+            .8 * stats.getSingles()
+            + 2.1 * stats.getDoubles()
+            + 3.4 * stats.getTriples()
+            + 1.8*stats.getHomeRuns()
+            + .1 * stats.getWalks();
+
+        Double c = (double) stats.getOuts();
+
+        Double d = (double) stats.getHomeRuns();
+
+        b = bsrFactor * b;
+
+        return a * b/(b+c) + d;
     }
 
     public static LeagueBattingReport create(Site site) {

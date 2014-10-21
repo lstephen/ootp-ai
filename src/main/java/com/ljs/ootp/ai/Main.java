@@ -79,6 +79,7 @@ public class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
+
     // PAM, MWF
     private static final SiteDefinition TWML =
         SiteDefinitionFactory.ootp6(
@@ -119,8 +120,8 @@ public class Main {
         // Restart
         SiteDefinitionFactory.ootp5("LBB", "http://bbs56.net/LBB/Site/Leaguesite/", Id.<Team>valueOf(4), "AL", 20);
 
-    //private static final SiteDefinition GABL =
-    //    SiteDefinition.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", new TeamId("10"), "American", 30);
+    private static final SiteDefinition GABL =
+        SiteDefinitionFactory.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", Id.<Team>valueOf(22), "National", 30);
 
     private static final SiteDefinition TFMS =
         SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
@@ -143,7 +144,12 @@ public class Main {
             .put("SAVOY", SAVOY)
             .put("PSD", PSD)
             .put("TFMS", TFMS)
+            .put("GABL", GABL)
             .build();
+
+    private static ImmutableSet<SiteDefinition> LOOK_TO_NEXT_SEASON = ImmutableSet.of();
+
+    private static ImmutableSet<SiteDefinition> PLAYOFFS = ImmutableSet.of(CBL);
 
     public static void main(String[] args) throws IOException {
         new Main().run();
@@ -183,9 +189,12 @@ public class Main {
         Boolean isLookToNextSeason = Boolean.FALSE;
         Boolean isPlayoffs = Boolean.FALSE;
 
-        if (def.getName().equals("CBL")
-            || def.getName().equals("SAVOY")) {
+        if (LOOK_TO_NEXT_SEASON.contains(def)) {
             isLookToNextSeason = Boolean.TRUE;
+        }
+
+        if (PLAYOFFS.contains(def)) {
+            isPlayoffs = Boolean.TRUE;
         }
 
         final Site site = def.getSite();

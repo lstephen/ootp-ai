@@ -52,6 +52,10 @@ public class DefensiveRatings {
 
     private FieldingRatings outfield;
 
+    public Double getPositionRating(Position p) {
+        return positionRating.containsKey(p) ? positionRating.get(p) : 0.0;
+    }
+
     public void setPositionRating(Position p, Double rating) {
         positionRating.put(p, rating);
     }

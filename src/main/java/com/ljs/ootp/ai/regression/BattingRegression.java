@@ -78,6 +78,7 @@ public final class BattingRegression {
                 ratings.getContact(), stats.getHitsPerPlateAppearance());
             extraBaseHits.addData(
                 ratings.getGap(), stats.getExtraBaseHitsPerPlateAppearance());
+
             homeRuns.addData(
                 ratings.getPower(), stats.getHomeRunsPerPlateAppearance());
             walks.addData(ratings.getEye(), stats.getWalksPerPlateAppearance());

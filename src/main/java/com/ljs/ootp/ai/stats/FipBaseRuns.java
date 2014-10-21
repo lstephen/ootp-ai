@@ -18,11 +18,10 @@ public class FipBaseRuns implements BaseRuns {
         Double hits = context.getBabip() * (stats.getPlateAppearances() - stats.getStrikeouts() - stats.getWalks() - stats.getHomeRuns());
         Double doubles = context.getDoublesPerHit() * hits;
         Double triples = context.getTriplesPerHit() * hits;
-
-        Double tb = hits + doubles + 2 * triples + 3 * stats.getHomeRuns();
+        Double singles = hits - doubles - triples - stats.getHomeRuns();
 
         Double a = hits + stats.getWalks() - stats.getHomeRuns();
-        Double b = factor * (1.4 * tb - .6 * hits - 3 * stats.getHomeRuns() + .1 * stats.getWalks());
+        Double b = factor * (.8*singles + 2.1*doubles + 3.4*triples + 1.8*stats.getHomeRuns() + .1*stats.getWalks());
         Double c = (double) stats.getOuts();
         Double d = (double) stats.getHomeRuns();
 
