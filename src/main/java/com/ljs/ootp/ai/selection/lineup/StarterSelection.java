@@ -107,12 +107,22 @@ public class StarterSelection {
     }
 
     private Validator<Defense> validator(final Iterable<Player> available) {
+        Integer cc = 0;
+        for (Player p : available) {
+          if (p.canPlay(Position.CATCHER)) {
+            cc++;
+          }
+        }
+
+        final Integer catcherCount = cc;
+
         return new Validator<Defense>() {
             @Override
             public Boolean apply(Defense input) {
                 if (requireBackupCatcher) {
-                    return containsCatcher(
-                        FluentIterable
+                    return catcherCount > 1
+                      && containsCatcher(
+                          FluentIterable
                             .from(available)
                             .filter(Predicates.not(Predicates.in(input.players()))));
                 } else {
@@ -135,7 +145,7 @@ public class StarterSelection {
                             vs.getStats(predictions, p).getWobaPlus();
                     }
 
-                    score += d.score() / 2.0;
+                    score += (d.score() / 2.0);
 
                     return score;
                 }

@@ -138,18 +138,15 @@ public class Main {
             .put("TWML", TWML)
             .put("CBL", CBL)
             .put("HFTC", HFTC)
-            //.put("HFTC_CHC", HFTC_CHC)
             .put("BTH", BTH)
             .put("LBB", LBB)
             .put("SAVOY", SAVOY)
-            .put("PSD", PSD)
-            .put("TFMS", TFMS)
             .put("GABL", GABL)
             .build();
 
     private static ImmutableSet<SiteDefinition> LOOK_TO_NEXT_SEASON = ImmutableSet.of();
 
-    private static ImmutableSet<SiteDefinition> PLAYOFFS = ImmutableSet.of(CBL);
+    private static ImmutableSet<SiteDefinition> PLAYOFFS = ImmutableSet.of();
 
     public static void main(String[] args) throws IOException {
         new Main().run();

@@ -33,7 +33,9 @@ public class Config {
     public static Config create(InputStream in) throws IOException {
         Properties properties = new Properties();
 
-        properties.load(in);
+        if (in != null) {
+          properties.load(in);
+        }
 
         return new Config(properties);
     }

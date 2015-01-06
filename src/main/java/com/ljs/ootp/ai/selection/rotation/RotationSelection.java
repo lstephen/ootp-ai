@@ -16,6 +16,7 @@ import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.Mode;
 import com.ljs.ootp.ai.selection.Selection;
+import com.ljs.ootp.ai.selection.rotation.Rotation.Role;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
@@ -76,16 +77,10 @@ public final class RotationSelection implements Selection {
             .<Rotation>builder()
             .validator(new Validator<Rotation>() {
                 public Boolean apply(Rotation r) {
-                    return r.isValid();
+                    return r.isValid() && r.get(Role.SP).size() == definition.getRotationSize();
                 }
             })
-            .heuristic(Ordering
-                .natural()
-                .onResultOf(new Function<Rotation, Double>() {
-                    public Double apply(Rotation r) {
-                        return r.score(predictions, method);
-                    }
-                }))
+            .heuristic(heuristic())
             .actionGenerator(actionGenerator(forced, available));
 
         Rotation r = new RepeatedHillClimbing<Rotation>(
@@ -99,6 +94,29 @@ public final class RotationSelection implements Selection {
         System.out.println();
         return r;
     }
+
+    private Ordering<Rotation> heuristic() {
+      Ordering<Rotation> byOverall = Ordering
+        .natural()
+        .onResultOf(new Function<Rotation, Double>() {
+          public Double apply(Rotation r) {
+            Double score = 0.0;
+            for (Player p : r.getAll()) {
+              score += method.getPlus(predictions.getOverall(p));
+            }
+            return score;
+          }});
+
+      return Ordering
+        .natural()
+        .onResultOf(new Function<Rotation, Double>() {
+            public Double apply(Rotation r) {
+                return r.score(predictions, method);
+            }
+        })
+        .compound(byOverall);
+    }
+
 
     private Callable<Rotation> initialStateGenerator(final Iterable<Player> forced, final Iterable<Player> available) {
         return new Callable<Rotation>() {
@@ -130,10 +148,19 @@ public final class RotationSelection implements Selection {
                 }
 
                 ps.removeAll(sps);
-                sps.addAll(ps.subList(0, definition.getRotationSize() - sps.size()));
+
+                sps.addAll(FluentIterable
+                    .from(ps)
+                    .limit(definition.getRotationSize() - sps.size())
+                    .toList());
+
                 ps.removeAll(sps);
 
-                mrs.addAll(ps.subList(0, definition.getRelieversSize() - mrs.size()));
+                mrs.addAll(FluentIterable
+                    .from(ps)
+                    .limit(definition.getRelieversSize() - mrs.size())
+                    .toList());
+
                 ps.removeAll(mrs);
 
                 rest.addAll(FluentIterable
@@ -158,26 +185,30 @@ public final class RotationSelection implements Selection {
         return new ActionGenerator<Rotation>() {
             @Override
             public Iterable<Action<Rotation>> apply(Rotation r) {
-                Set<Substitute> subs = substitutions(r);
-                Set<Swap> swaps = swaps(r);
-
                 Iterable<Action<Rotation>> actions =
                     Iterables.<Action<Rotation>>concat(
                         swaps(r),
-                        substitutions(r));
-                        //SequencedAction.allPairs(subs));
+                        substitutions(r),
+                        moves(r));
 
-                /*synchronized (RotationSelection.this) {
-                    PrintWriter w = new PrintWriter(System.out);
-                    w.println("----------");
-                    r.print(w);
-                    w.println("Score: " + r.score(predictions, method));
-                    w.println("Actions: " + Iterables.size(actions));
-                    w.flush();
-                }*/
 
                 return actions;
             }
+
+            private Set<Move> moves(Rotation rot) {
+              Set<Move> moves = Sets.newHashSet();
+
+              for (Player p : rot.getAll()) {
+                for (Role r : Rotation.Role.values()) {
+                  for (int i = 0; i < 5; i++) {
+                    moves.add(new Move(p, r, i));
+                  }
+                }
+              }
+
+              return moves;
+            }
+
 
             private Set<Swap> swaps(Rotation r) {
                 Set<Swap> swaps = Sets.newHashSet();
@@ -314,5 +345,21 @@ public final class RotationSelection implements Selection {
         public Rotation apply(Rotation r) {
             return r.substitute(in, out);
         }
+    }
+
+    private static class Move implements Action<Rotation> {
+      private Player p;
+      private Rotation.Role role;
+      private Integer idx;
+
+      public Move(Player p, Rotation.Role role, Integer idx) {
+        this.p = p;
+        this.role = role;
+        this.idx = idx;
+      }
+
+      public Rotation apply(Rotation r) {
+        return r.move(p, role, idx);
+      }
     }
 }

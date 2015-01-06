@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -67,10 +68,8 @@ public final class Roster implements Printable {
         assignments.remove(getStatus(p), p);
     }
 
-    public void release(Iterable<Player> ps) {
-        for (Player p : ps) {
-            release(p);
-        }
+    public void release(Collection<Player> ps) {
+      ps.stream().forEach(this::release);
     }
 
     public void release(Player p) {
@@ -84,18 +83,20 @@ public final class Roster implements Printable {
 
     public ImmutableSet<Player> getUnassigned() {
         return ImmutableSet.copyOf(
-                Sets.difference(
-                    ImmutableSet.copyOf(available),
-                    ImmutableSet.copyOf(assignments.values())));
+            available
+              .stream()
+              .filter(p -> !assignments.containsValue(p))
+              .collect(Collectors.toSet()));
     }
 
     public Status getStatus(Player p) {
-        for (Map.Entry<Status, Player> entries : assignments.entries()) {
-            if (entries.getValue().equals(p)) {
-                return entries.getKey();
-            }
-        }
-        return null;
+        return assignments
+          .entries()
+          .stream()
+          .filter(e -> e.getValue().equals(p))
+          .findFirst()
+          .map(Map.Entry::getKey)
+          .orElse(null);
     }
 
     public void assign(Status status, PlayerId... ids) {

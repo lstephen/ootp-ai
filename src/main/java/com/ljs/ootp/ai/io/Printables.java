@@ -22,7 +22,7 @@ public final class Printables {
         return new PrintDestination() {
             @Override
             public void to(OutputStream out) {
-                to(new OutputStreamWriter(out, Charsets.ISO_8859_1));
+                to(new OutputStreamWriter(out, Charsets.UTF_8));
             }
 
             @Override
