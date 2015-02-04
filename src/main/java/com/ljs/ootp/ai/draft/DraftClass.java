@@ -13,6 +13,7 @@ import com.ljs.scratch.util.Jackson;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -42,7 +43,7 @@ public final class DraftClass {
     }
 
     public Iterable<Player> getPlayers() {
-        return ImmutableSet.copyOf(players);
+        return ImmutableSet.copyOf(players.stream().filter(p -> p != null).collect(Collectors.toList()));
     }
 
     public void save(Site site, File f) {

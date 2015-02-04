@@ -49,6 +49,11 @@ public class LineupOrdering {
         { .436, .689,  .948, 1.249, .302, .329, .454, -.278, -.277 }
     };
 
+    private static final double[] RBIS_NO_DH = { 0.072, 0.090, 0.125, 0.133, 0.117, 0.108, 0.103, 0.083, 0.058 };
+    private static final double[] RBIS_DH = { 0.080, 0.098, 0.135, 0.126, 0.119, 0.103, 0.097, 0.093, 0.086 };
+
+    private static final double[] PAS = { 4.63, 4.52, 4.42, 4.32, 4.22, 4.11, 3.99, 3.88, 3.75 };
+
     private static final Map<Pair<Lineup.VsHand, ImmutableSet<Player>>, ImmutableList<Player>> CACHE
         = Maps.newConcurrentMap();
 
@@ -62,22 +67,22 @@ public class LineupOrdering {
         return order.get().size() == ImmutableSet.copyOf(order.get()).size();
     }
 
-	private Double score(Order order) {
-		Double vsL = score(order, VsHand.VS_LHP);
-		Double vsR = score(order, VsHand.VS_RHP);
+    private Double score(Order order) {
+      Double vsL = score(order, VsHand.VS_LHP);
+      Double vsR = score(order, VsHand.VS_RHP);
 
-        return (vsL + vsR) * getBalanceFactor(order);
-	}
+      return (vsL + vsR) * getBalanceFactor(order);
+    }
 
-	private Double getBalanceFactor(Order order) {
-		Double vsL = score(order, VsHand.VS_LHP) + 1;
-		Double vsR = score(order, VsHand.VS_RHP) + 1;
+    private Double getBalanceFactor(Order order) {
+      Double vsL = score(order, VsHand.VS_LHP) + 1;
+      Double vsR = score(order, VsHand.VS_RHP) + 1;
 
-        Double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
-        Double actBalance = (double) (vsL * vsR);
+      Double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
+      Double actBalance = vsL * vsR;
 
-        return Math.pow(actBalance / maxBalance, order.size());
-	}
+      return Math.pow(actBalance / maxBalance, order.size());
+    }
 
     private Double score(Order order, Lineup.VsHand vs) {
         Double score = 0.0;
@@ -109,13 +114,65 @@ public class LineupOrdering {
         return score;
     }
 
+    private Double getClutchScore(Order o) {
+      double[] rbis = o.size() > 8 ? RBIS_DH : RBIS_NO_DH;
+
+      Double score = 0.0;
+
+      for (int i = 0; i < 9; i++) {
+        Optional<Player> p = o.get(i);
+        if (p.isPresent() && p.get().getClutch().isPresent()) {
+          switch (p.get().getClutch().get()) {
+            case GREAT:
+              score += rbis[i];
+              break;
+            case SUFFERS:
+              score -= rbis[i];
+              break;
+            default:
+              // do nothing
+          }
+        }
+      }
+      return score / 10.0;
+    }
+
+    private Double getConsistencyScore(Order o) {
+      Double score = 0.0;
+
+      for (int i = 0; i < 9; i++) {
+        Optional<Player> p = o.get(i);
+        if (p.isPresent() && p.get().getConsistency().isPresent()) {
+          switch (p.get().getConsistency().get()) {
+            case GOOD:
+              score += PAS[i] / 100.0;
+              break;
+            case VERY_INCONSISTENT:
+              score += PAS[i] / 100.0;
+              break;
+          }
+        }
+      }
+
+      return score / 10.0;
+    }
+
     private Ordering<Order> byScore(final Lineup.VsHand vs) {
         return Ordering
             .natural()
             .onResultOf(
                 new Function<Order, Double>() {
                     public Double apply(Order o) {
-						return 2 * score(o, vs) + score(o);
+                        Double con = getConsistencyScore(o);
+                        Double clu = getClutchScore(o);
+                        Double ovs = score(o, vs);
+                        Double ovb = score(o);
+
+                        Double early = ovs + con;
+                        Double middle = ovs + clu + con;
+                        Double late = ovb + clu;
+
+                        return early + middle + late;
                     }
                 });
     }

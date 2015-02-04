@@ -308,7 +308,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s || %3d | %8s | %s",
+                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s | %2s || %3d | %8s | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -320,6 +320,7 @@ public final class RosterSelection {
                     batting.getSplits(p).getVsRight().getSlashLine(),
                     batting.getSplits(p).getVsRight().getWobaPlus(),
                     stats.contains(p) ? stats.getSplits(p).getVsRight().getWobaPlus() : "",
+                    p.getIntangibles(),
                     batting.getOverall(p).getWobaPlus(),
                     p.getDefensiveRatings().getPositionScores(),
                     Joiner.on(',').join(Slot.getPlayerSlots(p))));
@@ -347,7 +348,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s || %3d %3s | %s",
+                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s | %2s || %3d %3s | %s",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -361,6 +362,7 @@ public final class RosterSelection {
                     stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999)) : "",
                     method.getPlus(pitching.getSplits(p).getVsRight()),
                     stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsRight()), 999)) : "",
+                    p.getIntangibles(),
                     method.getPlus(pitching.getOverall(p)),
                     p.getPosition().equals("MR")
                         ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))

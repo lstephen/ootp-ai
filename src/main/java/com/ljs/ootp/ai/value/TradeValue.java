@@ -73,7 +73,35 @@ public class TradeValue {
 
                 int future = playerValue.getFutureValue(p) + futureRepl;
 
-                return Math.max(now, future) - getAgingFactor(p);
+                int intangibles = 0;
+
+                if (p.getClutch().isPresent()) {
+                  switch (p.getClutch().get()) {
+                    case GREAT:
+                      intangibles += 1;
+                      break;
+                    case SUFFERS:
+                      intangibles += -1;
+                      break;
+                    default:
+                      // do nothing
+                  }
+                }
+
+                if (p.getConsistency().isPresent()) {
+                  switch (p.getConsistency().get()) {
+                    case VERY_INCONSISTENT:
+                      intangibles -= 1;
+                      break;
+                    case GOOD:
+                      intangibles += 1;
+                      break;
+                    default:
+                      // do nothing
+                  }
+                }
+
+                return Math.max(now, future) - getAgingFactor(p) + intangibles;
             }
         };
     }

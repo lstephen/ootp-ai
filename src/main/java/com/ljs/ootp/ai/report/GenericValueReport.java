@@ -145,11 +145,13 @@ public class GenericValueReport {
     public void print(PrintWriter w) {
         w.println();
         w.format(
-            "**%-16s** | %11s %7s %7s |%n",
+            "**%-16s** | %11s %7s %7s | %s | %8s | XC | %n",
                 StringUtils.abbreviate(title, 16),
                 StringUtils.center("OVR", 10),
                 StringUtils.center("vL/vR", 7),
-                StringUtils.center("vRpl", 7));
+                StringUtils.center("vRpl", 7),
+                multiplier.isPresent() ? "         " : "   ",
+                "");
 
         Iterable<Player> ps = Ordering
             .natural()
@@ -185,7 +187,7 @@ public class GenericValueReport {
 
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %-13s |%s %9s | %7s | %2s %5s | %-20s | %s",
+                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %2s | %-13s |%s %9s | %7s | %2s %5s | %-20s | %s",
                     p.getPosition(),
                     StringUtils.abbreviate(p.getShortName(), 15),
                     p.getAge(),
@@ -199,6 +201,7 @@ public class GenericValueReport {
                     value,
                     mv,
                     Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
+                    p.getIntangibles(),
                     Joiner.on(',').join(p.getSlots()),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 9),

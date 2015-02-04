@@ -17,6 +17,7 @@ import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -53,15 +54,12 @@ public final class Rotation {
         return score;
     }
 
-    private Double scoreBullpen(TeamStats<PitchingStats> predictions, PitcherOverall overall) {
-      Double mrs = score(get(Role.MR), predictions, overall);
-      Double sus = score(get(Role.SU), predictions, overall);
-      Double cls = score(get(Role.CL), predictions, overall);
+    private static enum BullpenOption { ENDURANCE, CLUTCH, CONSISTENCY }
 
-      /*Double size = (double) get(Role.MR).size() + get(Role.SU).size() + get(Role.CL).size();
-      Double mrW= get(Role.MR).size() / size;
-      Double suW = get(Role.SU).size() / size;
-      Double clW = get(Role.CL).size() / size;*/
+    private Double scoreBullpen(TeamStats<PitchingStats> predictions, PitcherOverall overall) {
+      Double mrs = score(get(Role.MR), predictions, overall, EnumSet.of(BullpenOption.ENDURANCE));
+      Double sus = score(get(Role.SU), predictions, overall, EnumSet.of(BullpenOption.CONSISTENCY));
+      Double cls = score(get(Role.CL), predictions, overall, EnumSet.of(BullpenOption.CLUTCH, BullpenOption.CONSISTENCY));
 
       return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
     }
@@ -69,20 +67,67 @@ public final class Rotation {
     private Double score(
         ImmutableList<Player> players,
         TeamStats<PitchingStats> predictions,
-        PitcherOverall overall) {
+        PitcherOverall overall,
+        EnumSet<BullpenOption> options) {
 
-      Integer score = 0;
-      Integer vsL = 0;
-      Integer vsR = 0;
+      Double score = 0.0;
+      Double vsL = 0.0;
+      Double vsR = 0.0;
 
-      Integer factor = 5; //1 + players.size();
+      Integer factor = 5;
 
       for (Player p : players) {
         SplitStats<PitchingStats> stats = predictions.getSplits(p);
 
-        score += factor * overall.getPlus(stats.getOverall());
-        vsL += factor * overall.getPlus(stats.getVsLeft());
-        vsR += factor * overall.getPlus(stats.getVsRight());
+        Double endFactor = 0.0;
+
+        if (options.contains(BullpenOption.ENDURANCE)) {
+          Integer end = p.getPitchingRatings().getVsRight().getEndurance();
+          endFactor = (1000.0 - Math.pow(10 - end, 3)) / 2000.0;
+        }
+
+        Double clutchFactor = 0.0;
+
+        if (options.contains(BullpenOption.CLUTCH) && p.getClutch().isPresent()) {
+          switch (p.getClutch().get()) {
+            case SUFFERS:
+              clutchFactor = -0.25;
+              break;
+            case NORMAL:
+              clutchFactor = 0.0;
+              break;
+            case GREAT:
+              clutchFactor = 0.25;
+              break;
+            default:
+              throw new IllegalArgumentException();
+          }
+        }
+
+        Double consistencyFactor = 0.0;
+
+        if (options.contains(BullpenOption.CONSISTENCY) && p.getConsistency().isPresent()) {
+          switch (p.getConsistency().get()) {
+            case VERY_INCONSISTENT:
+              consistencyFactor = -0.25;
+              break;
+            case AVERAGE:
+              consistencyFactor = 0.0;
+              break;
+            case GOOD:
+              consistencyFactor = 0.25;
+              break;
+            default:
+              throw new IllegalArgumentException();
+          }
+        }
+
+
+        Double f = factor.doubleValue() + endFactor + clutchFactor + consistencyFactor;
+
+        score += f * overall.getPlus(stats.getOverall());
+        vsL += f * overall.getPlus(stats.getVsLeft());
+        vsR += f * overall.getPlus(stats.getVsRight());
 
         if (factor > 1) {
             factor--;
@@ -90,7 +135,7 @@ public final class Rotation {
       }
 
       Double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
-      Double actBalance = (double) (vsL * vsR);
+      Double actBalance = vsL * vsR;
 
       Double balanceFactor = Math.pow(actBalance / maxBalance, players.size());
 

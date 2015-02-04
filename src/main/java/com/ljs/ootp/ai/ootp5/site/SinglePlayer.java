@@ -5,6 +5,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.BattingHand;
+import com.ljs.ootp.ai.player.Clutch;
+import com.ljs.ootp.ai.player.Consistency;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
 import com.ljs.ootp.ai.player.PlayerSource;
@@ -167,6 +169,8 @@ public class SinglePlayer implements PlayerSource {
         player.setBattingHand(BattingHand.fromCode(splitInfo[9]));
 
         player.setStars(StarRating.extractFrom(doc));
+        player.setClutch(Clutch.extractFrom(doc));
+        player.setConsistency(Consistency.extractFrom(doc));
 
         if (site.isInjured(player)) {
             player.setInjured(Boolean.TRUE);

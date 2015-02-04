@@ -56,6 +56,12 @@ public final class Player {
     @JsonIgnore
     private Optional<StarRating> stars = Optional.absent();
 
+    @JsonIgnore
+    private Optional<Clutch> clutch = Optional.absent();
+
+    @JsonIgnore
+    private Optional<Consistency> consistency = Optional.absent();
+
     private Player(PlayerId id, String name, PlayerRatings ratings) {
         this.id = id;
         this.name = name;
@@ -114,10 +120,49 @@ public final class Player {
         this.stars = Optional.of(stars);
     }
 
+    public Optional<Clutch> getClutch() {
+      return clutch;
+    }
+
+    public void setClutch(Clutch clutch) {
+      this.clutch = Optional.of(clutch);
+    }
+
+    public Optional<Consistency> getConsistency() {
+      return consistency;
+    }
+
+    public void setConsistency(Consistency consistency) {
+      this.consistency = Optional.of(consistency);
+    }
+
+    public String getIntangibles() {
+      String clutch = " ";
+
+      if (getClutch().isPresent()) {
+        switch (getClutch().get()) {
+          case GREAT: clutch = "+"; break;
+          case SUFFERS: clutch = "-"; break;
+          default: // nothing
+        }
+      }
+
+      String consistency = " ";
+      if (getConsistency().isPresent()) {
+        switch (getConsistency().get()) {
+          case GOOD: consistency = "+"; break;
+          case VERY_INCONSISTENT: consistency = "-"; break;
+          default: // nothing
+        }
+      }
+
+      return clutch + consistency;
+    }
 
     public Optional<Boolean> getOn40Man() {
         return rosterStatus.getOn40Man();
     }
+
 
     public void setOn40Man(Boolean on40Man) {
         rosterStatus.setOn40Man(on40Man);

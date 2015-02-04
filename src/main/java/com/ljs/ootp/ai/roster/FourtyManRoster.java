@@ -166,10 +166,17 @@ public class FourtyManRoster {
     public Iterable<Player> getPlayersToWaive() {
         Set<Player> toWaive = Sets.newHashSet();
 
+
         for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
+            Integer current = value.getCurrentValueVsReplacement(p);
+            Integer future = value.getFutureValueVsReplacement(p);
+
+            boolean belowReplacement = 
+              Math.min(current, future) < 0
+              && Math.max(current, future) <= 0;
+
             if (p.getAge() > 25
-                && value.getCurrentValueVsReplacement(p) < 0
-                && value.getFutureValueVsReplacement(p) < 0
+                && belowReplacement
                 && !p.getClearedWaivers().or(Boolean.TRUE)
                 && !getDesired25ManRoster().contains(p)) {
 

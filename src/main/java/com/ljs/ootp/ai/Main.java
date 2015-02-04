@@ -118,7 +118,7 @@ public class Main {
     private static final SiteDefinition LBB =
         //SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
         // Restart
-        SiteDefinitionFactory.ootp5("LBB", "http://bbs56.net/LBB/Site/Leaguesite/", Id.<Team>valueOf(4), "AL", 20);
+        SiteDefinitionFactory.ootp5("LBB", "http://bbs56.net/LBB/Site/Leaguesite/", Id.<Team>valueOf(3), "AL", 20);
 
     private static final SiteDefinition GABL =
         SiteDefinitionFactory.ootp5("GABL", "http://www.goldenageofbaseball.com/commish/Leaguesite/", Id.<Team>valueOf(22), "National", 30);
@@ -441,7 +441,10 @@ public class Main {
 
         LOG.info("Draft...");
         ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
-        Iterable<Player> remaining = Sets.difference(ImmutableSet.copyOf(site.getDraft()), drafted);
+        Iterable<Player> remaining =
+          Sets.difference(
+              ImmutableSet.copyOf(FluentIterable.from(site.getDraft()).filter(Predicates.notNull())),
+              drafted);
 
 
         if (!Iterables.isEmpty(remaining)) {
@@ -504,7 +507,7 @@ public class Main {
             generic.print(out);
 
             generic.setTitle("Waive");
-            generic.setPlayers(fourtyMan.getPlayersToWaive());
+            generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
             generic.print(out);
         }
 

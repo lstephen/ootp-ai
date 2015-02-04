@@ -165,7 +165,7 @@ public final class RotationSelection implements Selection {
 
                 rest.addAll(FluentIterable
                     .from(ps)
-                    .limit(slots.size() - sps.size() - mrs.size() - rest.size())
+                    .limit(Math.max(0, slots.size() - sps.size() - mrs.size() - rest.size()))
                     .toList());
 
                 Rotation initial = Rotation.create(sps, mrs, rest);
