@@ -15,6 +15,7 @@ import com.ljs.ootp.ai.stats.SplitPercentagesHolder;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -31,15 +32,7 @@ public final class BattingRegression {
 
     private final TeamStats<BattingStats> stats;
 
-    private final SimpleRegression hits = new SimpleRegression();
-
-    private final SimpleRegression extraBaseHits = new SimpleRegression();
-
-    private final SimpleRegression homeRuns = new SimpleRegression();
-
-    private final SimpleRegression walks = new SimpleRegression();
-
-    private final SimpleRegression ks = new SimpleRegression();
+    private final Map<Predicting, SimpleRegression> regressions = new HashMap<>();
 
     private final SimpleRegression woba = new SimpleRegression();
 
@@ -58,8 +51,19 @@ public final class BattingRegression {
         return this;
     }
 
+    private SimpleRegression getRegression(Predicting predicting) {
+      return getRegression(regressions, predicting);
+    }
+
+    private SimpleRegression getRegression(Map<Predicting, SimpleRegression> r, Predicting p) {
+      if (!r.containsKey(p)) {
+        r.put(p, new SimpleRegression());
+      }
+      return r.get(p);
+    }
+
     public Boolean isEmpty() {
-        return hits.getN() == 0;
+        return getRegression(Predicting.HITS).getN() == 0;
     }
 
     private void addData(TeamStats<BattingStats> teamStats) {
@@ -67,53 +71,30 @@ public final class BattingRegression {
            Splits<BattingStats> stats = teamStats.getSplits(p);
            Splits<BattingRatings<?>> ratings = p.getBattingRatings();
 
-           addData(stats.getVsLeft(), ratings.getVsLeft());
-           addData(stats.getVsRight(), ratings.getVsRight());
+           addData(regressions, stats.getVsLeft(), ratings.getVsLeft());
+           addData(regressions, stats.getVsRight(), ratings.getVsRight());
        }
     }
 
-    private void addData(BattingStats stats, BattingRatings<?> ratings) {
+    private void addData(Map<Predicting, SimpleRegression> r, BattingStats stats, BattingRatings<?> ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            hits.addData(
+            getRegression(r, Predicting.HITS).addData(
                 ratings.getContact(), stats.getHitsPerPlateAppearance());
-            extraBaseHits.addData(
+            getRegression(r, Predicting.EXTRA_BASE_HITS).addData(
                 ratings.getGap(), stats.getExtraBaseHitsPerPlateAppearance());
 
-            homeRuns.addData(
+            getRegression(r, Predicting.HOME_RUNS).addData(
                 ratings.getPower(), stats.getHomeRunsPerPlateAppearance());
-            walks.addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
+            getRegression(r, Predicting.WALKS).addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
 
             if (ratings.getK().isPresent()) {
-                ks.addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
+                getRegression(r, Predicting.KS).addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
             }
         }
     }
 
     private double predict(Predicting predicting, int rating) {
-        SimpleRegression regression;
-
-
-        switch (predicting) {
-            case HITS:
-                regression = hits;
-                break;
-            case EXTRA_BASE_HITS:
-                regression = extraBaseHits;
-                break;
-            case HOME_RUNS:
-                regression = homeRuns;
-                break;
-            case WALKS:
-                regression = walks;
-                break;
-            case KS:
-                regression = ks;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-
-        return Math.max(0, regression.predict(rating));
+        return Math.max(0, getRegression(predicting).predict(rating));
     }
 
     public TeamStats<BattingStats> predict(Iterable<Player> ps) {
@@ -293,14 +274,19 @@ public final class BattingRegression {
         public void print(PrintWriter w) {
             w.println("  |   H%  |  XB%  |  HR%  |  BB%  |   K%  |  wOBA |");
 
+            print(w, "R2", regression.regressions);
+        }
+
+        private void print(PrintWriter w, String label, Map<Predicting, SimpleRegression> r) {
             w.println(
                 String.format(
-                "R2| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
-                regression.hits.getRSquare(),
-                regression.extraBaseHits.getRSquare(),
-                regression.homeRuns.getRSquare(),
-                regression.walks.getRSquare(),
-                regression.ks.getRSquare(),
+                "%2s| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
+                label,
+                r.get(Predicting.HITS).getRSquare(),
+                r.get(Predicting.EXTRA_BASE_HITS).getRSquare(),
+                r.get(Predicting.HOME_RUNS).getRSquare(),
+                r.get(Predicting.WALKS).getRSquare(),
+                r.get(Predicting.KS).getRSquare(),
                 regression.woba.getRSquare()));
         }
 

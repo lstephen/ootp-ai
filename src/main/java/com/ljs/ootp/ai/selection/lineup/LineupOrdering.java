@@ -52,6 +52,8 @@ public class LineupOrdering {
     private static final double[] RBIS_NO_DH = { 0.072, 0.090, 0.125, 0.133, 0.117, 0.108, 0.103, 0.083, 0.058 };
     private static final double[] RBIS_DH = { 0.080, 0.098, 0.135, 0.126, 0.119, 0.103, 0.097, 0.093, 0.086 };
 
+    private static final double[] RISP = { .208, .255, .291, .305, .283, .266, .270, .270, .264 };
+
     private static final double[] PAS = { 4.63, 4.52, 4.42, 4.32, 4.22, 4.11, 3.99, 3.88, 3.75 };
 
     private static final Map<Pair<Lineup.VsHand, ImmutableSet<Player>>, ImmutableList<Player>> CACHE
@@ -115,7 +117,8 @@ public class LineupOrdering {
     }
 
     private Double getClutchScore(Order o) {
-      double[] rbis = o.size() > 8 ? RBIS_DH : RBIS_NO_DH;
+      //double[] rbis = o.size() > 8 ? RBIS_DH : RBIS_NO_DH;
+      double[] rbis = RISP;
 
       Double score = 0.0;
 
