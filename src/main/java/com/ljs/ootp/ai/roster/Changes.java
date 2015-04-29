@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Changes {
 
     public static enum ChangeType {
-        ACQUISITION('a'), RELEASE('r'), FORCE_ML('m'), DONT_ACQUIRE('d'), PICKED('p'), FOURTY_MAN('f');
+        ACQUISITION('a'), RELEASE('r'), FORCE_ML('m'), FORCE_FORCE_ML('M'), DONT_ACQUIRE('d'), PICKED('p'), FOURTY_MAN('f');
 
         private final Character code;
 
@@ -51,7 +51,7 @@ public final class Changes {
     }
 
     public ImmutableSet<Player> get(ChangeType type) {
-        return ImmutableSet.copyOf(changes.get(type));
+      return ImmutableSet.copyOf(changes.get(type));
     }
 
     private void add(ChangeType type, Player p) {
@@ -121,6 +121,7 @@ public final class Changes {
                             break;
                         case RELEASE:
                         case FORCE_ML:
+                        case FORCE_FORCE_ML:
                         case FOURTY_MAN:
                             if (team == null) {
                                 team = site.getSingleTeam().getRoster().getAllPlayers();

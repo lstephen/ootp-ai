@@ -18,6 +18,8 @@ import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.ootp5.report.SpringTraining;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.player.ratings.BattingRatings;
+import com.ljs.ootp.ai.player.ratings.PitchingRatings;
 import com.ljs.ootp.ai.player.ratings.PlayerRatings;
 import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.regression.BattingRegression;
@@ -54,6 +56,7 @@ import com.ljs.ootp.ai.site.SiteDefinition;
 import com.ljs.ootp.ai.site.SiteHolder;
 import com.ljs.ootp.ai.site.Version;
 import com.ljs.ootp.ai.site.impl.SiteDefinitionFactory;
+import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.SplitPercentagesHolder;
 import com.ljs.ootp.ai.stats.SplitStats;
@@ -107,8 +110,15 @@ public class Main {
     //    SiteDefinition.ootp6("NTBL", "http://ntbl.twib.us/reports/", new TeamId("2"), "American", 16);
 
     // CHC, TTSn
-    private static final SiteDefinition BTH =
+    private static final SiteDefinition OLD_BTH_CHC =
         SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(20), "National", 30);
+
+    // NYY
+    private static final SiteDefinition OLD_BTH_NYY =
+        SiteDefinitionFactory.ootp6("OLD_BTH_NYY", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(3), "American", 30);
+
+    private static final SiteDefinition BTH =
+        SiteDefinitionFactory.ootp6("BTHUSTLE", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(1), "American", 16);
 
     // WTT, TTSt
     private static final SiteDefinition SAVOY =
@@ -138,6 +148,8 @@ public class Main {
             .put("TWML", TWML)
             .put("CBL", CBL)
             .put("HFTC", HFTC)
+            .put("OLD_BTH - CHC", OLD_BTH_CHC)
+            .put("OLD_BTH - NYY", OLD_BTH_NYY)
             .put("BTH", BTH)
             .put("LBB", LBB)
             .put("SAVOY", SAVOY)
@@ -258,6 +270,42 @@ public class Main {
 
         FreeAgents fas = FreeAgents.create(site, changes, tv.getTradeTargetValue(), tv);
 
+        if (team.size() == 0) {
+          final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, null);
+
+          if (battingRegression.isEmpty() && pitchingRegression.isEmpty()) {
+            generic.setCustomValueFunction((Player p) -> {
+              Integer base = 0;
+
+              if (p.isPitcher()) {
+                Splits<PitchingRatings<?>> rs = p.getPitchingRatings();
+
+                PitchingRatings<?> vL = rs.getVsLeft();
+                PitchingRatings<?> vR = rs.getVsRight();
+
+                base = vL.getStuff() + vL.getMovement() + vL.getControl()
+                     + vR.getStuff() + vR.getMovement() + vR.getControl();
+              } else {
+                Splits<BattingRatings<?>> rs = p.getBattingRatings();
+
+                BattingRatings<?> vL = rs.getVsLeft();
+                BattingRatings<?> vR = rs.getVsRight();
+
+                base = vL.getContact() + vL.getPower() + vL.getEye()
+                     + vR.getContact() + vR.getPower() + vR.getEye();
+
+              }
+
+              return base -= p.getAge();
+            });
+          }
+
+          generic.setTitle("Free Agents");
+          generic.setPlayers(site.getFreeAgents());
+          generic.print(out);
+          return;
+        }
+
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
@@ -293,10 +341,10 @@ public class Main {
             if (oldRoster.size() <= maxRosterSize) {
                 Integer n = 2;
 
-                if (site.getName().equals("BTH") || site.getName().equals("CBL")) {
+                if (site.getName().equals("BTH") || site.getName().equals("CBL") || site.getName().equals("TWML")) {
                     n = 1;
                 }
-                if (site.getName().equals("TWML") || site.getName().equals("SAVOY")) {
+                if (site.getName().equals("SAVOY") || site.getName().equals("GABL")) {
                     n = 0;
                 }
 

@@ -154,14 +154,19 @@ public final class RosterSelection {
         }
 
         for (Player p : changes.get(ChangeType.FORCE_ML)) {
-            FourtyManRoster fourtyMan = getFourtyManRoster();
-            fourtyMan.setChanges(changes);
+          if (changes.get(ChangeType.FORCE_FORCE_ML).contains(p)) {
+            System.out.println("Really forced: " + p.getShortName());
+            continue;
+          }
 
-            if (!fourtyMan.getDesired40ManRoster().contains(p)) {
-                System.out.println("Not on desired 40 Man: " + p.getShortName());
-                roster.release(p);
-                forced.remove(p);
-            }
+          FourtyManRoster fourtyMan = getFourtyManRoster();
+          fourtyMan.setChanges(changes);
+
+          if (!fourtyMan.getDesired40ManRoster().contains(p)) {
+              System.out.println("Not on desired 40 Man: " + p.getShortName());
+              roster.release(p);
+              forced.remove(p);
+          }
         }
 
         assignToDisabledList(roster, team.getInjuries());

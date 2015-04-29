@@ -224,7 +224,7 @@ public class BestStartersSelection implements Selection {
             score += wobaPlus;
 
             Position pos = l.getPosition(p);
-            score += (Defense.getPositionFactor(pos) * p.getDefensiveRatings().getPositionScore(pos)) / 2;
+            score += (Defense.getPositionFactor(pos) * p.getDefensiveRatings().getPositionScore(pos));
 
             /*if (p.canPlay(l.getPosition(p))) {
                 score += wobaPlus;

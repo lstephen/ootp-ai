@@ -145,7 +145,7 @@ public class StarterSelection {
                             vs.getStats(predictions, p).getWobaPlus();
                     }
 
-                    score += (d.score() / 2.0);
+                    score += (d.score());
 
                     return score;
                 }

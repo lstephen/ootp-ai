@@ -256,6 +256,10 @@ public final class PitchingRegression {
 
         for (TeamStats<PitchingStats> tss : all) {
             for (Player p : tss.getPlayers()) {
+                if (!p.isPitcher()) {
+                  continue;
+                }
+
                 SplitStats<PitchingStats> splits = tss.getSplits(p);
                 SplitStats<PitchingStats> predicted = predict(p.getPitchingRatings());
 

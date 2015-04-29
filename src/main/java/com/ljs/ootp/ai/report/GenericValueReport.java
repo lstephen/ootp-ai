@@ -205,7 +205,7 @@ public class GenericValueReport {
                     Joiner.on(',').join(p.getSlots()),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 9),
-                    SalaryFormat.prettyPrint(salary.predictMaximum(p)),
+                    salary == null ? "" : SalaryFormat.prettyPrint(salary.predictMaximum(p)),
                     p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getListedPosition().or(""),
                     p.getId().unwrap(),
                     StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),

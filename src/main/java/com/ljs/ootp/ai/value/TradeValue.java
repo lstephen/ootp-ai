@@ -107,14 +107,20 @@ public class TradeValue {
     }
 
     private int getAgingFactor(Player p) {
+        int factor = 0;
+        
         int age = p.getAge();
         if (age > 33) {
-            return (int) Math.pow(age - 33, 2);
+            factor = (int) Math.pow(age - 33, 2);
         } else if (age < 25) {
-            return age - 25;
+            factor = age - 25;
         } else {
-            return 0;
+            factor = 0;
         }
+
+        factor += Math.max(Math.min(33 - age, 6), 0);
+
+        return factor;
     }
 
     public Function<Player, Integer> getTradeBaitValue(

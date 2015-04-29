@@ -80,7 +80,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
 
     @Override
     public Double getYearlyRatingsIncrease() {
-        if (getName().equals("BTH") || getName().equals("PSD")) {
+        if (getName().contains("BTH") || getName().equals("PSD")) {
             return 8.0;
         }
 
@@ -105,7 +105,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
             return OneToOneHundred.scale();
         }
 
-        if (name.equals("BTH")) {
+        if (name.contains("BTH")) {
             return OneToTen.scale();
         }
 
@@ -125,7 +125,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
             return OneToOneHundred.scale();
         }
 
-        if (name.equals("BTH")) {
+        if (name.contains("BTH")) {
             return OneToOneHundred.scale();
         }
 

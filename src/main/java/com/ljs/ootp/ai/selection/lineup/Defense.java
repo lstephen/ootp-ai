@@ -1,6 +1,7 @@
 package com.ljs.ootp.ai.selection.lineup;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -186,6 +187,26 @@ public final class Defense {
                 }
             });
     }
+
+    public static Ordering<Defense> byBestPositionRating() {
+      return Ordering
+        .natural()
+        .onResultOf(
+          (Defense d) -> {
+            Double score = 0.0;
+
+            for (Map.Entry<Player, Position> entry : d.defense.entrySet()) {
+              Optional<Position> best = entry.getKey().getDefensiveRatings().getPrimaryPosition(Position.values());
+
+              if (best.isPresent()) {
+                score += getPositionFactor(best.get()) * entry.getKey().getDefensiveRatings().getPositionRating(best.get());
+              }
+            }
+
+            return score;
+          });
+    }
+              
 
     public static Callable<Defense> randomGenerator(final Iterable<Player> players) {
         return new Callable<Defense>() {

@@ -278,6 +278,8 @@ public final class BattingRegression {
         }
 
         private void print(PrintWriter w, String label, Map<Predicting, SimpleRegression> r) {
+            if (r.isEmpty()) { return; }
+
             w.println(
                 String.format(
                 "%2s| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
