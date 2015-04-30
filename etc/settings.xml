@@ -1,0 +1,11 @@
+<settings>
+  <localRepository>/var/workspace/.m2/repository</localRepository>
+
+  <servers>
+    <server>
+      <id>ossrh</id>
+      <username>levi.stephen</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+  </servers>
+</settings>

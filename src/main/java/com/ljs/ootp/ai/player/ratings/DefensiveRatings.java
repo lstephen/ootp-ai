@@ -74,7 +74,7 @@ public class DefensiveRatings {
     }
 
     public Double getPositionScore(Position p) {
-        Double rating = positionRating.containsKey(p) ? positionRating.get(p) : 0;
+        Double rating = positionRating.containsKey(p) ? positionRating.get(p) : 0.0;
 
         Double skill = null;
 
