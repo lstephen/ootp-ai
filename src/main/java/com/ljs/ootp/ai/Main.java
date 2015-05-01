@@ -111,11 +111,11 @@ public class Main {
 
     // CHC, TTSn
     private static final SiteDefinition OLD_BTH_CHC =
-        SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports", Id.<Team>valueOf(20), "National", 30);
+        SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/", Id.<Team>valueOf(20), "National", 30);
 
     // NYY
     private static final SiteDefinition OLD_BTH_NYY =
-        SiteDefinitionFactory.ootp6("OLD_BTH_NYY", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports", Id.<Team>valueOf(3), "American", 30);
+        SiteDefinitionFactory.ootp6("OLD_BTH_NYY", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/", Id.<Team>valueOf(3), "American", 30);
 
     private static final SiteDefinition BTH =
         SiteDefinitionFactory.ootp6("BTHUSTLE", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(1), "American", 16);
