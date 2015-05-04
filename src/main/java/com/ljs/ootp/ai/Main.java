@@ -117,7 +117,7 @@ public class Main {
     private static final SiteDefinition OLD_BTH_NYY =
         SiteDefinitionFactory.ootp6("OLD_BTH_NYY", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/", Id.<Team>valueOf(3), "American", 30);
 
-    private static final SiteDefinition BTH =
+    private static final SiteDefinition BTHUSTLE =
         SiteDefinitionFactory.ootp6("BTHUSTLE", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(1), "American", 16);
 
     // WTT, TTSt
@@ -150,7 +150,7 @@ public class Main {
             .put("HFTC", HFTC)
             .put("OLD_BTH - CHC", OLD_BTH_CHC)
             .put("OLD_BTH - NYY", OLD_BTH_NYY)
-            .put("BTH", BTH)
+            .put("BTHUSTLE", BTHUSTLE)
             .put("LBB", LBB)
             .put("SAVOY", SAVOY)
             .put("GABL", GABL)
@@ -528,7 +528,7 @@ public class Main {
         SalaryReport salary = new SalaryReport(team, site);
         Printables.print(salary).to(out);
 
-        if (def.getName().equals("BTH")) {
+        if (def.getName().equals("BTHUSTLE")) {
             LOG.info("40 man roster reports...");
 
             FourtyManRoster fourtyMan = new FourtyManRoster(
@@ -563,7 +563,7 @@ public class Main {
             return;
         }
 
-        if (def.getName().equals("BTH")) {
+        if (def.getName().equals("BTHUSTLE")) {
             LOG.info("Waviers report...");
             generic.setTitle("Waivers");
             generic.setPlayers(site.getWaiverWire());
