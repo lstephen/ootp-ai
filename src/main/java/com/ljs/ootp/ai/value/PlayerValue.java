@@ -149,7 +149,7 @@ public class PlayerValue {
         return Math.max(0, value - getAgingFactor(p));
     }
 
-    private int getAgingFactor(Player p) {
+    public static int getAgingFactor(Player p) {
         int age = p.getAge();
         if (age > 33) {
             return (int) Math.pow(age - 33, 2);
