@@ -103,7 +103,7 @@ public final class Defense {
             total += getPositionFactor(pos) * r.getPositionScore(pos);
 
             if (!ply.canPlay(pos)) {
-                total -= Math.pow(getPositionFactor(pos), 2);
+                total -= Math.pow(getPositionFactor(pos), r.getPositionRating(pos) > 0.5 ? (1.5 - 0.1 * r.getPositionRating(pos)) : 2);
             }
         }
 
