@@ -193,11 +193,15 @@ public class SinglePlayer implements PlayerSource {
         }
 
         if (doc.html().contains("Minor League Option Years")) {
+          if (!(site.getName().equals("BTH") || site.getName().contains("OLD_BTH"))) {
             player.setOutOfOptions(doc.html().contains("Out of Option Years"));
+          }
         }
 
         if (doc.html().contains("Minor League Option Years")) {
+          if (!(site.getName().equals("BTH") || site.getName().contains("OLD_BTH"))) {
             player.setClearedWaivers(doc.html().contains("Waivers cleared"));
+          }
         }
 
         if (doc.html().contains("Years of Pro Service")) {
