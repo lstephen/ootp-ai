@@ -37,9 +37,8 @@
     <lib.humanize-slim.version>1.1.5</lib.humanize-slim.version>
     <lib.ootp-extract.version>1.0</lib.ootp-extract.version>
 
-    <lib.joda-convert.version>1.5</lib.joda-convert.version>
+    <lib.assertj-core.version>3.0.0</lib.assertj-core.version>
     <lib.junit.version>4.12</lib.junit.version>
-    <lib.mockito-core.version>1.9.5</lib.mockito-core.version>
 
     <plugin.exec.version>1.2.1</plugin.exec.version>
   </properties>
@@ -137,22 +136,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${lib.mockito-core.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.joda</groupId>
-      <artifactId>joda-convert</artifactId>
-      <version>${lib.joda-convert.version}</version>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${lib.assertj-core.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
