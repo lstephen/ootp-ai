@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.github.lstephen</groupId>
     <artifactId>basepom</artifactId>
-    <version>1.7</version>
+    <version>1.9</version>
   </parent>
 
   <artifactId>ootp-ai</artifactId>
@@ -17,12 +17,10 @@
 
   <name>ootp-ai</name>
   <description>AI for OOTP</description>
-  <url>https://github.com/lstephen/ootp-ai</url>
 
   <scm>
     <connection>scm:git:git@github.com:lstpehen/ootp-ai.git</connection>
     <developerConnection>scm:git:git@github.com:lstephen/ootp-ai.git</developerConnection>
-    <url>https://github.com/lstephen/ootp-ai</url>
   </scm>
 
   <properties>
