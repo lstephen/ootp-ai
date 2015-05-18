@@ -391,10 +391,14 @@ public class Main {
             if (oldRoster.size() <= maxRosterSize) {
                 Integer n = 2;
 
-                if (site.getName().equals("BTH") || site.getName().equals("CBL") || site.getName().equals("TWML")) {
+                if (site.getName().equals("CBL") || site.getName().equals("TWML")) {
                     n = 1;
                 }
-                if (site.getName().equals("SAVOY") || site.getName().equals("GABL")) {
+
+                if (site.getName().equals("SAVOY")
+                  || site.getName().equals("GABL")
+                  || site.getName().equals("BTH")
+                  || site.getName().contains("OLD_BTH")) {
                     n = 0;
                 }
 
