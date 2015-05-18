@@ -17,10 +17,12 @@
 
   <name>ootp-ai</name>
   <description>AI for OOTP</description>
+  <url>${github.site}</url>
 
   <scm>
     <connection>scm:git:git@github.com:lstpehen/ootp-ai.git</connection>
     <developerConnection>scm:git:git@github.com:lstephen/ootp-ai.git</developerConnection>
+    <url>${github.url}</url>
   </scm>
 
   <properties>
