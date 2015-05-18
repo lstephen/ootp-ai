@@ -36,8 +36,8 @@
     </menu>
 
     <menu name="Contribute">
-      <item name="Issues" href="https://github.com/lstephen/ai-search/issues" />
-      <item name="Fork on GitHub" href="https://github.com/lstephen/ai-search" />
+      <item name="Issues" href="https://github.com/lstephen/ootp-ai/issues" />
+      <item name="Fork on GitHub" href="https://github.com/lstephen/ootp-ai" />
     </menu>
 
     <menu name="Reports" ref="reports"/>
