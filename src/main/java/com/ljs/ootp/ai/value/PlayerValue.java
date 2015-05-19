@@ -41,9 +41,9 @@ public class PlayerValue {
     public Integer getNowValue(Player p) {
         Slot st = Slot.getPrimarySlot(p);
 
-        return st == Slot.MR
-            ? (int) (MR_CONSTANT * getNowAbility(p))
-            : getNowAbility(p);
+        Double factor = st == Slot.MR ? MR_CONSTANT : Double.valueOf(1.0);
+
+        return (int) Math.round(factor * getNowAbility(p));
     }
 
     public Function<Player, Integer> getNowAbility() {
@@ -106,9 +106,9 @@ public class PlayerValue {
     public Integer getCeilingValue(Player p) {
         Slot st = Slot.getPrimarySlot(p);
 
-        return st == Slot.MR
-            ? (int) (MR_CONSTANT * getFutureAbility(p))
-            : getFutureAbility(p);
+        Double factor = st == Slot.MR ? MR_CONSTANT : Double.valueOf(1.0);
+
+        return (int) Math.round(factor * getFutureAbility(p));
     }
 
     public Function<Player, Integer> getFutureAbility() {

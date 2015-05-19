@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.site.SiteHolder;
@@ -21,7 +22,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-public final class Rotation {
+public final class Rotation implements Printable {
 
     public static enum Role { SP, MR, SU, CL, NONE };
 
@@ -207,9 +208,6 @@ public final class Rotation {
       }
 
       Rotation next = create(newRotation);
-      //print(System.out);
-      //System.out.println(p.getShortName() + "/" + r + "/" + idx);
-      //next.print(System.out);
 
       return next;
     }
@@ -217,20 +215,18 @@ public final class Rotation {
     private Rotation remove(Player p) {
       Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
 
-      for (Role r : newRotation.keySet()) {
-        if (newRotation.get(r).contains(p)) {
-          List<Player> ps = Lists.newArrayList(rotation.get(r));
+      for (Map.Entry<Role, ImmutableList<Player>> r : newRotation.entrySet()) {
+        if (r.getValue().contains(p)) {
+          List<Player> ps = Lists.newArrayList(rotation.get(r.getKey()));
 
           ps.remove(p);
 
-          newRotation.put(r, ImmutableList.copyOf(ps));
+          newRotation.put(r.getKey(), ImmutableList.copyOf(ps));
         }
       }
 
       return create(newRotation);
     }
-
-
 
     public Rotation swap(Player lhs, Player rhs) {
         Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
@@ -290,10 +286,6 @@ public final class Rotation {
         return get(Role.MR, Role.SU, Role.CL, Role.NONE);
     }
 
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
-    }
-
     public void print(PrintWriter w) {
         w.println();
         w.println(String.format("   %-15s %-15s %-15s %-15s %-15s %-15s", new Object[] {
@@ -311,10 +303,10 @@ public final class Rotation {
                 Integer.valueOf(i + 1),
                 i >= sps.size() ? "" : sps.get(i).getShortName(),
                 "",
-                mrs != null && i >= mrs.size() ? "" : mrs.get(i).getShortName(),
-                sus != null && i >= sus.size() ? "" : sus.get(i).getShortName(),
-                cls != null && i >= cls.size() ? "" : cls.get(i).getShortName(),
-                none != null && i >= none.size() ? "" : none.get(i).getShortName()
+                i >= mrs.size() ? "" : mrs.get(i).getShortName(),
+                i >= sus.size() ? "" : sus.get(i).getShortName(),
+                i >= cls.size() ? "" : cls.get(i).getShortName(),
+                i >= none.size() ? "" : none.get(i).getShortName()
             }));
 
         w.flush();

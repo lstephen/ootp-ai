@@ -488,7 +488,7 @@ public class Main {
                     site.getPitcherSelectionMethod())
                 .selectRotation(ImmutableSet.<Player>of(), Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));
 
-        rotation.print(out);
+        Printables.print(rotation).to(out);
 
         LOG.log(Level.INFO, "Choosing lineups...");
 
@@ -502,7 +502,7 @@ public class Main {
             .create(battingRegression.predict(newRoster.getAllPlayers()))
             .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
-        depthCharts.print(out);
+        Printables.print(depthCharts).to(out);
 
         Printables.print(lineups).to(out);
 
@@ -592,7 +592,7 @@ public class Main {
                     .using(battingRegression, pitchingRegression, ps.getPitcherOverall()),
                 tv);
 
-            fourtyMan.printReport(out);
+            Printables.print(fourtyMan).to(out);
 
             generic.setTitle("+40");
             generic.setPlayers(ImmutableSet

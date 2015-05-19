@@ -125,9 +125,6 @@ public final class TeamReport implements Printable, RecordPredictor {
 
     @Override
     public void print(PrintWriter w) {
-        Set<TeamScore> scores = getScores();
-
-
         w.println();
         w.println(String.format("**%-18s | %-5s %-5s %-5s | %-5s %-5s %-5s | (rpg:%.2f)", title, " Bat", " LU", " Ovr", " Pit", " Rot", " Ovr", getExpectedRunsPerGame()));
 
@@ -312,12 +309,6 @@ public final class TeamReport implements Printable, RecordPredictor {
                 .fillToSize(Slot.P)
                 .build(),
             Selections.onlyPitchers(players));
-    }
-
-    private Double calculateScore(
-        SelectionFactory selection, Iterable<Player> players) {
-
-        return calculateScore(selection.create(Mode.REGULAR_SEASON), players);
     }
 
     private Double calculateScore(Selection selection, Iterable<Player> players) {

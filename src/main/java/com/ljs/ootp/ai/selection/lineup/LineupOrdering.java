@@ -153,6 +153,8 @@ public class LineupOrdering {
             case VERY_INCONSISTENT:
               score += PAS[i] / 100.0;
               break;
+            default:
+              // do nothing
           }
         }
       }

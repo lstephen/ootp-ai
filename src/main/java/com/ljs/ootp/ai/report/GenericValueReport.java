@@ -7,6 +7,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import com.ljs.ootp.ai.io.Printable;
+import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.io.SalaryFormat;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.regression.BattingRegression;
@@ -23,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author lstephen
  */
-public class GenericValueReport {
+public class GenericValueReport implements Printable {
 
     private String title;
 
@@ -139,7 +141,7 @@ public class GenericValueReport {
     }
 
     public void print(OutputStream out) {
-        print(new PrintWriter(out));
+        Printables.print(this).to(out);
     }
 
     public void print(PrintWriter w) {
@@ -259,7 +261,7 @@ public class GenericValueReport {
 
 
     public void printReplacementLevelReport(OutputStream out) {
-        printReplacementLevelReport(new PrintWriter(out));
+      Printables.print(this::printReplacementLevelReport).to(out);
     }
 
     public void printReplacementLevelReport(PrintWriter w) {

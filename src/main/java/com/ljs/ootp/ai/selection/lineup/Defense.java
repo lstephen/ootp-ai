@@ -148,44 +148,27 @@ public final class Defense {
     }
 
     public static Ordering<Defense> byScore() {
-        return Ordering
-            .natural()
-            .onResultOf(new Function<Defense, Double>() {
-                public Double apply(Defense d) {
-                    return d.score();
-                }
-            });
+        return Ordering.natural().onResultOf(Defense::score);
     }
 
     public static Ordering<Defense> byAge() {
         return Ordering
             .natural()
-            .onResultOf(new Function<Defense, Integer>() {
-                public Integer apply(Defense d) {
-                    Integer age = 0;
-                    for (Map.Entry<Player, Position> entry : d.defense.entrySet()) {
-                        age += entry.getKey().getAge() * getPositionFactor(entry.getValue());
-                    }
-                    return age;
-                }
-            });
+            .onResultOf((d) -> d.defense
+                .entrySet()
+                .stream()
+                .map((e) -> e.getKey().getAge() * getPositionFactor(e.getValue()))
+                .reduce(0, Integer::sum));
     }
 
     public static Ordering<Defense> byRawRange() {
         return Ordering
-            .natural()
-            .onResultOf(new Function<Defense, Double>() {
-                public Double apply(Defense d) {
-                    Double range = 0.0;
-
-                    for (Map.Entry<Player, Position> entry : d.defense.entrySet()) {
-                        range += (getPositionFactor(entry.getValue())
-                            * entry.getKey().getDefensiveRatings().getPositionRating(entry.getValue()));
-                    }
-
-                    return range;
-                }
-            });
+          .natural()
+          .onResultOf((d) -> d.defense
+              .entrySet()
+              .stream()
+              .map((e) -> getPositionFactor(e.getValue()) * e.getKey().getDefensiveRatings().getPositionRating(e.getValue()))
+              .reduce(0.0, Double::sum));
     }
 
     public static Ordering<Defense> byBestPositionRating() {

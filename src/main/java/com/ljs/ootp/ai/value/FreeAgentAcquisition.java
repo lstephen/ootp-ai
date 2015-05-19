@@ -165,11 +165,7 @@ public final class FreeAgentAcquisition {
         return Heuristics.from(
             Ordering
                 .natural()
-                .onResultOf(new Function<FreeAgentAcquisition, Integer>() {
-                    public Integer apply(FreeAgentAcquisition faa) {
-                        return faa.score(rr, value);
-                    }
-                }));
+                .onResultOf((faa) -> faa.score(rr, value)));
     }
 
     private static ActionGenerator<FreeAgentAcquisition> actionGenerator(final Iterable<Player> roster, final Iterable<Player> fas) {

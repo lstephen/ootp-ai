@@ -12,6 +12,7 @@ import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
 import com.ljs.ai.search.hillclimbing.Validator;
 import com.ljs.ai.search.hillclimbing.action.Action;
 import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
+import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.selection.Mode;
@@ -171,7 +172,7 @@ public final class RotationSelection implements Selection {
                 Rotation initial = Rotation.create(sps, mrs, rest);
 
                 if (!initial.isValid()) {
-                    initial.print(System.out);
+                    Printables.print(initial).to(System.out);
                 }
 
                 Preconditions.checkState(initial.isValid());

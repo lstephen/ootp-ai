@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.BattingRegression;
@@ -301,7 +302,7 @@ public final class RosterSelection {
     }
 
     public void printBattingSelectionTable(OutputStream out, Roster roster, TeamStats<BattingStats> stats) {
-        printBattingSelectionTable(new PrintWriter(out), roster, stats);
+        Printables.print((w) -> printBattingSelectionTable(w, roster, stats)).to(out);
     }
 
     public void printBattingSelectionTable(PrintWriter w, Roster roster, TeamStats<BattingStats> stats) {
@@ -335,7 +336,7 @@ public final class RosterSelection {
     }
 
     public void printPitchingSelectionTable(OutputStream out, Roster roster, TeamStats<PitchingStats> stats) {
-        printPitchingSelectionTable(new PrintWriter(out), roster, stats);
+        Printables.print((w) -> printPitchingSelectionTable(w, roster, stats)).to(out);
     }
 
     public void printPitchingSelectionTable(PrintWriter w, Roster roster, TeamStats<PitchingStats> stats) {
