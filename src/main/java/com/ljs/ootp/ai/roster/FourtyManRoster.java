@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.roster.Roster.Status;
@@ -22,7 +23,7 @@ import java.util.Set;
  *
  * @author lstephen
  */
-public class FourtyManRoster {
+public class FourtyManRoster implements Printable {
 
     private final Roster roster;
 
@@ -46,12 +47,7 @@ public class FourtyManRoster {
         this.changes = Optional.of(changes);
     }
 
-
-    public void printReport(OutputStream out) {
-        printReport(new PrintWriter(out));
-    }
-
-    public void printReport(PrintWriter w) {
+    public void print(PrintWriter w) {
         w.println();
         w.println(
             String.format(

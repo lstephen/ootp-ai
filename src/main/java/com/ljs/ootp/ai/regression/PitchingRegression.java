@@ -129,9 +129,6 @@ public final class PitchingRegression {
     public SplitStats<PitchingStats> predict(Player p) {
         Long paToProject = Math.round(DEFAULT_PLATE_APPEARANCES + DEFAULT_PLATE_APPEARANCES * era.getRSquare());
 
-        Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhbPercentage());
-        Long vsLeftPa = paToProject - vsRightPa;
-
         SplitStats<PitchingStats> base = predict(p.getPitchingRatings(), paToProject * 100);
         PitchingStats vsLeft = base.getVsLeft();
         PitchingStats vsRight = base.getVsRight();
@@ -141,8 +138,6 @@ public final class PitchingRegression {
 
             vsLeft = vsLeft.add(splits.getVsLeft().multiply(100.0));
             vsRight = vsRight.add(splits.getVsRight().multiply(100.0));
-        } else {
-            
         }
 
         return SplitStats.create(vsLeft, vsRight);

@@ -112,7 +112,7 @@ public class DefensiveRatings {
             ? rating
             : ((skill + 1.25 * rating) / 2.25);
 
-        return MINIMUMS.containsKey(p) && score < MINIMUMS.get(p) ? 0.0 : score;
+        return MINIMUMS.containsKey(p) && score < MINIMUMS.get(p) ? Double.valueOf(0.0) : score;
     }
 
     public String getPositionScores() {

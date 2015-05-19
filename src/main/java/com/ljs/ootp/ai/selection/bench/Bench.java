@@ -22,11 +22,16 @@ import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.TeamStats;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.fest.util.Lists;
 
 /**
@@ -155,51 +160,28 @@ public class Bench implements Printable {
     }
 
     private static Validator<Bench> validator() {
-        return new Validator<Bench>() {
-            @Override
-            public Boolean apply(Bench b) {
-                if (b.selected.size() + b.players.size() > b.maxSize) {
-                    return false;
-                }
+        Predicate<Bench> size = (b) ->  b.selected.size() + b.players.size() < b.maxSize;
 
-                for (Player p : b.players) {
-                    if (b.lineups.getAllPlayers().contains(p)) {
-                        return false;
-                    }
-                }
+        Predicate<Bench> anyInLineup = (b) ->
+          b.players
+            .stream()
+            .filter((p) -> b.lineups.getAllPlayers().contains(p))
+            .findAny()
+            .isPresent();
 
-                return true;
-            }
-        };
+        return size.and(anyInLineup.negate())::test;
     }
 
     private static Ordering<Bench> byScore() {
-        return Ordering
-            .natural()
-            .onResultOf(new Function<Bench, Double>() {
-                public Double apply(Bench b) {
-                    return b.score();
-            }});
+        return Ordering.natural().onResultOf(Bench::score);
     }
 
     private static Ordering<Bench> bySize() {
-        return Ordering
-            .natural()
-            .onResultOf(new Function<Bench, Integer>() {
-                public Integer apply(Bench b) {
-                    return b.players.size();
-            }});
+        return Ordering.natural().onResultOf((b) -> b.players.size());
     }
 
     private static Ordering<Bench> byAge() {
-        return Ordering
-            .natural()
-            .reverse()
-            .onResultOf(new Function<Bench, Integer>() {
-                public Integer apply(Bench b) {
-                    return b.totalAge();
-            }});
-
+        return Ordering.natural().reverse().onResultOf(Bench::totalAge);
     }
 
     private static Ordering<Bench> heuristic() {
@@ -209,39 +191,27 @@ public class Bench implements Printable {
     }
 
     private static ActionGenerator<Bench> actionGenerator(final Iterable<Player> available) {
-        return new ActionGenerator<Bench>() {
+        Function<Bench, Set<Add>> adds = (b) ->
+          StreamSupport.stream(available.spliterator(), false)
+            .filter((p) -> !b.lineups.getAllPlayers().contains(p))
+            .filter((p) -> !b.players.contains(p))
+            .map(Add::new)
+            .collect(Collectors.toSet());
 
-            @Override
-            public Iterable<Action<Bench>> apply(Bench b) {
-                Set<Action<Bench>> actions = Sets.newHashSet();
+        Function<Bench, Set<Remove>> removes = (b) ->
+          b.players.stream().map(Remove::new).collect(Collectors.toSet());
 
-                Set<Add> adds = adds(b);
-                Set<Remove> removes = removes(b);
+        return (b) -> {
+          Set<Add> as = adds.apply(b);
+          Set<Remove> rs = removes.apply(b);
 
-                actions.addAll(adds);
-                actions.addAll(removes);
-                actions.addAll(SequencedAction.merged(adds, removes));
+          Set<Action<Bench>> actions = new HashSet<>();
 
-                return actions;
-            }
+          actions.addAll(as);
+          actions.addAll(rs);
+          actions.addAll(SequencedAction.merged(as, rs));
 
-            private Set<Remove> removes(Bench b) {
-                Set<Remove> removes = Sets.newHashSet();
-                for (Player p : b.players) {
-                    removes.add(new Remove(p));
-                }
-                return removes;
-            }
-
-            private Set<Add> adds(Bench b) {
-                Set<Add> adds = Sets.newHashSet();
-                for (Player p : available) {
-                    if (!b.lineups.getAllPlayers().contains(p) && !b.players.contains(p)) {
-                        adds.add(new Add(p));
-                    }
-                }
-                return adds;
-            }
+          return actions;
         };
     }
 

@@ -1,7 +1,7 @@
 package com.ljs.ootp.ai.selection.depthchart;
 
+import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.selection.lineup.All;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import org.fest.assertions.api.Assertions;
 
@@ -9,7 +9,7 @@ import org.fest.assertions.api.Assertions;
  *
  * @author lstephen
  */
-public final class AllDepthCharts {
+public final class AllDepthCharts implements Printable {
 
     private final All<DepthChart> all;
 
@@ -21,10 +21,6 @@ public final class AllDepthCharts {
 
     public static AllDepthCharts create(All<DepthChart> all) {
         return new AllDepthCharts(all);
-    }
-
-    public void print(OutputStream out) {
-        print(new PrintWriter(out));
     }
 
     public void print(PrintWriter w) {

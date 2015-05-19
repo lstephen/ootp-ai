@@ -40,6 +40,4 @@ public final class Printables {
         void to(Writer w);
     }
 
-
-
 }
