@@ -160,7 +160,7 @@ public class Bench implements Printable {
     }
 
     private static Validator<Bench> validator() {
-        Predicate<Bench> size = (b) ->  b.selected.size() + b.players.size() < b.maxSize;
+        Predicate<Bench> size = (b) ->  b.selected.size() + b.players.size() <= b.maxSize;
 
         Predicate<Bench> anyInLineup = (b) ->
           b.players
