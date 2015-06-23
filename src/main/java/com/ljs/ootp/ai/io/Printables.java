@@ -1,7 +1,6 @@
 package com.ljs.ootp.ai.io;
 
 import com.google.common.base.Charsets;
-import com.ljs.ootp.ai.annotation.ReturnTypesAreNonnullByDefault;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -13,7 +12,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @author lstephen
  */
 @ParametersAreNonnullByDefault
-@ReturnTypesAreNonnullByDefault
 public final class Printables {
 
     private Printables() { }

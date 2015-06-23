@@ -2,7 +2,6 @@ package com.ljs.ootp.ai.report;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
-import com.ljs.ootp.ai.annotation.ReturnTypesAreNonnullByDefault;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.roster.Team;
@@ -18,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
  * @author lstephen
  */
 @ParametersAreNonnullByDefault
-@ReturnTypesAreNonnullByDefault
 public class SalaryReport implements Printable {
 
     private final Team team;
