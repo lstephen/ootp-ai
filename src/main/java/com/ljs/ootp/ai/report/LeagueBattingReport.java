@@ -46,30 +46,13 @@ public class LeagueBattingReport implements Printable {
         w.format("act: %d%n", stats.getRuns());
         w.println();
 
-        // TODO: Could these be calculated from baseruns instead?
-        Double rperOut = (double) stats.getRuns() / stats.getOuts();
-        Double runBB = rperOut + 0.14;
-        Double run1B = runBB + 0.155;
-        Double run2B = run1B + 0.3;
-        Double run3B = run2B + 0.27;
-        Double runHR = 1.4;
+        Double runBB = getRunValueBB();
+        Double run1B = getRunValue1B();
+        Double run2B = getRunValue2B();
+        Double run3B = getRunValue3B();
+        Double runHR = getRunValueHR();
 
         w.println();
-        w.format("RperO: %.2f%n", rperOut);
-        w.format("runBB: %.2f%n", runBB);
-        w.format("run1B: %.2f%n", run1B);
-        w.format("run2B: %.2f%n", run2B);
-        w.format("run3B: %.2f%n", run3B);
-        w.format("runHR: %.2f%n", runHR);
-
-        runBB = getRunValueBB();
-        run1B = getRunValue1B();
-        run2B = getRunValue2B();
-        run3B = getRunValue3B();
-        runHR = getRunValueHR();
-
-        w.println();
-        w.format("RperO: %.2f%n", rperOut);
         w.format("runBB: %.2f%n", runBB);
         w.format("run1B: %.2f%n", run1B);
         w.format("run2B: %.2f%n", run2B);

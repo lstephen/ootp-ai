@@ -1,14 +1,20 @@
 package com.ljs.ootp.ai.ootp5.site;
 
-import com.google.common.collect.ImmutableMap;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.site.Site;
+
 import static com.ljs.ootp.ai.site.Version.OOTP5;
 import static com.ljs.ootp.ai.site.Version.OOTP6;
+
 import com.ljs.ootp.ai.splits.Splits;
 import com.ljs.ootp.extract.html.rating.Rating;
 import com.ljs.ootp.extract.html.rating.Scale;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+
 import javax.annotation.Nonnull;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -85,6 +91,7 @@ public final class PlayerPage {
     }
 
     public <T> BattingRatings<T> extractBattingRatings(Element el, Scale<T> scale) {
+        Preconditions.checkNotNull(scale);
 
         ImmutableMap<BattingRatingsType, Integer> idx;
         switch (site.getType()) {
