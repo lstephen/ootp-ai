@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.annotation.ReturnTypesAreNonnullByDefault;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
@@ -39,7 +38,6 @@ import org.fest.util.Strings;
  * @author lstephen
  */
 @ParametersAreNonnullByDefault
-@ReturnTypesAreNonnullByDefault
 public final class TeamReport implements Printable, RecordPredictor {
 
     private final String title;
