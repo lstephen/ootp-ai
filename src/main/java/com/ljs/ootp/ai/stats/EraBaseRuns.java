@@ -5,39 +5,48 @@ package com.ljs.ootp.ai.stats;
  * @author lstephen
  */
 public class EraBaseRuns implements BaseRuns {
-    private static final EraBaseRuns INSTANCE = new EraBaseRuns();
+  private static final EraBaseRuns INSTANCE = new EraBaseRuns();
 
-    private Double factor;
+  private Double factor;
 
-    private BattingStats context;
+  private BattingStats context;
 
-    private EraBaseRuns() { }
+  private EraBaseRuns() { }
 
-    public Double calculate(PitchingStats stats) {
-        Double hits = (double) stats.getHits();
-        Double doubles = (double) stats.getDoubles();
-        Double triples = context.getTriplesPerHit() * hits;
+  public Double calculate(PitchingStats stats) {
+    Double hits = (double) stats.getHits();
+    Double doubles = (double) stats.getDoubles();
+    Double triples = context.getTriplesPerHit() * hits;
 
-        Double a = hits + stats.getWalks() - stats.getHomeRuns();
-        Double b = factor * (.8*stats.getSingles() + 2.1*doubles + 3.4*triples + 1.8*stats.getHomeRuns() + .1*stats.getWalks());
-        Double c = (double) stats.getOuts();
-        Double d = (double) stats.getHomeRuns();
+    Double a = hits + stats.getWalks() - stats.getHomeRuns();
 
-        Double bsr = a * b/(b+c) + d;
+    Double b = factor * (
+        COEFFICIENT_SINGLE * stats.getSingles() +
+        COEFFICIENT_DOUBLE * doubles +
+        COEFFICIENT_TRIPLE * triples +
+        COEFFICIENT_HOME_RUN * stats.getHomeRuns() +
+        COEFFICIENT_WALK * stats.getWalks() +
+        COEFFICIENT_STRIKEOUT * stats.getStrikeouts() +
+        COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts()));
 
-        return bsr / stats.getOuts() * 27;
-    }
+    Double c = (double) stats.getOuts();
+    Double d = (double) stats.getHomeRuns();
 
-    public static EraBaseRuns get() {
-        return INSTANCE;
-    }
+    Double bsr = a * b/(b+c) + d;
 
-    public static void setFactor(Double factor) {
-        get().factor = factor;
-    }
+    return bsr / stats.getOuts() * 27;
+  }
 
-    public static void setLeagueContext(BattingStats stats) {
-        get().context = stats;
-    }
+  public static EraBaseRuns get() {
+    return INSTANCE;
+  }
+
+  public static void setFactor(Double factor) {
+    get().factor = factor;
+  }
+
+  public static void setLeagueContext(BattingStats stats) {
+    get().context = stats;
+  }
 
 }
