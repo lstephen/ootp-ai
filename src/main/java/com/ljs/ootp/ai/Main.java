@@ -160,7 +160,7 @@ public class Main {
 
     private static ImmutableSet<SiteDefinition> PLAYOFFS = ImmutableSet.of();
 
-    private static ImmutableSet<SiteDefinition> INAUGURAL_DRAFT = ImmutableSet.of(BTHUSTLE);
+    private static ImmutableSet<SiteDefinition> INAUGURAL_DRAFT = ImmutableSet.of();
 
     public static void main(String[] args) throws IOException {
         new Main().run();
@@ -391,7 +391,7 @@ public class Main {
             if (oldRoster.size() <= maxRosterSize) {
                 Integer n = 2;
 
-                if (site.getName().equals("CBL") || site.getName().equals("TWML")) {
+                if (site.getName().equals("CBL") || site.getName().equals("TWML") || site.getName().equals("BTHUSTLE")) {
                     n = 1;
                 }
 
