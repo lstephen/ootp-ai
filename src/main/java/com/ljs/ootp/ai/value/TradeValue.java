@@ -118,7 +118,7 @@ public class TradeValue {
             factor = 0;
         }
 
-        factor += Math.max(Math.min(33 - age, 6), 0);
+        factor -= Math.max(Math.min(33 - age, 6), 0);
 
         return factor;
     }
