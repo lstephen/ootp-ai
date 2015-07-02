@@ -60,6 +60,7 @@ public class BattingStats implements Stats<BattingStats> {
     public int getWalks() { return walks; }
     public void setWalks(long walks) { this.walks = (int) walks; }
 
+    public int getStrikeouts() { return ks; }
     public void setKs(long ks) { this.ks = (int) ks; }
 
     public void setLeagueBatting(BattingStats leagueBatting) {
