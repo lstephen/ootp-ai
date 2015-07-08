@@ -82,7 +82,7 @@ public final class FreeAgents {
                 continue;
             }
 
-            if (site.getType() != Version.OOTPX && mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
+            if (mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
                 continue;
             }
 

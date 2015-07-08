@@ -3,7 +3,6 @@ package com.ljs.ootp.ai.site.impl;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.ootp5.Ootp5;
 import com.ljs.ootp.ai.ootp6.Ootp6;
-import com.ljs.ootp.ai.ootpx.OotpX;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.SiteDefinition;
@@ -101,9 +100,6 @@ public final class SiteDefinitionImpl implements SiteDefinition {
         if (type == Version.OOTP5) {
             return PotentialRating.scale();
         }
-        if (type == Version.OOTPX) {
-            return OneToOneHundred.scale();
-        }
 
         if (name.contains("BTH")) {
             return OneToTen.scale();
@@ -120,9 +116,6 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     public Scale<?> getAbilityRatingScale() {
         if (type == Version.OOTP5) {
             return ZeroToTen.scale();
-        }
-        if (type == Version.OOTPX) {
-            return OneToOneHundred.scale();
         }
 
         if (name.contains("BTH")) {
@@ -143,8 +136,6 @@ public final class SiteDefinitionImpl implements SiteDefinition {
                 return Ootp5.create(this);
             case OOTP6:
                 return Ootp6.create(this);
-            case OOTPX:
-                return OotpX.create(this);
             default:
                 throw new IllegalStateException();
         }
@@ -170,18 +161,6 @@ public final class SiteDefinitionImpl implements SiteDefinition {
 
         return new SiteDefinitionImpl(
             Version.OOTP6, name, siteRoot, team, league, nTeams);
-    }
-
-    public static SiteDefinitionImpl ootpx(
-        String name,
-        String siteRoot,
-        Id<Team> team,
-        String league,
-        int nTeams) {
-
-        return new SiteDefinitionImpl(
-            Version.OOTPX, name, siteRoot, team, league, nTeams);
-
     }
 
 }
