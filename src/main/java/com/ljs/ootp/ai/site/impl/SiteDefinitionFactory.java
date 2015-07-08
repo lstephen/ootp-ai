@@ -33,14 +33,4 @@ public final class SiteDefinitionFactory {
         return SiteDefinitionImpl.ootp6(name, siteRoot, team, league, nTeams);
     }
 
-    public static SiteDefinition ootpx(
-        String name,
-        String siteRoot,
-        Id<Team> team,
-        String league,
-        int nTeams) {
-
-        return SiteDefinitionImpl.ootpx(name, siteRoot, team, league, nTeams);
-    }
-
 }

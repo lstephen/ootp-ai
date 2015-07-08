@@ -82,52 +82,31 @@ public class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
-
-    // PAM, MWF
     private static final SiteDefinition TWML =
         SiteDefinitionFactory.ootp6(
            "TWML", "http://www.darowski.com/twml/OOTP6Reports/", Id.<Team>valueOf(19), "Splendid Splinter", 20);
-        //    "TWML", "http://www.darowski.com/twml/2033/", new TeamId("22"), "Splendid Splinter", 24);
 
-    // WCH, TF
     private static final SiteDefinition CBL =
         SiteDefinitionFactory.ootp5(
             "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(20), "National", 20);
 
-    // DET, TF
     private static final SiteDefinition HFTC =
         SiteDefinitionFactory.ootp5(
             "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(8), "American", 32);
 
-    //private static final SiteDefinition HFTC_CHC =
-    //    SiteDefinitionFactory.ootp5(
-    //        "HFTC_CHC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(22), "National", 32);
-
-    //private static final SiteDefinition TWIB =
-    //    SiteDefinition.ootp6("TWIB", "http://twib.us/reports/", new TeamId("16"), "National", 16);
-
-    //private static final SiteDefinition NTBL =
-    //    SiteDefinition.ootp6("NTBL", "http://ntbl.twib.us/reports/", new TeamId("2"), "American", 16);
-
-    // CHC, TTSn
     private static final SiteDefinition OLD_BTH_CHC =
         SiteDefinitionFactory.ootp6("BTH", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/", Id.<Team>valueOf(20), "National", 30);
 
-    // NYY
     private static final SiteDefinition OLD_BTH_NYY =
         SiteDefinitionFactory.ootp6("OLD_BTH_NYY", "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/", Id.<Team>valueOf(3), "American", 30);
 
     private static final SiteDefinition BTHUSTLE =
         SiteDefinitionFactory.ootp6("BTHUSTLE", "http://bthbaseball.allsimbaseball10.com/game/lgreports/", Id.<Team>valueOf(14), "National", 16);
 
-    // WTT, TTSt
     private static final SiteDefinition SAVOY =
         SiteDefinitionFactory.ootp5("SAVOY", "http://www.thecblonline.com/savoy/", Id.<Team>valueOf(26), "UBA", 26);
 
-    // CIN, TTSn
     private static final SiteDefinition LBB =
-        //SiteDefinitionFactory.ootp5("LBB", "http://longballerbaseball.com/game/lgreports/Leaguesite/", new TeamId("21"), "NL", 30);
-        // Restart
         SiteDefinitionFactory.ootp5("LBB", "http://bbs56.net/LBB/Site/Leaguesite/", Id.<Team>valueOf(3), "AL", 20);
 
     private static final SiteDefinition GABL =
@@ -135,12 +114,6 @@ public class Main {
 
     private static final SiteDefinition TFMS =
         SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
-
-    private static final SiteDefinition PSD =
-        SiteDefinitionFactory.ootpx("PSD", "http://www.redraftleague.com/game/lgreports2/news/html/", Id.<Team>valueOf(8), "American", 20);
-
-    //private static final SiteDefinition OSBL =
-    //    SiteDefinitionFactory.ootpx("OBSL", "http://www.theobsl.com/2013seasonootp/", Id.<Team>valueOf(30), "National", 30);
 
     private static final ImmutableMap<String, SiteDefinition> SITES =
         ImmutableMap
@@ -434,19 +407,11 @@ public class Main {
             selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression, tv);
         }
 
-        if (site.getType() == Version.OOTPX) {
-            selection = RosterSelection.ootpx(team, battingRegression, pitchingRegression, tv);
-        }
-
         selection.setPrevious(oldRoster);
 
         LOG.log(Level.INFO, "Selecting new rosters...");
 
         Mode selectionMode = mode;
-
-        if (site.getType().equals(Version.OOTPX) && site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
-            selectionMode = Mode.EXPANDED;
-        }
 
         if (isPlayoffs) {
             selectionMode = Mode.PLAYOFFS;
@@ -506,7 +471,7 @@ public class Main {
 
         Printables.print(lineups).to(out);
 
-        if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH && site.getType() != Version.OOTPX) {
+        if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
             LOG.log(Level.INFO, "Spring training...");
             Printables
                 .print(SpringTraining.create(

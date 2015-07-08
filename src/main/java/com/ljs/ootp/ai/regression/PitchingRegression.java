@@ -199,7 +199,6 @@ public final class PitchingRegression {
                     Math.round(plateAppearances * predict(Predicting.DOUBLES, ratings.getGap()));
                 break;
             case OOTP6:
-            case OOTPX:
                 predictedDoubles = 0;
                 predictedHits =
                     Math.round(
