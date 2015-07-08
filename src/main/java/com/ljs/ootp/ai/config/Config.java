@@ -9,7 +9,7 @@ import java.util.Properties;
  *
  * @author lstephen
  */
-public class Config {
+public final class Config {
 
     private final Properties properties;
 
