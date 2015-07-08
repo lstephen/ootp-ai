@@ -12,8 +12,10 @@ import com.ljs.ootp.ai.site.SiteDefinition;
 import com.ljs.scratch.util.Jackson;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -21,61 +23,61 @@ import java.util.stream.Collectors;
  */
 public final class DraftClass {
 
-    private final Set<Player> players = Sets.newHashSet();
+  private final Set<Player> players = Sets.newHashSet();
 
-    private DraftClass() { }
+  private DraftClass() { }
 
-    @JsonCreator
-    private DraftClass(@JsonProperty("players") Set<Player> players) {
-        Iterables.addAll(this.players, players);
+  @JsonCreator
+  private DraftClass(@JsonProperty("players") Set<Player> players) {
+    Iterables.addAll(this.players, players);
+  }
+
+  public void addIfNotPresent(Player p) {
+    if (!this.players.contains(p)) {
+      this.players.add(p);
     }
+  }
 
-    public void addIfNotPresent(Player p) {
-        if (!this.players.contains(p)) {
-            this.players.add(p);
-        }
+  public void addIfNotPresent(Collection<Player> ps) {
+    ps.stream().forEach(this::addIfNotPresent);
+  }
+
+  public Collection<Player> getPlayers() {
+    return ImmutableSet.copyOf(playersStream().collect(Collectors.toList()));
+  }
+
+  private Stream<Player> playersStream() {
+    return players.stream().filter(p -> p != null);
+  }
+
+  public void save(Site site, File f) {
+    try {
+      Jackson.getMapper(site).writeValue(f, this);
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
     }
+  }
 
-    public void addIfNotPresent(Iterable<Player> ps) {
-        for (Player p : ps) {
-            addIfNotPresent(p);
-        }
-    }
+  public static DraftClass create(Collection<Player> ps) {
+    DraftClass dc = new DraftClass();
+    dc.addIfNotPresent(ps);
+    return dc;
+  }
 
-    public Iterable<Player> getPlayers() {
-        return ImmutableSet.copyOf(players.stream().filter(p -> p != null).collect(Collectors.toList()));
-    }
+  public static DraftClass load(File f, SiteDefinition site) {
+    if (f.exists()) {
+      try {
+        DraftClass dc = Jackson.getMapper(site.getSite()).readValue(f, DraftClass.class);
 
-    public void save(Site site, File f) {
-        try {
-            Jackson.getMapper(site).writeValue(f, this);
-        } catch (IOException e) {
-            throw Throwables.propagate(e);
-        }
-    }
+        dc.playersStream().forEach(p -> p.setRatingsDefinition(site));
 
-    public static DraftClass create(Iterable<Player> ps) {
-        DraftClass dc = new DraftClass();
-        dc.addIfNotPresent(ps);
         return dc;
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
+    } else {
+      return create(ImmutableSet.<Player>of());
     }
-
-    public static DraftClass load(File f, SiteDefinition site) {
-        if (f.exists()) {
-            try {
-                DraftClass dc = Jackson.getMapper(site.getSite()).readValue(f, DraftClass.class);
-
-                for (Player p : dc.getPlayers()) {
-                    p.setRatingsDefinition(site);
-                }
-
-                return dc;
-            } catch (IOException e) {
-                throw Throwables.propagate(e);
-            }
-        } else {
-            return create(ImmutableSet.<Player>of());
-        }
-    }
+  }
 
 }

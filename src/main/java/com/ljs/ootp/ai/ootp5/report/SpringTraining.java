@@ -14,6 +14,7 @@ import com.ljs.ootp.ai.splits.Splits;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -25,6 +26,8 @@ public final class SpringTraining implements Printable {
     private static enum HitterSkills { CONTACT, POWER, EYE, DEFENSE }
 
     private static final Integer HITTING_THRESHOLD = 20;
+
+    private static final Integer PROSPECT_MAX_AGE = 25;
 
     private final Version version;
 
@@ -40,15 +43,17 @@ public final class SpringTraining implements Printable {
         w.println();
         w.println("Spring Training");
         w.format("%-15s C/P/Z/D%n", "Hitters -------");
-        for (Player p : Player.byShortName().sortedCopy(Selections.onlyHitters(players))) {
-            printHitterPlan(w, p);
-        }
+        Player
+          .byShortName()
+          .sortedCopy(Selections.onlyHitters(players))
+          .forEach(p -> printHitterPlan(w, p));
 
         w.println();
         w.format("%-15s S/V/C/S%n", "Pitchers ------");
-        for (Player p : Player.byShortName().sortedCopy(Selections.onlyPitchers(players))) {
-            printPitcherPlan(w, p);
-        }
+        Player
+          .byShortName()
+          .sortedCopy(Selections.onlyPitchers(players))
+          .forEach(p -> printPitcherPlan(w, p));
     }
 
     private void printHitterPlan(PrintWriter w, Player p) {
@@ -82,35 +87,33 @@ public final class SpringTraining implements Printable {
             skills.remove(HitterSkills.DEFENSE);
         }
 
-        if (skills.size() == 4) {
+        if (skills.size() == HitterSkills.values().length) {
             return;
         }
 
         Map<HitterSkills, Integer> values = Maps.newHashMap();
 
-        Integer remaining = 20;
+        final AtomicReference<Integer> remaining =
+          new AtomicReference(skills.contains(HitterSkills.DEFENSE) ? 15 : 20);
 
         if (skills.contains(HitterSkills.DEFENSE)) {
             values.put(HitterSkills.DEFENSE, 5);
-            remaining = 15;
             skills.remove(HitterSkills.DEFENSE);
         } else {
             values.put(HitterSkills.DEFENSE, 0);
         }
 
-        for (HitterSkills skill :
-            ImmutableList.of(
-                HitterSkills.CONTACT, HitterSkills.POWER, HitterSkills.EYE)) {
-
+        ImmutableList.of(HitterSkills.CONTACT, HitterSkills.POWER, HitterSkills.EYE)
+          .forEach(skill -> {
             if (skills.contains(skill)) {
-                Integer points = remaining / skills.size();
-                remaining -= points;
+                Integer points = remaining.get() / skills.size();
+                remaining.set(remaining.get() - points);
                 values.put(skill, points);
                 skills.remove(skill);
             } else {
                 values.put(skill, 0);
             }
-        }
+        });
 
         w.format(
             "%-15s %s%n",
@@ -130,10 +133,10 @@ public final class SpringTraining implements Printable {
         if (endurance == 1
             || endurance == 5
             || endurance == 10
-            || (version == Version.OOTP5 && endurance == 6)) {
+            || version == Version.OOTP5 && endurance == 6) {
 
 
-            if (p.getAge() < 26) {
+            if (p.getAge() <= PROSPECT_MAX_AGE) {
                 w.format("%-15s 6/7/7/0%n", StringUtils.abbreviate(p.getShortName(), 15));
             } else {
                 w.format("%-15s 7/6/7/0%n", StringUtils.abbreviate(p.getShortName(), 15));

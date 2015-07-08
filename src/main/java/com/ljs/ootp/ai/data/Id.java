@@ -9,7 +9,7 @@ import org.fest.assertions.api.Assertions;
  */
 public final class Id<T> {
 
-    private String id;
+    private final String id;
 
     private Id(String id) {
         Assertions.assertThat(id).isNotNull();
