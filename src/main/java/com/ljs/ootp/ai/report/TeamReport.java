@@ -1,11 +1,5 @@
 package com.ljs.ootp.ai.report;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
@@ -25,19 +19,26 @@ import com.ljs.ootp.ai.site.RecordPredictor;
 import com.ljs.ootp.ai.site.Site;
 import com.ljs.ootp.ai.site.Standings;
 import com.ljs.ootp.ai.stats.PitchingStats;
+
 import java.io.PrintWriter;
+
 import java.util.Set;
-import javax.annotation.ParametersAreNonnullByDefault;
+
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.fest.assertions.api.Assertions;
-import org.fest.util.Strings;
 
 /**
  *
  * @author lstephen
  */
-@ParametersAreNonnullByDefault
 public final class TeamReport implements Printable, RecordPredictor {
 
     private final String title;
@@ -74,14 +75,7 @@ public final class TeamReport implements Printable, RecordPredictor {
         ordering = Ordering
             .natural()
             .reverse()
-            .onResultOf(new Function<TeamScore, Double>() {
-                @Override
-                public Double apply(TeamScore score) {
-                    Assertions.assertThat(score).isNotNull();
-
-                    return getExpectedEndOfSeason(score.getId()).getWinPercentage();
-                }
-            });
+            .onResultOf(score -> getExpectedEndOfSeason(score.getId()).getWinPercentage());
     }
 
     private Ordering<TeamScore> getOrdering() {
@@ -424,14 +418,7 @@ public final class TeamReport implements Printable, RecordPredictor {
             return Ordering
                 .natural()
                 .reverse()
-                .onResultOf(new Function<TeamScore, Double>() {
-                    @Override
-                    public Double apply(TeamScore score) {
-                        Assertions.assertThat(score).isNotNull();
-
-                        return score.getExpectedWinningPercentage(rpg);
-                    }
-                });
+                .onResultOf(s -> s.getExpectedWinningPercentage(rpg));
         }
 
     }

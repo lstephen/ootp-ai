@@ -1,9 +1,10 @@
 package com.ljs.ootp.ai.elo;
 
-import com.google.common.base.Objects;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.roster.Team;
-import org.fest.assertions.api.Assertions;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 /**
  *
@@ -20,10 +21,10 @@ public final class GameResult {
     private final Integer homeScore;
 
     private GameResult(Builder builder) {
-        Assertions.assertThat(builder.visitor).isNotNull();
-        Assertions.assertThat(builder.visitorScore).isNotNull().isNotNegative();
-        Assertions.assertThat(builder.home).isNotNull();
-        Assertions.assertThat(builder.homeScore).isNotNull().isNotNegative();
+        Preconditions.checkNotNull(builder.visitor);
+        Preconditions.checkNotNull(builder.visitorScore);
+        Preconditions.checkNotNull(builder.home);
+        Preconditions.checkNotNull(builder.homeScore);
 
         this.visitor = builder.visitor;
         this.visitorScore = builder.visitorScore;

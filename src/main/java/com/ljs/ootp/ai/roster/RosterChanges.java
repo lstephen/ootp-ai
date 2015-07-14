@@ -1,14 +1,16 @@
 package com.ljs.ootp.ai.roster;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.roster.Roster.Status;
+
 import java.io.PrintWriter;
+
 import java.util.Set;
-import org.fest.assertions.api.Assertions;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 
 /**
  *
@@ -55,23 +57,11 @@ public class RosterChanges implements Printable {
             return Ordering
                 .natural()
                 .nullsLast()
-                .onResultOf(new Function<RosterChange, Status>() {
-                    @Override
-                    public Status apply(RosterChange change) {
-                        Assertions.assertThat(change).isNotNull();
-                        return change.from;
-                    }
-                })
+                .onResultOf((RosterChange c) -> c.from)
                 .compound(Ordering
                     .natural()
                     .nullsLast()
-                    .onResultOf(new Function<RosterChange, Status>() {
-                        @Override
-                        public Status apply(RosterChange change) {
-                            Assertions.assertThat(change).isNotNull();
-                            return change.to;
-                        }
-                    }));
+                    .onResultOf(c -> c.to));
         }
     }
 

@@ -1,18 +1,5 @@
 package com.ljs.ootp.ai.selection.bench;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.Validator;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
-import com.ljs.ai.search.hillclimbing.action.SequencedAction;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.player.Player;
@@ -21,7 +8,10 @@ import com.ljs.ootp.ai.selection.lineup.Lineup;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.SplitPercentages;
 import com.ljs.ootp.ai.stats.TeamStats;
+
 import java.io.PrintWriter;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,7 +22,21 @@ import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import org.fest.util.Lists;
+
+import com.ljs.ai.search.hillclimbing.HillClimbing;
+import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
+import com.ljs.ai.search.hillclimbing.Validator;
+import com.ljs.ai.search.hillclimbing.action.Action;
+import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
+import com.ljs.ai.search.hillclimbing.action.SequencedAction;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 
 /**
  *
@@ -218,7 +222,7 @@ public class Bench implements Printable {
     private static Callable<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final TeamStats<BattingStats> predictions, final Iterable<Player> available, final Integer maxSize) {
         return new Callable<Bench>() {
             public Bench call() {
-                List<Player> candidates = Lists.newArrayList(
+                List<Player> candidates = new ArrayList<>(
                     Sets.difference(
                         ImmutableSet.copyOf(available),
                         lineups.getAllPlayers()));

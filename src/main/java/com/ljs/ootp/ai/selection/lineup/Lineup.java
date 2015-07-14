@@ -1,9 +1,5 @@
 package com.ljs.ootp.ai.selection.lineup;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
@@ -11,11 +7,18 @@ import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.stats.TeamStats;
+
 import java.io.PrintWriter;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import org.fest.assertions.api.Assertions;
+
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 public class Lineup implements Iterable<Lineup.Entry>, Printable {
 
@@ -75,7 +78,7 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             public BattingStats getStats(TeamStats<BattingStats> predictions, Player p) {
                 SplitStats<BattingStats> splits = predictions.getSplits(p);
 
-                Assertions.assertThat(splits).isNotNull().as("Expected to find splits for " + p.getShortName());
+                Preconditions.checkNotNull(splits, "Expected to find splits for %s", p.getShortName());
 
                 return splits.getVsRight();
             }

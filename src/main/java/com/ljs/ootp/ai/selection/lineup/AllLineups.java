@@ -1,13 +1,16 @@
 package com.ljs.ootp.ai.selection.lineup;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.player.Player;
+
 import java.io.PrintWriter;
+
 import java.util.Iterator;
 import java.util.Set;
-import org.fest.assertions.api.Assertions;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 public final class AllLineups implements Iterable<Lineup>, Printable {
 
@@ -17,7 +20,7 @@ public final class AllLineups implements Iterable<Lineup>, Printable {
     private final All<Lineup> all;
 
     private AllLineups(All<Lineup> all) {
-        Assertions.assertThat(all).isNotNull();
+        Preconditions.checkNotNull(all);
 
         this.all = all;
     }

@@ -1,8 +1,8 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.UnmodifiableIterator;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -16,10 +16,10 @@ public final class All<T> implements Iterable<T> {
     private final T vsLhpPlusDh;
 
     private All(Builder<T> builder) {
-        Assertions.assertThat(builder.vsRhp).isNotNull();
-        Assertions.assertThat(builder.vsRhpPlusDh).isNotNull();
-        Assertions.assertThat(builder.vsLhp).isNotNull();
-        Assertions.assertThat(builder.vsLhpPlusDh).isNotNull();
+        Preconditions.checkNotNull(builder.vsRhp);
+        Preconditions.checkNotNull(builder.vsRhpPlusDh);
+        Preconditions.checkNotNull(builder.vsLhp);
+        Preconditions.checkNotNull(builder.vsLhpPlusDh);
 
         this.vsRhp = builder.vsRhp;
         this.vsRhpPlusDh = builder.vsRhpPlusDh;

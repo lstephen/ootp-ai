@@ -1,6 +1,10 @@
 package com.ljs.ootp.ai.player;
 
+import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
+import com.ljs.ootp.ai.player.ratings.Position;
+
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -9,14 +13,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
-import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
-import com.ljs.ootp.ai.player.ratings.Position;
-import java.util.List;
-import javax.annotation.Nonnull;
-import org.fest.assertions.api.Assertions;
 
-// Referenced classes of package com.ljs.scratch.ootp.selection:
-//            Selections
+import java.util.List;
 
 public enum Slot {
 
@@ -62,18 +60,9 @@ public enum Slot {
                 Ordering
                     .natural()
                     .reverse()
-                    .onResultOf(new Function<Position, Double>() {
-                        public Double apply(@Nonnull Position p) {
-                            return def.getPositionScore(p);
-                        }})
+                    .onResultOf(def::getPositionScore)
                     .sortedCopy(ImmutableSet.of(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD)),
-                new Predicate<Position>() {
-
-                    public boolean apply(Position p) {
-                        Assertions.assertThat(p).isNotNull();
-
-                        return def.getPositionScore(p).doubleValue() > 0.0D;
-                    }}));
+                pl -> def.getPositionScore(pl).doubleValue() > 0.0D ));
 
         result.addAll(
             Lists.transform(
@@ -81,7 +70,7 @@ public enum Slot {
                 new Function<Position, Slot>() {
 
                     public Slot apply(Position p) {
-                        Assertions.assertThat(p).isNotNull();
+                        Preconditions.checkNotNull(p);
 
                         switch(p) {
                             case CATCHER:

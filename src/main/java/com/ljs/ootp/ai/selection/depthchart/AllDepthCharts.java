@@ -2,8 +2,10 @@ package com.ljs.ootp.ai.selection.depthchart;
 
 import com.ljs.ootp.ai.io.Printable;
 import com.ljs.ootp.ai.selection.lineup.All;
+
 import java.io.PrintWriter;
-import org.fest.assertions.api.Assertions;
+
+import com.google.common.base.Preconditions;
 
 /**
  *
@@ -14,7 +16,7 @@ public final class AllDepthCharts implements Printable {
     private final All<DepthChart> all;
 
     private AllDepthCharts(All<DepthChart> all) {
-        Assertions.assertThat(all).isNotNull();
+        Preconditions.checkNotNull(all);
 
         this.all = all;
     }

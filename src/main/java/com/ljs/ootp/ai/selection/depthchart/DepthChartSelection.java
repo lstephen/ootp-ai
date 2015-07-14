@@ -1,12 +1,5 @@
 package com.ljs.ootp.ai.selection.depthchart;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.player.ratings.Position;
@@ -16,10 +9,19 @@ import com.ljs.ootp.ai.selection.lineup.Defense;
 import com.ljs.ootp.ai.selection.lineup.Lineup;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.fest.util.Lists;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 
 /**
  *
@@ -151,7 +153,7 @@ public final class DepthChartSelection {
 
         Player fallback = sortedBench.get(0);
 
-        List<Player> backups = Lists.newArrayList();
+        List<Player> backups = new ArrayList<>();
 
         if (position != Position.DESIGNATED_HITTER && position != Position.FIRST_BASE) {
             Iterables.addAll(backups, selectBackupByPosition(position, sortedBench));
@@ -169,7 +171,7 @@ public final class DepthChartSelection {
     }
 
     private Iterable<Player> selectBackupByPosition(Position position, Iterable<Player> bench) {
-        List<Player> result = Lists.newArrayList();
+        List<Player> result = new ArrayList<>();
 
         for (Player p : bench) {
             if (p.getDefensiveRatings().getPositionScore(position) > 0) {
@@ -199,7 +201,7 @@ public final class DepthChartSelection {
     }
 
     private Iterable<Player> selectBackupBySlot(Slot slot, Iterable<Player> bench) {
-        List<Player> result = Lists.newArrayList();
+        List<Player> result = new ArrayList<>();
 
         for (Player p : bench) {
             if (p.getSlots().contains(slot)) {

@@ -1,5 +1,17 @@
 package com.ljs.ootp.ai.value;
 
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.report.RosterReport;
+import com.ljs.ootp.ai.roster.Changes;
+import com.ljs.ootp.ai.roster.Changes.ChangeType;
+import com.ljs.ootp.ai.site.Site;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -7,6 +19,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+
 import com.ljs.ai.search.hillclimbing.Heuristic;
 import com.ljs.ai.search.hillclimbing.Heuristics;
 import com.ljs.ai.search.hillclimbing.HillClimbing;
@@ -14,17 +27,6 @@ import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
 import com.ljs.ai.search.hillclimbing.Validators;
 import com.ljs.ai.search.hillclimbing.action.Action;
 import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.Slot;
-import com.ljs.ootp.ai.report.RosterReport;
-import com.ljs.ootp.ai.roster.Changes;
-import com.ljs.ootp.ai.roster.Changes.ChangeType;
-import com.ljs.ootp.ai.site.Site;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -78,21 +80,6 @@ public final class FreeAgentAcquisition {
 
     public static FreeAgentAcquisition create(Player fa, Player release) {
         return new FreeAgentAcquisition(fa, release);
-    }
-
-    public static final class Meta {
-        private Meta() { }
-
-        public static Function<FreeAgentAcquisition, Player> getRelease() {
-            return new Function<FreeAgentAcquisition, Player>() {
-                @Override
-                public Player apply(FreeAgentAcquisition faa) {
-                    Assertions.assertThat(faa).isNotNull();
-                    return faa.getRelease();
-                }
-            };
-        }
-
     }
 
     public static ImmutableSet<FreeAgentAcquisition> select(Site site, Changes changes, Iterable<Player> roster, Iterable<Player> fas, TradeValue value, Integer n) {

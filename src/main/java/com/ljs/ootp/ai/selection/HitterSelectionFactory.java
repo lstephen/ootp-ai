@@ -1,13 +1,13 @@
 package com.ljs.ootp.ai.selection;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
 import com.ljs.ootp.ai.regression.Predictions;
 import com.ljs.ootp.ai.stats.BattingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
-import org.fest.assertions.api.Assertions;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
 
 public final class HitterSelectionFactory implements SelectionFactory {
 
@@ -53,25 +53,13 @@ public final class HitterSelectionFactory implements SelectionFactory {
     public static HitterSelectionFactory using(
         TeamStats<BattingStats> stats) {
 
-        return using(stats, defaultValueFunction(stats));
+        return using(stats, p -> stats.getOverall(p).getWobaPlus());
     }
 
     public static HitterSelectionFactory using(
         TeamStats<BattingStats> predictions,
         final Function<Player, Integer> value) {
         return new HitterSelectionFactory(predictions, value);
-    }
-
-    private static Function<Player, Integer> defaultValueFunction(
-        final TeamStats<BattingStats> batting) {
-
-        return new Function<Player, Integer>() {
-            @Override
-            public Integer apply(Player p) {
-                Assertions.assertThat(p).isNotNull();
-                return batting.getOverall(p).getWobaPlus();
-            }
-        };
     }
 
 }

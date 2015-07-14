@@ -1,13 +1,5 @@
 package com.ljs.ootp.ai.player;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
 import com.ljs.ootp.ai.player.ratings.BattingRatings;
 import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
 import com.ljs.ootp.ai.player.ratings.PitchingRatings;
@@ -16,11 +8,23 @@ import com.ljs.ootp.ai.player.ratings.Position;
 import com.ljs.ootp.ai.player.ratings.RatingsDefinition;
 import com.ljs.ootp.ai.player.ratings.StarRating;
 import com.ljs.ootp.ai.splits.Splits;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
+
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -366,27 +370,13 @@ public final class Player {
     public static Ordering<Player> byAge() {
         return Ordering
             .natural()
-            .onResultOf(new Function<Player, Integer>() {
-                @Override
-                public Integer apply(Player p) {
-                    Assertions.assertThat(p).isNotNull();
-
-                    return p.getAge();
-                }
-            });
+            .onResultOf(Player::getAge);
     }
 
     public static Ordering<Player> byShortName() {
         return Ordering
             .natural()
-            .onResultOf(new Function<Player, String>() {
-                @Override
-                public String apply(Player p) {
-                    Assertions.assertThat(p).isNotNull();
-
-                    return p.getShortName();
-                }
-            });
+            .onResultOf(Player::getShortName);
     }
 
     public static Ordering<Player> byWeightedBattingRating() {
@@ -396,11 +386,13 @@ public final class Player {
             .onResultOf(new Function<Player, Double>() {
                 @Override
                 public Double apply(Player p) {
-                    Assertions.assertThat(p).isNotNull();
+                    Preconditions.checkNotNull(p);
 
                     BattingRatings ratings =
                         PlayerRatings.getOverallBatting(p.getBattingRatings());
 
+                    // We don't use calculated WOBA constants, as we want to be
+                    // able to use this when we have no stats/regression available
                     return 0.7 * ratings.getEye()
                         + 0.9 * ratings.getContact()
                         + 1.3 * ratings.getGap()
