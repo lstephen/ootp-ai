@@ -10,7 +10,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  */
 public class BattingStats implements Stats<BattingStats> {
 
-    private Integer runs;
+    private Integer runs = 0;
 
     private int atBats;
 

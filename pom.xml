@@ -26,6 +26,8 @@
   </scm>
 
   <properties>
+    <jruby.version>1.7.21</jruby.version>
+
     <lib.ai-search.version>1.1</lib.ai-search.version>
     <lib.commons-lang3.version>3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.2</lib.commons-math3.version>
@@ -43,8 +45,18 @@
     <lib.junit.version>4.12</lib.junit.version>
     <lib.mockito-core.version>1.10.19</lib.mockito-core.version>
 
+    <gem.rspec.version>3.3.0</gem.rspec.version>
+
     <plugin.exec.version>1.2.1</plugin.exec.version>
+    <plugin.rspec.version>1.0.10</plugin.rspec.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>rubygems-releases</id>
+      <url>http://rubygems-proxy.torquebox.org/releases</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -132,32 +144,12 @@
     </dependency>
 
     <dependency>
-      <groupId>org.assertj</groupId>
-      <artifactId>assertj-core</artifactId>
-      <version>${lib.assertj-core.version}</version>
+      <groupId>rubygems</groupId>
+      <artifactId>rspec</artifactId>
+      <version>${gem.rspec.version}</version>
+      <type>gem</type>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${lib.junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${lib.mockito-core.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.hamcrest</groupId>
-          <artifactId>hamcrest-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -176,6 +168,24 @@
         <configuration>
           <mainClass>com.ljs.ootp.ai.Main</mainClass>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>rspec-maven-plugin</artifactId>
+        <version>${plugin.rspec.version}</version>
+        <configuration>
+          <specSourceDirectory>src/test/rspec</specSourceDirectory>
+          <jrubyJvmArgs>${argLine}</jrubyJvmArgs>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
