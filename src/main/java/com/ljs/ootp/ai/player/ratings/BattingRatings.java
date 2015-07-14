@@ -1,18 +1,21 @@
 package com.ljs.ootp.ai.player.ratings;
 
+import com.ljs.ootp.ai.site.Site;
+
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import com.ljs.ootp.extract.html.rating.Rating;
+import com.ljs.ootp.extract.html.rating.Scale;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.extract.html.rating.Rating;
-import com.ljs.ootp.extract.html.rating.Scale;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -34,7 +37,7 @@ public final class BattingRatings<T> {
     private final Rating<T, ?> k;
 
     private BattingRatings(Builder<T> builder) {
-        Assertions.assertThat(builder.scale).isNotNull();
+        Preconditions.checkNotNull(builder.scale);
         Preconditions.checkNotNull(builder.contact);
         Preconditions.checkNotNull(builder.gap);
         Preconditions.checkNotNull(builder.power);

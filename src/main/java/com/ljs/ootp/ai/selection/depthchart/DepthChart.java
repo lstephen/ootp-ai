@@ -1,20 +1,24 @@
 package com.ljs.ootp.ai.selection.depthchart;
 
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.ratings.Position;
+
+import java.io.PrintWriter;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.ratings.Position;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -98,7 +102,7 @@ public class DepthChart {
             return new Function<Backup, String>() {
                 @Override
                 public String apply(Backup bu) {
-                    Assertions.assertThat(bu).isNotNull();
+                    Preconditions.checkNotNull(bu);
 
                     return String.format(
                         "(%s) %-15s",

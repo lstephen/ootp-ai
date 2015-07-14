@@ -1,7 +1,8 @@
 package com.ljs.scratch.util;
 
+import com.google.common.base.Preconditions;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -12,7 +13,7 @@ public class Wrapped<T> {
     private final T value;
 
     protected Wrapped(T value) {
-        Assertions.assertThat(value).isNotNull();
+        Preconditions.checkNotNull(value);
         this.value = value;
     }
 

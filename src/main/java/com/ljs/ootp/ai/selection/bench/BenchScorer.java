@@ -1,18 +1,20 @@
 package com.ljs.ootp.ai.selection.bench;
 
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.ratings.Position;
+import com.ljs.ootp.ai.selection.lineup.Lineup;
+import com.ljs.ootp.ai.stats.BattingStats;
+import com.ljs.ootp.ai.stats.TeamStats;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.selection.lineup.Lineup;
-import com.ljs.ootp.ai.stats.BattingStats;
-import com.ljs.ootp.ai.stats.TeamStats;
-import java.util.List;
-import org.fest.util.Lists;
 
 /**
  *
@@ -92,7 +94,7 @@ public class BenchScorer {
             .compound(Player.byTieBreak())
             .immutableSortedCopy(bench);
 
-        List<Player> ps = Lists.newArrayList();
+        List<Player> ps = new ArrayList<>();
 
         for (Player p : sortedBench) {
             if (p.canPlay(pos)) {

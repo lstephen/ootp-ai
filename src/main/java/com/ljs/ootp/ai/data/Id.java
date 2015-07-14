@@ -1,7 +1,7 @@
 package com.ljs.ootp.ai.data;
 
 import com.google.common.base.Objects;
-import org.fest.assertions.api.Assertions;
+import com.google.common.base.Preconditions;
 
 /**
  *
@@ -12,7 +12,7 @@ public final class Id<T> {
     private final String id;
 
     private Id(String id) {
-        Assertions.assertThat(id).isNotNull();
+        Preconditions.checkNotNull(id);
 
         this.id = id;
     }

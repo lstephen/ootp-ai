@@ -1,12 +1,15 @@
 package com.ljs.ootp.ai.stats;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.Maps;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.PlayerId;
+
 import java.util.Map;
-import org.fest.assertions.api.Assertions;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Maps;
 
 /**
  * TODO: Two maps should be unnecessary. Probably need a custom serializer
@@ -48,10 +51,8 @@ public final class TeamStats<S extends Stats<S>> {
     }
 
     public SplitStats<S> getSplits(Player p) {
-        Assertions
-            .assertThat(stats)
-            .containsKey(p.getId())
-            .describedAs("Expected to find stats for player:" + p);
+        Preconditions.checkArgument(
+            stats.containsKey(p.getId()), "Expected to find stats for player: %s", p);
 
         return stats.get(p.getId());
     }

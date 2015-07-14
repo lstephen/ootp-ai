@@ -1,14 +1,17 @@
 package com.ljs.ootp.ai.ootp5.site;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.collect.Lists;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.roster.Team;
 import com.ljs.ootp.ai.site.LeagueStructure;
 import com.ljs.ootp.ai.site.Site;
+
 import java.util.List;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.fest.util.Strings;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;

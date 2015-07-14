@@ -1,16 +1,5 @@
 package com.ljs.ootp.ai;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.draft.DraftReport;
@@ -63,15 +52,31 @@ import com.ljs.ootp.ai.stats.SplitStats;
 import com.ljs.ootp.ai.value.FreeAgentAcquisition;
 import com.ljs.ootp.ai.value.PlayerValue;
 import com.ljs.ootp.ai.value.TradeValue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
+
 import org.joda.time.DateTimeConstants;
 
 /**
@@ -622,7 +627,7 @@ public class Main {
                 futureFas,
                 Iterables.transform(
                     faas,
-                    FreeAgentAcquisition.Meta.getRelease()),
+                    FreeAgentAcquisition::getRelease),
                 released));
         generic.setLimit(200);
         generic.setMultiplier(1.1);

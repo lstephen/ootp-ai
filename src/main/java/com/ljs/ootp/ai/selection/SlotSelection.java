@@ -1,14 +1,15 @@
 package com.ljs.ootp.ai.selection;
 
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
+
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.Slot;
-import org.fest.assertions.api.Assertions;
 
 public final class SlotSelection implements Selection {
 
@@ -21,9 +22,9 @@ public final class SlotSelection implements Selection {
     private final Slot fillToSize;
 
     private SlotSelection(Builder builder) {
-        Assertions.assertThat(builder.slots).isNotNull();
-        Assertions.assertThat(builder.size).isNotNull().isNotNegative();
-        Assertions.assertThat(builder.ordering).isNotNull();
+        Preconditions.checkNotNull(builder.slots);
+        Preconditions.checkNotNull(builder.size);
+        Preconditions.checkNotNull(builder.ordering);
 
         slots = builder.slots;
         size = builder.size;

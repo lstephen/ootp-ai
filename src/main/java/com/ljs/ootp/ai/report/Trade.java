@@ -1,17 +1,18 @@
 package com.ljs.ootp.ai.report;
 
+import com.ljs.ootp.ai.site.Site;
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.report.SalaryRegression;
+import com.ljs.ootp.ai.value.TradeValue;
+
+import java.util.Iterator;
+import java.util.Set;
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ootp.ai.site.Site;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.report.SalaryRegression;
-import com.ljs.ootp.ai.value.TradeValue;
-import java.util.Iterator;
-import java.util.Set;
-import org.fest.assertions.api.Assertions;
 
 /**
  *
@@ -99,7 +100,7 @@ public final class Trade implements Iterable<Player> {
         return Ordering
             .natural()
             .reverse()
-            .onResultOf(getValueFunction(tv, site, salary))
+            .onResultOf((Trade t) -> t.getValue(tv, site, salary))
             .sortedCopy(allTrades);
     }
 
@@ -109,17 +110,6 @@ public final class Trade implements Iterable<Player> {
             @Override
             public boolean apply(Trade trade) {
                 return trade.isFeasible(tv);
-            }
-        };
-    }
-
-    private static Function<Trade, Integer> getValueFunction(
-        final TradeValue tv, final Site site, final SalaryRegression salary) {
-        return new Function<Trade, Integer>() {
-            @Override
-            public Integer apply(Trade trade) {
-                Assertions.assertThat(trade).isNotNull();
-                return trade.getValue(tv, site, salary);
             }
         };
     }
