@@ -13,7 +13,7 @@ targets:
 
   clean: mvn -B clean
 
-  site: mvn -B clean site
+  site: mvn -B -e clean site
 
   snapshot:
     files:
