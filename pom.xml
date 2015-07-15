@@ -7,8 +7,8 @@
 
   <parent>
     <groupId>com.github.lstephen</groupId>
-    <artifactId>basepom</artifactId>
-    <version>1.11</version>
+    <artifactId>basepom-java-rspec</artifactId>
+    <version>1.14</version>
   </parent>
 
   <artifactId>ootp-ai</artifactId>
@@ -26,13 +26,9 @@
   </scm>
 
   <properties>
-    <jruby.version>1.7.21</jruby.version>
-
     <lib.ai-search.version>1.1</lib.ai-search.version>
     <lib.commons-lang3.version>3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.2</lib.commons-math3.version>
-    <lib.fest-assert-core.version>2.0M10</lib.fest-assert-core.version>
-    <lib.fest-util.version>1.2.5</lib.fest-util.version>
     <lib.jackson.version>2.3.0</lib.jackson.version>
     <lib.joda-time.version>2.2</lib.joda-time.version>
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
@@ -41,22 +37,8 @@
     <lib.humanize-slim.version>1.1.5</lib.humanize-slim.version>
     <lib.ootp-extract.version>1.0</lib.ootp-extract.version>
 
-    <lib.assertj-core.version>3.0.0</lib.assertj-core.version>
-    <lib.junit.version>4.12</lib.junit.version>
-    <lib.mockito-core.version>1.10.19</lib.mockito-core.version>
-
-    <gem.rspec.version>3.3.0</gem.rspec.version>
-
     <plugin.exec.version>1.2.1</plugin.exec.version>
-    <plugin.rspec.version>1.0.10</plugin.rspec.version>
   </properties>
-
-  <repositories>
-    <repository>
-      <id>rubygems-releases</id>
-      <url>http://rubygems-proxy.torquebox.org/releases</url>
-    </repository>
-  </repositories>
 
   <dependencies>
     <dependency>
@@ -130,14 +112,6 @@
       <artifactId>jsr305</artifactId>
       <version>${lib.jsr305.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>rspec</artifactId>
-      <version>${gem.rspec.version}</version>
-      <type>gem</type>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
@@ -156,24 +130,6 @@
         <configuration>
           <mainClass>com.ljs.ootp.ai.Main</mainClass>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>de.saumya.mojo</groupId>
-        <artifactId>rspec-maven-plugin</artifactId>
-        <version>${plugin.rspec.version}</version>
-        <configuration>
-          <specSourceDirectory>src/test/rspec</specSourceDirectory>
-          <jrubyJvmArgs>${argLine}</jrubyJvmArgs>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
