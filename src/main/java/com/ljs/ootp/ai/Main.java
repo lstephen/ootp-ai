@@ -667,7 +667,7 @@ public class Main {
             site,
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getNowValue());
-        if (!site.getName().contains("OLD_BTH")) {
+        if (!site.getName().contains("OLD_BTH") && !site.getName().equals("BTH")) {
           LOG.info("Power Rankings...");
           Printables.print(site.getPowerRankingsReport(now)).to(out);
         }
