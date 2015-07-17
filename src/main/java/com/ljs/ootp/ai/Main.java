@@ -63,10 +63,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
-
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
@@ -126,8 +125,8 @@ public class Main {
             .put("TWML", TWML)
             .put("CBL", CBL)
             .put("HFTC", HFTC)
-            .put("OLD_BTH - CHC", OLD_BTH_CHC)
-            .put("OLD_BTH - NYY", OLD_BTH_NYY)
+            .put("OLD_BTH_CHC", OLD_BTH_CHC)
+            .put("OLD_BTH_NYY", OLD_BTH_NYY)
             .put("BTHUSTLE", BTHUSTLE)
             .put("LBB", LBB)
             .put("SAVOY", SAVOY)
@@ -145,23 +144,18 @@ public class Main {
     }
 
     public void run() throws IOException {
-        String site = System.getProperty("site");
+        String site = System.getenv("OOTPAI_SITE");
 
         if (site == null) {
-            site = (String) JOptionPane.showInputDialog(
-                null,
-                "Please select site:",
-                "OOTP-AI",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                Ordering.natural().sortedCopy(SITES.keySet()).toArray(),
-                null);
+          throw new IllegalStateException("OOTPAI_SITE is required");
         }
 
         run(SITES.get(site));
     }
 
     private void run(SiteDefinition def) throws IOException {
+        Preconditions.checkNotNull(def, "SiteDefinition not found");
+
         File outputDirectory =
             new File(Config.createDefault().getValue("output.dir").or("c:/ootp"));
 
@@ -758,7 +752,7 @@ public class Main {
             .sortedCopy(newRoster.getAllPlayers());
 
 
-        LOG.log(Level.INFO, "Top Trades...");
+        /*LOG.log(Level.INFO, "Top Trades...");
 
         int idx = 1;
         for (Trade trade
@@ -775,7 +769,7 @@ public class Main {
             generic.setPlayers(trade);
             generic.print(out);
             idx++;
-        }
+        }*/
 
         /*LOG.info("Below Replacement Trades...");
         ImmutableSet<Player> belowReplacementBait =

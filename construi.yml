@@ -4,6 +4,10 @@ environment:
   - GPG_PASSPHRASE
   - GITHUB_OAUTH_TOKEN
   - NEXUS_PASSWORD
+  - OOTPAI_SITE
+  - OOTPAI_DATA=/var/workspace/ootp-ai-data
+  - GIT_AUTHOR_NAME
+  - GIT_AUTHOR_EMAIL
 
 files:
   - etc/settings.xml:/root/.m2/settings.xml
@@ -14,6 +18,11 @@ targets:
   clean: mvn -B clean
 
   site: mvn -B -e clean site
+
+  run:
+    files:
+      - $GIT_SSH_KEY:/root/.ssh/id_rsa:0600
+    run: /bin/bash construi/run/run.sh
 
   snapshot:
     files:
