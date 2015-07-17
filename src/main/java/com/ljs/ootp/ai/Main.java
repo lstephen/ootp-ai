@@ -169,6 +169,11 @@ public class Main {
     private void run(SiteDefinition def, OutputStream out) throws IOException {
         LOG.log(Level.INFO, "Running for {0}...", def.getName());
 
+        if (System.getenv("OOTPAI_CLEAR_CACHE").equals("true")) {
+          LOG.log(Level.INFO, "Clearing cache...");
+          def.getSite().clearCache();
+        }
+
         Boolean isLookToNextSeason = Boolean.FALSE;
         Boolean isPlayoffs = Boolean.FALSE;
 
