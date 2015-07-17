@@ -1,9 +1,13 @@
 package com.ljs.ootp.ai.config;
 
-import com.google.common.base.Optional;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.Properties;
+
+import com.google.common.base.Optional;
+
+import org.apache.commons.lang3.text.StrSubstitutor;
 
 /**
  *
@@ -18,7 +22,9 @@ public final class Config {
     }
 
     public Optional<String> getValue(String key) {
-        return Optional.fromNullable(properties.getProperty(key));
+        return Optional
+          .fromNullable(properties.getProperty(key))
+          .transform((v) -> StrSubstitutor.replace(v, System.getenv()));
     }
 
     public static Config createDefault() throws IOException {
