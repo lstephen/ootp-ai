@@ -8,6 +8,7 @@ if [ -d "ootp-ai-data/.git" ]; then
   echo "Pulling latest data..."
   cd ootp-ai-data
   git reset --hard HEAD
+  git clean -fd || true
   git pull --rebase
   cd ..
 else

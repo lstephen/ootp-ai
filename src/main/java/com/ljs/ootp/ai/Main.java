@@ -662,9 +662,10 @@ public class Main {
             site,
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getNowValue());
-
-        LOG.info("Power Rankings...");
-        Printables.print(site.getPowerRankingsReport(now)).to(out);
+        if (!site.getName().contains("OLD_BTH")) {
+          LOG.info("Power Rankings...");
+          Printables.print(site.getPowerRankingsReport(now)).to(out);
+        }
 
         LOG.info("Team Now Report...");
 
