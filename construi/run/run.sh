@@ -28,6 +28,7 @@ cd ootp-ai-data
 
 git add --all
 git commit -m "$(date)"
+git pull --rebase
 git push origin master
 
 echo "Done."
