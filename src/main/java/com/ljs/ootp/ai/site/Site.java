@@ -46,6 +46,8 @@ public interface Site {
 
     LeagueStructure getLeagueStructure();
 
+    void clearCache();
+
     Page getPage(String url, Object... args);
 
     PitcherOverall getPitcherSelectionMethod();

@@ -1,13 +1,5 @@
 package com.ljs.ootp.ai.ootp5;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.ljs.ootp.ai.config.Config;
 import com.ljs.ootp.ai.data.Id;
 import com.ljs.ootp.ai.io.Printable;
@@ -45,8 +37,23 @@ import com.ljs.ootp.extract.html.PageFactory;
 import com.ljs.ootp.extract.html.loader.DiskCachingLoader;
 import com.ljs.ootp.extract.html.loader.PageLoader;
 import com.ljs.ootp.extract.html.loader.PageLoaderBuilder;
+
+import java.io.File;
 import java.io.IOException;
+
 import java.util.Set;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
+
+import org.apache.commons.io.FileUtils;
+
 import org.joda.time.LocalDate;
 
 /**
@@ -110,19 +117,34 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
+  public void clearCache() {
+    File directory = new File(getCacheDirectory());
+
+    if (directory.exists()) {
+      try {
+        FileUtils.deleteDirectory(new File(getCacheDirectory()));
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
+    }
+  }
+
+  @Override
   public Page getPage(String url, Object... args) {
+    PageLoader loader = PageLoaderBuilder
+      .create()
+      .diskCache(getCacheDirectory())
+      .inMemoryCache()
+      .build();
+
+    return PageFactory
+      .create(loader)
+      .getPage(definition.getSiteRoot(), String.format(url, args));
+  }
+
+  private String getCacheDirectory() {
     try {
-      PageLoader loader = PageLoaderBuilder
-        .create()
-        .diskCache(Config.createDefault().getValue("cache.dir").or(DiskCachingLoader.DEFAULT_CACHE_DIR) + "/" + getName())
-        .inMemoryCache()
-        .build();
-
-
-
-      return PageFactory
-        .create(loader)
-        .getPage(definition.getSiteRoot(), String.format(url, args));
+      return Config.createDefault().getValue("cache.dir").or(DiskCachingLoader.DEFAULT_CACHE_DIR) + "/" + getName();
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }

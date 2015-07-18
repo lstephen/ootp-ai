@@ -27,6 +27,7 @@
 
   <properties>
     <lib.ai-search.version>1.1</lib.ai-search.version>
+    <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.2</lib.commons-math3.version>
     <lib.jackson.version>2.3.0</lib.jackson.version>
@@ -63,6 +64,12 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${lib.guava.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${lib.commons-io.version}</version>
     </dependency>
 
     <dependency>
