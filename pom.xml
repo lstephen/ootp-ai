@@ -35,19 +35,13 @@
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
     <lib.jsr305.version>1.3.9</lib.jsr305.version>
     <lib.guava.version>15.0</lib.guava.version>
+    <lib.guava-retrying.version>1.0.4</lib.guava-retrying.version>
     <lib.humanize-slim.version>1.1.5</lib.humanize-slim.version>
-    <lib.ootp-extract.version>1.0</lib.ootp-extract.version>
 
     <plugin.exec.version>1.2.1</plugin.exec.version>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>com.github.lstephen</groupId>
-      <artifactId>ootp-extract</artifactId>
-      <version>${lib.ootp-extract.version}</version>
-    </dependency>
-
     <dependency>
       <groupId>com.github.lstephen</groupId>
       <artifactId>ai-search</artifactId>
@@ -64,6 +58,18 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>${lib.guava.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.rholder</groupId>
+      <artifactId>guava-retrying</artifactId>
+      <version>${lib.guava-retrying.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
