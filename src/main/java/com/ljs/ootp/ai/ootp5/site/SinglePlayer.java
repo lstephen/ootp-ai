@@ -113,7 +113,6 @@ public class SinglePlayer implements PlayerSource {
 
     if (splitInfo.length < 9) {
       LOG.log(Level.WARNING, "Error extracting player. ID: {0}", id);
-      System.out.println(info.html());
       return null;
     }
 
