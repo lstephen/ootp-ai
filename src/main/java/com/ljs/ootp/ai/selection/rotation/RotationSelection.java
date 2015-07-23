@@ -4,14 +4,6 @@
 // Source File Name:   RotationSelection.java
 package com.ljs.ootp.ai.selection.rotation;
 
-import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.Validator;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
 import com.ljs.ootp.ai.io.Printables;
 import com.ljs.ootp.ai.player.Player;
 import com.ljs.ootp.ai.player.Slot;
@@ -21,13 +13,23 @@ import com.ljs.ootp.ai.selection.rotation.Rotation.Role;
 import com.ljs.ootp.ai.stats.PitcherOverall;
 import com.ljs.ootp.ai.stats.PitchingStats;
 import com.ljs.ootp.ai.stats.TeamStats;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-// Referenced classes of package com.ljs.scratch.ootp.selection.rotation:
-//            Rotation
+import com.github.lstephen.ai.search.HillClimbing;
+import com.github.lstephen.ai.search.RepeatedHillClimbing;
+import com.github.lstephen.ai.search.Validator;
+import com.github.lstephen.ai.search.action.Action;
+import com.github.lstephen.ai.search.action.ActionGenerator;
+
+import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.*;
+
 public final class RotationSelection implements Selection {
 
     private final TeamStats<PitchingStats> predictions;
@@ -74,19 +76,15 @@ public final class RotationSelection implements Selection {
         System.out.println("Forced:" + Iterables.size(forced));
         System.out.println("Available:" + Iterables.size(available));
 
-        HillClimbing.Builder<Rotation> builder = HillClimbing
+        HillClimbing<Rotation> hc = HillClimbing
             .<Rotation>builder()
-            .validator(new Validator<Rotation>() {
-                public Boolean apply(Rotation r) {
-                    return r.isValid() && r.get(Role.SP).size() == definition.getRotationSize();
-                }
-            })
+            .validator(r -> r.isValid() && r.get(Role.SP).size() == definition.getRotationSize())
             .heuristic(heuristic())
-            .actionGenerator(actionGenerator(forced, available));
+            .actionGenerator(actionGenerator(forced, available))
+            .build();
 
         Rotation r = new RepeatedHillClimbing<Rotation>(
-                initialStateGenerator(forced, available),
-                builder)
+              initialStateGenerator(forced, available), hc)
             .search();
 
         for (Player p : Player.byShortName().sortedCopy(r.getAll())) {
@@ -119,10 +117,10 @@ public final class RotationSelection implements Selection {
     }
 
 
-    private Callable<Rotation> initialStateGenerator(final Iterable<Player> forced, final Iterable<Player> available) {
-        return new Callable<Rotation>() {
+    private Supplier<Rotation> initialStateGenerator(final Iterable<Player> forced, final Iterable<Player> available) {
+        return new Supplier<Rotation>() {
             @Override
-            public Rotation call() throws Exception {
+            public Rotation get() {
                 List<Player> ps = Lists.newArrayList(available);
                 Iterables.removeAll(ps, ImmutableSet.copyOf(forced));
 
@@ -185,15 +183,14 @@ public final class RotationSelection implements Selection {
     private ActionGenerator<Rotation> actionGenerator(final Iterable<Player> forced, final Iterable<Player> available) {
         return new ActionGenerator<Rotation>() {
             @Override
-            public Iterable<Action<Rotation>> apply(Rotation r) {
+            public Stream<Action<Rotation>> apply(Rotation r) {
                 Iterable<Action<Rotation>> actions =
                     Iterables.<Action<Rotation>>concat(
                         swaps(r),
                         substitutions(r),
                         moves(r));
 
-
-                return actions;
+                return Stream.concat(swaps(r).stream(), Stream.concat(substitutions(r).stream(), moves(r).stream()));
             }
 
             private Set<Move> moves(Rotation rot) {

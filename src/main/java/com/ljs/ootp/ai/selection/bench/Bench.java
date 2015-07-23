@@ -20,15 +20,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.Validator;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
-import com.ljs.ai.search.hillclimbing.action.SequencedAction;
+import com.github.lstephen.ai.search.HillClimbing;
+import com.github.lstephen.ai.search.RepeatedHillClimbing;
+import com.github.lstephen.ai.search.Validator;
+import com.github.lstephen.ai.search.action.Action;
+import com.github.lstephen.ai.search.action.ActionGenerator;
+import com.github.lstephen.ai.search.action.SequencedAction;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -209,19 +211,13 @@ public class Bench implements Printable {
           Set<Add> as = adds.apply(b);
           Set<Remove> rs = removes.apply(b);
 
-          Set<Action<Bench>> actions = new HashSet<>();
-
-          actions.addAll(as);
-          actions.addAll(rs);
-          actions.addAll(SequencedAction.merged(as, rs));
-
-          return actions;
+          return Stream.concat(Stream.concat(as.stream(), rs.stream()), SequencedAction.merged(as, rs));
         };
     }
 
-    private static Callable<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final TeamStats<BattingStats> predictions, final Iterable<Player> available, final Integer maxSize) {
-        return new Callable<Bench>() {
-            public Bench call() {
+    private static Supplier<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final TeamStats<BattingStats> predictions, final Iterable<Player> available, final Integer maxSize) {
+        return new Supplier<Bench>() {
+            public Bench get() {
                 List<Player> candidates = new ArrayList<>(
                     Sets.difference(
                         ImmutableSet.copyOf(available),
@@ -235,13 +231,14 @@ public class Bench implements Printable {
     }
 
     public static Bench select(AllLineups lineups, Iterable<Player> selected, TeamStats<BattingStats> predictions, Iterable<Player> available, Integer maxSize) {
-        HillClimbing.Builder<Bench> builder = HillClimbing
+        HillClimbing<Bench> hc = HillClimbing
             .<Bench>builder()
             .heuristic(heuristic())
             .validator(validator())
-            .actionGenerator(actionGenerator(available));
+            .actionGenerator(actionGenerator(available))
+            .build();
 
-       Bench result = new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictions, available, maxSize), builder).search();
+       Bench result = new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictions, available, maxSize), hc).search();
 
        Printables.print(result).to(System.out);
 

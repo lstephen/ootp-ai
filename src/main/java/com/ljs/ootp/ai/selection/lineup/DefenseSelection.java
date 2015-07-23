@@ -1,19 +1,23 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import com.ljs.ootp.ai.player.Player;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import com.github.lstephen.ai.search.HillClimbing;
+import com.github.lstephen.ai.search.RepeatedHillClimbing;
+import com.github.lstephen.ai.search.action.Action;
+import com.github.lstephen.ai.search.action.ActionGenerator;
+import com.github.lstephen.ai.search.action.SequencedAction;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
-import com.ljs.ai.search.hillclimbing.action.SequencedAction;
-import com.ljs.ootp.ai.player.Player;
-import java.util.Map;
-import java.util.Set;
 
 public class DefenseSelection {
 
@@ -25,16 +29,17 @@ public class DefenseSelection {
 
     private Defense select(ImmutableSet<Player> selected) {
         if (!CACHE.containsKey(selected)) {
-            HillClimbing.Builder<Defense> builder = HillClimbing
+            HillClimbing<Defense> hc = HillClimbing
                 .<Defense>builder()
                 .actionGenerator(actionsFunction(selected))
-                .heuristic(heuristic());
+                .heuristic(heuristic())
+                .build();
 
             CACHE.put(
                 selected,
                 new RepeatedHillClimbing<Defense>(
                     Defense.randomGenerator(selected),
-                    builder)
+                    hc)
                 .search());
         }
         return CACHE.get(selected);
@@ -57,12 +62,7 @@ public class DefenseSelection {
             }
         }
 
-        return new ActionGenerator<Defense>() {
-            @Override
-            public Iterable<Action<Defense>> apply(Defense state) {
-                return Iterables.concat(swaps, SequencedAction.allPairs(swaps));
-            }
-        };
+        return (state) -> Stream.concat(swaps.stream(), SequencedAction.allPairs(swaps));
     }
 
     private static class Swap implements Action<Defense> {

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -20,13 +21,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
-import com.ljs.ai.search.hillclimbing.Heuristic;
-import com.ljs.ai.search.hillclimbing.Heuristics;
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.Validators;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
+import com.github.lstephen.ai.search.Heuristic;
+import com.github.lstephen.ai.search.HillClimbing;
+import com.github.lstephen.ai.search.RepeatedHillClimbing;
+import com.github.lstephen.ai.search.action.Action;
+import com.github.lstephen.ai.search.action.ActionGenerator;
 
 /**
  *
@@ -113,17 +112,17 @@ public final class FreeAgentAcquisition {
 
         final RosterReport rr = RosterReport.create(site, roster);
 
-        HillClimbing.Builder<FreeAgentAcquisition> builder =
+        HillClimbing<FreeAgentAcquisition> hc =
             HillClimbing
                 .<FreeAgentAcquisition>builder()
-                .validator(Validators.<FreeAgentAcquisition>alwaysTrue())
                 .heuristic(heuristic(rr, value))
-                .actionGenerator(actionGenerator(roster, fas));
+                .actionGenerator(actionGenerator(roster, fas))
+                .build();
 
         FreeAgentAcquisition faa =
             new RepeatedHillClimbing<FreeAgentAcquisition>(
                 initialStateGenerator(roster, fas),
-                builder)
+                hc)
             .search();
 
         if (faa.score(rr, value) > 0) {
@@ -133,10 +132,10 @@ public final class FreeAgentAcquisition {
         }
     }
 
-    private static Callable<FreeAgentAcquisition> initialStateGenerator(final Iterable<Player> roster, final Iterable<Player> fas) {
-        return new Callable<FreeAgentAcquisition>() {
+    private static Supplier<FreeAgentAcquisition> initialStateGenerator(final Iterable<Player> roster, final Iterable<Player> fas) {
+        return new Supplier<FreeAgentAcquisition>() {
             @Override
-            public FreeAgentAcquisition call() throws Exception {
+            public FreeAgentAcquisition get() {
                 List<Player> rel = Lists.newArrayList(roster);
                 List<Player> acq = Lists.newArrayList(fas);
 
@@ -149,10 +148,9 @@ public final class FreeAgentAcquisition {
     }
 
     private static Heuristic<FreeAgentAcquisition> heuristic(final RosterReport rr, final TradeValue value) {
-        return Heuristics.from(
-            Ordering
-                .natural()
-                .onResultOf((faa) -> faa.score(rr, value)));
+      return Ordering
+        .natural()
+        .onResultOf((FreeAgentAcquisition faa) -> faa.score(rr, value))::compare;
     }
 
     private static ActionGenerator<FreeAgentAcquisition> actionGenerator(final Iterable<Player> roster, final Iterable<Player> fas) {
@@ -166,12 +164,7 @@ public final class FreeAgentAcquisition {
             actions.add(new ChangeFreeAgent(p));
         }
 
-        return new ActionGenerator<FreeAgentAcquisition>() {
-            @Override
-            public Iterable<Action<FreeAgentAcquisition>> apply(FreeAgentAcquisition faa) {
-                return actions;
-            }
-        };
+        return (faa) -> actions.stream();
     }
 
     private static class ChangeFreeAgent implements Action<FreeAgentAcquisition> {
