@@ -1,5 +1,25 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.Slot;
+import com.ljs.ootp.ai.player.ratings.Position;
+import com.ljs.ootp.ai.stats.BattingStats;
+import com.ljs.ootp.ai.stats.TeamStats;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.logging.Logger;
+import java.util.stream.Stream;
+
+import com.github.lstephen.ai.search.HillClimbing;
+import com.github.lstephen.ai.search.RepeatedHillClimbing;
+import com.github.lstephen.ai.search.Validator;
+import com.github.lstephen.ai.search.action.Action;
+import com.github.lstephen.ai.search.action.ActionGenerator;
+import com.github.lstephen.ai.search.action.SequencedAction;
+
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -9,21 +29,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.Validator;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
-import com.ljs.ai.search.hillclimbing.action.SequencedAction;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.Slot;
-import com.ljs.ootp.ai.player.ratings.Position;
-import com.ljs.ootp.ai.stats.BattingStats;
-import com.ljs.ootp.ai.stats.TeamStats;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 // Referenced classes of package com.ljs.scratch.ootp.selection.lineup:
@@ -89,17 +95,18 @@ public class StarterSelection {
 
         if (!CACHE.containsKey(cacheKey)) {
 
-            HillClimbing.Builder<Defense> builder = HillClimbing
+            HillClimbing<Defense> hc = HillClimbing
                 .<Defense>builder()
                 .actionGenerator(actionsFunction(available))
                 .heuristic(heuristic(vs))
-                .validator(validator(available));
+                .validator(validator(available))
+                .build();
 
             CACHE.put(
                 cacheKey,
                 new RepeatedHillClimbing<Defense>(
                     Defense.randomGenerator(available),
-                    builder)
+                    hc)
                 .search());
         }
 
@@ -118,7 +125,7 @@ public class StarterSelection {
 
         return new Validator<Defense>() {
             @Override
-            public Boolean apply(Defense input) {
+            public boolean test(Defense input) {
                 if (requireBackupCatcher) {
                     return catcherCount > 1
                       && containsCatcher(
@@ -178,7 +185,7 @@ public class StarterSelection {
 
         return new ActionGenerator<Defense>() {
             @Override
-            public Iterable<Action<Defense>> apply(Defense state) {
+            public Stream<Action<Defense>> apply(Defense state) {
                 final Set<Action<Defense>> swaps = Sets.newHashSet();
                 Set<Action<Defense>> internalSwaps = Sets.newHashSet();
 
@@ -192,10 +199,7 @@ public class StarterSelection {
                     }
                 }
 
-                return Iterables.concat(
-                    swaps,
-                    internalSwaps,
-                    SequencedAction.merged(internalSwaps, swaps));
+                return Stream.concat(Stream.concat(swaps.stream(), internalSwaps.stream()), SequencedAction.merged(internalSwaps, swaps));
             }
         };
     }

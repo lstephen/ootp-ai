@@ -1,5 +1,24 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.selection.lineup.Lineup.VsHand;
+import com.ljs.ootp.ai.stats.BattingStats;
+import com.ljs.ootp.ai.stats.TeamStats;
+
+import com.github.lstephen.ai.search.HillClimbing;
+import com.github.lstephen.ai.search.RepeatedHillClimbing;
+import com.github.lstephen.ai.search.action.Action;
+import com.github.lstephen.ai.search.action.ActionGenerator;
+import com.github.lstephen.ai.search.action.SequencedAction;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -10,20 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.ljs.ai.search.hillclimbing.HillClimbing;
-import com.ljs.ai.search.hillclimbing.RepeatedHillClimbing;
-import com.ljs.ai.search.hillclimbing.action.Action;
-import com.ljs.ai.search.hillclimbing.action.ActionGenerator;
-import com.ljs.ai.search.hillclimbing.action.SequencedAction;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.selection.lineup.Lineup.VsHand;
-import com.ljs.ootp.ai.stats.BattingStats;
-import com.ljs.ootp.ai.stats.TeamStats;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 public class LineupOrdering {
@@ -192,12 +198,13 @@ public class LineupOrdering {
             return CACHE.get(key);
         }
 
-        HillClimbing.Builder<Order> builder = HillClimbing
+        HillClimbing<Order> hc = HillClimbing
             .<Order>builder()
             .heuristic(byScore(vs))
-            .actionGenerator(new OrderActions());
+            .actionGenerator(new OrderActions())
+            .build();
 
-        Order result = new RepeatedHillClimbing<Order>(new RandomGenerator(ps), builder).search();
+        Order result = new RepeatedHillClimbing<Order>(new RandomGenerator(ps), hc).search();
 
         CACHE.put(key, result.get());
 
@@ -237,7 +244,7 @@ public class LineupOrdering {
         }
     }
 
-    private static class RandomGenerator implements Callable<Order> {
+    private static class RandomGenerator implements Supplier<Order> {
 
         private List<Player> ps;
 
@@ -245,7 +252,7 @@ public class LineupOrdering {
             this.ps = Lists.newArrayList(ps);
         }
 
-        public Order call() {
+        public Order get() {
             Collections.shuffle(ps);
             return Order.create(ps);
         }
@@ -253,7 +260,7 @@ public class LineupOrdering {
     }
 
     private static class OrderActions implements ActionGenerator<Order> {
-        public Iterable<Action<Order>> apply(Order o) {
+        public Stream<Action<Order>> apply(Order o) {
             Set<Action<Order>> actions = Sets.newHashSet();
 
             for (int i = 0; i < o.size(); i++) {
@@ -262,7 +269,7 @@ public class LineupOrdering {
                 }
             }
 
-            return Iterables.concat(actions, SequencedAction.allPairs(actions));
+            return Stream.concat(actions.stream(), SequencedAction.allPairs(actions));
         }
     }
 

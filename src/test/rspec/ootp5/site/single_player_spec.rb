@@ -9,9 +9,9 @@ java_import com.ljs.ootp.ai.site.Version;
 java_import com.google.common.base.Optional;
 java_import com.google.common.io.Resources;
 
+java_import com.ljs.ootp.extract.html.Documents;
 java_import com.ljs.ootp.extract.html.ootp5.rating.PotentialRating;
 java_import com.ljs.ootp.extract.html.ootp5.rating.ZeroToTen;
-
 java_import org.jsoup.Jsoup;
 
 RSpec.describe SinglePlayer do
@@ -26,7 +26,7 @@ RSpec.describe SinglePlayer do
     let(:resource) { Resources.asByteSource(Resources.getResource(html)) }
 
     let(:document) do
-      with_closeable(resource.openStream) { |is| Jsoup.parse(is, nil, '') }
+      with_closeable(resource.openStream) { |is| Documents.load is }
     end
 
     let(:site) do

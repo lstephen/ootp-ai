@@ -1,5 +1,23 @@
 package com.ljs.ootp.ai.selection.lineup;
 
+import com.ljs.ootp.ai.player.Player;
+import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
+import com.ljs.ootp.ai.player.ratings.Position;
+
+import static com.ljs.ootp.ai.player.ratings.Position.CATCHER;
+import static com.ljs.ootp.ai.player.ratings.Position.CENTER_FIELD;
+import static com.ljs.ootp.ai.player.ratings.Position.LEFT_FIELD;
+import static com.ljs.ootp.ai.player.ratings.Position.RIGHT_FIELD;
+import static com.ljs.ootp.ai.player.ratings.Position.SECOND_BASE;
+import static com.ljs.ootp.ai.player.ratings.Position.SHORTSTOP;
+import static com.ljs.ootp.ai.player.ratings.Position.THIRD_BASE;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -8,20 +26,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
-import com.ljs.ootp.ai.player.Player;
-import com.ljs.ootp.ai.player.ratings.DefensiveRatings;
-import com.ljs.ootp.ai.player.ratings.Position;
-import static com.ljs.ootp.ai.player.ratings.Position.CATCHER;
-import static com.ljs.ootp.ai.player.ratings.Position.CENTER_FIELD;
-import static com.ljs.ootp.ai.player.ratings.Position.LEFT_FIELD;
-import static com.ljs.ootp.ai.player.ratings.Position.RIGHT_FIELD;
-import static com.ljs.ootp.ai.player.ratings.Position.SECOND_BASE;
-import static com.ljs.ootp.ai.player.ratings.Position.SHORTSTOP;
-import static com.ljs.ootp.ai.player.ratings.Position.THIRD_BASE;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 /**
  *
@@ -191,10 +195,10 @@ public final class Defense {
     }
               
 
-    public static Callable<Defense> randomGenerator(final Iterable<Player> players) {
-        return new Callable<Defense>() {
+    public static Supplier<Defense> randomGenerator(final Iterable<Player> players) {
+        return new Supplier<Defense>() {
             @Override
-            public Defense call() {
+            public Defense get() {
                 List<Player> ps = Lists.newArrayList(players);
                 Collections.shuffle(ps);
 

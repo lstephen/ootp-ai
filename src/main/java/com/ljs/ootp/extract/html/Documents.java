@@ -47,13 +47,21 @@ public final class Documents {
                     try (
                         InputStream in = new URL(url).openStream()) {
 
-                        return Jsoup.parse(in, Charsets.ISO_8859_1.name(), "");
+                      return load(in);
                     }
                 }
             });
         } catch (RetryException | ExecutionException e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    public static Document load(InputStream is) throws IOException {
+      Document doc = Jsoup.parse(is, Charsets.ISO_8859_1.name(), "");
+
+      doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+
+      return doc;
     }
 
 }
