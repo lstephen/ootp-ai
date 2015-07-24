@@ -2,9 +2,9 @@ require 'spec_helper'
 
 require 'java'
 
-java_import com.ljs.ootp.ai.report.LeagueBattingReport
-java_import com.ljs.ootp.ai.site.Site;
-java_import com.ljs.ootp.ai.stats.BattingStats;
+java_import com.github.lstephen.ootp.ai.report.LeagueBattingReport
+java_import com.github.lstephen.ootp.ai.site.Site;
+java_import com.github.lstephen.ootp.ai.stats.BattingStats;
 
 java_import java.io.PrintWriter
 java_import java.io.StringWriter
