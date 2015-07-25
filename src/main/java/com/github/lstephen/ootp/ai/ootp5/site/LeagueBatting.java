@@ -1,19 +1,26 @@
 package com.github.lstephen.ootp.ai.ootp5.site;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
 import com.github.lstephen.ootp.ai.config.Config;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.extract.html.Page;
-import com.ljs.scratch.util.Jackson;
+import com.github.lstephen.scratch.util.Jackson;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
@@ -53,7 +60,9 @@ public class LeagueBatting {
     private File getHistoricalFile() {
         try {
             String historyDirectory = Config.createDefault().getValue("history.dir").or("c:/ootp/history/");
-            return new File(historyDirectory + "/" + site.getName() + "league.batting.json");
+            File historicalFile = new File(historyDirectory + "/" + site.getName() + "league.batting.json");
+            Files.createParentDirs(historicalFile);
+            return historicalFile;
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }

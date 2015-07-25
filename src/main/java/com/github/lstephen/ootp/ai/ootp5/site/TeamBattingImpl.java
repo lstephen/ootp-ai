@@ -6,7 +6,7 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
-import com.ljs.scratch.util.ElementsUtil;
+import com.github.lstephen.scratch.util.ElementsUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 

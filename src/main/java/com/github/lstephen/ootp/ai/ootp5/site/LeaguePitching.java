@@ -8,7 +8,7 @@ import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.extract.html.Page;
-import com.ljs.scratch.util.Jackson;
+import com.github.lstephen.scratch.util.Jackson;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
