@@ -2,16 +2,16 @@ require 'spec_helper'
 
 require 'java'
 
-java_import com.ljs.ootp.ai.player.PlayerId;
-java_import com.ljs.ootp.ai.ootp5.site.SinglePlayer;
-java_import com.ljs.ootp.ai.site.Version;
+java_import com.github.lstephen.ootp.ai.player.PlayerId;
+java_import com.github.lstephen.ootp.ai.ootp5.site.SinglePlayer;
+java_import com.github.lstephen.ootp.ai.site.Version;
 
 java_import com.google.common.base.Optional;
 java_import com.google.common.io.Resources;
 
-java_import com.ljs.ootp.extract.html.Documents;
-java_import com.ljs.ootp.extract.html.ootp5.rating.PotentialRating;
-java_import com.ljs.ootp.extract.html.ootp5.rating.ZeroToTen;
+java_import com.github.lstephen.ootp.extract.html.Documents;
+java_import com.github.lstephen.ootp.extract.html.ootp5.rating.PotentialRating;
+java_import com.github.lstephen.ootp.extract.html.ootp5.rating.ZeroToTen;
 java_import org.jsoup.Jsoup;
 
 RSpec.describe SinglePlayer do

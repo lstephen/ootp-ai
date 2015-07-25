@@ -141,7 +141,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>com.ljs.ootp.ai.Main</mainClass>
+          <mainClass>com.github.lstephen.ootp.ai.Main</mainClass>
         </configuration>
       </plugin>
     </plugins>
