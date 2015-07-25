@@ -45,7 +45,7 @@ public class LeagueBatting {
     private LeagueBatting() { }
 
     public LeagueBatting(Site site, String league) {
-        page = site.getPage("leagueb.html");
+        this.page = site.getPage("leagueb.html");
         this.league = league;
         this.site = site;
     }
