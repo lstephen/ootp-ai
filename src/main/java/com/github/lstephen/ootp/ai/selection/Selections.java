@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
-// Referenced classes of package com.ljs.scratch.ootp.selection:
+// Referenced classes of package com.github.lstephen.ootp.ootp.selection:
 //            Selection
 
 public final class Selections {

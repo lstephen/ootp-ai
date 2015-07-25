@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-// Referenced classes of package com.ljs.scratch.ootp.selection.lineup:
+// Referenced classes of package com.github.lstephen.ootp.ootp.selection.lineup:
 //            Lineup
 public class StarterSelection {
 

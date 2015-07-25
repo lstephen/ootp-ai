@@ -32,11 +32,15 @@
     <lib.commons-math3.version>3.5</lib.commons-math3.version>
     <lib.jackson.version>2.6.0</lib.jackson.version>
     <lib.joda-time.version>2.8.1</lib.joda-time.version>
-    <lib.jsoup.version>1.8.2</lib.jsoup.version>
     <lib.jsr305.version>2.0.2</lib.jsr305.version>
     <lib.guava.version>18.0</lib.guava.version>
     <lib.guava-retrying.version>2.0.0</lib.guava-retrying.version>
     <lib.humanize-slim.version>1.2.2</lib.humanize-slim.version>
+
+    <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
+    <lib.jsoup.version>1.7.3</lib.jsoup.version>
+
+    <gem.rspec-its.version>1.2.0</gem.rspec-its.version>
 
     <plugin.exec.version>1.4.0</plugin.exec.version>
   </properties>
@@ -124,6 +128,14 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>${lib.jsr305.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rspec-its</artifactId>
+      <version>${gem.rspec-its.version}</version>
+      <type>gem</type>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

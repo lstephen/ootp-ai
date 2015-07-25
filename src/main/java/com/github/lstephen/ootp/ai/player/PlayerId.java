@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.player;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.ljs.scratch.util.Wrapped;
+import com.github.lstephen.scratch.util.Wrapped;
 
 /**
  *

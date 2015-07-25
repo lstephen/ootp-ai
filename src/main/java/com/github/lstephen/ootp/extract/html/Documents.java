@@ -41,27 +41,18 @@ public final class Documents {
             .build();
 
         try {
-            return retryer.call(new Callable<Document>() {
-                @Override
-                public Document call() throws IOException {
-                    try (
-                        InputStream in = new URL(url).openStream()) {
-
-                      return load(in);
-                    }
-                }
-            });
+          return retryer.call(() -> {
+            try (InputStream in = new URL(url).openStream()) {
+              return load(in);
+            }
+          });
         } catch (RetryException | ExecutionException e) {
             throw Throwables.propagate(e);
         }
     }
 
     public static Document load(InputStream is) throws IOException {
-      Document doc = Jsoup.parse(is, Charsets.ISO_8859_1.name(), "");
-
-      doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
-
-      return doc;
+      return Jsoup.parse(is, Charsets.ISO_8859_1.name(), "");
     }
 
 }

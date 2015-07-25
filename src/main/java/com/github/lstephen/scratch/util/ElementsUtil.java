@@ -1,4 +1,4 @@
-package com.ljs.scratch.util;
+package com.github.lstephen.scratch.util;
 
 import org.jsoup.select.Elements;
 

@@ -1,11 +1,12 @@
-package com.ljs.scratch.util;
+package com.github.lstephen.scratch.util;
+
+import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
+import com.github.lstephen.ootp.ai.site.Site;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
-import com.github.lstephen.ootp.ai.site.Site;
 
 /**
  *
