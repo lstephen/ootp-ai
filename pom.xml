@@ -26,6 +26,8 @@
   </scm>
 
   <properties>
+    <scala.target>jvm-1.${java.version}</scala.target>
+
     <lib.ai-search.version>1.2</lib.ai-search.version>
     <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.4</lib.commons-lang3.version>
@@ -36,6 +38,7 @@
     <lib.guava.version>18.0</lib.guava.version>
     <lib.guava-retrying.version>2.0.0</lib.guava-retrying.version>
     <lib.humanize-slim.version>1.2.2</lib.humanize-slim.version>
+    <lib.scala-library.version>2.11.7</lib.scala-library.version>
 
     <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
@@ -43,9 +46,16 @@
     <gem.rspec-its.version>1.2.0</gem.rspec-its.version>
 
     <plugin.exec.version>1.4.0</plugin.exec.version>
+    <plugin.scala.version>3.2.2</plugin.scala.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${lib.scala-library.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.github.lstephen</groupId>
       <artifactId>ai-search</artifactId>
@@ -156,6 +166,67 @@
           <mainClass>com.github.lstephen.ootp.ai.Main</mainClass>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>${plugin.scala.version}</version>
+        <executions>
+          <execution>
+            <id>scala-compile-first</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>add-source</goal>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>doc-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <args>
+            <arg>-target:${scala.target}</arg>
+          </args>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>${plugin.scala.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports/>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
