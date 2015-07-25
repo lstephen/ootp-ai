@@ -198,10 +198,6 @@
           <args>
             <arg>-target:${scala.target}</arg>
           </args>
-          <!--<javacArgs>
-            <javacArg>-source</javacArg><javacArg>8</javacArg>
-            <javacArg>-target</javacArg><javacArg>8</javacArg>
-          </javacArgs>-->
         </configuration>
       </plugin>
 
