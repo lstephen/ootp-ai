@@ -26,6 +26,10 @@
   </scm>
 
   <properties>
+    <scala.version>2.11</scala.version>
+    <scala.compat.version>2.11</scala.compat.version>
+    <scala.target>jvm-1.6</scala.target>
+
     <lib.ai-search.version>1.2</lib.ai-search.version>
     <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.4</lib.commons-lang3.version>
@@ -34,10 +38,13 @@
     <lib.joda-time.version>2.8.1</lib.joda-time.version>
     <lib.jsr305.version>2.0.2</lib.jsr305.version>
     <lib.guava.version>18.0</lib.guava.version>
-    <lib.guava-retrying.version>2.0.0</lib.guava-retrying.version>
     <lib.humanize-slim.version>1.2.2</lib.humanize-slim.version>
+    <lib.scala-arm.version>1.4</lib.scala-arm.version>
+    <lib.scala-library.version>2.11.7</lib.scala-library.version>
+    <lib.scala-logging.version>3.1.0</lib.scala-logging.version>
+    <lib.slf4j-api.version>1.7.7</lib.slf4j-api.version>
 
-    <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
+      <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
 
     <gem.rspec-its.version>1.2.0</gem.rspec-its.version>
@@ -50,24 +57,6 @@
       <groupId>com.github.lstephen</groupId>
       <artifactId>ai-search</artifactId>
       <version>${lib.ai-search.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>${lib.jsoup.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${lib.guava.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.rholder</groupId>
-      <artifactId>guava-retrying</artifactId>
-      <version>${lib.guava-retrying.version}</version>
     </dependency>
 
     <dependency>
@@ -89,9 +78,21 @@
     </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>${lib.joda-time.version}</version>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${lib.guava.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.mfornos</groupId>
+      <artifactId>humanize-slim</artifactId>
+      <version>${lib.humanize-slim.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -113,21 +114,51 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.mfornos</groupId>
-      <artifactId>humanize-slim</artifactId>
-      <version>${lib.humanize-slim.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>${lib.joda-time.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>${lib.jsoup.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>${lib.jsr305.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jsuereth</groupId>
+      <artifactId>scala-arm_${scala.version}</artifactId>
+      <version>${lib.scala-arm.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.typesafe.scala-logging</groupId>
+      <artifactId>scala-logging_${scala.version}</artifactId>
+      <version>${lib.scala-logging.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${lib.slf4j-api.version}</version>
     </dependency>
 
     <dependency>
