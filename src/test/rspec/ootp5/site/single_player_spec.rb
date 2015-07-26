@@ -9,7 +9,7 @@ java_import com.github.lstephen.ootp.ai.site.Version;
 java_import com.google.common.base.Optional;
 java_import com.google.common.io.Resources;
 
-java_import com.github.lstephen.ootp.extract.html.Documents;
+java_import com.github.lstephen.ootp.extract.html.loader.JsoupLoader;
 java_import com.github.lstephen.ootp.extract.html.ootp5.rating.PotentialRating;
 java_import com.github.lstephen.ootp.extract.html.ootp5.rating.ZeroToTen;
 java_import org.jsoup.Jsoup;
@@ -26,7 +26,7 @@ RSpec.describe SinglePlayer do
     let(:resource) { Resources.asByteSource(Resources.getResource(html)) }
 
     let(:document) do
-      with_closeable(resource.openStream) { |is| Documents.load is }
+      with_closeable(resource.openStream) { |is| JsoupLoader.new.load is }
     end
 
     let(:site) do
