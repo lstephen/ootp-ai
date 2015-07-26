@@ -19,7 +19,7 @@ class JsoupLoader extends PageLoader with LazyLogging  {
 
     val d = managed(new URL(url).openStream()) map { load _ }
 
-    d.opt getOrElse { throw new PageLoaderException }
+    d.opt getOrElse { throw new PageLoaderException(s"Unable to load $url") }
   }
 
   def load(is: InputStream) : Document = {
