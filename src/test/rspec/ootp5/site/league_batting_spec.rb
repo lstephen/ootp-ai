@@ -14,7 +14,7 @@ RSpec.describe LeagueBatting do
   let(:resource) { Resources.asByteSource(Resources.getResource(html)) }
 
   let(:document) do
-    with_closeable(resource.openStream) { |is| Documents.load is }
+    with_closeable(resource.openStream) { |is| JsoupLoader.new.load is }
   end
 
   let(:page) do
