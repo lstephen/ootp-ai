@@ -18,7 +18,7 @@ else
 fi
 
 echo "Running..."
-mvn -B install exec:java -Dgpg.skip=true
+mvn -B clean install exec:java -Dgpg.skip=true
 
 echo "Updating data..."
 cd ootp-ai-data
