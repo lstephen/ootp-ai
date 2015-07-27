@@ -3,11 +3,11 @@ require 'spec_helper'
 require 'java'
 
 java_import com.github.lstephen.ootp.ai.report.TeamReport
-java_import com.github.lstephen.ootp.ai.site.Site;
-java_import com.github.lstephen.ootp.ai.stats.BattingStats;
-java_import com.github.lstephen.ootp.ai.stats.FipBaseRuns;
-java_import com.github.lstephen.ootp.ai.stats.PitcherOverall;
-java_import com.github.lstephen.ootp.ai.stats.PitchingStats;
+java_import com.github.lstephen.ootp.ai.site.Site
+java_import com.github.lstephen.ootp.ai.stats.BattingStats
+java_import com.github.lstephen.ootp.ai.stats.FipBaseRuns
+java_import com.github.lstephen.ootp.ai.stats.PitcherOverall
+java_import com.github.lstephen.ootp.ai.stats.PitchingStats
 
 java_import java.io.PrintWriter
 java_import java.io.StringWriter
