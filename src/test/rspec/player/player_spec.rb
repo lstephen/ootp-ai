@@ -3,28 +3,11 @@ require 'spec_helper'
 
 require 'java'
 
+require 'player/ratings/matchers'
+
 java_import com.github.lstephen.ootp.ai.player.Player
 java_import com.github.lstephen.scratch.util.Jackson
 java_import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty
-
-RSpec::Matchers.define :be_batting_ratings do |contact, gap, power, eye, k|
-  def normalize(value)
-    scale.normalize(value).get
-  end
-
-  match do |ratings|
-    ratings != nil &&
-      ratings.contact == normalize(contact) &&
-      ratings.gap == normalize(gap) &&
-      ratings.power == normalize(power) &&
-      ratings.eye == normalize(eye) &&
-      ratings.k.present? && ratings.k.get == normalize(k)
-  end
-
-  description do
-    "be ratings of #{contact}/#{gap}/#{power}/#{eye}/#{k}"
-  end
-end
 
 RSpec.describe Player do
   context 'deserialize' do

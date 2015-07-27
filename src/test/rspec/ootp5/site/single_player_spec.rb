@@ -19,19 +19,18 @@ RSpec.describe SinglePlayer do
   subject(:single_player) { SinglePlayer.new }
 
   describe '#get' do
-    let(:id) { PlayerId.new('TEST_ID') }
+    let(:id) { PlayerId.new('ELIJAH_CHAUSSE') }
 
-    let(:player) { 'elijah_chausse' }
-    let(:html) { "com/github/lstephen/ootp/ai/ootp5/site/#{player}.html" }
-    let(:resource) { Resources.asByteSource(Resources.getResource(html)) }
+    let(:file) { 'elijah_chausse' }
+    let(:html) { "com/github/lstephen/ootp/ai/ootp5/site/#{file}.html" }
+    let(:resource) { Resources.getResource(html) }
+    let(:document) { JsoupLoader.new.load resource }
 
-    let(:document) do
-      with_closeable(resource.openStream) { |is| JsoupLoader.new.load is }
-    end
+    let(:ability_scale) { ZeroToTen.scale }
 
     let(:site) do
       double('Site',
-        getAbilityRatingScale: ZeroToTen.scale,
+        getAbilityRatingScale: ability_scale,
         getPotentialRatingScale: PotentialRating.scale,
         getType: Version::OOTP5,
         getDefinition: nil,
@@ -48,15 +47,24 @@ RSpec.describe SinglePlayer do
 
     before(:each) { single_player.salary_source = double('SalarySource', getSalary: '$SALARY') }
 
-    subject { single_player.get(id) }
+    subject(:player) { single_player.get(id) }
 
     it { is_expected.to_not be(nil) }
-  end
-end
+    its(:name) { is_expected.to eq('Elijah Chausse') }
 
-def with_closeable(cl)
-  yield cl
-ensure
-  cl.close
+    context '#batting_ratings' do
+      let(:scale) { ability_scale }
+      subject { player.batting_ratings }
+
+      its(:vs_left) { is_expected.to be_batting_ratings 5, 4, 7, 8, 3 }
+      its(:vs_right) { is_expected.to be_batting_ratings 6, 5, 8, 9, 4 }
+    end
+
+    context '#defensive_ratings' do
+      subject { player.defensive_ratings }
+
+      its(:position_scores) { is_expected.to eq('-2---3-5') }
+    end
+  end
 end
 
