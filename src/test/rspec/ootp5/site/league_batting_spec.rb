@@ -11,11 +11,8 @@ RSpec.describe LeagueBatting do
   let(:league) { 'National' }
 
   let(:html) { "com/github/lstephen/ootp/ai/ootp6/site/leagueb.html" }
-  let(:resource) { Resources.asByteSource(Resources.getResource(html)) }
-
-  let(:document) do
-    with_closeable(resource.openStream) { |is| JsoupLoader.new.load is }
-  end
+  let(:resource) { Resources.getResource(html) }
+  let(:document) { JsoupLoader.new.load resource }
 
   let(:page) do
     double('Page')
