@@ -12,6 +12,8 @@ java_import com.google.common.io.Resources;
 java_import com.github.lstephen.ootp.extract.html.loader.JsoupLoader;
 java_import com.github.lstephen.ootp.extract.html.ootp5.rating.PotentialRating;
 java_import com.github.lstephen.ootp.extract.html.ootp5.rating.ZeroToTen;
+java_import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty;
+java_import com.github.lstephen.ootp.extract.html.ootp6.rating.TwoToEight;
 java_import org.jsoup.Jsoup;
 
 RSpec.describe SinglePlayer do
@@ -19,20 +21,17 @@ RSpec.describe SinglePlayer do
   subject(:single_player) { SinglePlayer.new }
 
   describe '#get' do
-    let(:id) { PlayerId.new('ELIJAH_CHAUSSE') }
+    let(:id) { PlayerId.new(file.upcase) }
 
-    let(:file) { 'elijah_chausse' }
-    let(:html) { "com/github/lstephen/ootp/ai/ootp5/site/#{file}.html" }
+    let(:html) { "com/github/lstephen/ootp/ai/#{version.to_s.downcase}/site/#{file}.html" }
     let(:resource) { Resources.getResource(html) }
     let(:document) { JsoupLoader.new.load resource }
-
-    let(:ability_scale) { ZeroToTen.scale }
 
     let(:site) do
       double('Site',
         getAbilityRatingScale: ability_scale,
-        getPotentialRatingScale: PotentialRating.scale,
-        getType: Version::OOTP5,
+        getPotentialRatingScale: potential_scale,
+        getType: version,
         getDefinition: nil,
         isInjured: false,
         isFutureFreeAgent: false,
@@ -49,21 +48,59 @@ RSpec.describe SinglePlayer do
 
     subject(:player) { single_player.get(id) }
 
-    it { is_expected.to_not be(nil) }
-    its(:name) { is_expected.to eq('Elijah Chausse') }
-
-    context '#batting_ratings' do
+    RSpec.shared_context 'Batting Ratings', :property => :batting_ratings do
       let(:scale) { ability_scale }
       subject { player.batting_ratings }
-
-      its(:vs_left) { is_expected.to be_batting_ratings 5, 4, 7, 8, 3 }
-      its(:vs_right) { is_expected.to be_batting_ratings 6, 5, 8, 9, 4 }
     end
 
-    context '#defensive_ratings' do
+    RSpec.shared_context 'Defensive Ratings', :property => :defensive_ratings do
       subject { player.defensive_ratings }
+    end
 
-      its(:position_scores) { is_expected.to eq('-2---3-5') }
+
+    context 'OOTP5' do
+      let(:version) { Version::OOTP5 }
+      let(:ability_scale) { ZeroToTen.scale }
+      let(:potential_scale) { PotentialRating.scale }
+
+      context 'Elijah Chausse' do
+        let(:file) { 'elijah_chausse' }
+
+        it { is_expected.to_not be(nil) }
+        its(:name) { is_expected.to eq('Elijah Chausse') }
+
+        context '#batting_ratings', :property => :batting_ratings do
+          its(:vs_left) { is_expected.to be_batting_ratings 5, 4, 7, 8, 3 }
+          its(:vs_right) { is_expected.to be_batting_ratings 6, 5, 8, 9, 4 }
+        end
+
+        context '#defensive_ratings', :property => :defensive_ratings do
+          its(:position_scores) { is_expected.to eq('-2---3-5') }
+        end
+      end
+    end
+
+    context 'OOTP6' do
+      let(:version) { Version::OOTP6 }
+      let(:ability_scale) { OneToTwenty.scale }
+      let(:potential_scale) { TwoToEight.scale }
+
+      context 'Victor Plata' do
+        let(:file) { 'victor_plata' }
+
+        it { is_expected.to_not be(nil) }
+        its(:name) { is_expected.to eq('Victor Plata') }
+
+        context '#batting_ratings', :property => :batting_ratings do
+          its(:vs_left) { is_expected.to be_batting_ratings 9, 14, 20, 20, 7 }
+          its(:vs_right) { is_expected.to be_batting_ratings 9, 14, 20, 20, 7 }
+        end
+
+        context '#defensive_ratings', :property => :defensive_ratings do
+          its(:position_scores) { is_expected.to eq('-2------') }
+        end
+      end
+
     end
   end
 end
