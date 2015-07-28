@@ -26,6 +26,9 @@
   </scm>
 
   <properties>
+    <github.url>https://github.com/lstephen/ootp-ai.git</github.url>
+    <github.site>https://lstephen.github.io/ootp-ai</github.site>
+
     <scala.version>2.11</scala.version>
     <scala.compat.version>2.11</scala.compat.version>
     <scala.target>jvm-1.6</scala.target>
