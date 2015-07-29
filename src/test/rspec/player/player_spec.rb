@@ -1,8 +1,7 @@
 
 require 'spec_helper'
 
-require 'java'
-
+require 'player/ratings/contexts'
 require 'player/ratings/matchers'
 
 java_import com.github.lstephen.ootp.ai.player.Player
@@ -20,17 +19,14 @@ RSpec.describe Player do
     its(:age) { is_expected.to eq(34) }
     its(:pitching_ratings) { is_expected.to be_nil }
 
-    context '#batting_ratings' do
-      let(:scale) { OneToTwenty.scale }
-      subject { player.batting_ratings }
+    context '#batting_ratings', :property => :batting_ratings do
+      let(:ability_scale) { OneToTwenty.new }
 
       its(:vs_left) { is_expected.to be_batting_ratings 10, 14, 20, 20, 7 }
       its(:vs_right) { is_expected.to be_batting_ratings 9, 14, 20, 20, 7 }
     end
 
-    context '#defensive_ratings' do
-      subject { player.defensive_ratings }
-
+    context '#defensive_ratings', :property => :defensive_ratings do
       its(:position_scores) { is_expected.to eq('-2------') }
     end
   end

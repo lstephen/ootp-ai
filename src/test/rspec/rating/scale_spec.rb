@@ -19,7 +19,7 @@ java_import com.github.lstephen.ootp.ai.rating.ZeroToTen
   RSpec.describe scale do
     let(:range) { range }
 
-    subject { scale.scale }
+    subject { scale.respond_to?(:scale) ? scale.scale : scale.new }
 
     describe '#parse' do
       it 'parses from a String' do 

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-require 'java'
+require 'player/ratings/contexts'
+
 
 java_import com.github.lstephen.ootp.ai.player.PlayerId;
 java_import com.github.lstephen.ootp.ai.ootp5.site.SinglePlayer;
@@ -48,16 +49,6 @@ RSpec.describe SinglePlayer do
 
     subject(:player) { single_player.get(id) }
 
-    RSpec.shared_context 'Batting Ratings', :property => :batting_ratings do
-      let(:scale) { ability_scale }
-      subject { player.batting_ratings }
-    end
-
-    RSpec.shared_context 'Defensive Ratings', :property => :defensive_ratings do
-      subject { player.defensive_ratings }
-    end
-
-
     context 'OOTP5' do
       let(:version) { Version::OOTP5 }
       let(:ability_scale) { ZeroToTen.scale }
@@ -82,7 +73,7 @@ RSpec.describe SinglePlayer do
 
     context 'OOTP6' do
       let(:version) { Version::OOTP6 }
-      let(:ability_scale) { OneToTwenty.scale }
+      let(:ability_scale) { OneToTwenty.new }
       let(:potential_scale) { TwoToEight.scale }
 
       context 'Victor Plata' do

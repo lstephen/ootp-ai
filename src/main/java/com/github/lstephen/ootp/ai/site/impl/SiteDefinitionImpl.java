@@ -123,7 +123,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
         }
 
         if (name.equals("TWML")) {
-            return OneToTwenty.scale();
+            return new OneToTwenty();
         }
 
         throw new IllegalArgumentException();
