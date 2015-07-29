@@ -1,6 +1,10 @@
 package com.github.lstephen.ootp.extract.html.rating;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.fasterxml.jackson.annotation.JsonValue;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
@@ -11,6 +15,8 @@ import com.google.common.base.Throwables;
  */
 public final class Rating<T, S extends Scale<T>> {
 
+    private static final Logger LOGGER = Logger.getLogger(Rating.class.getName());
+
     private final T value;
 
     private final S scale;
@@ -19,12 +25,13 @@ public final class Rating<T, S extends Scale<T>> {
         Preconditions.checkNotNull(value);
         Preconditions.checkNotNull(scale);
 
-        // Seems that occaisionally a String gets through here.
-        // This fix hides a problem somewhere else.
-        // The error occurs when loading from JSON
-        this.value = (String.class.isInstance(value)
-            ? scale.parse(String.class.cast(value)).value
-            : value);
+        if (String.class.isInstance(value)) {
+          Exception backtrace = new RuntimeException();
+          LOGGER.log(Level.WARNING, "Received String for Rating: " + value + ":" + scale, backtrace);
+          this.value = scale.parse(String.class.cast(value)).value;
+        } else {
+          this.value = value;
+        }
 
         this.scale = scale;
     }
