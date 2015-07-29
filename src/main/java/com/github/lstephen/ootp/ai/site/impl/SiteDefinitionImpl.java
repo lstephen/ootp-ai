@@ -102,11 +102,11 @@ public final class SiteDefinitionImpl implements SiteDefinition {
         }
 
         if (name.contains("BTH")) {
-            return OneToTen.scale();
+            return new OneToTen();
         }
 
         if (name.equals("TWML")) {
-            return TwoToEight.scale();
+            return new TwoToEight();
         }
 
         throw new IllegalArgumentException();
@@ -115,11 +115,11 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     @Override
     public Scale<?> getAbilityRatingScale() {
         if (type == Version.OOTP5) {
-            return ZeroToTen.scale();
+            return new ZeroToTen();
         }
 
         if (name.contains("BTH")) {
-            return OneToOneHundred.scale();
+            return new OneToOneHundred();
         }
 
         if (name.equals("TWML")) {

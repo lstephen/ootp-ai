@@ -51,7 +51,7 @@ RSpec.describe SinglePlayer do
 
     context 'OOTP5' do
       let(:version) { Version::OOTP5 }
-      let(:ability_scale) { ZeroToTen.scale }
+      let(:ability_scale) { ZeroToTen.new }
       let(:potential_scale) { PotentialRating.scale }
 
       context 'Elijah Chausse' do
@@ -74,7 +74,7 @@ RSpec.describe SinglePlayer do
     context 'OOTP6' do
       let(:version) { Version::OOTP6 }
       let(:ability_scale) { OneToTwenty.new }
-      let(:potential_scale) { TwoToEight.scale }
+      let(:potential_scale) { TwoToEight.new }
 
       context 'Victor Plata' do
         let(:file) { 'victor_plata' }

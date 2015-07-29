@@ -191,11 +191,11 @@ public class PitchingRatings<T> {
 
         @JsonProperty("endurance")
         public Builder<T> endurance(String s) {
-            return endurance(OneToTen.scale().parse(s));
+            return endurance(new OneToTen().parse(s));
         }
 
         public Builder<T> endurance(Integer value) {
-            return endurance(Rating.create(value, OneToTen.scale()));
+            return endurance(Rating.create(value, new OneToTen()));
         }
 
 
