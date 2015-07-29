@@ -28,12 +28,25 @@ java_import com.github.lstephen.ootp.ai.rating.ZeroToTen
     end
 
     describe '#normalize' do
+      let(:expected_step_size) { 100 / range.count }
       it 'normalizes to between 1 and 100' do
         range.each { |r| expect(subject.normalize(r).get).to be_between(1, 100) }
       end
 
       it 'is centered on the 1..100 range' do
         expect(subject.normalize(range.min).get - 1).to be_within(1).of(100 - subject.normalize(range.max).get)
+      end
+
+      it 'is linear' do
+        range.each_cons(2) do |a, b|
+          expect(subject.normalize(b).get - subject.normalize(a).get)
+            .to be_within(1).of(expected_step_size)
+        end
+      end
+
+      it 'is spread through the entire 1..100 range' do
+        expect(subject.normalize(range.min).get - 1).to be <= expected_step_size
+        expect(100 - subject.normalize(range.max).get).to be <= expected_step_size
       end
     end
   end
