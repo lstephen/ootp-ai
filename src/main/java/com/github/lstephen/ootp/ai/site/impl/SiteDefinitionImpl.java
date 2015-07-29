@@ -3,18 +3,18 @@ package com.github.lstephen.ootp.ai.site.impl;
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.ootp5.Ootp5;
 import com.github.lstephen.ootp.ai.ootp6.Ootp6;
+import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
+import com.github.lstephen.ootp.ai.rating.OneToTen;
+import com.github.lstephen.ootp.ai.rating.OneToTwenty;
+import com.github.lstephen.ootp.ai.rating.PotentialRating;
+import com.github.lstephen.ootp.ai.rating.Scale;
+import com.github.lstephen.ootp.ai.rating.TwoToEight;
+import com.github.lstephen.ootp.ai.rating.ZeroToTen;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.SiteDefinition;
 import com.github.lstephen.ootp.ai.site.Version;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
-import com.github.lstephen.ootp.extract.html.ootp5.rating.PotentialRating;
-import com.github.lstephen.ootp.extract.html.ootp5.rating.ZeroToTen;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTen;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.TwoToEight;
-import com.github.lstephen.ootp.extract.html.rating.OneToOneHundred;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
 
 /**
  *

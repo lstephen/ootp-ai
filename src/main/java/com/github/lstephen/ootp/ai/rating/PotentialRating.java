@@ -1,11 +1,10 @@
-package com.github.lstephen.ootp.extract.html.ootp5.rating;
+package com.github.lstephen.ootp.ai.rating;
+
+import java.util.Locale;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+
 import com.google.common.base.CharMatcher;
-import com.github.lstephen.ootp.extract.html.rating.OneToOneHundred;
-import com.github.lstephen.ootp.extract.html.rating.Rating;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
-import java.util.Locale;
 
 /**
  *

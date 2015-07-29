@@ -1,13 +1,8 @@
-package com.github.lstephen.ootp.extract.html.rating;
+package com.github.lstephen.ootp.ai.rating;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.github.lstephen.ootp.extract.html.ootp5.rating.PotentialRating;
-import com.github.lstephen.ootp.extract.html.ootp5.rating.ZeroToTen;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTen;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.TwoToEight;
 
 /**
  *

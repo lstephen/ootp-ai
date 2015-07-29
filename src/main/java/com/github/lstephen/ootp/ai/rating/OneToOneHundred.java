@@ -1,4 +1,4 @@
-package com.github.lstephen.ootp.extract.html.rating;
+package com.github.lstephen.ootp.ai.rating;
 
 /**
  *

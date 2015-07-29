@@ -19,7 +19,7 @@ import com.github.lstephen.ootp.ai.ootp5.site.TopProspects;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.github.lstephen.ootp.ai.player.PlayerSource;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
+import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.roster.Roster;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.site.LeagueStructure;

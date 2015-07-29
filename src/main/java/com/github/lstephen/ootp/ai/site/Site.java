@@ -1,11 +1,10 @@
 package com.github.lstephen.ootp.ai.site;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
+import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.roster.Roster;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
@@ -13,7 +12,10 @@ import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+
 import org.joda.time.LocalDate;
 
 /**

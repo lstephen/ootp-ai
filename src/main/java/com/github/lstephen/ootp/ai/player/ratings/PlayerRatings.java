@@ -1,15 +1,17 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
+import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
+import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.splits.Splits;
+import com.github.lstephen.ootp.ai.stats.SplitPercentages;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import com.google.common.base.Objects;
-import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
-import com.github.lstephen.ootp.ai.splits.Splits;
-import com.github.lstephen.ootp.ai.stats.SplitPercentages;
-import com.github.lstephen.ootp.extract.html.rating.OneToOneHundred;
-import com.github.lstephen.ootp.extract.html.rating.Rating;
 
 /**
  *

@@ -1,14 +1,13 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import com.github.lstephen.ootp.extract.html.rating.Rating;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;

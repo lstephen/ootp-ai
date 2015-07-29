@@ -6,8 +6,8 @@ require 'java'
 require 'player/ratings/matchers'
 
 java_import com.github.lstephen.ootp.ai.player.Player
+java_import com.github.lstephen.ootp.ai.rating.OneToTwenty
 java_import com.github.lstephen.scratch.util.Jackson
-java_import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty
 
 RSpec.describe Player do
   context 'deserialize' do

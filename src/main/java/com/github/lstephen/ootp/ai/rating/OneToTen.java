@@ -1,7 +1,4 @@
-package com.github.lstephen.ootp.extract.html.ootp6.rating;
-
-import com.github.lstephen.ootp.extract.html.rating.IntegerScale;
-import com.github.lstephen.ootp.extract.html.rating.Rating;
+package com.github.lstephen.ootp.ai.rating;
 
 /**
  *
