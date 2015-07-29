@@ -14,7 +14,7 @@ public final class ZeroToTen extends IntegerScale {
 
     @Override
     protected Integer scale(Integer value) {
-        return value * 10;
+        return value == 0 ? 1 : value * 10;
     }
 
     public static ZeroToTen scale() {

@@ -14,7 +14,7 @@ public final class OneToTwenty extends IntegerScale {
 
     @Override
     protected Integer scale(Integer value) {
-        return value * 5;
+        return value * 5 - 2;
     }
 
     public static OneToTwenty scale() {
