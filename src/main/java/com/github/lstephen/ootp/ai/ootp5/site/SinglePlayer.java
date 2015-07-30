@@ -97,7 +97,7 @@ public class SinglePlayer implements PlayerSource {
     try {
       return extract(id, loadPage(id));
     } catch (Exception e) {
-      LOG.log(Level.WARNING, "Player not found. ID: {0}", id);
+      LOG.log(Level.WARNING, "Player not found. ID: " + id);
       return null;
     }
   }
