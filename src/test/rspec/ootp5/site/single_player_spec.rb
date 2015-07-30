@@ -6,10 +6,13 @@ require 'player/ratings/contexts'
 
 java_import com.github.lstephen.ootp.ai.player.PlayerId;
 java_import com.github.lstephen.ootp.ai.ootp5.site.SinglePlayer;
-java_import com.github.lstephen.ootp.ai.rating.Potential;
-java_import com.github.lstephen.ootp.ai.rating.ZeroToTen;
+java_import com.github.lstephen.ootp.ai.rating.AToE;
+java_import com.github.lstephen.ootp.ai.rating.OneToFive;
 java_import com.github.lstephen.ootp.ai.rating.OneToTwenty;
+java_import com.github.lstephen.ootp.ai.rating.Potential;
+java_import com.github.lstephen.ootp.ai.rating.Rating;
 java_import com.github.lstephen.ootp.ai.rating.TwoToEight;
+java_import com.github.lstephen.ootp.ai.rating.ZeroToTen;
 java_import com.github.lstephen.ootp.ai.site.Version;
 java_import com.github.lstephen.ootp.extract.html.loader.JsoupLoader;
 
@@ -34,6 +37,7 @@ RSpec.describe SinglePlayer do
         getName: '',
         getAbilityRatingScale: ability_scale,
         getPotentialRatingScale: potential_scale,
+        getBuntScale: bunt_scale,
         getType: version,
         getDefinition: nil,
         isInjured: false,
@@ -55,11 +59,14 @@ RSpec.describe SinglePlayer do
       let(:version) { Version::OOTP5 }
       let(:ability_scale) { ZeroToTen.new }
       let(:potential_scale) { Potential.new }
+      let(:bunt_scale) { AToE.new }
 
       context 'Elijah Chausse' do
         let(:file) { 'elijah_chausse' }
 
         it_behaves_like :batter, 'Elijah Chausse', 26
+
+        its(:bunt_for_hit_rating) { is_expected.to eq(Rating.new('E', AToE.new)) }
 
         context '#batting_ratings', :property => :batting_ratings do
           its(:vs_left) { is_expected.to be_batting_ratings 5, 4, 7, 8, 3 }
@@ -75,6 +82,8 @@ RSpec.describe SinglePlayer do
     context 'OOTP6' do
       let(:version) { Version::OOTP6 }
 
+      let(:bunt_scale) { OneToFive.new }
+
       context 'TWML' do
         let(:ability_scale) { OneToTwenty.new }
         let(:potential_scale) { TwoToEight.new }
@@ -83,6 +92,8 @@ RSpec.describe SinglePlayer do
           let(:file) { 'victor_plata' }
 
           it_behaves_like :batter, 'Victor Plata', 34
+
+          its(:bunt_for_hit_rating) { is_expected.to eq(Rating.new(2, OneToFive.new)) }
 
           context '#batting_ratings', :property => :batting_ratings do
             its(:vs_left) { is_expected.to be_batting_ratings 9, 14, 20, 20, 7 }
@@ -103,6 +114,8 @@ RSpec.describe SinglePlayer do
           let(:file) { 'alonso_ayo' }
 
           it_behaves_like :batter, 'Alonso Ayo', 27
+
+          its(:bunt_for_hit_rating) { is_expected.to eq(Rating.new(2, OneToFive.new)) }
 
           context '#batting_ratings', :property => :batting_ratings do
             its(:vs_left) { is_expected.to be_batting_ratings 88, 99, 100, 100, 61 }

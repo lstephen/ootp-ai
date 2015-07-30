@@ -7,6 +7,7 @@ import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.player.ratings.RatingsDefinition;
 import com.github.lstephen.ootp.ai.player.ratings.StarRating;
+import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.splits.Splits;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -317,6 +318,10 @@ public final class Player {
 
     public Splits<BattingRatings<Integer>> getBattingPotentialRatings() {
         return ratings.getBattingPotential(age);
+    }
+
+    public Rating<?, ?> getBuntForHitRating() {
+      return ratings.getBuntForHit();
     }
 
     public boolean hasPitchingRatings() {
