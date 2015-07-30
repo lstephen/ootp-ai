@@ -127,6 +127,28 @@ RSpec.describe SinglePlayer do
           end
         end
       end
+
+     context 'BTHUSTLE' do
+        let(:ability_scale) { OneToOneHundred.new }
+        let(:potential_scale) { OneToTen.new }
+
+        context 'Earl Yi' do
+          let(:file) { 'earl_yi' }
+
+          it_behaves_like :batter, 'Earl Yi', 31
+
+          its(:bunt_for_hit_rating) { is_expected.to eq(Rating.new(1, OneToFive.new)) }
+
+          context '#batting_ratings', :property => :batting_ratings do
+            its(:vs_left) { is_expected.to be_batting_ratings 80, 65, 100, 100, 65 }
+            its(:vs_right) { is_expected.to be_batting_ratings 65, 59, 100, 100, 62 }
+          end
+
+          context '#defensive_ratings', :property => :defensive_ratings do
+            its(:position_scores) { is_expected.to eq('-3-66---') }
+          end
+        end
+      end
     end
   end
 end
