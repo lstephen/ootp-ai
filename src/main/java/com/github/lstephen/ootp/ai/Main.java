@@ -62,6 +62,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
@@ -477,14 +478,6 @@ public class Main {
 
         Printables.print(lineups).to(out);
 
-        if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
-            LOG.log(Level.INFO, "Spring training...");
-            Printables
-                .print(SpringTraining.create(
-                    site.getType(), newRoster.getAllPlayers()))
-                .to(out);
-        }
-
         LOG.log(Level.INFO, "Salary Regression...");
 
         SalaryRegression salaryRegression = new SalaryRegression(tv, site);
@@ -501,6 +494,25 @@ public class Main {
         Printables.print(salaryRegression).to(out);
 
         final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salaryRegression);
+        generic.setCustomValueFunction(tv.getTradeTargetValue());
+        generic.setReverse(false);
+
+        LOG.log(Level.INFO, "Strategy...");
+        generic.setTitle("Bunt for Hit");
+        generic.setPlayers(newRoster
+            .getPlayers(Status.ML)
+            .stream()
+            .filter(p -> p.getBuntForHitRating().normalize().get() >= 80)
+            .collect(Collectors.toSet()));
+        generic.print(out);
+
+        if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
+            LOG.log(Level.INFO, "Spring training...");
+            Printables
+                .print(SpringTraining.create(
+                    site.getType(), newRoster.getAllPlayers()))
+                .to(out);
+        }
 
         generic.printReplacementLevelReport(out);
 
@@ -508,17 +520,12 @@ public class Main {
 
         Printables.print(rosterReport).to(out);
 
-        generic.setCustomValueFunction(tv.getTradeTargetValue());
-
-        generic.setReverse(false);
-
         LOG.info("Draft...");
         ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
         Iterable<Player> remaining =
           Sets.difference(
               ImmutableSet.copyOf(FluentIterable.from(site.getDraft()).filter(Predicates.notNull())),
               drafted);
-
 
         if (!Iterables.isEmpty(remaining)) {
             generic.setTitle("Drafted");
