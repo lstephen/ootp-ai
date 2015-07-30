@@ -125,7 +125,7 @@ public class PitchingRatings<T> {
         }
 
         public Builder<T> hits(T value) {
-            return hits(Rating.create(value, scale));
+            return hits(new Rating<>(value, scale));
         }
 
         public Builder<T> gap(Rating<T, ?> gap) {
@@ -139,7 +139,7 @@ public class PitchingRatings<T> {
         }
 
         public Builder<T> gap(T value) {
-            return gap(Rating.create(value, scale));
+            return gap(new Rating<>(value, scale));
         }
 
         public Builder<T> stuff(Rating<T, ?> stuff) {
@@ -153,7 +153,7 @@ public class PitchingRatings<T> {
         }
 
         public Builder<T> stuff(T value) {
-            return stuff(Rating.create(value, scale));
+            return stuff(new Rating<>(value, scale));
         }
 
         public Builder<T> control(Rating<T, ?> control) {
@@ -167,7 +167,7 @@ public class PitchingRatings<T> {
         }
 
         public Builder<T> control(T value) {
-            return control(Rating.create(value, scale));
+            return control(new Rating<>(value, scale));
         }
 
         public Builder<T> movement(Rating<T, ?> movement) {
@@ -181,7 +181,7 @@ public class PitchingRatings<T> {
         }
 
         public Builder<T> movement(T value) {
-            return movement(Rating.create(value, scale));
+            return movement(new Rating<>(value, scale));
         }
 
         public Builder<T> endurance(Rating<Integer, ? super OneToTen> endurance) {
@@ -195,7 +195,7 @@ public class PitchingRatings<T> {
         }
 
         public Builder<T> endurance(Integer value) {
-            return endurance(Rating.create(value, new OneToTen()));
+            return endurance(new Rating<>(value, new OneToTen()));
         }
 
 

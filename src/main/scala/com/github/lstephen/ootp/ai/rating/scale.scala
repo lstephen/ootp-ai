@@ -27,12 +27,12 @@ abstract class IntegerScale(scale: Integer => Integer) extends Scale[Integer] {
     OneToOneHundred.valueOf(scale(v))
 
   override def parse(s: String): Rating[Integer, IntegerScale] =
-    Rating.create(Integer.parseInt(s), this)
+    Rating(Integer.parseInt(s), this)
 }
 
 object OneToOneHundred {
   def valueOf(v: Integer): Rating[Integer, OneToOneHundred] =
-    Rating.create(v, OneToOneHundred())
+    Rating(v, OneToOneHundred())
 }
 
 case class OneToOneHundred() extends IntegerScale(v => v)
@@ -55,7 +55,7 @@ case class Potential() extends Scale[String] {
       ratings.keySet.contains(sanitize(s)),
       s"Unknown rating: $s")
 
-    Rating.create(s, this)
+    Rating(s, this)
   }
 
   override def normalize(v: String): Rating[Integer, OneToOneHundred] =
