@@ -10,12 +10,13 @@ import com.google.common.base.CharMatcher
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(Array(
-    new Type(classOf[ZeroToTen]),
-    new Type(classOf[OneToTen]),
-    new Type(value = classOf[Potential], name = "PotentialRating$RatingScale"),
-    new Type(classOf[OneToOneHundred]),
-    new Type(classOf[OneToTwenty]),
-    new Type(classOf[TwoToEight])
+  new Type(classOf[OneToFive]),
+  new Type(classOf[OneToTen]),
+  new Type(classOf[OneToOneHundred]),
+  new Type(classOf[OneToTwenty]),
+  new Type(value = classOf[Potential], name = "PotentialRating$RatingScale"),
+  new Type(classOf[TwoToEight]),
+  new Type(classOf[ZeroToTen])
 ))
 trait Scale[T] {
   def parse(s: String): Rating[T, _ <: Scale[T]]
@@ -35,6 +36,7 @@ object OneToOneHundred {
     Rating(v, OneToOneHundred())
 }
 
+case class OneToFive() extends IntegerScale(v => v * 20 - 10)
 case class OneToOneHundred() extends IntegerScale(v => v)
 case class OneToTen() extends IntegerScale(v => v * 10 - 5)
 case class OneToTwenty() extends IntegerScale(v => v * 5 - 2)

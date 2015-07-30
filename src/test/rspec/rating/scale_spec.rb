@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'java'
 
+java_import com.github.lstephen.ootp.ai.rating.OneToFive
 java_import com.github.lstephen.ootp.ai.rating.OneToOneHundred
 java_import com.github.lstephen.ootp.ai.rating.OneToTen
 java_import com.github.lstephen.ootp.ai.rating.OneToTwenty
@@ -9,6 +10,7 @@ java_import com.github.lstephen.ootp.ai.rating.TwoToEight
 java_import com.github.lstephen.ootp.ai.rating.ZeroToTen
 
 {
+  OneToFive       => 1..5,
   OneToOneHundred => 1..100,
   OneToTwenty     => 1..20,
   TwoToEight      => 2..8,
