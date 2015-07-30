@@ -4,7 +4,7 @@ require 'java'
 java_import com.github.lstephen.ootp.ai.rating.OneToOneHundred
 java_import com.github.lstephen.ootp.ai.rating.OneToTen
 java_import com.github.lstephen.ootp.ai.rating.OneToTwenty
-java_import com.github.lstephen.ootp.ai.rating.PotentialRating
+java_import com.github.lstephen.ootp.ai.rating.Potential
 java_import com.github.lstephen.ootp.ai.rating.TwoToEight
 java_import com.github.lstephen.ootp.ai.rating.ZeroToTen
 
@@ -14,7 +14,7 @@ java_import com.github.lstephen.ootp.ai.rating.ZeroToTen
   TwoToEight      => 2..8,
   OneToTen        => 1..10,
   ZeroToTen       => 0..10,
-  PotentialRating => ['Poor', 'Fair', 'Average', 'Good', 'Brilliant']
+  Potential       => ['Poor', 'Fair', 'Average', 'Good', 'Brilliant']
 }.each do |scale, range|
   RSpec.describe scale do
     let(:range) { range }

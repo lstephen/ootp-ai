@@ -6,7 +6,7 @@ import com.github.lstephen.ootp.ai.ootp6.Ootp6;
 import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.OneToTen;
 import com.github.lstephen.ootp.ai.rating.OneToTwenty;
-import com.github.lstephen.ootp.ai.rating.PotentialRating;
+import com.github.lstephen.ootp.ai.rating.Potential;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.rating.TwoToEight;
 import com.github.lstephen.ootp.ai.rating.ZeroToTen;
@@ -98,7 +98,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     @Override
     public Scale<?> getPotentialRatingsScale() {
         if (type == Version.OOTP5) {
-            return PotentialRating.scale();
+            return new Potential();
         }
 
         if (name.contains("BTH")) {

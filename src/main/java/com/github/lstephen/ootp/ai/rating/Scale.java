@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes({
     @Type(ZeroToTen.class),
     @Type(OneToTen.class),
-    @Type(PotentialRating.RatingScale.class),
+    @Type(value=Potential.class, name="PotentialRating$RatingScale"),
     @Type(OneToOneHundred.class),
     @Type(OneToTwenty.class),
     @Type(TwoToEight.class)

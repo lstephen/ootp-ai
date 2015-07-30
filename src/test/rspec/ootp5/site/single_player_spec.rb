@@ -5,7 +5,7 @@ require 'player/ratings/contexts'
 
 java_import com.github.lstephen.ootp.ai.player.PlayerId;
 java_import com.github.lstephen.ootp.ai.ootp5.site.SinglePlayer;
-java_import com.github.lstephen.ootp.ai.rating.PotentialRating;
+java_import com.github.lstephen.ootp.ai.rating.Potential;
 java_import com.github.lstephen.ootp.ai.rating.ZeroToTen;
 java_import com.github.lstephen.ootp.ai.rating.OneToTwenty;
 java_import com.github.lstephen.ootp.ai.rating.TwoToEight;
@@ -52,7 +52,7 @@ RSpec.describe SinglePlayer do
     context 'OOTP5' do
       let(:version) { Version::OOTP5 }
       let(:ability_scale) { ZeroToTen.new }
-      let(:potential_scale) { PotentialRating.scale }
+      let(:potential_scale) { Potential.new }
 
       context 'Elijah Chausse' do
         let(:file) { 'elijah_chausse' }

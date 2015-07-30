@@ -23,38 +23,29 @@ case class OneToTwenty() extends IntegerScale(v => v * 5 - 2)
 case class TwoToEight() extends IntegerScale(v => (v * 2 + (v - 5)) * 5)
 case class ZeroToTen() extends IntegerScale(v => if (v == 0) 1 else v * 10)
 
-/**
- * Legacy naming. In areas such as JSON decoding with Jackson the
- * class name is important.
- */
-object PotentialRating {
+case class Potential() extends Scale[String] {
+  private val ratings = Map(
+    "BRILLIANT" -> 90,
+    "GOOD"      -> 70,
+    "AVERAGE"   -> 50,
+    "FAIR"      -> 30,
+    "POOR"      -> 10
+  )
 
-  def scale = RatingScale()
+  override def parse(s: String): Rating[String, Potential] = {
+    require(
+      ratings.keySet.contains(sanitize(s)),
+      s"Unknown rating: $s")
 
-  case class RatingScale() extends Scale[String] {
-    private val ratings = Map(
-      "BRILLIANT" -> 90,
-      "GOOD"      -> 70,
-      "AVERAGE"   -> 50,
-      "FAIR"      -> 30,
-      "POOR"      -> 10
-    )
-
-    override def parse(s: String): Rating[String, RatingScale] = {
-      require(
-        ratings.keySet.contains(sanitize(s)),
-        s"Unknown rating: $s")
-
-      Rating.create(s, this)
-    }
-
-    override def normalize(v: String): Rating[Integer, OneToOneHundred] =
-      OneToOneHundred.valueOf(normalizeToInt(v))
-
-    private def normalizeToInt(v: String): Integer =
-      ratings.getOrElse(sanitize(v), throw new IllegalStateException(s"Unknown rating: $v"))
-
-    private def sanitize(v: String): String =
-      CharMatcher.WHITESPACE.trimFrom(v).toUpperCase(Locale.ENGLISH)
+    Rating.create(s, this)
   }
+
+  override def normalize(v: String): Rating[Integer, OneToOneHundred] =
+    OneToOneHundred.valueOf(normalizeToInt(v))
+
+  private def normalizeToInt(v: String): Integer =
+    ratings.getOrElse(sanitize(v), throw new IllegalStateException(s"Unknown rating: $v"))
+
+  private def sanitize(v: String): String =
+    CharMatcher.WHITESPACE.trimFrom(v).toUpperCase(Locale.ENGLISH)
 }
