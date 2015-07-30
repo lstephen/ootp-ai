@@ -25,14 +25,7 @@ public final class Rating<T, S extends Scale<T>> {
         Preconditions.checkNotNull(value);
         Preconditions.checkNotNull(scale);
 
-        if (String.class.isInstance(value)) {
-          Exception backtrace = new RuntimeException();
-          LOGGER.log(Level.WARNING, "Received String for Rating: " + value + ":" + scale, backtrace);
-          this.value = scale.parse(String.class.cast(value)).value;
-        } else {
-          this.value = value;
-        }
-
+        this.value = value;
         this.scale = scale;
     }
 
