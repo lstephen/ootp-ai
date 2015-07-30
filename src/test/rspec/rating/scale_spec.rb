@@ -1,6 +1,7 @@
 require 'spec_helper'
 require 'java'
 
+java_import com.github.lstephen.ootp.ai.rating.AToE
 java_import com.github.lstephen.ootp.ai.rating.OneToFive
 java_import com.github.lstephen.ootp.ai.rating.OneToOneHundred
 java_import com.github.lstephen.ootp.ai.rating.OneToTen
@@ -16,6 +17,7 @@ java_import com.github.lstephen.ootp.ai.rating.ZeroToTen
   TwoToEight      => 2..8,
   OneToTen        => 1..10,
   ZeroToTen       => 0..10,
+  AToE            => ['E', 'D', 'C', 'B', 'A'],
   Potential       => ['Poor', 'Fair', 'Average', 'Good', 'Brilliant']
 }.each do |scale, range|
   RSpec.describe scale do
