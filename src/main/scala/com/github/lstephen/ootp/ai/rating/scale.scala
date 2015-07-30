@@ -2,7 +2,25 @@ package com.github.lstephen.ootp.ai.rating
 
 import java.util.Locale
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
 import com.google.common.base.CharMatcher
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
+@JsonSubTypes(Array(
+    new Type(classOf[ZeroToTen]),
+    new Type(classOf[OneToTen]),
+    new Type(value = classOf[Potential], name = "PotentialRating$RatingScale"),
+    new Type(classOf[OneToOneHundred]),
+    new Type(classOf[OneToTwenty]),
+    new Type(classOf[TwoToEight])
+))
+trait Scale[T] {
+  def parse(s: String): Rating[T, _ <: Scale[T]]
+  def normalize(v: T): Rating[Integer, OneToOneHundred]
+}
 
 abstract class IntegerScale(scale: Integer => Integer) extends Scale[Integer] {
   override def normalize(v: Integer): Rating[Integer, OneToOneHundred] =
@@ -49,3 +67,4 @@ case class Potential() extends Scale[String] {
   private def sanitize(v: String): String =
     CharMatcher.WHITESPACE.trimFrom(v).toUpperCase(Locale.ENGLISH)
 }
+
