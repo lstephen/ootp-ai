@@ -1,14 +1,14 @@
 package com.github.lstephen.ootp.ai.ootp5.site;
 
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
+import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
 
 import static com.github.lstephen.ootp.ai.site.Version.OOTP5;
 import static com.github.lstephen.ootp.ai.site.Version.OOTP6;
 
 import com.github.lstephen.ootp.ai.splits.Splits;
-import com.github.lstephen.ootp.extract.html.rating.Rating;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;

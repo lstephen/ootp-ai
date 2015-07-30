@@ -3,18 +3,18 @@ package com.github.lstephen.ootp.ai.site.impl;
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.ootp5.Ootp5;
 import com.github.lstephen.ootp.ai.ootp6.Ootp6;
+import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
+import com.github.lstephen.ootp.ai.rating.OneToTen;
+import com.github.lstephen.ootp.ai.rating.OneToTwenty;
+import com.github.lstephen.ootp.ai.rating.Potential;
+import com.github.lstephen.ootp.ai.rating.Scale;
+import com.github.lstephen.ootp.ai.rating.TwoToEight;
+import com.github.lstephen.ootp.ai.rating.ZeroToTen;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.SiteDefinition;
 import com.github.lstephen.ootp.ai.site.Version;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
-import com.github.lstephen.ootp.extract.html.ootp5.rating.PotentialRating;
-import com.github.lstephen.ootp.extract.html.ootp5.rating.ZeroToTen;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTen;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty;
-import com.github.lstephen.ootp.extract.html.ootp6.rating.TwoToEight;
-import com.github.lstephen.ootp.extract.html.rating.OneToOneHundred;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
 
 /**
  *
@@ -98,15 +98,15 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     @Override
     public Scale<?> getPotentialRatingsScale() {
         if (type == Version.OOTP5) {
-            return PotentialRating.scale();
+            return new Potential();
         }
 
         if (name.contains("BTH")) {
-            return OneToTen.scale();
+            return new OneToTen();
         }
 
         if (name.equals("TWML")) {
-            return TwoToEight.scale();
+            return new TwoToEight();
         }
 
         throw new IllegalArgumentException();
@@ -115,15 +115,15 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     @Override
     public Scale<?> getAbilityRatingScale() {
         if (type == Version.OOTP5) {
-            return ZeroToTen.scale();
+            return new ZeroToTen();
         }
 
         if (name.contains("BTH")) {
-            return OneToOneHundred.scale();
+            return new OneToOneHundred();
         }
 
         if (name.equals("TWML")) {
-            return OneToTwenty.scale();
+            return new OneToTwenty();
         }
 
         throw new IllegalArgumentException();

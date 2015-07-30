@@ -1,9 +1,5 @@
 package com.github.lstephen.ootp.ai.ootp5.site;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Ordering;
 import com.github.lstephen.ootp.ai.player.BattingHand;
 import com.github.lstephen.ootp.ai.player.Clutch;
 import com.github.lstephen.ootp.ai.player.Consistency;
@@ -16,14 +12,22 @@ import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.player.ratings.StarRating;
+import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.Version;
 import com.github.lstephen.ootp.ai.splits.Splits;
-import com.github.lstephen.ootp.extract.html.rating.Rating;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Ordering;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;

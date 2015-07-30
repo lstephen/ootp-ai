@@ -1,15 +1,17 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
+import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
+import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.splits.Splits;
+import com.github.lstephen.ootp.ai.stats.SplitPercentages;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import com.google.common.base.Objects;
-import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
-import com.github.lstephen.ootp.ai.splits.Splits;
-import com.github.lstephen.ootp.ai.stats.SplitPercentages;
-import com.github.lstephen.ootp.extract.html.rating.OneToOneHundred;
-import com.github.lstephen.ootp.extract.html.rating.Rating;
 
 /**
  *
@@ -68,7 +70,7 @@ public final class PlayerRatings {
         BattingRatings<?> ovr = getOverallBatting(getBatting());
 
         BattingRatings<Integer> capped = BattingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .contact(capBattingPotential(age, ovr.getContact(), battingPotential.getContact()))
             .gap(capBattingPotential(age, ovr.getGap(), battingPotential.getGap()))
             .power(capBattingPotential(age, ovr.getPower(), battingPotential.getPower()))
@@ -78,7 +80,7 @@ public final class PlayerRatings {
         BattingRatings<?> curVsLeft = getBatting().getVsLeft();
 
         BattingRatings<Integer> potVsLeft = BattingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .contact(capBatting(age, curVsLeft.getContact(), capped.getContact(), ovr.getContact()))
             .gap(capBatting(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
             .power(capBatting(age, curVsLeft.getPower(), capped.getPower(), ovr.getPower()))
@@ -88,7 +90,7 @@ public final class PlayerRatings {
         BattingRatings<?> curVsRight = getBatting().getVsRight();
 
         BattingRatings<Integer> potVsRight = BattingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .contact(capBatting(age, curVsRight.getContact(), capped.getContact(), ovr.getContact()))
             .gap(capBatting(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
             .power(capBatting(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
@@ -102,7 +104,7 @@ public final class PlayerRatings {
         PitchingRatings<?> ovr = getOverallPitching(getPitching());
 
         PitchingRatings<Integer> capped = PitchingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .stuff(capPitchingPotential(age, ovr.getStuff(), pitchingPotential.getStuff()))
             .control(capPitchingPotential(age, ovr.getControl(), pitchingPotential.getControl()))
             .movement(capPitchingPotential(age, ovr.getMovement(), pitchingPotential.getMovement()))
@@ -114,7 +116,7 @@ public final class PlayerRatings {
         PitchingRatings curVsLeft = getPitching().getVsLeft();
 
         PitchingRatings<Integer> potVsLeft = PitchingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .stuff(capPitching(age, curVsLeft.getStuff(), capped.getStuff(), ovr.getStuff()))
             .control(capPitching(age, curVsLeft.getControl(), capped.getControl(), ovr.getControl()))
             .movement(capPitching(age, curVsLeft.getMovement(), capped.getMovement(), ovr.getMovement()))
@@ -126,7 +128,7 @@ public final class PlayerRatings {
         PitchingRatings curVsRight = getPitching().getVsRight();
 
         PitchingRatings<Integer> potVsRight = PitchingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .stuff(capPitching(age, curVsRight.getStuff(), capped.getStuff(), ovr.getStuff()))
             .control(capPitching(age, curVsRight.getControl(), capped.getControl(), ovr.getControl()))
             .movement(capPitching(age, curVsRight.getMovement(), capped.getMovement(), ovr.getMovement()))
@@ -211,7 +213,7 @@ public final class PlayerRatings {
         Integer vL = 1000 - vR;
 
         BattingRatings ovr = BattingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .contact(OneToOneHundred.valueOf((vR * splits.getVsRight().getContact() + vL * splits.getVsLeft().getContact()) / 1000))
             .gap(OneToOneHundred.valueOf((vR * splits.getVsRight().getGap() + vL * splits.getVsLeft().getGap()) / 1000))
             .power(OneToOneHundred.valueOf((vR * splits.getVsRight().getPower() + vL * splits.getVsLeft().getPower()) / 1000))
@@ -226,7 +228,7 @@ public final class PlayerRatings {
         Integer vL = 1000 - vR;
 
         return PitchingRatings
-            .builder(OneToOneHundred.scale())
+            .builder(new OneToOneHundred())
             .stuff((vR * splits.getVsRight().getStuff() + vL * splits.getVsLeft().getStuff()) / 1000)
             .control((vR * splits.getVsRight().getControl() + vL * splits.getVsLeft().getControl()) / 1000)
             .movement((vR * splits.getVsRight().getMovement() + vL * splits.getVsLeft().getMovement()) / 1000)

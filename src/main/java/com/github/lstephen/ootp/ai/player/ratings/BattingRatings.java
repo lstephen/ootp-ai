@@ -1,14 +1,13 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import com.github.lstephen.ootp.extract.html.rating.Rating;
-import com.github.lstephen.ootp.extract.html.rating.Scale;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
@@ -170,7 +169,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> contact(T value) {
-            return contact(Rating.create(value, scale));
+          return contact(new Rating<>(value, scale));
         }
 
         public Builder<T> gap(Rating<T, ?> gap) {
@@ -184,7 +183,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> gap(T value) {
-            return gap(Rating.create(value, scale));
+            return gap(new Rating<>(value, scale));
         }
 
         public Builder<T> power(Rating<T, ?> power) {
@@ -198,7 +197,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> power(T value) {
-            return power(Rating.create(value, scale));
+            return power(new Rating<>(value, scale));
         }
 
         public Builder<T> eye(Rating<T, ?> eye) {
@@ -212,7 +211,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> eye(T value) {
-            return eye(Rating.create(value, scale));
+            return eye(new Rating<>(value, scale));
         }
 
         public Builder<T> k(Rating<T, ?> k) {
@@ -228,7 +227,7 @@ public final class BattingRatings<T> {
         }
 
         public Builder<T> k(T value) {
-            return value == null ? this : k(Rating.create(value, scale));
+            return value == null ? this : k(new Rating<>(value, scale));
         }
 
 

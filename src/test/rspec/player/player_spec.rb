@@ -1,37 +1,57 @@
 
 require 'spec_helper'
 
-require 'java'
-
+require 'player/ratings/contexts'
 require 'player/ratings/matchers'
 
 java_import com.github.lstephen.ootp.ai.player.Player
+java_import com.github.lstephen.ootp.ai.rating.OneToTen
+java_import com.github.lstephen.ootp.ai.rating.OneToTwenty
 java_import com.github.lstephen.scratch.util.Jackson
-java_import com.github.lstephen.ootp.extract.html.ootp6.rating.OneToTwenty
+
+RSpec.shared_examples :batter do |name, age|
+  it { is_expected.to_not be_nil }
+  its(:name) { is_expected.to eq(name) }
+  its(:age) { is_expected.to eq(age) }
+  its(:pitching_ratings) { is_expected.to be_nil }
+end
 
 RSpec.describe Player do
-  context 'deserialize' do
-    let(:json) { VICTOR_PLATA_JSON }
-
+  context 'deserialize from Json' do
     subject(:player) { Jackson.getMapper(nil).readValue(json, Player.java_class) }
 
-    it { is_expected.to_not be_nil }
-    its(:name) { is_expected.to eq('Victor Plata') }
-    its(:age) { is_expected.to eq(34) }
-    its(:pitching_ratings) { is_expected.to be_nil }
+    context 'Victor Plata' do
+      let(:json) { VICTOR_PLATA_JSON }
 
-    context '#batting_ratings' do
-      let(:scale) { OneToTwenty.scale }
-      subject { player.batting_ratings }
+      it_behaves_like :batter, 'Victor Plata', 34
 
-      its(:vs_left) { is_expected.to be_batting_ratings 10, 14, 20, 20, 7 }
-      its(:vs_right) { is_expected.to be_batting_ratings 9, 14, 20, 20, 7 }
+      context '#batting_ratings', :property => :batting_ratings do
+        let(:ability_scale) { OneToTwenty.new }
+
+        its(:vs_left) { is_expected.to be_batting_ratings 10, 14, 20, 20, 7 }
+        its(:vs_right) { is_expected.to be_batting_ratings 9, 14, 20, 20, 7 }
+      end
+
+      context '#defensive_ratings', :property => :defensive_ratings do
+        its(:position_scores) { is_expected.to eq('-2------') }
+      end
     end
 
-    context '#defensive_ratings' do
-      subject { player.defensive_ratings }
+    context 'Elijah Chausse' do
+      let(:json) { ELIJAH_CHAUSEE_JSON }
 
-      its(:position_scores) { is_expected.to eq('-2------') }
+      it_behaves_like :batter, 'Elijah Chausse', 27
+
+      context '#batting_ratings', :property => :batting_ratings do
+        let(:ability_scale) { ZeroToTen.new }
+
+        its(:vs_left) { is_expected.to be_batting_ratings 5, 4, 8, 8, 3 }
+        its(:vs_right) { is_expected.to be_batting_ratings 6, 5, 9, 9, 4 }
+      end
+
+      context '#defensive_ratings', :property => :defensive_ratings do
+        its(:position_scores) { is_expected.to eq('-2---3-5') }
+      end
     end
   end
 end
@@ -149,5 +169,121 @@ VICTOR_PLATA_JSON = <<-JSON
   "battingHand" : "SWITCH",
   "upcomingFreeAgent" : false,
   "injured" : false
+}
+JSON
+
+ELIJAH_CHAUSEE_JSON = <<-JSON
+{
+  "id" : "p764",
+  "name" : "Elijah Chausse",
+  "ratings" : {
+    "batting" : {
+      "vsLeft" : {
+        "@type" : "BattingRatings",
+        "scale" : {
+          "@type" : "ZeroToTen"
+        },
+        "contact" : 5,
+        "gap" : 4,
+        "power" : 8,
+        "eye" : 8,
+        "k" : 3
+      },
+      "vsRight" : {
+        "@type" : "BattingRatings",
+        "scale" : {
+          "@type" : "ZeroToTen"
+        },
+        "contact" : 6,
+        "gap" : 5,
+        "power" : 9,
+        "eye" : 9,
+        "k" : 4
+      }
+    },
+    "defensive" : {
+      "positionRating" : {
+        "RIGHT_FIELD" : 3.0
+      },
+      "catcher" : {
+        "range" : {
+          "present" : false
+        },
+        "errors" : {
+          "present" : false
+        },
+        "arm" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "dp" : {
+          "present" : false
+        },
+        "ability" : {
+          "reference" : 0,
+          "present" : true
+        }
+      },
+      "infield" : {
+        "range" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "errors" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "arm" : {
+          "reference" : 50,
+          "present" : true
+        },
+        "dp" : {
+          "reference" : 50,
+          "present" : true
+        },
+        "ability" : {
+          "present" : false
+        }
+      },
+      "outfield" : {
+        "range" : {
+          "reference" : 21,
+          "present" : true
+        },
+        "errors" : {
+          "reference" : 87,
+          "present" : true
+        },
+        "arm" : {
+          "reference" : 90,
+          "present" : true
+        },
+        "dp" : {
+          "present" : false
+        },
+        "ability" : {
+          "present" : false
+        }
+      }
+    },
+    "pitching" : null,
+    "battingPotential" : {
+      "scale" : {
+        "@type" : "PotentialRating$RatingScale"
+      },
+      "contact" : "GOOD",
+      "gap" : "AVERAGE",
+      "power" : "BRILLIANT",
+      "eye" : "BRILLIANT",
+      "k" : "AVERAGE"
+    },
+    "pitchingPotential" : null
+  },
+  "age" : 27,
+  "team" : "Wichita Linemen",
+  "salary" : "$4.43M  ",
+  "battingHand" : "LEFT",
+  "injured" : false,
+  "upcomingFreeAgent" : true
 }
 JSON

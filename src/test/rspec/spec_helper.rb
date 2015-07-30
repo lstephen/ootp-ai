@@ -1,6 +1,13 @@
 
 require 'rspec/its'
 
+require 'java'
+
+java_import java.util.logging.Level
+java_import java.util.logging.Logger
+
+Logger.get_logger('').level = Level::SEVERE
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
