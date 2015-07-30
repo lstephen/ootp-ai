@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.site.impl;
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.ootp5.Ootp5;
 import com.github.lstephen.ootp.ai.ootp6.Ootp6;
+import com.github.lstephen.ootp.ai.rating.AToE;
 import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.OneToTen;
 import com.github.lstephen.ootp.ai.rating.OneToTwenty;
@@ -127,6 +128,11 @@ public final class SiteDefinitionImpl implements SiteDefinition {
         }
 
         throw new IllegalArgumentException();
+    }
+
+    @Override
+    public Scale<?> getBuntScale() {
+      return new AToE();
     }
 
     @Override

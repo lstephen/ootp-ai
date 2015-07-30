@@ -343,9 +343,16 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
+  public Scale<?> getBuntScale() {
+    return definition.getBuntScale();
+  }
+
+  @Override
   public Printable getPowerRankingsReport(RecordPredictor recordPredictor) {
     return PowerRankingsReport.create(this, recordPredictor);
   }
+
+
 
   public static SiteImpl create(SiteDefinition definition, PlayerSource players) {
     return new SiteImpl(definition, players);

@@ -32,6 +32,8 @@ public final class PlayerRatings {
 
     private PitchingRatings pitchingPotential;
 
+    private Rating<?, ?> buntForHit;
+
     @JsonIgnore
     private RatingsDefinition definition;
 
@@ -60,6 +62,14 @@ public final class PlayerRatings {
     public DefensiveRatings getDefensive() { return defensive; }
 
     public Splits<BattingRatings<?>> getBatting() { return batting; }
+
+    public Rating<?, ?> getBuntForHit() {
+      return buntForHit;
+    }
+
+    public void setBuntForHit(Rating<?, ?> buntForHit) {
+      this.buntForHit = buntForHit;
+    }
 
     public Splits<PitchingRatings<?>> getPitching() { return pitching; }
 

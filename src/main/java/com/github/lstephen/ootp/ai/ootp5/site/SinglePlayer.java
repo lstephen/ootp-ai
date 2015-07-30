@@ -98,6 +98,7 @@ public class SinglePlayer implements PlayerSource {
       return extract(id, loadPage(id));
     } catch (Exception e) {
       LOG.log(Level.WARNING, "Player not found. ID: " + id);
+      LOG.log(Level.FINE, "Reason for not finding " + id, e);
       return null;
     }
   }
@@ -140,6 +141,8 @@ public class SinglePlayer implements PlayerSource {
     if (ratings.hasPitching()) {
       ratings.setPitchingPotential(extractPitchingPotential(doc));
     }
+
+    ratings.setBuntForHit(extractBuntForHit(doc));
 
     Player player = Player.create(id, name, ratings);
 
@@ -239,7 +242,19 @@ public class SinglePlayer implements PlayerSource {
   }
 
   private String extractContractText(Document doc, String title) {
-    String titles = doc.select("td.s4:contains(Contract)").html();
+    return extractLabelledText(doc, "Contract", title);
+  }
+
+  private Rating<?, ?> extractBuntForHit(Document doc) {
+    return site.getBuntScale().parse(extractBattingRunningText(doc, " Bunt for Hit :"));
+  }
+
+  private String extractBattingRunningText(Document doc, String title) {
+    return extractLabelledText(doc, "Bunting Ratings", title);
+  }
+
+  private String extractLabelledText(Document doc, String category, String title) {
+    String titles = doc.select("td.s4:contains(" + category + ")").html();
 
     String[] splitTitles = StringUtils.splitByWholeSeparatorPreserveAllTokens(titles, "<br />");
 
@@ -253,10 +268,10 @@ public class SinglePlayer implements PlayerSource {
     }
 
     if (idx < 0) {
-      return null;
+      throw new IllegalStateException("Coulld not find labelled text: " + category + "/" + title);
     }
 
-    String raw = doc.select("td.s4:contains(Contract) + td.s4").html();
+    String raw = doc.select("td.s4:contains(" + category + ") + td.s4").html();
 
     String[] split = StringUtils.splitByWholeSeparatorPreserveAllTokens(raw, "<br />");
 
