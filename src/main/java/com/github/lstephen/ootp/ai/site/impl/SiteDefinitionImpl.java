@@ -144,6 +144,18 @@ public final class SiteDefinitionImpl implements SiteDefinition {
     }
 
     @Override
+    public Scale<?> getRunningScale() {
+      switch (type) {
+        case OOTP5:
+          return new AToE();
+        case OOTP6:
+          return new OneToTen();
+        default:
+          throw new IllegalStateException();
+      }
+    }
+
+    @Override
     public Site getSite() {
         switch (type) {
             case OOTP5:

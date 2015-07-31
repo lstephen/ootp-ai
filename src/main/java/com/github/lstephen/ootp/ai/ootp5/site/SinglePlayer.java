@@ -143,6 +143,7 @@ public class SinglePlayer implements PlayerSource {
     }
 
     ratings.setBuntForHit(extractBuntForHit(doc));
+    ratings.setStealing(extractStealing(doc));
 
     Player player = Player.create(id, name, ratings);
 
@@ -246,10 +247,14 @@ public class SinglePlayer implements PlayerSource {
   }
 
   private Rating<?, ?> extractBuntForHit(Document doc) {
-    return site.getBuntScale().parse(extractBattingRunningText(doc, " Bunt for Hit :"));
+    return site.getBuntScale().parse(extractRunningText(doc, " Bunt for Hit :"));
   }
 
-  private String extractBattingRunningText(Document doc, String title) {
+  private Rating<?, ?> extractStealing(Document doc) {
+    return site.getRunningScale().parse(extractRunningText(doc, " Stealing Ability :"));
+  }
+
+  private String extractRunningText(Document doc, String title) {
     return extractLabelledText(doc, "Bunting Ratings", title);
   }
 

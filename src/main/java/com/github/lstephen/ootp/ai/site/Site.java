@@ -97,6 +97,7 @@ public interface Site {
     Scale<?> getAbilityRatingScale();
     Scale<?> getPotentialRatingScale();
     Scale<?> getBuntScale();
+    Scale<?> getRunningScale();
 
     Printable getPowerRankingsReport(RecordPredictor recordPredictor);
 

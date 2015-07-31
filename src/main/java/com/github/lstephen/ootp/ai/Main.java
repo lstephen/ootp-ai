@@ -502,7 +502,15 @@ public class Main {
         generic.setPlayers(newRoster
             .getPlayers(Status.ML)
             .stream()
-            .filter(p -> p.getBuntForHitRating().normalize().get() >= 80)
+            .filter(p -> p.getBuntForHitRating().normalize().get() > 80)
+            .collect(Collectors.toSet()));
+        generic.print(out);
+
+        generic.setTitle("Stealing");
+        generic.setPlayers(newRoster
+            .getPlayers(Status.ML)
+            .stream()
+            .filter(p -> p.getStealingRating().normalize().get() > 80)
             .collect(Collectors.toSet()));
         generic.print(out);
 

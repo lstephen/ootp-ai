@@ -24,5 +24,6 @@ public interface SiteDefinition extends RatingsDefinition {
     Scale<?> getAbilityRatingScale();
     Scale<?> getPotentialRatingsScale();
     Scale<?> getBuntScale();
+    Scale<?> getRunningScale();
 
 }
