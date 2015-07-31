@@ -324,6 +324,10 @@ public final class Player {
       return ratings.getBuntForHit();
     }
 
+    public Rating<?, ?> getStealingRating() {
+      return ratings.getStealing();
+    }
+
     public boolean hasPitchingRatings() {
         return ratings.hasPitching();
     }

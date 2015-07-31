@@ -34,6 +34,8 @@ public final class PlayerRatings {
 
     private Rating<?, ?> buntForHit;
 
+    private Rating<?, ?> stealing;
+
     @JsonIgnore
     private RatingsDefinition definition;
 
@@ -69,6 +71,14 @@ public final class PlayerRatings {
 
     public void setBuntForHit(Rating<?, ?> buntForHit) {
       this.buntForHit = buntForHit;
+    }
+
+    public Rating<?, ?> getStealing() {
+      return stealing;
+    }
+
+    public void setStealing(Rating<?, ?> stealing) {
+      this.stealing = stealing;
     }
 
     public Splits<PitchingRatings<?>> getPitching() { return pitching; }

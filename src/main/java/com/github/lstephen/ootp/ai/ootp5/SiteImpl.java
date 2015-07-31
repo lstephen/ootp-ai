@@ -348,6 +348,11 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
+  public Scale<?> getRunningScale() {
+    return definition.getRunningScale();
+  }
+
+  @Override
   public Printable getPowerRankingsReport(RecordPredictor recordPredictor) {
     return PowerRankingsReport.create(this, recordPredictor);
   }
