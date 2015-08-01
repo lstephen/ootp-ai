@@ -47,6 +47,12 @@ RSpec.describe Player do
         its(:position_scores) { is_expected.to eq('-2---3-5') }
       end
     end
+
+    context 'Ricky Sanchez' do
+      let(:json) { RICKY_SANCHEZ_JSON }
+
+      it_behaves_like :batter, 'Ricky Sanchez', 18
+    end
   end
 end
 
@@ -281,3 +287,130 @@ ELIJAH_CHAUSEE_JSON = <<-JSON
   "upcomingFreeAgent" : true
 }
 JSON
+
+RICKY_SANCHEZ_JSON = <<-JSON
+{
+  "id" : "p560",
+  "name" : "Ricky Sanchez",
+  "ratings" : {
+    "batting" : {
+      "vsLeft" : {
+        "@type" : "BattingRatings",
+        "scale" : {
+          "@type" : "OneToTwenty",
+          "scale" : { }
+        },
+        "contact" : 6,
+        "gap" : 8,
+        "power" : 8,
+        "eye" : 9,
+        "k" : 2
+      },
+      "vsRight" : {
+        "@type" : "BattingRatings",
+        "scale" : {
+          "@type" : "OneToTwenty",
+          "scale" : { }
+        },
+        "contact" : 6,
+        "gap" : 8,
+        "power" : 8,
+        "eye" : 9,
+        "k" : 3
+      }
+    },
+    "defensive" : {
+      "positionRating" : {
+        "CATCHER" : 2.0
+      },
+      "catcher" : {
+        "range" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "errors" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "arm" : {
+          "reference" : 60,
+          "present" : true
+        },
+        "dp" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "ability" : {
+          "reference" : 20,
+          "present" : true
+        }
+      },
+      "infield" : {
+        "range" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "errors" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "arm" : {
+          "reference" : 60,
+          "present" : true
+        },
+        "dp" : {
+          "reference" : 60,
+          "present" : true
+        },
+        "ability" : {
+          "reference" : 0,
+          "present" : true
+        }
+      },
+      "outfield" : {
+        "range" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "errors" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "arm" : {
+          "reference" : 20,
+          "present" : true
+        },
+        "dp" : {
+          "reference" : 0,
+          "present" : true
+        },
+        "ability" : {
+          "reference" : 0,
+          "present" : true
+        }
+      }
+    },
+    "pitching" : null,
+    "battingPotential" : {
+      "scale" : {
+        "@type" : "TwoToEight",
+        "scale" : { }
+      },
+      "contact" : 5,
+      "gap" : 6,
+      "power" : 8,
+      "eye" : 7,
+      "k" : 5
+    },
+    "pitchingPotential" : null,
+    "buntForHit" : null
+  },
+  "age" : 18,
+  "team" : "No Team",
+  "salary" : "",
+  "battingHand" : "RIGHT",
+  "injured" : false,
+  "upcomingFreeAgent" : false
+}
+JSON
+

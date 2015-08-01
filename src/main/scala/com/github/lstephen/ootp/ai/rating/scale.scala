@@ -4,6 +4,7 @@ import scala.collection.immutable.TreeMap
 
 import java.util.Locale
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -25,6 +26,7 @@ trait Scale[T] {
   def normalize(v: T): Rating[Integer, OneToOneHundred]
 }
 
+@JsonIgnoreProperties(Array("scale"))
 abstract class IntegerScale(scale: Integer => Integer) extends Scale[Integer] {
   override def normalize(v: Integer): Rating[Integer, OneToOneHundred] =
     OneToOneHundred.valueOf(scale(v))
