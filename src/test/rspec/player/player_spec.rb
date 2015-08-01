@@ -12,7 +12,7 @@ java_import com.github.lstephen.scratch.util.Jackson
 
 RSpec.describe Player do
   context 'deserialize from Json' do
-    subject(:player) { Jackson.getMapper(nil).readValue(json, Player.java_class) }
+    subject(:player) { deserialize json }
 
     context 'Victor Plata' do
       let(:json) { VICTOR_PLATA_JSON }
@@ -29,6 +29,8 @@ RSpec.describe Player do
       context '#defensive_ratings', :property => :defensive_ratings do
         its(:position_scores) { is_expected.to eq('-2------') }
       end
+
+      it { expect { deserialize(serialize player) }.not_to raise_error }
     end
 
     context 'Elijah Chausse' do
@@ -46,14 +48,18 @@ RSpec.describe Player do
       context '#defensive_ratings', :property => :defensive_ratings do
         its(:position_scores) { is_expected.to eq('-2---3-5') }
       end
-    end
 
-    context 'Ricky Sanchez' do
-      let(:json) { RICKY_SANCHEZ_JSON }
-
-      it_behaves_like :batter, 'Ricky Sanchez', 18
+      it { expect { deserialize(serialize player) }.not_to raise_error }
     end
   end
+end
+
+def deserialize(json)
+  Jackson.getMapper(nil).readValue json, Player.java_class
+end
+
+def serialize(player)
+  Jackson.getMapper(nil).writeValueAsString player
 end
 
 VICTOR_PLATA_JSON = <<-JSON
@@ -285,132 +291,6 @@ ELIJAH_CHAUSEE_JSON = <<-JSON
   "battingHand" : "LEFT",
   "injured" : false,
   "upcomingFreeAgent" : true
-}
-JSON
-
-RICKY_SANCHEZ_JSON = <<-JSON
-{
-  "id" : "p560",
-  "name" : "Ricky Sanchez",
-  "ratings" : {
-    "batting" : {
-      "vsLeft" : {
-        "@type" : "BattingRatings",
-        "scale" : {
-          "@type" : "OneToTwenty",
-          "scale" : { }
-        },
-        "contact" : 6,
-        "gap" : 8,
-        "power" : 8,
-        "eye" : 9,
-        "k" : 2
-      },
-      "vsRight" : {
-        "@type" : "BattingRatings",
-        "scale" : {
-          "@type" : "OneToTwenty",
-          "scale" : { }
-        },
-        "contact" : 6,
-        "gap" : 8,
-        "power" : 8,
-        "eye" : 9,
-        "k" : 3
-      }
-    },
-    "defensive" : {
-      "positionRating" : {
-        "CATCHER" : 2.0
-      },
-      "catcher" : {
-        "range" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "errors" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "arm" : {
-          "reference" : 60,
-          "present" : true
-        },
-        "dp" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "ability" : {
-          "reference" : 20,
-          "present" : true
-        }
-      },
-      "infield" : {
-        "range" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "errors" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "arm" : {
-          "reference" : 60,
-          "present" : true
-        },
-        "dp" : {
-          "reference" : 60,
-          "present" : true
-        },
-        "ability" : {
-          "reference" : 0,
-          "present" : true
-        }
-      },
-      "outfield" : {
-        "range" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "errors" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "arm" : {
-          "reference" : 20,
-          "present" : true
-        },
-        "dp" : {
-          "reference" : 0,
-          "present" : true
-        },
-        "ability" : {
-          "reference" : 0,
-          "present" : true
-        }
-      }
-    },
-    "pitching" : null,
-    "battingPotential" : {
-      "scale" : {
-        "@type" : "TwoToEight",
-        "scale" : { }
-      },
-      "contact" : 5,
-      "gap" : 6,
-      "power" : 8,
-      "eye" : 7,
-      "k" : 5
-    },
-    "pitchingPotential" : null,
-    "buntForHit" : null
-  },
-  "age" : 18,
-  "team" : "No Team",
-  "salary" : "",
-  "battingHand" : "RIGHT",
-  "injured" : false,
-  "upcomingFreeAgent" : false
 }
 JSON
 

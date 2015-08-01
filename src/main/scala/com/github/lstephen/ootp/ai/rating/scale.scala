@@ -59,6 +59,7 @@ case class Potential() extends StringScale(
     "Poor"      -> 10
   ))
 
+@JsonIgnoreProperties(Array("ratings"))
 class StringScale(rs: Map[String, Integer]) extends Scale[String] {
 
   // case insensitive keys for ratings map
