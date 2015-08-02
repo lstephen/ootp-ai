@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.regression;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.selection.lineup.Lineup;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
@@ -56,6 +57,10 @@ public class Predictions {
 
     public Integer getOverallHitting(Player p) {
         return hitting.getOverall(p).getWobaPlus();
+    }
+
+    public Integer getHitting(Player p, Lineup.VsHand vs) {
+      return vs.getStats(hitting, p).getWobaPlus();
     }
 
     public Integer getOverallPitching(Player p) {

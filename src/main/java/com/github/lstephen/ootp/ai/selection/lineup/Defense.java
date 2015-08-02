@@ -101,17 +101,24 @@ public final class Defense {
             Player ply = entry.getKey();
             Position pos = entry.getValue();
 
-
-            DefensiveRatings r = ply.getDefensiveRatings();
-
-            total += getPositionFactor(pos) * r.getPositionScore(pos);
-
-            if (!ply.canPlay(pos)) {
-                total -= Math.pow(getPositionFactor(pos), r.getPositionRating(pos) > 0.5 ? (1.5 - 0.1 * r.getPositionRating(pos)) : 2);
-            }
+            total += score(ply, pos);
         }
 
         return total;
+    }
+
+    public static Double score(Player ply, Position pos) {
+      Double total = 0.0;
+
+      DefensiveRatings r = ply.getDefensiveRatings();
+
+      total += getPositionFactor(pos) * r.getPositionScore(pos);
+
+      if (!ply.canPlay(pos)) {
+          total -= Math.pow(getPositionFactor(pos), r.getPositionRating(pos) > 0.5 ? (1.5 - 0.1 * r.getPositionRating(pos)) : 2);
+      }
+
+      return total;
     }
 
     @Override

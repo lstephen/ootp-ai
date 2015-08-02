@@ -20,6 +20,7 @@ import com.github.lstephen.ootp.ai.report.LeagueBattingReport;
 import com.github.lstephen.ootp.ai.report.RosterReport;
 import com.github.lstephen.ootp.ai.report.SalaryRegression;
 import com.github.lstephen.ootp.ai.report.SalaryReport;
+import com.github.lstephen.ootp.ai.report.TeamPositionReport;
 import com.github.lstephen.ootp.ai.report.TeamReport;
 import com.github.lstephen.ootp.ai.report.Trade;
 import com.github.lstephen.ootp.ai.roster.Changes;
@@ -433,6 +434,8 @@ public class Main {
         selection.printPitchingSelectionTable(out, newRoster, site.getTeamPitching());
 
         Printables.print(newRoster).to(out);
+
+        Printables.print(new TeamPositionReport(newRoster, ps)).to(out);
 
         LOG.info("Calculating roster changes...");
 

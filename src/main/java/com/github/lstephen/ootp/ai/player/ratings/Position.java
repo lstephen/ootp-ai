@@ -1,5 +1,8 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author lstephen
@@ -24,5 +27,13 @@ public enum Position {
 
     public String getAbbreviation() {
         return abbreviation;
+    }
+
+    public static List<Position> hitting() {
+      return Arrays.asList(
+          CATCHER,
+          FIRST_BASE, SECOND_BASE, THIRD_BASE, SHORTSTOP,
+          LEFT_FIELD, CENTER_FIELD, RIGHT_FIELD,
+          DESIGNATED_HITTER);
     }
 }
