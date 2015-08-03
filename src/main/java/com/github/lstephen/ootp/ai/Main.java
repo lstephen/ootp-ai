@@ -435,8 +435,6 @@ public class Main {
 
         Printables.print(newRoster).to(out);
 
-        Printables.print(new TeamPositionReport(newRoster, ps)).to(out);
-
         LOG.info("Calculating roster changes...");
 
         Printables.print(newRoster.getChangesFrom(oldRoster)).to(out);
@@ -638,6 +636,7 @@ public class Main {
         generic.setLimit(50);
         generic.print(out);
 
+        Printables.print(new TeamPositionReport(newRoster, ps)).to(out);
 
         generic.setTitle("Trade Values");
         generic.setPlayers(

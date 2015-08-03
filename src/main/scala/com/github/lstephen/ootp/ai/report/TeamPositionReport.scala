@@ -5,14 +5,14 @@ import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
 import com.github.lstephen.ootp.ai.roster.Roster
-import com.github.lstephen.ootp.ai.selection.lineup.Defense
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
+import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 
 import java.io.PrintWriter
 
 import collection.JavaConversions._
 
-class TeamPositionReport(roster: Roster, predictions: Predictions) extends Printable {
+class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) extends Printable {
 
   override def print(pw: PrintWriter): Unit = {
     implicit val w = pw
@@ -37,28 +37,15 @@ class TeamPositionReport(roster: Roster, predictions: Predictions) extends Print
       }
   }
 
-  def format(s: Score): String = {
+  def format(s: InLineupScore): String = {
     f"${s.name}%-16s ${s.hitting}%3d ${s.defense}%3.0f ${s.total}%3.0f"
   }
 
-  def top(p: Position, vs: Option[VsHand] = None): List[Score] = {
+  def top(p: Position, vs: Option[VsHand] = None): List[InLineupScore] = {
     (List() ++ roster.getAllPlayers)
-      .map(new Score(_, p, vs))
+      .map(new InLineupScore(_, p, vs))
       .sortBy(_.total)
       .reverse
-  }
-
-  class Score(player: Player, position: Position, vs: Option[VsHand] = None) {
-    val name = player.getShortName
-
-    val hitting = vs match {
-      case None     => predictions.getOverallHitting(player)
-      case Some(vs) => predictions.getHitting(player, vs)
-    }
-
-    val defense = Defense.score(player, position)
-
-    val total = hitting + defense
   }
 
 }

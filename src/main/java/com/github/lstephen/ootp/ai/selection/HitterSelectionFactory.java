@@ -11,11 +11,11 @@ import com.google.common.collect.Ordering;
 
 public final class HitterSelectionFactory implements SelectionFactory {
 
-    private final TeamStats<BattingStats> predictions;
+    private final Predictions predictions;
 
     private final Function<Player, Integer> value;
 
-    private HitterSelectionFactory(TeamStats<BattingStats> predictions, Function<Player, Integer> value) {
+    private HitterSelectionFactory(Predictions predictions, Function<Player, Integer> value) {
         this.predictions = predictions;
         this.value = value;
     }
@@ -47,17 +47,11 @@ public final class HitterSelectionFactory implements SelectionFactory {
     }
 
     public static HitterSelectionFactory using(Predictions predictions) {
-        return using(predictions.getAllBatting());
+        return using(predictions, p -> predictions.getOverallHitting(p));
     }
 
     public static HitterSelectionFactory using(
-        TeamStats<BattingStats> stats) {
-
-        return using(stats, p -> stats.getOverall(p).getWobaPlus());
-    }
-
-    public static HitterSelectionFactory using(
-        TeamStats<BattingStats> predictions,
+        Predictions predictions,
         final Function<Player, Integer> value) {
         return new HitterSelectionFactory(predictions, value);
     }

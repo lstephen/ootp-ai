@@ -32,7 +32,7 @@ public class ReplacementValue {
         this.value = value;
 
         Selection hitterSelection = HitterSelectionFactory
-            .using(ps.getAllBatting(), selectionValue)
+            .using(ps, selectionValue)
             .slot(Mode.REGULAR_SEASON);
 
         Selection pitcherSelection = PitcherSelectionFactory
