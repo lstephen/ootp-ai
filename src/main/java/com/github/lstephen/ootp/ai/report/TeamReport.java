@@ -269,7 +269,7 @@ public final class TeamReport implements Printable, RecordPredictor {
 
     private Double calculateBatting(Iterable<Player> players) {
         return calculateScore(
-            HitterSelectionFactory.using(ps.getAllBatting(), value).slot(Mode.REGULAR_SEASON),
+            HitterSelectionFactory.using(ps, value).slot(Mode.REGULAR_SEASON),
             Selections.onlyHitters(players));
     }
 

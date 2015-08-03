@@ -5,6 +5,7 @@ import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.selection.lineup.AllLineups;
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup;
+import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
@@ -54,11 +55,11 @@ public class Bench implements Printable {
 
     private final Integer maxSize;
 
-    private final TeamStats<BattingStats> predictions;
+    private final Predictions predictions;
 
     private static SplitPercentages pcts;
 
-    private Bench(AllLineups lineups, Iterable<Player> selected, Iterable<Player> players, Integer maxSize, TeamStats<BattingStats> predictions) {
+    private Bench(AllLineups lineups, Iterable<Player> selected, Iterable<Player> players, Integer maxSize, Predictions predictions) {
         this.lineups = lineups;
         this.players = ImmutableSet.copyOf(players);
         this.selected = ImmutableSet.copyOf(selected);
@@ -215,7 +216,7 @@ public class Bench implements Printable {
         };
     }
 
-    private static Supplier<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final TeamStats<BattingStats> predictions, final Iterable<Player> available, final Integer maxSize) {
+    private static Supplier<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final Predictions predictions, final Iterable<Player> available, final Integer maxSize) {
         return new Supplier<Bench>() {
             public Bench get() {
                 List<Player> candidates = new ArrayList<>(
@@ -230,7 +231,7 @@ public class Bench implements Printable {
         };
     }
 
-    public static Bench select(AllLineups lineups, Iterable<Player> selected, TeamStats<BattingStats> predictions, Iterable<Player> available, Integer maxSize) {
+    public static Bench select(AllLineups lineups, Iterable<Player> selected, Predictions predictions, Iterable<Player> available, Integer maxSize) {
         HillClimbing<Bench> hc = HillClimbing
             .<Bench>builder()
             .heuristic(heuristic())

@@ -1,10 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.github.lstephen.ootp.ai.selection;
+
+import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.player.ratings.Position;
+import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.selection.bench.Bench;
+import com.github.lstephen.ootp.ai.selection.lineup.AllLineups;
+import com.github.lstephen.ootp.ai.selection.lineup.Defense;
+import com.github.lstephen.ootp.ai.selection.lineup.Lineup;
+import com.github.lstephen.ootp.ai.selection.lineup.LineupSelection;
+import com.github.lstephen.ootp.ai.selection.lineup.StarterSelection;
+import com.github.lstephen.ootp.ai.stats.BattingStats;
+import com.github.lstephen.ootp.ai.stats.SplitPercentages;
+import com.github.lstephen.ootp.ai.stats.TeamStats;
+
+import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.collect.HashMultimap;
@@ -16,19 +26,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.player.Slot;
-import com.github.lstephen.ootp.ai.player.ratings.Position;
-import com.github.lstephen.ootp.ai.selection.bench.Bench;
-import com.github.lstephen.ootp.ai.selection.lineup.AllLineups;
-import com.github.lstephen.ootp.ai.selection.lineup.Defense;
-import com.github.lstephen.ootp.ai.selection.lineup.Lineup;
-import com.github.lstephen.ootp.ai.selection.lineup.LineupSelection;
-import com.github.lstephen.ootp.ai.selection.lineup.StarterSelection;
-import com.github.lstephen.ootp.ai.stats.BattingStats;
-import com.github.lstephen.ootp.ai.stats.SplitPercentages;
-import com.github.lstephen.ootp.ai.stats.TeamStats;
-import java.util.Set;
 
 /**
  *
@@ -40,11 +37,11 @@ public class BestStartersSelection implements Selection {
 
 	private final Multiset<Slot> slots;
 
-	private final TeamStats<BattingStats> predictions;
+	private final Predictions predictions;
 
 	private final Function<Player, Integer> value;
 
-	public BestStartersSelection(Iterable<Slot> slots, TeamStats<BattingStats> predictions, Function<Player, Integer> value) {
+	public BestStartersSelection(Iterable<Slot> slots, Predictions predictions, Function<Player, Integer> value) {
 		this.slots = HashMultiset.create(slots);
 		this.predictions = predictions;
 		this.value = value;
@@ -133,7 +130,7 @@ public class BestStartersSelection implements Selection {
             return partial;
         }
 
-        AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(partial);
+        AllLineups lineups = new LineupSelection(predictions.getAllBatting()).dontRequireBackupCatcher().select(partial);
 
         Bench bench = Bench.select(lineups, partial, predictions, available, getTargetSize());
 
@@ -145,7 +142,7 @@ public class BestStartersSelection implements Selection {
         Set<Player> selected = Sets.newHashSet(best);
 
         while (selected.size() > size) {
-            AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(selected);
+            AllLineups lineups = new LineupSelection(predictions.getAllBatting()).dontRequireBackupCatcher().select(selected);
             Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
 
             Iterables.removeAll(ps, forced);
@@ -163,7 +160,7 @@ public class BestStartersSelection implements Selection {
             selected.remove(byValueProvided(lineups, selected).min(ps));
         }
 
-        AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(selected);
+        AllLineups lineups = new LineupSelection(predictions.getAllBatting()).dontRequireBackupCatcher().select(selected);
 
         System.out.print("Limited:");
         for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
@@ -175,7 +172,7 @@ public class BestStartersSelection implements Selection {
     }
 
     private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
-		StarterSelection starters = new StarterSelection(predictions);
+		StarterSelection starters = new StarterSelection(predictions.getAllBatting());
 
         starters.dontRequireBackupCatcher();
 
@@ -218,7 +215,7 @@ public class BestStartersSelection implements Selection {
 
     private Double getValueProvided(Player p, Lineup l, Iterable<Player> selected, Double pct, Lineup.VsHand vs) {
         Double score = 0.0;
-        Integer wobaPlus = vs.getStats(predictions, p).getWobaPlus();
+        Integer wobaPlus = predictions.getHitting(p, vs);
 
         if (l.contains(p)) {
             score += wobaPlus;

@@ -8,6 +8,7 @@ import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
+import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.selection.bench.BenchScorer;
 import com.github.lstephen.ootp.ai.selection.lineup.AllLineups;
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup;
@@ -25,11 +26,11 @@ public class SelectedPlayers {
 
     private final ImmutableSet<Player> players;
 
-    private final TeamStats<BattingStats> predictions;
+    private final Predictions predictions;
 
     private final SplitPercentages splits;
 
-    private SelectedPlayers(Iterable<Player> players, TeamStats<BattingStats> predictions, SplitPercentages splits) {
+    private SelectedPlayers(Iterable<Player> players, Predictions predictions, SplitPercentages splits) {
         this.players = ImmutableSet.copyOf(players);
         this.predictions = predictions;
         this.splits = splits;
@@ -54,7 +55,7 @@ public class SelectedPlayers {
     }
 
     public Double score() {
-        AllLineups lineups = new LineupSelection(predictions).select(players);
+        AllLineups lineups = new LineupSelection(predictions.getAllBatting()).select(players);
 
         return splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh())
             + splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp())
@@ -71,7 +72,7 @@ public class SelectedPlayers {
     private Integer hittingScore(Lineup.VsHand vs, Lineup lineup) {
         Integer score = 0;
         for (Player p : lineup.playerSet()) {
-            score += vs.getStats(predictions, p).getWobaPlus();
+            score += vs.getStats(predictions.getAllBatting(), p).getWobaPlus();
         }
         return score;
     }
@@ -84,7 +85,7 @@ public class SelectedPlayers {
                 continue;
             }
             if (entry.getPlayer().canPlay(entry.getPositionEnum())) {
-                score += vs.getStats(predictions, entry.getPlayer()).getWobaPlus();
+                score += vs.getStats(predictions.getAllBatting(), entry.getPlayer()).getWobaPlus();
             }
         }
         return score;
@@ -98,7 +99,7 @@ public class SelectedPlayers {
         Integer score = 0;
         for (Player p : players) {
             // This already combines according to split percentages
-            score += predictions.getSplits(p).getOverall().getWobaPlus();
+            score += predictions.getAllBatting().getSplits(p).getOverall().getWobaPlus();
         }
         return score;
     }
@@ -111,7 +112,7 @@ public class SelectedPlayers {
         return score;
     }
 
-    public static SelectedPlayers create(Iterable<Player> ps, TeamStats<BattingStats> predictions, SplitPercentages pcts) {
+    public static SelectedPlayers create(Iterable<Player> ps, Predictions predictions, SplitPercentages pcts) {
         return new SelectedPlayers(ps, predictions, pcts);
     }
 

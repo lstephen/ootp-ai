@@ -21,3 +21,13 @@ class InLineupScore
   val total = hitting + defense
 }
 
+object InLineupScore {
+  def apply(ply: Player, pos: Position)(implicit ps: Predictions): InLineupScore = {
+    new InLineupScore(ply, pos, None)
+  }
+
+  def apply(ply: Player, pos: Position, vs: VsHand)(implicit ps: Predictions): InLineupScore = {
+    new InLineupScore(ply, pos, Some(vs))
+  }
+}
+
