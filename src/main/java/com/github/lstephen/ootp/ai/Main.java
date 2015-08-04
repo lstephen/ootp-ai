@@ -471,8 +471,7 @@ public class Main {
 
         LOG.log(Level.INFO, "Choosing Depth Charts...");
 
-        AllDepthCharts depthCharts = DepthChartSelection
-            .create(battingRegression.predict(newRoster.getAllPlayers()))
+        AllDepthCharts depthCharts = new DepthChartSelection(ps)
             .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         Printables.print(depthCharts).to(out);
