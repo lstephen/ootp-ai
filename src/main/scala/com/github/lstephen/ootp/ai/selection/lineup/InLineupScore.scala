@@ -29,5 +29,9 @@ object InLineupScore {
   def apply(ply: Player, pos: Position, vs: VsHand)(implicit ps: Predictions): InLineupScore = {
     new InLineupScore(ply, pos, Some(vs))
   }
+
+  def sort(players: Traversable[Player], pos: Position, vs: VsHand)(implicit ps: Predictions): Seq[Player] = {
+    players.toSeq.sortBy[Double](InLineupScore(_, pos, vs).total).reverse
+  }
 }
 

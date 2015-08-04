@@ -40,11 +40,7 @@ class BenchScorer(implicit predictions: Predictions) {
   }
 
   def selectBenchPlayers(bench: Traversable[Player], position: Position, vs: VsHand): Seq[Player] = {
-    bench
-      .toSeq
-      .sortBy(InLineupScore(_, position, vs).total)
-      .reverse
-      .take(2)
+    InLineupScore.sort(bench, position, vs).take(2)
   }
 
 }
