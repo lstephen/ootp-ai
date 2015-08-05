@@ -65,9 +65,10 @@ class DepthChartSelection(implicit predictions: Predictions) {
 
     var primary = dc.getStarter(position)
     var remaining = 100.0
+    var rank = 1
 
     for (backup <- backups) {
-      val pct = backupPercentage(position, primary, backup, vs)
+      val pct = backupPercentage(primary, backup, position, vs, rank)
 
       val primaryPct = remaining - (pct * remaining)
 
@@ -77,6 +78,7 @@ class DepthChartSelection(implicit predictions: Predictions) {
 
       remaining -= primaryPct
       primary = backup
+      rank += 1
     }
 
     if (roundPercentage(remaining) > 1) {
@@ -84,12 +86,12 @@ class DepthChartSelection(implicit predictions: Predictions) {
     }
   }
 
-  def backupPercentage(p: Position, primary: Player, backup: Player, vs: VsHand): Double = {
+  def backupPercentage(primary: Player, backup: Player, p: Position, vs: VsHand, rank: Integer): Double = {
     def ability(ply: Player): Double = InLineupScore(ply, p, vs).total
 
     // The max is needed because sometimes the lineup chosen doesn't have the best player.
     // There is probably a tweak or a bug in the lineup selection or defense selection.
-    val daysOff = (ability(primary) - ability(backup)).max(0) / Defense.getPositionFactor(p) + 1
+    val daysOff = (ability(primary) - ability(backup)).max(0) / (Defense.getPositionFactor(p).toDouble / rank) + 1
 
     1 / (daysOff + 1)
   }
