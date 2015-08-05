@@ -87,7 +87,9 @@ class DepthChartSelection(implicit predictions: Predictions) {
   def backupPercentage(p: Position, primary: Player, backup: Player, vs: VsHand): Double = {
     def ability(ply: Player): Double = InLineupScore(ply, p, vs).total
 
-    val daysOff = (ability(primary) - ability(backup)) / Defense.getPositionFactor(p) + 1
+    // The max is needed because sometimes the lineup chosen doesn't have the best player.
+    // There is probably a tweak or a bug in the lineup selection or defense selection.
+    val daysOff = (ability(primary) - ability(backup)).max(0) / Defense.getPositionFactor(p) + 1
 
     1 / (daysOff + 1)
   }
