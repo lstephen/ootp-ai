@@ -52,7 +52,7 @@ public class DepthChart {
         backups.add(Backup.create(position, player, pct.intValue()));
     }
 
-    private Iterable<Backup> getBackups(Position position) {
+    public Iterable<Backup> getBackups(Position position) {
         List<Backup> result = Lists.newArrayList();
 
         for (Backup bu : backups) {
@@ -73,10 +73,10 @@ public class DepthChart {
 
             w.println(
                 String.format(
-                    "%2s: %-15s DR: %-15s BU: %s",
-                    p.getAbbreviation(),
+                    "%-15s (D) %-15s |%2s| %s",
                     StringUtils.abbreviate(getStarter(p).getShortName(), 15),
                     dr.isPresent() ? StringUtils.abbreviate(dr.get().getShortName(), 15) : "",
+                    p.getAbbreviation(),
                     Joiner.on(' ').join(Iterables.transform(getBackups(p), Backup.format()))));
             w.flush();
         }
@@ -84,18 +84,30 @@ public class DepthChart {
         w.flush();
     }
 
-    private static class Backup {
+    public static class Backup {
 
         private final Position position;
 
         private final Player player;
 
-        private final BackupPlayingTime percentage;
+        private final Integer percentage;
 
         private Backup(Position position, Player player, Integer percentage) {
             this.position = position;
             this.player = player;
-            this.percentage = BackupPlayingTime.roundFrom(percentage);
+            this.percentage = percentage;
+        }
+
+        public Player getPlayer() {
+          return player;
+        }
+
+        public Position getPosition() {
+          return position;
+        }
+
+        public Integer getPercentage() {
+          return percentage;
         }
 
         public static Function<Backup, String> format() {
@@ -105,9 +117,9 @@ public class DepthChart {
                     Preconditions.checkNotNull(bu);
 
                     return String.format(
-                        "(%s) %-15s",
-                        bu.percentage.format(),
-                        StringUtils.abbreviate(bu.player.getShortName(), 15));
+                        "(%2d) %-15s",
+                        bu.percentage,
+                        bu.player.getShortName());
                 }
             };
         }
