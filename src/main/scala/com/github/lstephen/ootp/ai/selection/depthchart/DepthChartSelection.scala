@@ -65,25 +65,27 @@ class DepthChartSelection(implicit predictions: Predictions) {
 
     var primary = dc.getStarter(position)
     var remaining = 100.0
-    var rank = 1
+
+    var depth = List[(Player, Integer)]()
 
     for (backup <- backups) {
-      val pct = backupPercentage(primary, backup, position, vs, rank)
+      val pct = backupPercentage(primary, backup, position, vs, depth.size + 1)
 
       val primaryPct = remaining - (pct * remaining)
 
-      if (backups.contains(primary) && primaryPct >= 1) {
-        dc.addBackup(position, primary, roundPercentage(primaryPct))
+      if (backups.contains(primary) && (depth.isEmpty || roundPercentage(primaryPct) > 1)) {
+        depth = depth :+ (primary, roundPercentage(primaryPct))
       }
 
       remaining -= primaryPct
       primary = backup
-      rank += 1
     }
 
     if (roundPercentage(remaining) > 1) {
-      dc.addBackup(position, primary, roundPercentage(remaining))
+      depth = depth :+ (primary, roundPercentage(remaining))
     }
+
+    depth.foreach { case(ply, pct) => dc.addBackup(position, ply, pct) }
   }
 
   def backupPercentage(primary: Player, backup: Player, p: Position, vs: VsHand, rank: Integer): Double = {
@@ -96,10 +98,10 @@ class DepthChartSelection(implicit predictions: Predictions) {
     1 / (daysOff + 1)
   }
 
-  def roundPercentage(pct: Double): Long = {
+  def roundPercentage(pct: Double): Integer = {
     val rounded = (pct/5.0).round * 5
 
-    if (rounded == 0) 1 else rounded
+    if (rounded == 0) 1 else rounded.toInt
   }
 }
 
