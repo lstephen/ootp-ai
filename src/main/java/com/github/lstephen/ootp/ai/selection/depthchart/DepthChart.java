@@ -73,7 +73,8 @@ public class DepthChart {
 
             w.println(
                 String.format(
-                    "%-15s (D) %-15s |%2s| %s",
+                    "%2s| %-15s (D) %-15s |%2s| %s",
+                    p.getAbbreviation(),
                     StringUtils.abbreviate(getStarter(p).getShortName(), 15),
                     dr.isPresent() ? StringUtils.abbreviate(dr.get().getShortName(), 15) : "",
                     p.getAbbreviation(),
