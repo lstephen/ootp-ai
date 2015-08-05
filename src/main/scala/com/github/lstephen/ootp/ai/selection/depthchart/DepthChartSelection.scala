@@ -72,15 +72,15 @@ class DepthChartSelection(implicit predictions: Predictions) {
       val primaryPct = remaining - (pct * remaining)
 
       if (backups.contains(primary) && primaryPct >= 1) {
-        dc.addBackup(position, primary, primaryPct)
+        dc.addBackup(position, primary, roundPercentage(primaryPct))
       }
 
       remaining -= primaryPct
       primary = backup
     }
 
-    if (remaining >= 1) {
-      dc.addBackup(position, primary, remaining)
+    if (roundPercentage(remaining) > 1) {
+      dc.addBackup(position, primary, roundPercentage(remaining))
     }
   }
 
@@ -90,6 +90,12 @@ class DepthChartSelection(implicit predictions: Predictions) {
     val daysOff = (ability(primary) - ability(backup)) / Defense.getPositionFactor(p) + 1
 
     1 / (daysOff + 1)
+  }
+
+  def roundPercentage(pct: Double): Long = {
+    val rounded = (pct/5.0).round * 5
+
+    if (rounded == 0) 1 else rounded
   }
 }
 
