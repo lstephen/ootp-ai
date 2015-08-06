@@ -104,30 +104,9 @@ public class Bench implements Printable {
         return score;
     }
 
-    private Double score(Player p) {
-        Double score = 0.0;
-
-        score += (pcts.getVsLhpPercentage() * score(p, lineups.getVsLhp(), Lineup.VsHand.VS_LHP));
-        score += (pcts.getVsLhpPercentage() * score(p, lineups.getVsLhpPlusDh(), Lineup.VsHand.VS_LHP));
-        score += (pcts.getVsRhpPercentage() * score(p, lineups.getVsRhp(), Lineup.VsHand.VS_RHP));
-        score += (pcts.getVsRhpPercentage() * score(p, lineups.getVsRhpPlusDh(), Lineup.VsHand.VS_RHP));
-
-        return score;
-    }
-
     private Double score(Lineup lineup, Lineup.VsHand vs) {
         return new BenchScorer(predictions)
             .score(
-                Iterables.concat(
-                    Sets.difference(selected, lineup.playerSet()), players),
-                    lineup,
-                    vs);
-    }
-
-    private Double score(Player p, Lineup lineup, Lineup.VsHand vs) {
-        return new BenchScorer(predictions)
-            .score(
-                p,
                 Iterables.concat(
                     Sets.difference(selected, lineup.playerSet()), players),
                     lineup,
@@ -145,23 +124,9 @@ public class Bench implements Printable {
     }
 
     public void print(PrintWriter w) {
-        final Map<Player, Double> scores = Maps.newHashMap();
-       for (Player p : players()) {
-           scores.put(p, score(p));
-       }
-
        w.print("Bench:");
-       for (Player p : Ordering
-           .natural()
-           .reverse()
-           .onResultOf(new Function<Player, Double>() {
-               public Double apply(Player p) {
-                   return scores.get(p);
-               }
-           })
-           .sortedCopy(scores.keySet())) {
-
-           w.print(p.getShortName() + "-" + Math.round(scores.get(p)) + "/");
+       for (Player p : Player.byShortName().sortedCopy(players())) {
+           w.print(p.getShortName() + "/");
        }
        w.println();
     }

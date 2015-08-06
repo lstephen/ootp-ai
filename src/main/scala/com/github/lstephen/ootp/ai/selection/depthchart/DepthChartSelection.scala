@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.selection.depthchart
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.selection.bench.BenchScorer
 import com.github.lstephen.ootp.ai.selection.lineup.All
 import com.github.lstephen.ootp.ai.selection.lineup.AllLineups
 import com.github.lstephen.ootp.ai.selection.lineup.Defense
@@ -61,44 +62,44 @@ class DepthChartSelection(implicit predictions: Predictions) {
   }
 
   def addBackups(dc: DepthChart, position: Position, bench: Set[Player], vs: VsHand): Unit = {
-    val backups = InLineupScore.sort(bench, position, vs).take(2)
+    val starter = dc getStarter position
+    val backups = InLineupScore.sort(bench, position, vs).take(3)
 
-    var primary = dc.getStarter(position)
-    var remaining = 100.0
-
-    for (backup <- backups) {
-      val pct = backupPercentage(position, primary, backup, vs)
-
-      val primaryPct = remaining - (pct * remaining)
-
-      if (backups.contains(primary) && primaryPct >= 1) {
-        dc.addBackup(position, primary, roundPercentage(primaryPct))
-      }
-
-      remaining -= primaryPct
-      primary = backup
-    }
-
-    if (roundPercentage(remaining) > 1) {
-      dc.addBackup(position, primary, roundPercentage(remaining))
-    }
+    DepthChartSelection.AllPcts
+      .map((starter +: backups) zip _)
+      .maxBy(score(_, position, vs))
+      .filter { case (ply, _) => ply != starter }
+      .filter { case (_, pct) => pct > 0 }
+      .foreach { case (ply, pct) => dc.addBackup(position, ply, pct) }
   }
 
-  def backupPercentage(p: Position, primary: Player, backup: Player, vs: VsHand): Double = {
-    def ability(ply: Player): Double = InLineupScore(ply, p, vs).total
-
-    // The max is needed because sometimes the lineup chosen doesn't have the best player.
-    // There is probably a tweak or a bug in the lineup selection or defense selection.
-    val daysOff = (ability(primary) - ability(backup)).max(0) / Defense.getPositionFactor(p) + 1
-
-    1 / (daysOff + 1)
+  def score(players: Traversable[(Player, Int)], position: Position, vs: VsHand): Double = {
+    players.map { case (ply, pct) => score(ply, pct, position, vs) }.sum
   }
 
-  def roundPercentage(pct: Double): Long = {
-    val rounded = (pct/5.0).round * 5
+  def score(player: Player, pct: Int, position: Position, vs: VsHand): Double = {
+    val base = InLineupScore(player, position, vs).total * pct
+    val fatigue = (pct * Defense.getPositionFactor(position) * pct / 10) / 2
 
-    if (rounded == 0) 1 else rounded
+    // simplifies to (s/100)p - (f/2000)p^2
+    (base - fatigue) / 100.0
   }
 }
 
+object DepthChartSelection {
+
+  val AllPcts = {
+    val bu1 = 1 +: (5 until 95 by 5)
+    val bu2 = 0 until 50 by 5
+    val bu3 = 0 until 50 by 5
+
+    bu1
+      .flatMap(b => bu2.map(List(b, _)))
+      .flatMap(p => bu3.map(p :+ _))
+      .filter(_.sum < 100)
+      .filter(p => p(1) <= p(0))
+      .filter(p => p(2) <= p(1))
+      .map(p => (100 - p.sum) +: p)
+  }
+}
 

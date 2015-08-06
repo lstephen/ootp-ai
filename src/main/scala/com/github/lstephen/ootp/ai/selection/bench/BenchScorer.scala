@@ -13,32 +13,25 @@ import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 import collection.JavaConversions._
 
 class BenchScorer(implicit predictions: Predictions) {
-
-  def score(p: Player, bench: java.lang.Iterable[Player], lineup: Lineup, vs: VsHand): Double = {
-    score(bench, lineup, vs, p == _)
-  }
+  val depthChartSelection = new DepthChartSelection
 
   def score(bench: java.lang.Iterable[Player], lineup: Lineup, vs: VsHand): Double = {
-    score(bench, lineup, vs, p => true)
+    score_(bench, lineup, vs)
   }
 
-  def score(bench: Traversable[Player], lineup: Lineup, vs: VsHand, predicate: Player => Boolean): Double = {
-    val dc = new DepthChartSelection().select(lineup, bench.toSet, vs)
+  def score_(bench: Traversable[Player], lineup: Lineup, vs: VsHand): Double = {
+    val dc = depthChartSelection.select(lineup, bench.toSet, vs)
 
     lineup
       .filter(_.getPositionEnum != Position.PITCHER)
-      .flatMap { e => dc.getBackups(e.getPositionEnum) }
-      .filter { bu => predicate(bu.getPlayer) }
+      .flatMap(bu => dc.getBackups(bu.getPositionEnum))
       .map(score(_, vs))
       .sum
   }
 
   def score(bu: Backup, vs: VsHand): Double = {
-    val base = InLineupScore(bu.getPlayer, bu.getPosition, vs).total * bu.getPercentage
-    val fatigue = (bu.getPercentage * Defense.getPositionFactor(bu.getPosition) * bu.getPercentage / 10) / 2
-
-    (base - fatigue) / 100.0
-
+    depthChartSelection.score(bu.getPlayer, bu.getPercentage, bu.getPosition, vs)
   }
+
 }
 
