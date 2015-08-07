@@ -58,7 +58,7 @@ class DepthChartSelection(implicit predictions: Predictions) {
 
     def defense(p: Player): Double = p.getDefensiveRatings.getPositionScore(position)
 
-    if (defense(candidate) > defense(starter)) Some(candidate) else None
+    if (defense(candidate) > defense(starter) * 1.1) Some(candidate) else None
   }
 
   def addBackups(dc: DepthChart, position: Position, bench: Set[Player], vs: VsHand): Unit = {
