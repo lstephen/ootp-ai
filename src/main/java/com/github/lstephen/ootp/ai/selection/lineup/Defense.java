@@ -12,6 +12,7 @@ import static com.github.lstephen.ootp.ai.player.ratings.Position.SECOND_BASE;
 import static com.github.lstephen.ootp.ai.player.ratings.Position.SHORTSTOP;
 import static com.github.lstephen.ootp.ai.player.ratings.Position.THIRD_BASE;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -119,6 +120,13 @@ public final class Defense {
       }
 
       return total;
+    }
+
+    public static Double score(Player ply) {
+      return Arrays.stream(Position.values())
+        .mapToDouble(p -> score(ply, p))
+        .max()
+        .orElse(0.0);
     }
 
     @Override
