@@ -5,6 +5,7 @@ import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
 import com.github.lstephen.ootp.ai.selection.depthchart.DepthChart.Backup
 import com.github.lstephen.ootp.ai.selection.depthchart.DepthChartSelection
+import com.github.lstephen.ootp.ai.selection.depthchart.WithPlayingTimeScore
 import com.github.lstephen.ootp.ai.selection.lineup.Defense
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup
@@ -29,9 +30,8 @@ class BenchScorer(implicit predictions: Predictions) {
       .sum
   }
 
-  def score(bu: Backup, vs: VsHand): Double = {
-    depthChartSelection.score(bu.getPlayer, bu.getPercentage, bu.getPosition, vs)
-  }
+  def score(bu: Backup, vs: VsHand): Double =
+    new WithPlayingTimeScore(bu.getPlayer, bu.getPercentage, bu.getPosition, vs).total
 
 }
 

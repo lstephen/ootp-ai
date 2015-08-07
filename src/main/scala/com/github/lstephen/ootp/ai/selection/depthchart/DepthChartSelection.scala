@@ -11,6 +11,13 @@ import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 
+import com.github.lstephen.ai.search.HillClimbing
+import com.github.lstephen.ai.search.Heuristic
+import com.github.lstephen.ai.search.Validator
+import com.github.lstephen.ai.search.action.Action
+import com.github.lstephen.ai.search.action.ActionGenerator
+import com.github.lstephen.ai.search.action.SequencedAction
+
 import collection.JavaConversions._
 
 class DepthChartSelection(implicit predictions: Predictions) {
@@ -65,41 +72,84 @@ class DepthChartSelection(implicit predictions: Predictions) {
     val starter = dc getStarter position
     val backups = InLineupScore.sort(bench, position, vs).take(3)
 
-    DepthChartSelection.AllPcts
-      .map((starter +: backups) zip _)
-      .maxBy(score(_, position, vs))
-      .filter { case (ply, _) => ply != starter }
-      .filter { case (_, pct) => pct > 0 }
-      .foreach { case (ply, pct) => dc.addBackup(position, ply, pct) }
-  }
-
-  def score(players: Traversable[(Player, Int)], position: Position, vs: VsHand): Double = {
-    players.map { case (ply, pct) => score(ply, pct, position, vs) }.sum
-  }
-
-  def score(player: Player, pct: Int, position: Position, vs: VsHand): Double = {
-    val base = InLineupScore(player, position, vs).total * pct
-    val fatigue = (pct * Defense.getPositionFactor(position) * pct / 10) / 2
-
-    // simplifies to (s/100)p - (f/2000)p^2
-    (base - fatigue) / 100.0
+    new BackupPercentageSelection(starter, backups, position, vs)
+      .select
+      .zip(backups)
+      .filter { case (pct, _) => pct > 0 }
+      .foreach { case (pct, ply) => dc.addBackup(position, ply, pct) }
   }
 }
 
-object DepthChartSelection {
 
-  val AllPcts = {
-    val bu1 = 1 +: (5 until 95 by 5)
-    val bu2 = 0 until 50 by 5
-    val bu3 = 0 until 50 by 5
+class BackupPercentageSelection
+  (starter: Player, backups: Seq[Player], position: Position, vs: VsHand)
+  (implicit predictions: Predictions) {
 
-    bu1
-      .flatMap(b => bu2.map(List(b, _)))
-      .flatMap(p => bu3.map(p :+ _))
-      .filter(_.sum < 100)
-      .filter(p => p(1) <= p(0))
-      .filter(p => p(2) <= p(1))
-      .map(p => (100 - p.sum) +: p)
+  type BackupPercentage = Array[Int]
+
+  def select: BackupPercentage = {
+    HillClimbing
+      .builder[BackupPercentage]
+      .validator(validator)
+      .heuristic(heuristic)
+      .actionGenerator(actionGenerator)
+      .build
+      .search(Array(1) ++ Array.fill(backups.size - 1)(0))
   }
+
+  val validator: Validator[BackupPercentage] = new Validator[BackupPercentage] {
+    override def test(pcts: BackupPercentage): Boolean = {
+      pcts.size == backups.size &&
+        pcts.forall(_ >= 0) &&
+        pcts.sum < 100 &&
+        pcts.sliding(2).forall(pair => pair(0) >= pair(1))
+    }
+  }
+
+  val heuristic: Heuristic[BackupPercentage] = new Heuristic[BackupPercentage] {
+    override def compare(lhs: BackupPercentage, rhs: BackupPercentage) =
+      score(lhs) compare score(rhs)
+
+    def score(pcts: BackupPercentage): Double = {
+      val s = new WithPlayingTimeScore(starter, 100 - pcts.sum, position, vs).total
+      val b = (backups zip pcts)
+        .map { case (ply, pct) => new WithPlayingTimeScore(ply, pct, position, vs).total }
+        .sum
+
+      s + b
+    }
+  }
+
+  def actionGenerator: ActionGenerator[BackupPercentage] = new ActionGenerator[BackupPercentage] {
+    override def apply(pcts: BackupPercentage): java.util.stream.Stream[Action[BackupPercentage]] =
+      toJavaActionList(actions(pcts.size)).stream
+
+    def actions(size: Int) : Seq[BackupPercentage => BackupPercentage] = {
+      def increase(i: Int): BackupPercentage => BackupPercentage =
+        p => if (p(i) == 1) p.updated(i, 5) else p.updated(i, p(i) + 5)
+
+      def decrease(i: Int): BackupPercentage => BackupPercentage = p => p.updated(i, p(i) - 5)
+
+      0 until size flatMap (s => List(increase(s), decrease(s)))
+    }
+
+    def toAction[S](f: S => S): Action[S] = new Action[S] {
+      override def apply(s: S) = f(s)
+    }
+
+    def toJavaActionList[S](fs: Seq[S => S]): java.util.List[Action[S]] =
+      seqAsJavaList(fs map (toAction(_)))
+  }
+}
+
+class WithPlayingTimeScore
+  (player: Player, percentage: Integer, position: Position, vs: VsHand)
+  (implicit predictions: Predictions) {
+
+  val base = InLineupScore(player, position, vs).total * percentage
+  val fatigue = (Defense.getPositionFactor(position) * percentage * percentage / 10.0) / 2.0
+
+  // Simplies to (s/100)p + (f/2000)p^2
+  val total = (base - fatigue) / 100.0
 }
 
