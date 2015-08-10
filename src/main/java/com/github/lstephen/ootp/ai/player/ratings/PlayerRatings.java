@@ -1,14 +1,18 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
 import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
+import com.github.lstephen.ootp.ai.player.ratings.json.BuntForHitDeserializer;
+import com.github.lstephen.ootp.ai.player.ratings.json.StealingDeserializer;
 import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
+import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.splits.Splits;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import com.google.common.base.Objects;
@@ -32,8 +36,10 @@ public final class PlayerRatings {
 
     private PitchingRatings pitchingPotential;
 
+    @JsonDeserialize(using = BuntForHitDeserializer.class)
     private Rating<?, ?> buntForHit;
 
+    @JsonDeserialize(using = StealingDeserializer.class)
     private Rating<?, ?> stealing;
 
     @JsonIgnore
