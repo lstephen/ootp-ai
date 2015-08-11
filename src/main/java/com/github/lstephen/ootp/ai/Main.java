@@ -16,6 +16,7 @@ import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
+import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
 import com.github.lstephen.ootp.ai.report.LeagueBattingReport;
 import com.github.lstephen.ootp.ai.report.RosterReport;
 import com.github.lstephen.ootp.ai.report.SalaryRegression;
@@ -430,7 +431,7 @@ public class Main {
         newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);
 
-        selection.printBattingSelectionTable(out, newRoster, site.getTeamBatting());
+        Printables.print(new HittingSelectionReport(newRoster, ps, site.getTeamBatting())).to(out);
         selection.printPitchingSelectionTable(out, newRoster, site.getTeamPitching());
 
         Printables.print(newRoster).to(out);

@@ -22,6 +22,13 @@ class InLineupScore
 }
 
 object InLineupScore {
+  def apply(ply: Player)(implicit ps: Predictions): InLineupScore = {
+    Position.values
+      .map(InLineupScore(ply, _))
+      .maxBy(_.total)
+  }
+
+
   def apply(ply: Player, pos: Position)(implicit ps: Predictions): InLineupScore = {
     new InLineupScore(ply, pos, None)
   }

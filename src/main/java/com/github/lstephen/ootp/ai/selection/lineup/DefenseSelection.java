@@ -47,7 +47,6 @@ public class DefenseSelection {
 
     private Ordering<Defense> heuristic() {
         return Defense.byScore()
-            .compound(Defense.byBestPositionRating())
             .compound(Defense.byAge().reverse());
     }
 

@@ -22,6 +22,7 @@ import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selection;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.selection.SlotSelection;
+import com.github.lstephen.ootp.ai.selection.lineup.Defense;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
@@ -299,40 +300,6 @@ public final class RosterSelection {
             }
         }
         return ImmutableSet.copyOf(forced);
-    }
-
-    public void printBattingSelectionTable(OutputStream out, Roster roster, TeamStats<BattingStats> stats) {
-        Printables.print((w) -> printBattingSelectionTable(w, roster, stats)).to(out);
-    }
-
-    public void printBattingSelectionTable(PrintWriter w, Roster roster, TeamStats<BattingStats> stats) {
-        w.println();
-        TeamStats<BattingStats> batting = predictions.getAllBatting();
-
-        for (Player p :
-            hitterSelectionFactory.byOverall().sortedCopy(Selections.onlyHitters(batting.getPlayers()))) {
-
-            w.println(
-                String.format(
-                    "%-2s %-15s%s %3s %2d | %14s %3d %3s | %14s %3d %3s | %2s || %3d | %8s | %s",
-                    p.getPosition(),
-                    p.getShortName(),
-                    p.getRosterStatus(),
-                    roster.getStatus(p) != null ? roster.getStatus(p) : "",
-                    p.getAge(),
-                    batting.getSplits(p).getVsLeft().getSlashLine(),
-                    batting.getSplits(p).getVsLeft().getWobaPlus(),
-                    stats.contains(p) ? stats.getSplits(p).getVsLeft().getWobaPlus() : "",
-                    batting.getSplits(p).getVsRight().getSlashLine(),
-                    batting.getSplits(p).getVsRight().getWobaPlus(),
-                    stats.contains(p) ? stats.getSplits(p).getVsRight().getWobaPlus() : "",
-                    p.getIntangibles(),
-                    batting.getOverall(p).getWobaPlus(),
-                    p.getDefensiveRatings().getPositionScores(),
-                    Joiner.on(',').join(Slot.getPlayerSlots(p))));
-        }
-
-        w.flush();
     }
 
     public void printPitchingSelectionTable(OutputStream out, Roster roster, TeamStats<PitchingStats> stats) {

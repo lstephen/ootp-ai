@@ -77,7 +77,7 @@ RSpec.describe SinglePlayer do
         end
 
         context '#defensive_ratings', :property => :defensive_ratings do
-          its(:position_scores) { is_expected.to eq('-2---3-5') }
+          its(:position_scores) { is_expected.to eq('-2---325') }
         end
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe SinglePlayer do
           end
 
           context '#defensive_ratings', :property => :defensive_ratings do
-            its(:position_scores) { is_expected.to eq('-2------') }
+            its(:position_scores) { is_expected.to eq('-2-----1') }
           end
         end
       end
@@ -151,7 +151,7 @@ RSpec.describe SinglePlayer do
           end
 
           context '#defensive_ratings', :property => :defensive_ratings do
-            its(:position_scores) { is_expected.to eq('-3-66---') }
+            its(:position_scores) { is_expected.to eq('-3266---') }
           end
         end
       end

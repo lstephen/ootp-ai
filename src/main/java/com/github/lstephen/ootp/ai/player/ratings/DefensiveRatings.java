@@ -1,6 +1,9 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.github.lstephen.ootp.ai.selection.lineup.Defense;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -9,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+
 import java.util.Arrays;
 import java.util.Map;
 
@@ -112,7 +116,10 @@ public class DefensiveRatings {
             ? rating
             : ((skill + 1.25 * rating) / 2.25);
 
-        return MINIMUMS.containsKey(p) && score < MINIMUMS.get(p) ? Double.valueOf(0.0) : score;
+
+        return MINIMUMS.containsKey(p) && score < MINIMUMS.get(p)
+          ? 2 * score - (MINIMUMS.get(p))
+          : score;
     }
 
     public String getPositionScores() {
@@ -150,41 +157,11 @@ public class DefensiveRatings {
     }
 
     public String getPrimaryPosition() {
-        return Iterables
-            .getFirst(
-                Optional.presentInstances(
-                    ImmutableList.of(
-                        getPrimaryPosition(Position.CATCHER, Position.SHORTSTOP, Position.CENTER_FIELD),
-                        getPrimaryPosition(Position.SECOND_BASE, Position.THIRD_BASE),
-                        getPrimaryPosition(Position.RIGHT_FIELD, Position.LEFT_FIELD),
-                        getPrimaryPosition(Position.FIRST_BASE))),
-                Position.DESIGNATED_HITTER)
-            .getAbbreviation();
-
-    }
-
-    public Optional<Position> getPrimaryPosition(Position... ps) {
-        return getPrimaryPosition(Arrays.asList(ps));
-    }
-
-    public Optional<Position> getPrimaryPosition(Iterable<Position> ps) {
-        for (Position p : byRawScore(this).reverse().sortedCopy(ps)) {
-            if (getPositionScore(p) > 0 && positionRating.containsKey(p) && positionRating.get(p) > 0) {
-                return Optional.of(p);
-            }
-        }
-        return Optional.absent();
-    }
-
-    private Ordering<Position> byRawScore(final DefensiveRatings rs) {
-        return Ordering
-            .natural()
-            .onResultOf(new Function<Position, Double>() {
-                @Override
-                public Double apply(Position p) {
-                    return rs.getPositionScore(p);
-                }
-            });
+      return Arrays.stream(Position.values())
+        .filter(positionRating::containsKey)
+        .max(Ordering.natural().onResultOf(p -> Defense.score(this, p)))
+        .map(Position::getAbbreviation)
+        .orElse("");
     }
 
 }
