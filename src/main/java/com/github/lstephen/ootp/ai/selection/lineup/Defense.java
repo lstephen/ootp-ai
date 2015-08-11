@@ -109,17 +109,11 @@ public final class Defense {
     }
 
     public static Double score(Player ply, Position pos) {
-      Double total = 0.0;
+      return score(ply.getDefensiveRatings(), pos);
+    }
 
-      DefensiveRatings r = ply.getDefensiveRatings();
-
-      total += getPositionFactor(pos) * r.getPositionScore(pos);
-
-      if (!ply.canPlay(pos)) {
-          total -= Math.pow(getPositionFactor(pos), r.getPositionRating(pos) > 0.5 ? (1.5 - 0.1 * r.getPositionRating(pos)) : 2);
-      }
-
-      return total;
+    public static Double score(DefensiveRatings r, Position pos) {
+      return getPositionFactor(pos) * r.getPositionScore(pos);
     }
 
     public static Double score(Player ply) {
@@ -189,26 +183,6 @@ public final class Defense {
               .map((e) -> getPositionFactor(e.getValue()) * e.getKey().getDefensiveRatings().getPositionRating(e.getValue()))
               .reduce(0.0, Double::sum));
     }
-
-    public static Ordering<Defense> byBestPositionRating() {
-      return Ordering
-        .natural()
-        .onResultOf(
-          (Defense d) -> {
-            Double score = 0.0;
-
-            for (Map.Entry<Player, Position> entry : d.defense.entrySet()) {
-              Optional<Position> best = entry.getKey().getDefensiveRatings().getPrimaryPosition(Position.values());
-
-              if (best.isPresent()) {
-                score += getPositionFactor(best.get()) * entry.getKey().getDefensiveRatings().getPositionRating(best.get());
-              }
-            }
-
-            return score;
-          });
-    }
-              
 
     public static Supplier<Defense> randomGenerator(final Iterable<Player> players) {
         return new Supplier<Defense>() {
