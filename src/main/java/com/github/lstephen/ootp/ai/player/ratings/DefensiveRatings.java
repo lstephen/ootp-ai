@@ -168,7 +168,7 @@ public class DefensiveRatings {
         .filter(positionRating::containsKey)
         .max(Ordering.natural().onResultOf(p -> Defense.score(this, p)))
         .map(Position::getAbbreviation)
-        .orElse("");
+        .orElse("DH");
     }
 
 }
