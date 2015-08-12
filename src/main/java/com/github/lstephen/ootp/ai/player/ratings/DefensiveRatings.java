@@ -116,10 +116,16 @@ public class DefensiveRatings {
             ? rating
             : ((skill + 1.25 * rating) / 2.25);
 
+        if (MINIMUMS.containsKey(p) && score < MINIMUMS.get(p)) {
+          Double min = MINIMUMS.get(p);
 
-        return MINIMUMS.containsKey(p) && score < MINIMUMS.get(p)
-          ? 2 * score - (MINIMUMS.get(p))
-          : score;
+          Double f = Defense.getPositionFactor(p).doubleValue();
+          Double m = (f + min) / min;
+
+          return m * score - f;
+        } else {
+          return score;
+        }
     }
 
     public String getPositionScores() {
@@ -157,11 +163,12 @@ public class DefensiveRatings {
     }
 
     public String getPrimaryPosition() {
-      return Arrays.stream(Position.values())
+      return Position.hitting()
+        .stream()
         .filter(positionRating::containsKey)
         .max(Ordering.natural().onResultOf(p -> Defense.score(this, p)))
         .map(Position::getAbbreviation)
-        .orElse("");
+        .orElse("DH");
     }
 
 }

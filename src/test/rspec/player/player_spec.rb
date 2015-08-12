@@ -16,7 +16,7 @@ java_import com.github.lstephen.ootp.ai.site.SiteHolder;
 java_import com.github.lstephen.scratch.util.Jackson
 
 RSpec.describe Player do
-  let(:site) { double('Site', getBuntScale: bunt_scale) }
+  let(:site) { double('Site', getBuntScale: bunt_scale, getRunningScale: running_scale) }
 
   before(:each) { SiteHolder.set(site) }
 
@@ -26,6 +26,7 @@ RSpec.describe Player do
     context 'Victor Plata' do
       let(:json) { VICTOR_PLATA_JSON }
       let(:bunt_scale) { OneToFive.new }
+      let(:running_scale) { OneToTen.new }
 
       it_behaves_like :batter, 'Victor Plata', 34
 
@@ -49,6 +50,7 @@ RSpec.describe Player do
     context 'Elijah Chausse' do
       let(:json) { ELIJAH_CHAUSEE_JSON }
       let(:bunt_scale) { AToE.new }
+      let(:running_scale) { AToE.new }
 
       it_behaves_like :batter, 'Elijah Chausse', 27
 
