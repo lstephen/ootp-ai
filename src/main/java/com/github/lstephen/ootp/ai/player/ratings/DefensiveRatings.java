@@ -116,7 +116,7 @@ public class DefensiveRatings {
             ? rating
             : ((skill + 1.25 * rating) / 2.25);
 
-        if (MINIMUMS.containsKey(p)) {
+        if (MINIMUMS.containsKey(p) && score < MINIMUMS.get(p)) {
           Double min = MINIMUMS.get(p);
 
           Double f = Defense.getPositionFactor(p).doubleValue();
