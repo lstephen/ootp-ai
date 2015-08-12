@@ -163,7 +163,8 @@ public class DefensiveRatings {
     }
 
     public String getPrimaryPosition() {
-      return Arrays.stream(Position.values())
+      return Position.hitting()
+        .stream()
         .filter(positionRating::containsKey)
         .max(Ordering.natural().onResultOf(p -> Defense.score(this, p)))
         .map(Position::getAbbreviation)
