@@ -4,12 +4,12 @@ import scala.collection.immutable.TreeMap
 
 import java.util.Locale
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 import com.google.common.base.CharMatcher
+
+import scalaz.CaseInsensitive
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(Array(
@@ -36,8 +36,7 @@ abstract class IntegerScale(scale: Integer => Integer) extends Scale[Integer] {
 }
 
 object OneToOneHundred {
-  def valueOf(v: Integer): Rating[Integer, OneToOneHundred] =
-    Rating(v, OneToOneHundred())
+  def valueOf(v: Integer): Rating[Integer, OneToOneHundred] = Rating(v, OneToOneHundred())
 }
 
 case class OneToFive() extends IntegerScale(v => v * 20 - 10)
@@ -62,23 +61,22 @@ case class Potential() extends StringScale(
 @JsonIgnoreProperties(Array("ratings"))
 class StringScale(rs: Map[String, Integer]) extends Scale[String] {
 
-  // case insensitive keys for ratings map
-  private val ratings = new TreeMap[String, Integer]()(Ordering.by(_.toUpperCase)) ++ rs
+  val ratings = rs map { case (k, v) => (CaseInsensitive(k), v) }
+
+  def contains(k: String): Boolean = ratings contains CaseInsensitive(k)
+
+  def get(k: String): Integer =
+    ratings.getOrElse(
+      CaseInsensitive(k),
+      throw new IllegalStateException(s"Unkown rating: $k"))
 
   override def parse(s: String): Rating[String, StringScale] = {
-    require(
-      ratings.keySet.contains(sanitize(s)),
-      s"Unknown rating: $s")
+    require(contains(s), s"Unknown rating: $s")
 
     Rating(s, this)
   }
 
-  override def normalize(v: String): Rating[Integer, OneToOneHundred] =
-    OneToOneHundred.valueOf(normalizeToInt(v))
-
-  private def normalizeToInt(v: String): Integer =
-    ratings.getOrElse(sanitize(v), throw new IllegalStateException(s"Unknown rating: $v"))
-
-  private def sanitize(v: String): String = CharMatcher.WHITESPACE.trimFrom(v)
+  override def normalize(k: String): Rating[Integer, OneToOneHundred] =
+    OneToOneHundred.valueOf(get(k))
 }
 
