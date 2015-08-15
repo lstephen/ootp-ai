@@ -16,7 +16,7 @@ class InLineupScore
     case Some(vs) => predictions.getHitting(player, vs)
   }
 
-  val defense = Defense.score(player, position)
+  val defense = new PlayerDefenseScore(player, position).total
 
   val total = hitting + defense
 }
