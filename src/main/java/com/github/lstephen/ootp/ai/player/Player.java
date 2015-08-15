@@ -280,7 +280,7 @@ public final class Player {
                 ? "SP"
                 : "MR";
         } else {
-            return getDefensiveRatings().getPrimaryPosition();
+          return getDefensiveRatings().getPrimaryPosition();
         }
     }
 

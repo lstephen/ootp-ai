@@ -1,6 +1,7 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
 import com.github.lstephen.ootp.ai.selection.lineup.Defense;
+import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -166,7 +167,7 @@ public class DefensiveRatings {
       return Position.hitting()
         .stream()
         .filter(positionRating::containsKey)
-        .max(Ordering.natural().onResultOf(p -> Defense.score(this, p)))
+        .max(Ordering.natural().onResultOf(p -> new PlayerDefenseScore(this, p).total()))
         .map(Position::getAbbreviation)
         .orElse("DH");
     }

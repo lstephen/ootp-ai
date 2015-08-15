@@ -4,7 +4,7 @@ import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.regression.Predictions
 import com.github.lstephen.ootp.ai.roster.Roster
-import com.github.lstephen.ootp.ai.selection.lineup.Defense
+import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 import com.github.lstephen.ootp.ai.stats.BattingStats
@@ -44,8 +44,10 @@ class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, 
       f"${ps.getSlashLine}%14s ${ps.getWobaPlus}%3d ${ss map (_.getWobaPlus) getOrElse ""}%3s"
     }
 
-    def defense: String =
-      f"${p.getDefensiveRatings.getPositionScores}%8s ${Defense.score(p).doubleValue.round}%3d"
+    def positionScores = p.getDefensiveRatings.getPositionScores
+    def atBestPosition = PlayerDefenseScore.atBestPosition(p).total.round
+
+    def defense: String =  f"$positionScores%8s $atBestPosition%3d"
 
     def intangibles: String = p.getIntangibles
 

@@ -102,25 +102,10 @@ public final class Defense {
             Player ply = entry.getKey();
             Position pos = entry.getValue();
 
-            total += score(ply, pos);
+            total += new PlayerDefenseScore(ply, pos).total();
         }
 
         return total;
-    }
-
-    public static Double score(Player ply, Position pos) {
-      return score(ply.getDefensiveRatings(), pos);
-    }
-
-    public static Double score(DefensiveRatings r, Position pos) {
-      return getPositionFactor(pos) * r.getPositionScore(pos);
-    }
-
-    public static Double score(Player ply) {
-      return Arrays.stream(Position.values())
-        .mapToDouble(p -> score(ply, p))
-        .max()
-        .orElse(0.0);
     }
 
     @Override
