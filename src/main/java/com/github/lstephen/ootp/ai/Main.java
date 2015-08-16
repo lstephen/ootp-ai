@@ -138,8 +138,6 @@ public class Main {
 
     private static ImmutableSet<SiteDefinition> LOOK_TO_NEXT_SEASON = ImmutableSet.of();
 
-    private static ImmutableSet<SiteDefinition> PLAYOFFS = ImmutableSet.of();
-
     private static ImmutableSet<SiteDefinition> INAUGURAL_DRAFT = ImmutableSet.of();
 
     public static void main(String[] args) throws IOException {
@@ -186,7 +184,7 @@ public class Main {
             isLookToNextSeason = Boolean.TRUE;
         }
 
-        if (PLAYOFFS.contains(def)) {
+        if ("true".equals(System.getenv("OOTPAI_PLAYOFFS"))) {
             isPlayoffs = Boolean.TRUE;
         }
 
