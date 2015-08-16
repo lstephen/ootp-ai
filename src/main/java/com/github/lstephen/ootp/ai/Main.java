@@ -178,14 +178,10 @@ public class Main {
         }
 
         Boolean isLookToNextSeason = Boolean.FALSE;
-        Boolean isPlayoffs = Boolean.FALSE;
+        Boolean isPlayoffs = "true".equals(System.getenv("OOTPAI_PLAYOFFS"));
 
         if (LOOK_TO_NEXT_SEASON.contains(def)) {
             isLookToNextSeason = Boolean.TRUE;
-        }
-
-        if ("true".equals(System.getenv("OOTPAI_PLAYOFFS"))) {
-            isPlayoffs = Boolean.TRUE;
         }
 
         final Site site = def.getSite();
