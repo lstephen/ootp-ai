@@ -2,10 +2,7 @@ package com.github.lstephen.ootp.ai.selection
 
 import com.github.lstephen.ootp.ai.algebra._
 
-import scalaz.{ Order => _, _ }
-import scalaz.syntax.traverse._
-
-import spire.algebra._
+import spire.algebra.Order
 
 trait ScoreLike {
   def total: Score
@@ -14,8 +11,8 @@ trait ScoreLike {
 object ScoreLike {
   implicit def ord[A <: ScoreLike]: Order[A] = Order.by(_.total)
 
-  implicit class FoldableOfScoreLike[A <: ScoreLike, T[_]: Traverse](xs: T[A]) {
-    def total: Score = xs.map(_.total).msum
+  implicit class ScoreLikeSeq[A <: ScoreLike](xs: Seq[A]) {
+    def total: Score = xs.map(_.total).mconcat
   }
 }
 

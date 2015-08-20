@@ -1,10 +1,11 @@
 package com.github.lstephen.ootp.ai.selection
 
-import spire.algebra._
-import spire.math._
+import spire.algebra.{ CMonoid, Order }
+import spire.math.Real
+
 import spire.implicits._
 
-class Score(private[Score] val n: Score.N) {
+class Score(private[Score] val n: Real) {
   def toInt: Int = n.round.intValue
   def toDouble: Double = n.doubleValue
 
@@ -13,21 +14,19 @@ class Score(private[Score] val n: Score.N) {
   def +(rhs: Score) = Score(n + rhs.n)
 }
 
-trait ScoreIsAdditiveCMonoid extends AdditiveCMonoid[Score] {
-  def zero: Score = Score(0)
-  def plus(lhs: Score, rhs: Score): Score = lhs + rhs
+trait ScoreIsMonoid extends CMonoid[Score] {
+  def id: Score = Score(0)
+  def op(lhs: Score, rhs: Score): Score = lhs + rhs
 }
 
 trait ScoreIsOrdered extends Order[Score] {
   def compare(x: Score, y: Score): Int = x compare y
 }
 
-class ScoreAlgebra extends ScoreIsAdditiveCMonoid with ScoreIsOrdered
+class ScoreAlgebra extends ScoreIsMonoid with ScoreIsOrdered
 
 object Score {
-  private[Score] type N = Double
-
-  def apply(n: N): Score = new Score(n)
+  def apply(t: Real): Score = new Score(t)
 
   implicit val Alg: ScoreAlgebra = new ScoreAlgebra
 }
