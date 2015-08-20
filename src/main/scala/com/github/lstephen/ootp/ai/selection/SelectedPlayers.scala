@@ -13,6 +13,9 @@ import com.github.lstephen.ootp.ai.stats.SplitPercentages
 
 import collection.JavaConversions._
 
+import scalaz._
+import Scalaz._
+
 class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, splits: SplitPercentages) {
 
   def score: Double = {
@@ -36,7 +39,7 @@ class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, s
     lineup
       .filter(_.getPositionEnum != Position.PITCHER)
       .map(e => InLineupScore(e.getPlayer, e.getPositionEnum, vs))
-      .toSeq
+      .toList
       .total
   }
 }
