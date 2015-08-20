@@ -3,16 +3,11 @@ package com.github.lstephen.ootp.ai.selection.lineup
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
-import com.github.lstephen.ootp.ai.selection.Score
-import com.github.lstephen.ootp.ai.selection.ScoreLike
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
-
-import spire.compat._
 
 class InLineupScore
   (player: Player, position: Position, vs: Option[VsHand] = None)
-  (implicit predictions: Predictions)
-  extends ScoreLike {
+  (implicit predictions: Predictions) {
 
   val name = player.getShortName
 
@@ -23,14 +18,14 @@ class InLineupScore
 
   val defense = new PlayerDefenseScore(player, position).total
 
-  def total = Score(hitting + defense)
+  val total = hitting + defense
 }
 
 object InLineupScore {
   def apply(ply: Player)(implicit ps: Predictions): InLineupScore = {
     Position.values
       .map(InLineupScore(ply, _))
-      .max
+      .maxBy(_.total)
   }
 
 
@@ -43,7 +38,7 @@ object InLineupScore {
   }
 
   def sort(players: Traversable[Player], pos: Position, vs: VsHand)(implicit ps: Predictions): Seq[Player] = {
-    players.toSeq.sortBy(InLineupScore(_, pos, vs)).reverse
+    players.toSeq.sortBy[Double](InLineupScore(_, pos, vs).total).reverse
   }
 }
 
