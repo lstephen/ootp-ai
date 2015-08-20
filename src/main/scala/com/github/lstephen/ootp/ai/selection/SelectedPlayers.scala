@@ -13,8 +13,6 @@ import com.github.lstephen.ootp.ai.stats.SplitPercentages
 
 import collection.JavaConversions._
 
-import spire.algebra.CMonoid
-
 class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, splits: SplitPercentages) {
 
   def score: Double = {

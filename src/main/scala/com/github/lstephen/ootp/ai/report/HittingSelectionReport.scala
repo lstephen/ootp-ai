@@ -4,7 +4,6 @@ import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.regression.Predictions
 import com.github.lstephen.ootp.ai.roster.Roster
-import com.github.lstephen.ootp.ai.selection.Score
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
