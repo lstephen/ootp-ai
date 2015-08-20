@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.selection
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.selection.ScoreLike._
 import com.github.lstephen.ootp.ai.selection.bench.BenchScorer;
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup
@@ -11,6 +12,8 @@ import com.github.lstephen.ootp.ai.selection.lineup.LineupSelection
 import com.github.lstephen.ootp.ai.stats.SplitPercentages
 
 import collection.JavaConversions._
+
+import spire.algebra.CMonoid
 
 class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, splits: SplitPercentages) {
 
@@ -24,18 +27,19 @@ class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, s
   }
 
   def score(vs: VsHand, lineup: Lineup): Double = {
-    lineupScore(lineup, vs) + benchScore(lineup, vs)
+    lineupScore(lineup, vs).toDouble + benchScore(lineup, vs)
   }
 
   def benchScore(lineup: Lineup, vs: VsHand): Double = {
     new BenchScorer().score(players -- lineup.playerSet, lineup, vs)
   }
 
-  def lineupScore(lineup: Lineup, vs: VsHand): Double = {
+  def lineupScore(lineup: Lineup, vs: VsHand): Score = {
     lineup
       .filter(_.getPositionEnum != Position.PITCHER)
-      .map(e => InLineupScore(e.getPlayer, e.getPositionEnum, vs).total)
-      .sum
+      .map(e => InLineupScore(e.getPlayer, e.getPositionEnum, vs))
+      .toSeq
+      .total
   }
 }
 
