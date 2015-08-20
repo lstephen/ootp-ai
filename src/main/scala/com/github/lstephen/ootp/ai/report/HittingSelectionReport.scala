@@ -14,14 +14,17 @@ import java.io.PrintWriter
 
 import collection.JavaConversions._
 
+import spire.compat._
+import spire.implicits._
+
 class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, stats: TeamStats[BattingStats]) extends Printable {
 
   def print(w: PrintWriter): Unit = {
     w.println()
 
     (List() ++ roster.getAllPlayers)
+      .sortBy(InLineupScore(_))
       .filter(_.isHitter)
-      .sortBy(InLineupScore(_).total)
       .reverse
       .foreach(p => w.println(format(p)))
   }
@@ -51,7 +54,7 @@ class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, 
 
     def intangibles: String = p.getIntangibles
 
-    def overall: String = f"${InLineupScore(p).total.round}%3d"
+    def overall: String = f"${InLineupScore(p).total.toInt}%3d"
 
     def status: String = {
       val level = if (roster.getStatus(p) == null) "" else roster.getStatus(p)

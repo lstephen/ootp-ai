@@ -12,6 +12,9 @@ import java.io.PrintWriter
 
 import collection.JavaConversions._
 
+import spire.compat._
+import spire.implicits._
+
 class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) extends Printable {
 
   override def print(pw: PrintWriter): Unit = {
@@ -38,13 +41,13 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
   }
 
   def format(s: InLineupScore): String = {
-    f"${s.name}%-16s ${s.hitting}%3d ${s.defense}%3.0f ${s.total}%3.0f"
+    f"${s.name}%-16s ${s.hitting}%3d ${s.defense}%3.0f ${s.total.toInt}%3d"
   }
 
-  def top(p: Position, vs: Option[VsHand] = None): List[InLineupScore] = {
+  def top(p: Position, vs: Option[VsHand] = None): Seq[InLineupScore] = {
     (List() ++ roster.getAllPlayers)
       .map(new InLineupScore(_, p, vs))
-      .sortBy(_.total)
+      .sorted
       .reverse
   }
 
