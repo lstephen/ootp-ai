@@ -38,15 +38,14 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
   }
 
   def format(s: InLineupScore): String = {
-    f"${s.name}%-16s ${s.hitting}%3d ${s.defense}%3.0f ${s.total}%3.0f"
+    f"${s.name}%-16s ${s.hitting}%3d ${s.defense.total}%3.0f ${s.total}%3.0f"
   }
 
-  def top(p: Position, vs: Option[VsHand] = None): List[InLineupScore] = {
+  def top(p: Position, vs: Option[VsHand] = None): List[InLineupScore] =
     (List() ++ roster.getAllPlayers)
       .map(new InLineupScore(_, p, vs))
-      .sortBy(_.total)
+      .sorted
       .reverse
-  }
 
 }
 
