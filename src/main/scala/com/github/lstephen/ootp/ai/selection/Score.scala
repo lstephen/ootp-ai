@@ -20,12 +20,10 @@ object Score {
 
   def apply(t: Double): Score = new SimpleScore(t)
 
-  val zero = Score(0)
-
   implicit def ordering[A <: Score]: ScalaOrdering[A] = new ScoreIsOrdered().toScalaOrdering
 
   implicit class FoldableOfScore[A <: Score, F[_]: Foldable](xs: F[A]) {
-    def total: Score = xs.foldLeft(zero)(_ + _)
+    def total: Score = Score(xs.foldLeft(0)(_.total + _.total))
   }
 }
 
