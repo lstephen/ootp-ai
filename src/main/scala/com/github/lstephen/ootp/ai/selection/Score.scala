@@ -23,7 +23,7 @@ object Score {
   implicit def ordering[A <: Score]: ScalaOrdering[A] = new ScoreIsOrdered().toScalaOrdering
 
   implicit class FoldableOfScore[A <: Score, F[_]: Foldable](xs: F[A]) {
-    def total: Score = Score(xs.foldLeft(0)(_.total + _.total))
+    def total: Score = Score(xs.foldLeft(0.0)(_ + _.total))
   }
 }
 
