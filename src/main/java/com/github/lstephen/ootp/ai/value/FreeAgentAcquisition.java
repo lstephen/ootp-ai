@@ -66,7 +66,7 @@ public final class FreeAgentAcquisition {
 
         // Penalize for releasing player in needed slot
         for (Slot s : release.getSlots()) {
-            if (s != Slot.P) {
+            if (s != Slot.P && s != Slot.H) {
                 score -= Math.max(0, rr.getTargetRatio() - rr.getRatio(s));
             }
         }
