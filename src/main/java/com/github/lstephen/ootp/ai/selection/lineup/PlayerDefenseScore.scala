@@ -2,8 +2,7 @@ package com.github.lstephen.ootp.ai.selection.lineup
 
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.{ DefensiveRatings, Position }
-import com.github.lstephen.ootp.ai.selection.Score
-import com.github.lstephen.ootp.ai.selection.Scoreable
+import com.github.lstephen.ootp.ai.score._
 
 class PlayerDefenseScore(defensiveRatings: DefensiveRatings, position: Position)
   extends Scoreable {

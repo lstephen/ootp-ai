@@ -3,8 +3,7 @@ package com.github.lstephen.ootp.ai.selection.lineup
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
-import com.github.lstephen.ootp.ai.selection.Score
-import com.github.lstephen.ootp.ai.selection.Scoreable
+import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 
 import scalaz._

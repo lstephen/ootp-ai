@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.selection
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.bench.BenchScorer
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup
