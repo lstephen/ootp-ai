@@ -38,7 +38,7 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
   }
 
   def format(s: InLineupScore): String = {
-    f"${s.name}%-16s ${s.hitting}%3d ${s.defense.total}%3.0f ${s.total}%3.0f"
+    f"${s.name}%-16s ${s.hitting}%3d ${s.defense.toLong}%3d ${s.toLong}%3d"
   }
 
   def top(p: Position, vs: Option[VsHand] = None): List[InLineupScore] =

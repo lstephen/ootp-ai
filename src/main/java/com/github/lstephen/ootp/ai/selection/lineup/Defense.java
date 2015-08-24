@@ -102,7 +102,7 @@ public final class Defense {
             Player ply = entry.getKey();
             Position pos = entry.getValue();
 
-            total += new PlayerDefenseScore(ply, pos).total();
+            total += new PlayerDefenseScore(ply, pos).toDouble();
         }
 
         return total;

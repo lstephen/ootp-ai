@@ -167,7 +167,7 @@ public class DefensiveRatings {
       return Position.hitting()
         .stream()
         .filter(positionRating::containsKey)
-        .max(Ordering.natural().onResultOf(p -> new PlayerDefenseScore(this, p).total()))
+        .max(Ordering.natural().onResultOf(p -> new PlayerDefenseScore(this, p).toDouble()))
         .map(Position::getAbbreviation)
         .orElse("DH");
     }

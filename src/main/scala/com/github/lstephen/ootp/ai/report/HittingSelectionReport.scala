@@ -21,7 +21,7 @@ class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, 
 
     (List() ++ roster.getAllPlayers)
       .filter(_.isHitter)
-      .sortBy(InLineupScore(_).total)
+      .sortBy(InLineupScore(_))
       .reverse
       .foreach(p => w.println(format(p)))
   }
@@ -45,13 +45,13 @@ class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, 
     }
 
     def positionScores = p.getDefensiveRatings.getPositionScores
-    def atBestPosition = PlayerDefenseScore.atBestPosition(p).total.round
+    def atBestPosition = PlayerDefenseScore.atBestPosition(p).score
 
-    def defense: String =  f"$positionScores%8s $atBestPosition%3d"
+    def defense: String =  f"$positionScores%8s ${atBestPosition.toLong}%3d"
 
     def intangibles: String = p.getIntangibles
 
-    def overall: String = f"${InLineupScore(p).total.round}%3d"
+    def overall: String = f"${InLineupScore(p).toLong}%3d"
 
     def status: String = {
       val level = if (roster.getStatus(p) == null) "" else roster.getStatus(p)
