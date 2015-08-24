@@ -5,25 +5,47 @@ import scala.math.{ Ordering => ScalaOrdering }
 import scalaz._
 import Scalaz._
 
-trait Score {
-  def total: Double
+class Score(private val n: Double) extends AnyVal {
+  def toDouble: Double = n
+  def toLong: Long = n.round
 
-  def +(that: Score): Score = Score(total + that.total)
+  def +(that: Score) = new Score(n + that.n)
 }
 
-class ScoreIsOrdered[A <: Score](implicit o: Order[Double]) extends Order[A] {
-  def order(x: A, y: A): Ordering = x.total ?|? y.total
+
+class ScoreIsOrdered(implicit o: Order[Double]) extends Order[Score] {
+  def order(x: Score, y: Score): Ordering = x.toDouble ?|? y.toDouble
+}
+
+class ScoreableIsOrdered[A <: Scoreable](implicit o: Order[Double]) extends Order[A] {
+  def order(x: A, y: A): Ordering = x.score ?|? y.score
 }
 
 object Score {
-  private class SimpleScore(val total: Double) extends Score
+  val zero = Score(0)
+  def apply[N: Numeric](n: N): Score = new Score(implicitly[Numeric[N]] toDouble n)
 
-  def apply(t: Double): Score = new SimpleScore(t)
+  implicit def order: Order[Score] = new ScoreIsOrdered
 
-  implicit def ordering[A <: Score]: ScalaOrdering[A] = new ScoreIsOrdered().toScalaOrdering
+  implicit class FoldableOfScore[F[_]: Foldable](xs: F[Score]) {
+    def total: Score = xs.foldLeft(zero)(_ + _)
+  }
 
-  implicit class FoldableOfScore[A <: Score, F[_]: Foldable](xs: F[A]) {
-    def total: Score = Score(xs.foldLeft(0.0)(_ + _.total))
+}
+
+trait Scoreable {
+  def score: Score
+
+  def toDouble: Double = score.toDouble
+  def toLong: Long = score.toLong
+}
+
+object Scoreable {
+  implicit def ordering[A <: Scoreable]: ScalaOrdering[A] = new ScoreableIsOrdered().toScalaOrdering
+
+  implicit class TraverseOfScoreable[A <: Scoreable, T[_]: Traverse](xs: T[A]) {
+    import Score.FoldableOfScore
+    def total: Score = xs.map(_.score).total
   }
 }
 

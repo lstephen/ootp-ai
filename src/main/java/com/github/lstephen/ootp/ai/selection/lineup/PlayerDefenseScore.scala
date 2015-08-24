@@ -3,16 +3,17 @@ package com.github.lstephen.ootp.ai.selection.lineup
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.{ DefensiveRatings, Position }
 import com.github.lstephen.ootp.ai.selection.Score
+import com.github.lstephen.ootp.ai.selection.Scoreable
 
 class PlayerDefenseScore(defensiveRatings: DefensiveRatings, position: Position)
-  extends Score {
+  extends Scoreable {
 
   def this(ply: Player, pos: Position) = this(ply.getDefensiveRatings, pos)
 
   val positionFactor = Defense.getPositionFactor(position)
-  val score = defensiveRatings getPositionScore position
+  val positionScore = defensiveRatings getPositionScore position
 
-  val total = positionFactor * score
+  val score = Score(positionFactor * positionScore)
 }
 
 object PlayerDefenseScore {

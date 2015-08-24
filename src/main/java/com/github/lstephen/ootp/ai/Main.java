@@ -71,6 +71,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -414,6 +415,8 @@ public class Main {
 
         LOG.log(Level.INFO, "Selecting new rosters...");
 
+        Stopwatch sw = Stopwatch.createStarted();
+
         Mode selectionMode = mode;
 
         if (isPlayoffs) {
@@ -424,6 +427,10 @@ public class Main {
 
         newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);
+
+        sw.stop();
+
+        LOG.log(Level.INFO, "Roster selection time: " + sw);
 
         Printables.print(new HittingSelectionReport(newRoster, ps, site.getTeamBatting())).to(out);
         selection.printPitchingSelectionTable(out, newRoster, site.getTeamPitching());

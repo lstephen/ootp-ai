@@ -27,7 +27,7 @@ class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, s
   }
 
   def score(vs: VsHand, lineup: Lineup): Double =
-    lineupScore(lineup, vs).total + benchScore(lineup, vs)
+    lineupScore(lineup, vs).toDouble + benchScore(lineup, vs)
 
   def benchScore(lineup: Lineup, vs: VsHand): Double =
     new BenchScorer().score(players -- lineup.playerSet, lineup, vs)

@@ -146,7 +146,7 @@ class WithPlayingTimeScore
   (player: Player, percentage: Integer, position: Position, vs: VsHand)
   (implicit predictions: Predictions) {
 
-  val base = InLineupScore(player, position, vs).total * percentage
+  val base = InLineupScore(player, position, vs).score.toDouble * percentage
   val fatigue = (Defense.getPositionFactor(position) * percentage * percentage / 10.0) / 2.0
 
   // Simplies to (s/100)p + (f/2000)p^2
