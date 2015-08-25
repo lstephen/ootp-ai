@@ -1,26 +1,27 @@
 package com.github.lstephen.ootp.ai.score
 
-import scala.math.{ Ordering => ScalaOrdering }
+import scala.math.Ordering
 
-import scalaz._
-import Scalaz._
+import scalaz.Traverse
+import scalaz.syntax.TraverseSyntax
+
+import spire.algebra.Order
 
 trait Scoreable {
-  def score: Score
-
   def toDouble: Double = score.toDouble
   def toLong: Long = score.toLong
-}
 
-class ScoreableIsOrdered[A <: Scoreable](implicit o: Order[Double]) extends Order[A] {
-  def order(x: A, y: A): Ordering = x.score ?|? y.score
+  def score: Score
 }
 
 object Scoreable {
-  implicit def ordering[A <: Scoreable]: ScalaOrdering[A] = new ScoreableIsOrdered().toScalaOrdering
+  implicit def order[A <: Scoreable]: Order[A] = Order.by(_.score)
+  implicit def ordering[A <: Scoreable]: Ordering[A] = Order.ordering
 
   implicit class TraverseOfScoreable[A <: Scoreable, T[_]: Traverse](xs: T[A]) {
-    import Score.FoldableOfScore
+    import Score._
+    import scalaz.Scalaz._
+
     def total: Score = xs.map(_.score).total
   }
 }
