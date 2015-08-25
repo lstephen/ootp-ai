@@ -15,7 +15,7 @@ files:
   - etc/settings.xml:/root/.m2/settings.xml
 
 targets:
-  build: mvn -B clean verify -Dgpg.skip=true
+  build: mvn -B clean verify -Dgpg.skip=true -DaddScalacArgs=-feature
 
   clean: mvn -B clean
 

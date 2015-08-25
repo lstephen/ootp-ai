@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.score
 
 import scalaz.Foldable
 
-import spire.algebra.Order
+import spire.algebra.{ AdditiveMonoid, Order }
 
 class Score(private val n: Double) extends AnyVal {
   def toDouble: Double = n
@@ -13,20 +13,20 @@ class Score(private val n: Double) extends AnyVal {
   def +(that: Score) = new Score(n + that.n)
 }
 
-class ScoreIsOrdered extends Order[Score] {
+trait ScoreIsOrdered extends Order[Score] {
   def compare(x: Score, y: Score): Int = x compare y
 }
 
+trait ScoreIsAdditiveMonoid extends AdditiveMonoid[Score] {
+  val zero: Score = Score(0)
+  def plus(x: Score, y: Score): Score = x + y
+}
+
+class ScoreAlgebra extends ScoreIsOrdered with ScoreIsAdditiveMonoid
+
 object Score {
-  val zero = Score(0)
   def apply[N: Numeric](n: N): Score = new Score(implicitly[Numeric[N]] toDouble n)
 
-  implicit val order: Order[Score] = new ScoreIsOrdered
-
-  implicit class FoldableOfScore[F[_]: Foldable](xs: F[Score]) {
-    import scalaz.Scalaz._
-
-    def total: Score = xs.foldLeft(zero)(_ + _)
-  }
+  implicit val algebra = new ScoreAlgebra
 }
 

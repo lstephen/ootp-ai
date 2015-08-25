@@ -1,9 +1,12 @@
 package com.github.lstephen.ootp.ai.score
 
+import com.github.lstephen.ootp.ai.syntax._
+
+import scala.language.higherKinds
 import scala.math.Ordering
 
 import scalaz.Traverse
-import scalaz.syntax.TraverseSyntax
+import scalaz.syntax.traverse._
 
 import spire.algebra.Order
 
@@ -19,10 +22,7 @@ object Scoreable {
   implicit def ordering[A <: Scoreable]: Ordering[A] = Order.ordering
 
   implicit class TraverseOfScoreable[A <: Scoreable, T[_]: Traverse](xs: T[A]) {
-    import Score._
-    import scalaz.Scalaz._
-
-    def total: Score = xs.map(_.score).total
+    def total: Score = xs.map(_.score).msum
   }
 }
 
