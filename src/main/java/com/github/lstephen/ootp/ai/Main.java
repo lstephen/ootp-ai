@@ -468,7 +468,7 @@ public class Main {
         LOG.log(Level.INFO, "Choosing lineups...");
 
         AllLineups lineups =
-            new LineupSelection(battingRegression.predict(newRoster.getAllPlayers()))
+          new LineupSelection(Predictions.predict(newRoster.getAllPlayers()).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod()))
                 .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         LOG.log(Level.INFO, "Choosing Depth Charts...");
