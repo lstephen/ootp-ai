@@ -14,7 +14,7 @@ if [ -d "ootp-ai-data/.git" ]; then
 else
   echo "Cloning latest data..."
   rm -rf ootp-ai-data
-  git clone git@github.com:lstephen/ootp-ai-data.git
+  git clone -depth 1 git@github.com:lstephen/ootp-ai-data.git
 fi
 
 echo "Running..."

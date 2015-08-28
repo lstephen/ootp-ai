@@ -19,7 +19,7 @@ import Scalaz._
 class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, splits: SplitPercentages) {
 
   def score: Double = {
-    val lineups = new LineupSelection(predictions.getAllBatting).select(players)
+    val lineups = new LineupSelection(predictions).select(players)
 
     splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh()) +
       splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp()) +

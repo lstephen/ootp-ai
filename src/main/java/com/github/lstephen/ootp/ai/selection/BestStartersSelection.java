@@ -130,7 +130,7 @@ public class BestStartersSelection implements Selection {
             return partial;
         }
 
-        AllLineups lineups = new LineupSelection(predictions.getAllBatting()).dontRequireBackupCatcher().select(partial);
+        AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(partial);
 
         Bench bench = Bench.select(lineups, partial, predictions, available, getTargetSize());
 
@@ -142,7 +142,7 @@ public class BestStartersSelection implements Selection {
         Set<Player> selected = Sets.newHashSet(best);
 
         while (selected.size() > size) {
-            AllLineups lineups = new LineupSelection(predictions.getAllBatting()).dontRequireBackupCatcher().select(selected);
+            AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(selected);
             Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
 
             Iterables.removeAll(ps, forced);
@@ -160,7 +160,7 @@ public class BestStartersSelection implements Selection {
             selected.remove(byValueProvided(lineups, selected).min(ps));
         }
 
-        AllLineups lineups = new LineupSelection(predictions.getAllBatting()).dontRequireBackupCatcher().select(selected);
+        AllLineups lineups = new LineupSelection(predictions).dontRequireBackupCatcher().select(selected);
 
         System.out.print("Limited:");
         for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
@@ -172,14 +172,12 @@ public class BestStartersSelection implements Selection {
     }
 
     private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
-		StarterSelection starters = new StarterSelection(predictions.getAllBatting());
-
-        starters.dontRequireBackupCatcher();
+        StarterSelection starters = new StarterSelection(predictions);
 
         return ImmutableSet.copyOf(
             Iterables.concat(
-                starters.selectWithDh(Lineup.VsHand.VS_LHP, ps),
-                starters.selectWithDh(Lineup.VsHand.VS_RHP, ps)));
+                starters.selectWithDh(Lineup.VsHand.VS_LHP, ps, false),
+                starters.selectWithDh(Lineup.VsHand.VS_RHP, ps, false)));
     }
 
 	private Ordering<Player> byOverall() {
