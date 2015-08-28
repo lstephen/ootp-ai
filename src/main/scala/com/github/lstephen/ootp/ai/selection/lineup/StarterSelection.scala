@@ -17,19 +17,14 @@ class StarterSelection(implicit predictions: Predictions) {
 
   type Starters = Map[Position, Player]
 
-  def selectWithDh
-    (ps: GenTraversableOnce[Player], vs: VsHand)
-    (implicit requireBackupCatcher: Boolean = false): Set[Player] =
+  def selectWithDh(ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] =
       selectForPositions(Position.hitting.toSet, ps, vs)
 
-  def select
-    (ps: GenTraversableOnce[Player], vs: VsHand)
-    (implicit requireBackupCatcher: Boolean = false): Set[Player] =
+  def select(ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] =
       selectForPositions(Position.hitting.toSet - Position.DESIGNATED_HITTER, ps, vs)
 
   def selectForPositions
-    (pos: Set[Position], ps: GenTraversableOnce[Player], vs: VsHand)
-    (implicit requireBackupCatcher: Boolean = false): Set[Player] = {
+    (pos: Set[Position], ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] = {
 
     val initial = (pos.toList, ps.toList).zipped.toMap
 
@@ -60,10 +55,10 @@ class StarterSelection(implicit predictions: Predictions) {
 
 
   // For Java compat
-  def select(vs: VsHand, ps: JavaIterable[Player], rbc: Boolean): JavaIterable[Player] =
+  def select(vs: VsHand, ps: JavaIterable[Player]): JavaIterable[Player] =
     select(List() ++ ps, vs)
 
-  def selectWithDh(vs: VsHand, ps: JavaIterable[Player], rbc: Boolean): JavaIterable[Player] =
+  def selectWithDh(vs: VsHand, ps: JavaIterable[Player]): JavaIterable[Player] =
     selectWithDh(List() ++ ps, vs)
 
 }

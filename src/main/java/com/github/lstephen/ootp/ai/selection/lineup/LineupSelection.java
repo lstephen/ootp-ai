@@ -9,15 +9,8 @@ public class LineupSelection {
 
     private final Predictions predictions;
 
-    private boolean requireBackupCatcher = true;
-
     public LineupSelection(Predictions predictions) {
         this.predictions = predictions;
-    }
-
-    public LineupSelection dontRequireBackupCatcher() {
-        requireBackupCatcher = false;
-        return this;
     }
 
     public AllLineups select(Iterable<Player> available) {
@@ -35,12 +28,8 @@ public class LineupSelection {
 
         StarterSelection ss = new StarterSelection(predictions);
 
-        //if (!requireBackupCatcher) {
-        //    ss.dontRequireBackupCatcher();
-        //}
-
         ImmutableSet<Player> withoutDhStarters =
-            ImmutableSet.copyOf(ss.select(vs, available, requireBackupCatcher));
+            ImmutableSet.copyOf(ss.select(vs, available));
 
         return arrange(vs, available, withoutDhStarters);
     }
@@ -49,7 +38,7 @@ public class LineupSelection {
         StarterSelection ss = new StarterSelection(predictions);
 
         ImmutableSet<Player> withDhStarters =
-            ImmutableSet.copyOf(ss.selectWithDh(vs, available, requireBackupCatcher));
+            ImmutableSet.copyOf(ss.selectWithDh(vs, available));
 
         return arrange(vs, available, withDhStarters);
     }
