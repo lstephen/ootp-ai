@@ -26,7 +26,7 @@ class StarterSelection(implicit predictions: Predictions) {
   def selectForPositions
     (pos: Set[Position], ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] = {
 
-    val initial = (pos.toList, ps.toList).zipped.toMap
+    val initial = (pos.toList, ps.toList.sortBy(InLineupScore(_)).reverse).zipped.toMap
 
     new HillClimbing(heuristic(vs), navigator(ps)).search(initial).values.toSet
   }
