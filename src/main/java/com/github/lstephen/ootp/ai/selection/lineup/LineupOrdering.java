@@ -133,10 +133,10 @@ public class LineupOrdering {
         if (p.isPresent() && p.get().getClutch().isPresent()) {
           switch (p.get().getClutch().get()) {
             case GREAT:
-              score += rbis[i];
+              score += rbis[i] / 2.0;
               break;
             case SUFFERS:
-              score -= rbis[i];
+              score -= rbis[i] / 2.0;
               break;
             default:
               // do nothing
