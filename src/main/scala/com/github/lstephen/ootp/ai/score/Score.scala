@@ -6,13 +6,20 @@ class Score(private val n: Double) extends AnyVal with Ordered[Score] {
   def toDouble: Double = n
   def toLong: Long = n.round
 
-  def compare(that: Score) = n compare that.n
+  def compare(that: Score): Int = n compare that.n
 
-  def +(that: Score) = new Score(n + that.n)
+  def +(that: Score): Score = Score(n + that.n)
+  def -(that: Score): Score = Score(n - that.n)
+  def unary_-(): Score = Score(-n)
+  def *:[N: Numeric](that: N): Score = Score(implicitly[Numeric[N]].toDouble(that) * n)
+  def :/[N: Numeric](that: N): Score = Score(n / implicitly[Numeric[N]].toDouble(that))
 }
 
 object Score {
   def apply[N: Numeric](n: N): Score = new Score(implicitly[Numeric[N]] toDouble n)
+
+  // Java Interop
+  def apply(n: Number): Score = Score(n.doubleValue)
 
   val zero: Score = Score(0)
 

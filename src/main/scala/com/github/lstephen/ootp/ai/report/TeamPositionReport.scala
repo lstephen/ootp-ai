@@ -7,6 +7,8 @@ import com.github.lstephen.ootp.ai.regression.Predictions
 import com.github.lstephen.ootp.ai.roster.Roster
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
+import com.github.lstephen.ootp.ai.selection.rotation.InRoleScore
+import com.github.lstephen.ootp.ai.selection.rotation.Role
 
 import java.io.PrintWriter
 
@@ -16,7 +18,8 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
 
   override def print(pw: PrintWriter): Unit = {
     implicit val w = pw
-    Position.hitting.foreach { print(_) }
+    Position.hitting.foreach(print(_))
+    Role.all.foreach(print(_))
   }
 
   def print(pos: Position)(implicit w: PrintWriter): Unit = {
@@ -46,6 +49,33 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
       .map(new InLineupScore(_, p, vs))
       .sorted
       .reverse
+
+  def top(r: Role): List[InRoleScore] =
+    (List() ++ roster.getAllPlayers)
+      .filter(_.isPitcher)
+      .map(new InRoleScore(_, r))
+      .sorted
+      .reverse
+
+
+
+  def print(role: Role)(implicit w: PrintWriter): Unit = {
+    w.println()
+    w.println(s"$role")
+
+    top(role)
+      .toSeq
+      .take(10)
+      .zipWithIndex
+      .foreach { case (s, idx) =>
+        w.println(f"${idx + 1}%2d | ${format(s)}")
+      }
+  }
+
+  def format(s: InRoleScore): String = {
+   f"${s.name}%-16s ${s.pitching.toLong}%3d ${s.endurance.toLong}%3d ${s.consistency.toLong}%3d ${s.clutch.toLong}%3d ${s.toLong}%3d"
+  }
+
 
 }
 
