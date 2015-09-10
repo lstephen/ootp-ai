@@ -73,7 +73,7 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
   }
 
   def format(s: InRoleScore): String = {
-   f"${s.name}%-16s ${s.pitching.toLong}%3d ${s.endurance.toLong}%3d ${s.consistency.toLong}%3d ${s.clutch.toLong}%3d ${s.toLong}%3d"
+   f"${s.name}%-16s ${s.pitching.toLong}%3d ${s.endurance.toLong}%3d ${s.consistency.toLong}%3d ${s.clutch.toLong}%3d ${s.inRole.toLong}%3d ${s.toLong}%3d"
   }
 
 

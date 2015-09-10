@@ -32,8 +32,6 @@ object InLineupScore {
       .map(InLineupScore(ply, _))
       .max
 
-
-
   def apply(ply: Player, pos: Position)(implicit ps: Predictions): InLineupScore = {
     new InLineupScore(ply, pos, None)
   }
