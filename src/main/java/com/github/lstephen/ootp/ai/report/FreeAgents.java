@@ -2,9 +2,12 @@ package com.github.lstephen.ootp.ai.report;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.roster.Changes;
@@ -12,6 +15,7 @@ import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.Version;
 import com.github.lstephen.ootp.ai.value.TradeValue;
+
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +37,7 @@ public final class FreeAgents {
 
     private FreeAgents(Site site, Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
         this.site = site;
-        this.fas = ImmutableSet.copyOf(fas);
+        this.fas = ImmutableSet.copyOf(Iterables.filter(fas, Predicates.notNull()));
         this.value = value;
         this.tv = tv;
     }
