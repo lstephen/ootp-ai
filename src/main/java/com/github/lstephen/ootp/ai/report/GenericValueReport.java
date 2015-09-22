@@ -1,12 +1,5 @@
 package com.github.lstephen.ootp.ai.report;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.io.SalaryFormat;
@@ -17,8 +10,19 @@ import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementValue;
+
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -105,7 +109,7 @@ public class GenericValueReport implements Printable {
     }
 
     public void setPlayers(Iterable<Player> players) {
-        this.players = ImmutableSet.copyOf(players);
+        this.players = ImmutableSet.copyOf(Iterables.filter(players, Predicates.notNull()));
     }
 
     public void setLimit(int limit) {
