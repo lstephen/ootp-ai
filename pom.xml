@@ -189,6 +189,12 @@
       <version>${gem.rspec-its.version}</version>
       <type>gem</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>rubygems</groupId>
+          <artifactId>rspec-support</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
