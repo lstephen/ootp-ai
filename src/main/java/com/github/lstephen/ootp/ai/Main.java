@@ -92,7 +92,7 @@ public class Main {
 
     private static final SiteDefinition TWML =
         SiteDefinitionFactory.ootp6(
-           "TWML", "http://www.darowski.com/twml/OOTP6Reports/", Id.<Team>valueOf(19), "Splendid Splinter", 20);
+           "TWML", "http://www.darowski.com/twml/OOTP6Reports/", Id.<Team>valueOf(15), "Splendid Splinter", 16);
 
     private static final SiteDefinition CBL =
         SiteDefinitionFactory.ootp5(
