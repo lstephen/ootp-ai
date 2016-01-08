@@ -7,11 +7,11 @@ environment:
   - OOTPAI_SITE
   - OOTPAI_CLEAR_CACHE
   - OOTPAI_PLAYOFFS
-  - OOTPAI_DATA=/var/workspace/ootp-ai-data
+  - OOTPAI_DATA=./ootp-ai-data
   - GIT_AUTHOR_NAME
   - GIT_AUTHOR_EMAIL
 
-files:
+volumes:
   - etc/settings.xml:/root/.m2/settings.xml
 
 targets:
@@ -24,16 +24,7 @@ targets:
   site: mvn -B -e clean site
 
   run:
-    files:
-      - $GIT_SSH_KEY:/root/.ssh/id_rsa:0600
+    volumes:
+      - $GIT_SSH_KEY:/ssh/id_rsa:ro
     run: /bin/bash construi/run/run.sh
-
-  snapshot:
-    files:
-      - $GPG_PUBLIC_KEY:/root/.gnupg/public.key
-      - $GPG_PRIVATE_KEY:/root/.gnupg/private.key
-    run:
-      - gpg --import /root/.gnupg/public.key
-      - gpg --import --allow-secret-key-import /root/.gnupg/private.key
-      - mvn -B deploy
 

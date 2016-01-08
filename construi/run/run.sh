@@ -1,8 +1,14 @@
 #!/bin/bash
 
 set -e
+set -x
+
+mkdir -p /root/.ssh
 
 printf "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+cp /ssh/id_rsa /root/.ssh/id_rsa
+chmod 600 /root/.ssh/id_rsa
 
 if [ -d "ootp-ai-data/.git" ]; then
   echo "Pulling latest data..."
