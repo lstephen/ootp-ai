@@ -12,7 +12,7 @@ environment:
   - GIT_AUTHOR_EMAIL
 
 volumes:
-  - etc/settings.xml:/root/.m2/settings.xml
+  - ./etc/settings.xml:/root/.m2/settings.xml
 
 targets:
   build: mvn -B clean verify -Dgpg.skip=true -DaddScalacArgs=-feature
