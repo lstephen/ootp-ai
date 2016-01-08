@@ -1,0 +1,47 @@
+<project>
+  <publishDate position="bottom" format="yyyy-MM-dd" />
+  <version position="bottom" />
+
+  <skin>
+    <groupId>lt.velykis.maven.skins</groupId>
+    <artifactId>reflow-maven-skin</artifactId>
+    <version>1.1.1</version>
+  </skin>
+
+  <custom>
+    <reflowSkin>
+      <brand>
+        <name>ootp-ai</name>
+        <href>https://lstephen.github.io/ootp-ai</href>
+      </brand>
+
+      <topNav>Reports|Contribute</topNav>
+
+      <bottomNav maxspan="9">
+        <column>Main</column>
+        <column>Contribute</column>
+        <column>Reports</column>
+      </bottomNav>
+    </reflowSkin>
+  </custom>
+
+  <body>
+    <links>
+      <item name="GitHub project" href="https://github.com/lstephen/ootp-ai"/>
+    </links>
+
+    <menu name="Main">
+      <item name="Home" href="./" />
+      <item name="GitHub project" href="https://github.com/lstephen/ootp-ai" />
+    </menu>
+
+    <menu name="Contribute">
+      <item name="Issues" href="https://github.com/lstephen/ootp-ai/issues" />
+      <item name="Fork on GitHub" href="https://github.com/lstephen/ootp-ai" />
+    </menu>
+
+    <menu name="Reports" ref="reports"/>
+  </body>
+
+</project>
+
