@@ -1,18 +1,11 @@
 image: maven:3-jdk-8
 
 environment:
-  - GPG_PASSPHRASE
-  - GITHUB_OAUTH_TOKEN
-  - NEXUS_PASSWORD
-  - OOTPAI_SITE
-  - OOTPAI_CLEAR_CACHE
-  - OOTPAI_PLAYOFFS
-  - OOTPAI_DATA=./ootp-ai-data
   - GIT_AUTHOR_NAME
   - GIT_AUTHOR_EMAIL
 
 volumes:
-  - ./etc/settings.xml:/root/.m2/settings.xml
+  - ./.m2:/root/.m2
 
 targets:
   build: mvn -B clean verify -Dgpg.skip=true -DaddScalacArgs=-feature
@@ -24,7 +17,14 @@ targets:
   site: mvn -B -e clean site
 
   run:
+    build: .
+    environment:
+      - OOTPAI_SITE
+      - OOTPAI_CLEAR_CACHE
+      - OOTPAI_PLAYOFFS
+      - OOTPAI_DATA=/var/ootp-ai-data
     volumes:
       - $GIT_SSH_KEY:/ssh/id_rsa:ro
+      - ./ootp-ai-data:/var/ootp-ai-data
     run: /bin/bash construi/run/run.sh
 
