@@ -143,7 +143,7 @@ public class LineupOrdering {
           }
         }
       }
-      return score / 10.0;
+      return score / 50.0;
     }
 
     private Double getConsistencyScore(Order o) {
@@ -165,7 +165,7 @@ public class LineupOrdering {
         }
       }
 
-      return score / 10.0;
+      return score / 50.0;
     }
 
     private Ordering<Order> byScore(final Lineup.VsHand vs) {
