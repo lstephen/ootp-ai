@@ -122,66 +122,18 @@ public class LineupOrdering {
         return score;
     }
 
-    private Double getClutchScore(Order o) {
-      //double[] rbis = o.size() > 8 ? RBIS_DH : RBIS_NO_DH;
-      double[] rbis = RISP;
-
-      Double score = 0.0;
-
-      for (int i = 0; i < 9; i++) {
-        Optional<Player> p = o.get(i);
-        if (p.isPresent() && p.get().getClutch().isPresent()) {
-          switch (p.get().getClutch().get()) {
-            case GREAT:
-              score += rbis[i] / 2.0;
-              break;
-            case SUFFERS:
-              score -= rbis[i] / 2.0;
-              break;
-            default:
-              // do nothing
-          }
-        }
-      }
-      return score / 50.0;
-    }
-
-    private Double getConsistencyScore(Order o) {
-      Double score = 0.0;
-
-      for (int i = 0; i < 9; i++) {
-        Optional<Player> p = o.get(i);
-        if (p.isPresent() && p.get().getConsistency().isPresent()) {
-          switch (p.get().getConsistency().get()) {
-            case GOOD:
-              score += PAS[i] / 100.0;
-              break;
-            case VERY_INCONSISTENT:
-              score -= PAS[i] / 100.0;
-              break;
-            default:
-              // do nothing
-          }
-        }
-      }
-
-      return score / 50.0;
-    }
-
     private Ordering<Order> byScore(final Lineup.VsHand vs) {
         return Ordering
             .natural()
             .onResultOf(
                 new Function<Order, Double>() {
                     public Double apply(Order o) {
-                        Double con = getConsistencyScore(o);
-                        Double clu = getClutchScore(o);
                         Double ovs = score(o, vs);
                         Double ovb = score(o);
 
-                        Double early = ovs + con;
-                        Double middle = ovs + clu + con;
-                        Double late = ovb + clu;
+                        Double early = ovs;
+                        Double middle = ovs;
+                        Double late = ovb;
 
                         return early + middle + late;
                     }
