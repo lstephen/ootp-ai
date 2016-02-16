@@ -12,12 +12,15 @@ targets:
 
   clean: mvn -B clean
 
+  install: mvn -B install -Dgpg.skip=true -DaddScalacArgs=-feature
+
   update-versions: mvn -B versions:update-properties -DgenerateBackupPoms=false
 
   site: mvn -B -e clean site
 
   run:
-    build: .
+    before:
+      - install
     environment:
       - OOTPAI_SITE
       - OOTPAI_CLEAR_CACHE
