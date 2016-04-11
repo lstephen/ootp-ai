@@ -567,7 +567,7 @@ public class Main {
         generic.print(out);
 
         LOG.info("Salary report...");
-        SalaryReport salary = new SalaryReport(team, site);
+        SalaryReport salary = new SalaryReport(team, site.getSalary());
         Printables.print(salary).to(out);
 
         if (def.getName().equals("BTHUSTLE")) {
