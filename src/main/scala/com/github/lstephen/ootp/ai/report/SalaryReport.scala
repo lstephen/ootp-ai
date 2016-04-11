@@ -25,9 +25,13 @@ class SalaryReport(team: Team, salary: Salary, tv: TradeValue) extends Printable
     val currentTotal: Int = team.map(salary.getCurrentSalary(_).toInt).sum
     val nextTotal: Int = team.map(salary.getNextSalary(_).toInt).sum
 
-    val replCurrentTotal: Int = team.map(tv.getCurrentValueVsReplacement(_).toInt).sum
+    val replCurrentTotal: Int = team
+      .filter(tv.getCurrentValueVsReplacement(_) > 0)
+      .map(tv.getCurrentValueVsReplacement(_).toInt)
+      .sum
 
     val replNextTotal: Int = team
+      .filter(tv.getCurrentValueVsReplacement(_) > 0)
       .filter(salary.getNextSalary(_) > 0)
       .map(tv.getCurrentValueVsReplacement(_).toInt)
       .sum
@@ -54,20 +58,24 @@ class SalaryReport(team: Team, salary: Salary, tv: TradeValue) extends Printable
             val current = format(s)
             val next = if (nextS == 0) "" else format(s)
 
-            w println f"$position%s $name%15s $age%2d| $current%11s $next%11s"
+            w println f"$position%2s $name%15s $age%2d| $current%11s $next%11s"
         }
+
+        val line = "-" * 45
 
         val totalCurrent = format(currentTotal)
         val totalNext = format(nextTotal)
         val buffer = " " * 21
 
         val perReplLabel = "$/Repl"
-        val perReplCurrent = currentTotal / replCurrentTotal
-        val perReplNext = nextTotal / replNextTotal
+        val perReplCurrent = format(currentTotal / replCurrentTotal)
+        val perReplNext = format(nextTotal / replNextTotal)
 
 
+        w println line
         w println f"$buffer| $totalCurrent%11s $totalNext%11s"
-        w println f"$perReplLabel%21s | $perReplCurrent%11s $perReplNext%11s"
+        w println f"$perReplLabel%21s| $perReplCurrent%11s $perReplNext%11s"
+        w println line
     }
 
 }
