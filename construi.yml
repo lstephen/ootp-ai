@@ -8,7 +8,10 @@ volumes:
   - ./.m2:/root/.m2
 
 targets:
-  build: mvn -B clean verify -Dgpg.skip=true -DaddScalacArgs=-feature
+  build:
+    environment:
+      - OOTPAI_DATA=/var/ootp-ai-data
+    run: mvn -B clean verify -Dgpg.skip=true -DaddScalacArgs=-feature
 
   clean: mvn -B clean
 
