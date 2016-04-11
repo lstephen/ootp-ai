@@ -70,75 +70,9 @@ class DepthChartSelection(implicit predictions: Predictions) {
 
   def addBackups(dc: DepthChart, position: Position, bench: Set[Player], vs: VsHand): Unit = {
     val starter = dc getStarter position
-    val backups = InLineupScore.sort(bench, position, vs).take(3)
+    val backup = InLineupScore.sort(bench, position, vs).head
 
-    new BackupPercentageSelection(starter, backups, position, vs)
-      .select
-      .zip(backups)
-      .filter { case (pct, _) => pct > 0 }
-      .foreach { case (pct, ply) => dc.addBackup(position, ply, pct) }
-  }
-}
-
-
-class BackupPercentageSelection
-  (starter: Player, backups: Seq[Player], position: Position, vs: VsHand)
-  (implicit predictions: Predictions) {
-
-  type BackupPercentage = Array[Int]
-
-  def select: BackupPercentage = {
-    HillClimbing
-      .builder[BackupPercentage]
-      .validator(validator)
-      .heuristic(heuristic)
-      .actionGenerator(actionGenerator)
-      .build
-      .search(Array(1) ++ Array.fill(backups.size - 1)(0))
-  }
-
-  val validator: Validator[BackupPercentage] = new Validator[BackupPercentage] {
-    override def test(pcts: BackupPercentage): Boolean = {
-      pcts.size == backups.size &&
-        pcts.forall(_ >= 0) &&
-        pcts.sum < 100 &&
-        pcts.sliding(2).forall(pair => pair(0) >= pair(1))
-    }
-  }
-
-  val heuristic: Heuristic[BackupPercentage] = new Heuristic[BackupPercentage] {
-    override def compare(lhs: BackupPercentage, rhs: BackupPercentage) =
-      score(lhs) compare score(rhs)
-
-    def score(pcts: BackupPercentage): Double = {
-      val s = new WithPlayingTimeScore(starter, 100 - pcts.sum, position, vs).total
-      val b = (backups zip pcts)
-        .map { case (ply, pct) => new WithPlayingTimeScore(ply, pct, position, vs).total }
-        .sum
-
-      s + b
-    }
-  }
-
-  def actionGenerator: ActionGenerator[BackupPercentage] = new ActionGenerator[BackupPercentage] {
-    override def apply(pcts: BackupPercentage): java.util.stream.Stream[Action[BackupPercentage]] =
-      toJavaActionList(actions(pcts.size)).stream
-
-    def actions(size: Int) : Seq[BackupPercentage => BackupPercentage] = {
-      def increase(i: Int): BackupPercentage => BackupPercentage =
-        p => if (p(i) == 1) p.updated(i, 5) else p.updated(i, p(i) + 5)
-
-      def decrease(i: Int): BackupPercentage => BackupPercentage = p => p.updated(i, p(i) - 5)
-
-      0 until size flatMap (s => List(increase(s), decrease(s)))
-    }
-
-    def toAction[S](f: S => S): Action[S] = new Action[S] {
-      override def apply(s: S) = f(s)
-    }
-
-    def toJavaActionList[S](fs: Seq[S => S]): java.util.List[Action[S]] =
-      seqAsJavaList(fs map (toAction(_)))
+    dc.addBackup(position, backup, 1)
   }
 }
 
