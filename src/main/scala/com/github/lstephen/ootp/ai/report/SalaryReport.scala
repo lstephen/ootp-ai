@@ -7,9 +7,11 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.site.Salary;
 import com.github.lstephen.ootp.ai.site.Site;
+import com.github.lstephen.ootp.ai.value.TradeValue;
+
 import java.io.PrintWriter;
 import java.text.NumberFormat;
-import javax.annotation.ParametersAreNonnullByDefault;
+
 import org.apache.commons.lang3.StringUtils;
 
 import collection.JavaConversions._
@@ -18,10 +20,17 @@ import collection.JavaConversions._
  *
  * @author lstephen
  */
-class SalaryReport(team: Team, salary: Salary) extends Printable {
+class SalaryReport(team: Team, salary: Salary, tv: TradeValue) extends Printable {
 
-    val currentTotal: Integer = team.map(salary.getCurrentSalary(_).toInt).sum
-    val nextTotal: Integer = team.map(salary.getCurrentSalary(_).toInt).sum
+    val currentTotal: Int = team.map(salary.getCurrentSalary(_).toInt).sum
+    val nextTotal: Int = team.map(salary.getNextSalary(_).toInt).sum
+
+    val replCurrentTotal: Int = team.map(tv.getCurrentValueVsReplacement(_).toInt).sum
+
+    val replNextTotal: Int = team
+      .filter(salary.getNextSalary(_) > 0)
+      .map(tv.getCurrentValueVsReplacement(_).toInt)
+      .sum
 
     def format(i: Int): String = NumberFormat.getIntegerInstance().format(i)
 
@@ -52,7 +61,13 @@ class SalaryReport(team: Team, salary: Salary) extends Printable {
         val totalNext = format(nextTotal)
         val buffer = " " * 21
 
+        val perReplLabel = "$/Repl"
+        val perReplCurrent = currentTotal / replCurrentTotal
+        val perReplNext = nextTotal / replNextTotal
+
+
         w println f"$buffer| $totalCurrent%11s $totalNext%11s"
+        w println f"$perReplLabel%21s | $perReplCurrent%11s $perReplNext%11s"
     }
 
 }
