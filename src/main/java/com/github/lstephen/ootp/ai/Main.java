@@ -448,8 +448,8 @@ public class Main {
                     "%4s -> %-4s %2s %s%n",
                     "FA",
                     "",
-                    player.getPosition(),
-                    player.getShortName())
+                    player.getListedPosition(),
+                    player.getName())
                 .getBytes(Charsets.ISO_8859_1));
         }
 
