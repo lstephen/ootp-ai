@@ -150,14 +150,7 @@ public class GenericValueReport implements Printable {
 
     public void print(PrintWriter w) {
         w.println();
-        w.format(
-            "**%-16s** | %11s %7s %7s | %s | %8s | XC | %n",
-                StringUtils.abbreviate(title, 16),
-                StringUtils.center("OVR", 10),
-                StringUtils.center("vL/vR", 7),
-                StringUtils.center("vRpl", 7),
-                multiplier.isPresent() ? "         " : "   ",
-                "");
+        w.format("--- %s ---", title);
 
         Iterable<Player> ps = Ordering
             .natural()
