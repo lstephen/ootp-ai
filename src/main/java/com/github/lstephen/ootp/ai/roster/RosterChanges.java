@@ -49,8 +49,8 @@ public class RosterChanges implements Printable {
                     "%4s -> %-4s %2s %s",
                     from == null ? "" : from,
                     to == null ? "" : to,
-                    player.getPosition(),
-                    player.getShortName()));
+                    player.getListPosition().or(""),
+                    player.getName()));
         }
 
         public static Ordering<RosterChange> ordering() {
