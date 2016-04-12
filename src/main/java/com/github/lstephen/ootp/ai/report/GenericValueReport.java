@@ -193,7 +193,7 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %s %9s | %7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %-8s | %s %9s | %7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
@@ -206,7 +206,9 @@ public class GenericValueReport implements Printable {
                     futureReplacementValue.getValueVsReplacement(p),
                     value,
                     mv,
-                    Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : p.getPosition(),
+                    Selections.isHitter(p)
+                      ? p.getDefensiveRatings().getPositionScores() 
+                      : (p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getPosition()),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 9),
                     salary == null ? "" : SalaryFormat.prettyPrint(salary.predictMaximum(p)),
