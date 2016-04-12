@@ -150,7 +150,7 @@ public class GenericValueReport implements Printable {
 
     public void print(PrintWriter w) {
         w.println();
-        w.format("--- %s ---", title);
+        w.format("--- %s ---%n", title);
 
         Iterable<Player> ps = Ordering
             .natural()
