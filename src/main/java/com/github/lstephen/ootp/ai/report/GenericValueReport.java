@@ -193,9 +193,9 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-15s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %2s | %-13s |%s %9s | %7s | %2s %5s | %-20s | %s",
-                    p.getPosition(),
-                    StringUtils.abbreviate(p.getShortName(), 15),
+                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %8s | %s %9s | %7s | %5s | %-20s | %s",
+                    p.getListedPosition().or(""),
+                    StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
                     current,
                     ceiling,
@@ -206,13 +206,10 @@ public class GenericValueReport implements Printable {
                     futureReplacementValue.getValueVsReplacement(p),
                     value,
                     mv,
-                    Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
-                    p.getIntangibles(),
-                    Joiner.on(',').join(p.getSlots()),
+                    Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : p.getPosition(),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 9),
                     salary == null ? "" : SalaryFormat.prettyPrint(salary.predictMaximum(p)),
-                    p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getListedPosition().or(""),
                     p.getId().unwrap(),
                     StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),
                     p.getStars().isPresent() ? p.getStars().get().getFormattedText() : ""));
