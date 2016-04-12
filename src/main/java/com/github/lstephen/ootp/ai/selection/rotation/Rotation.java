@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public final class Rotation implements Printable {
 
@@ -288,28 +289,14 @@ public final class Rotation implements Printable {
 
     public void print(PrintWriter w) {
         w.println();
-        w.println(String.format("   %-15s %-15s %-15s %-15s %-15s %-15s", new Object[] {
-            "SP", "LR", "MR", "SU", "CL", "NONE"
-        }));
 
-        ImmutableList<Player> sps = get(Role.SP);
-        ImmutableList<Player> mrs = get(Role.MR);
-        ImmutableList<Player> sus = get(Role.SU);
-        ImmutableList<Player> cls = get(Role.CL);
-        ImmutableList<Player> none = get(Role.NONE);
-
-        for(int i = 0; i < 5; i++)
-            w.println(String.format("%d. %-15s %-15s %-15s %-15s %-15s %-15s", new Object[] {
-                Integer.valueOf(i + 1),
-                i >= sps.size() ? "" : sps.get(i).getShortName(),
-                "",
-                i >= mrs.size() ? "" : mrs.get(i).getShortName(),
-                i >= sus.size() ? "" : sus.get(i).getShortName(),
-                i >= cls.size() ? "" : cls.get(i).getShortName(),
-                i >= none.size() ? "" : none.get(i).getShortName()
-            }));
-
-        w.flush();
+        Stream
+          .of(Role.SP, Role.MR, Role.SU, Role.CL, Role.NONE)
+          .forEach(r -> {
+              w.println(r);
+              get(r).forEach(p -> w.println(p.getName()));
+              w.println();
+          });
     }
 
     public static final Rotation create(Iterable<Player> sps, Iterable<Player> mrs, Iterable<Player> rest) {
