@@ -58,7 +58,7 @@ class SalaryReport(team: Team, salary: Salary, tv: TradeValue) extends Printable
             val current = format(s)
             val next = if (nextS == 0) "" else format(s)
 
-            w println f"$position%2s $name%15s $age%2d| $current%11s $next%11s"
+            w println f"$position%2s $name%-15s $age%2d| $current%11s $next%11s"
         }
 
         val line = "-" * 45
