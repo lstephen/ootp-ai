@@ -22,6 +22,8 @@ import com.github.lstephen.ootp.ai.player.PlayerSource;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.roster.Roster;
 import com.github.lstephen.ootp.ai.roster.Team;
+import com.github.lstephen.ootp.ai.site.Financials;
+import com.github.lstephen.ootp.ai.site.FinancialsReport;
 import com.github.lstephen.ootp.ai.site.LeagueStructure;
 import com.github.lstephen.ootp.ai.site.RecordPredictor;
 import com.github.lstephen.ootp.ai.site.Site;
@@ -197,6 +199,11 @@ public final class SiteImpl implements Site, SalarySource {
   @Override
   public SalaryImpl getSalary(int teamId) {
     return getSalary(Id.<Team>valueOf(Integer.toString(teamId)));
+  }
+
+  @Override
+  public Financials getFinancials() {
+    return new FinancialsReport(this, definition.getTeam());
   }
 
   public String getSalary(Player p) {

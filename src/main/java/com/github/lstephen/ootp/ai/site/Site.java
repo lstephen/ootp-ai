@@ -69,6 +69,8 @@ public interface Site {
 
     Salary getSalary(int teamId);
 
+    Financials getFinancials();
+
     SingleTeam getSingleTeam();
 
     SingleTeam getSingleTeam(
