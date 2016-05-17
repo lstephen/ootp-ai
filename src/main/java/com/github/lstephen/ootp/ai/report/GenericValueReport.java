@@ -10,6 +10,7 @@ import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementValue;
+import com.github.lstephen.ootp.ai.value.SalaryPredictor;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -51,14 +52,14 @@ public class GenericValueReport implements Printable {
 
     private final PitchingRegression pitching;
 
-    private final SalaryRegression salary;
+    private final SalaryPredictor salary;
 
     private final Predictions now;
 
     private Optional<Double> multiplier = Optional.absent();
 
     public GenericValueReport(
-        Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryRegression salary) {
+        Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryPredictor salary) {
 
         this.batting = batting;
         this.pitching = pitching;
@@ -186,7 +187,7 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %-8s | %s %9s | %7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %-8s | %s %9s | %7s | %7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
@@ -204,7 +205,8 @@ public class GenericValueReport implements Printable {
                       : (p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getPosition()),
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 9),
-                    salary == null ? "" : SalaryFormat.prettyPrint(salary.predictMaximum(p)),
+                    salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNow(p)),
+                    salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNext(p)),
                     p.getId().unwrap(),
                     StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),
                     p.getStars().isPresent() ? p.getStars().get().getFormattedText() : ""));

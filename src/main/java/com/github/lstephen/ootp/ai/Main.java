@@ -19,11 +19,9 @@ import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
 import com.github.lstephen.ootp.ai.report.LeagueBattingReport;
 import com.github.lstephen.ootp.ai.report.RosterReport;
-import com.github.lstephen.ootp.ai.report.SalaryRegression;
 import com.github.lstephen.ootp.ai.report.SalaryReport;
 import com.github.lstephen.ootp.ai.report.TeamPositionReport;
 import com.github.lstephen.ootp.ai.report.TeamReport;
-import com.github.lstephen.ootp.ai.report.Trade;
 import com.github.lstephen.ootp.ai.roster.Changes;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.FourtyManRoster;
@@ -480,22 +478,10 @@ public class Main {
 
         Printables.print(lineups).to(out);
 
-        LOG.log(Level.INFO, "Salary Regression...");
+        LOG.info("Salary report...");
+        SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), tv);
 
-        SalaryRegression salaryRegression = new SalaryRegression(tv, site);
-
-        Integer n = Iterables.size(site.getTeamIds());
-        int count = 1;
-        for (Id<Team> id : site.getTeamIds()) {
-            LOG.log(Level.INFO, "{0}/{1}...", new Object[] { count, n });
-
-            salaryRegression.add(site.getSalariedPlayers(id));
-            count++;
-        }
-
-        Printables.print(salaryRegression).to(out);
-
-        final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salaryRegression);
+        final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salary);
         generic.setCustomValueFunction(tv.getTradeTargetValue());
         generic.setReverse(false);
 
@@ -549,6 +535,8 @@ public class Main {
 
         DraftReport.create(site, tv).print(out);
 
+        Printables.print(salary).to(out);
+
         LOG.info("Extensions report...");
         generic.setTitle("Extensions");
         generic.setPlayers(
@@ -566,9 +554,6 @@ public class Main {
         }));
         generic.print(out);
 
-        LOG.info("Salary report...");
-        SalaryReport salary = new SalaryReport(team, site.getSalary(), tv);
-        Printables.print(salary).to(out);
 
         if (def.getName().equals("BTHUSTLE")) {
             LOG.info("40 man roster reports...");
@@ -660,7 +645,9 @@ public class Main {
         generic.setLimit(50);
         generic.setMultiplier(0.91);
 
-        count = 1;
+        int n = Iterables.size(site.getTeamIds());
+
+        int count = 1;
         for (Id<Team> id : site.getTeamIds()) {
             SingleTeam t = site.getSingleTeam(id);
             LOG.log(Level.INFO, "{0} ({1}/{2})...", new Object[] { t.getName(), count, n });
@@ -758,7 +745,7 @@ public class Main {
         generic.print(out);*/
 
         LOG.log(Level.INFO, "Trade Bait report...");
-        generic.setCustomValueFunction(tv.getTradeBaitValue(site, salaryRegression));
+        generic.setCustomValueFunction(tv.getTradeBaitValue(site, salary));
         generic.setTitle("Trade Bait");
         generic.setPlayers(newRoster.getAllPlayers());
         generic.setLimit(200);
@@ -770,58 +757,8 @@ public class Main {
         Iterable<Player> topBait = Ordering
             .natural()
             .reverse()
-            .onResultOf(tv.getTradeBaitValue(site, salaryRegression))
+            .onResultOf(tv.getTradeBaitValue(site, salary))
             .sortedCopy(newRoster.getAllPlayers());
-
-
-        /*LOG.log(Level.INFO, "Top Trades...");
-
-        int idx = 1;
-        for (Trade trade
-            : Iterables.limit(
-                Trade.getTopTrades(
-                    tv,
-                    site,
-                    salaryRegression,
-                    Iterables.limit(topBait, newRoster.size() / 10),
-                    all),
-                20)) {
-
-            generic.setTitle("#" + idx + "-" + trade.getValue(tv, site, salaryRegression));
-            generic.setPlayers(trade);
-            generic.print(out);
-            idx++;
-        }*/
-
-        /*LOG.info("Below Replacement Trades...");
-        ImmutableSet<Player> belowReplacementBait =
-            ImmutableSet.copyOf(
-                Iterables.filter(
-                    Iterables.limit(topBait, newRoster.size() / 10),
-                    new Predicate<Player>() {
-                        @Override
-                        public boolean apply(Player p) {
-                            return tv.getCurrentValueVsReplacement(p) < 0
-                                && tv.getFutureValueVsReplacement(p) < 0;
-                        }
-                    }));
-
-        idx = 1;
-        for (Trade trade
-            : Iterables.limit(
-                Trade.getTopTrades(
-                    tv,
-                    site,
-                    salaryRegression,
-                    belowReplacementBait,
-                    all),
-                20)) {
-
-            generic.setTitle("BR #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
-            generic.setPlayers(trade);
-            generic.print(out);
-            idx++;
-        }*/
 
         LOG.log(Level.INFO, "Non Top 10 prospects...");
         ImmutableSet<Player> nonTopTens =

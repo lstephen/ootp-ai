@@ -8,6 +8,8 @@ import com.github.lstephen.ootp.ai.player.Player;
  */
 public interface SalaryPredictor {
 
-    Integer predict(Player p);
+    Integer predictNow(Player p);
+
+    Integer predictNext(Player p);
 
 }

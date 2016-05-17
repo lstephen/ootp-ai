@@ -135,7 +135,7 @@ public class TradeValue {
     }
 
     private Integer getTradeBaitValue(Player p, Site site, SalaryPredictor salary) {
-        int salaryFactor = (site.getCurrentSalary(p) - salary.predict(p)) / 750000;
+        int salaryFactor = (site.getCurrentSalary(p) - salary.predictNow(p)) / 750000;
 
         return salaryFactor
             + Math.min(
