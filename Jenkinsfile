@@ -40,7 +40,8 @@ if (OOTPAI_SITE != 'NONE') {
         , credentialsId: 'cfbecb37-737f-4597-86f7-43fb2d3322cc' ]
       ]) {
       withEnv(
-        [ "OOTPAI_PLAYOFFS=${OOTPAI_PLAYOFFS}"
+        [ "OOTPAI_SITE=${OOTPAI_SITE}"
+        , "OOTPAI_PLAYOFFS=${OOTPAI_PLAYOFFS}"
         , "OOTPAI_CLEAR_CACHE=${OOTPAI_CLEAR_CACHE}"
         ]) {
         construi 'run'
