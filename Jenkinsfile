@@ -24,6 +24,7 @@ construi_on_node 'build'
 if (env.OOTPAI_SITE != null) {
   stage 'Run'
   node('construi') {
+    checkout scm
     currentBuild.description = "Run ${env.OOTPAI_SITE}"
 
     withCredentials([
