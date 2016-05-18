@@ -26,7 +26,7 @@ if (env.OOTPAI_SITE != null) {
   node('construi') {
     currentBuild.description = "Run ${env.OOTPAI_SITE}"
 
-    withCredentials(
+    withCredentials([
       [ $class: 'FileBinding'
         , variable: 'GIT_SSH_KEY'
         , credentialsId: 'cfbecb37-737f-4597-86f7-43fb2d3322cc' ]
