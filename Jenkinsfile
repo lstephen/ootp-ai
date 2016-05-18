@@ -3,9 +3,13 @@
 properties(
   [ [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', daysToKeepStr: '30'] ]
   , [$class: 'GithubProjectProperty', projectUrlStr: 'http://github.com/lstephen/ootp-ai']
-  , [$class: 'ChoiceParameterDefinition', name: 'OOTPAI_SITE', choices: 'NONE,TWML']
-  , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_CLEAR_CACHE', defaultValue: false]
-  , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_PLAYOFFS', defaultValue: false]
+  , [$class: 'ParametersDefinitionProperty',
+      parameterDefinitions:
+      [ [$class: 'ChoiceParameterDefinition', name: 'OOTPAI_SITE', choices: 'NONE,TWML']
+      , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_CLEAR_CACHE', defaultValue: false]
+      , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_PLAYOFFS', defaultValue: false]
+      ]
+    ]
   ])
 
 def construi(target) {
