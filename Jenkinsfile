@@ -21,18 +21,23 @@ def construi_on_node(target) {
 stage 'Build'
 construi_on_node 'build'
 
-if (env.OOTPAI_SITE != null) {
+if (OOTPAI_SITE != null) {
   stage 'Run'
   node('construi') {
     checkout scm
-    currentBuild.description = "Run ${env.OOTPAI_SITE}"
+    currentBuild.description = "Run ${OOTPAI_SITE}"
 
     withCredentials([
       [ $class: 'FileBinding'
         , variable: 'GIT_SSH_KEY'
         , credentialsId: 'cfbecb37-737f-4597-86f7-43fb2d3322cc' ]
       ]) {
+      withEnv(
+        [ "OOTPAI_PLAYOFFS=${OOTPAI_PLAYOFFS}"
+        , "OOTPAI_CLEAR_CACHE=${OOTPAI_CLEAR_CACHE}"
+        ]) {
         construi 'run'
+      }
     }
   }
 }
