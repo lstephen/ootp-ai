@@ -49,7 +49,18 @@ public class PlayerValue {
           ? PlayerDefenseScore$.MODULE$.atBestPosition(p, true).score()
           : 0.0;
 
-        return (int) Math.round(factor * getNowAbility(p) + defense);
+        Double endurance = 1.0;
+
+        if (Selections.isPitcher(p)) {
+            Integer end = p.getPitchingRatings().getVsRight().getEndurance();
+            endurance = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+        }
+
+        if (endurance < MR_CONSTANT) {
+          endurance = MR_CONSTANT;
+        }
+
+        return (int) Math.round(endurance * getNowAbility(p) + defense);
     }
 
     public Function<Player, Integer> getNowAbility() {
@@ -97,15 +108,27 @@ public class PlayerValue {
             ? Math.pow((double) (ceiling - now) / ceiling, 2)
             : 0.0;
 
+
         return (int) Math.round(risk * now + (1.0 - risk) * ceiling);
     }
 
     public Integer getCeilingValue(Player p) {
-        Slot st = Slot.getPrimarySlot(p);
+        Double defense = Selections.isHitter(p)
+          ? PlayerDefenseScore$.MODULE$.atBestPosition(p, true).score()
+          : 0.0;
 
-        Double factor = st == Slot.MR ? MR_CONSTANT : Double.valueOf(1.0);
+        Double endurance = 1.0;
 
-        return (int) Math.round(factor * getFutureAbility(p));
+        if (Selections.isPitcher(p)) {
+            Integer end = p.getPitchingRatings().getVsRight().getEndurance();
+            endurance = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+        }
+
+        if (endurance < MR_CONSTANT) {
+          endurance = MR_CONSTANT;
+        }
+
+        return (int) Math.round(endurance * getFutureAbility(p) + defense);
     }
 
     public Function<Player, Integer> getFutureAbility() {

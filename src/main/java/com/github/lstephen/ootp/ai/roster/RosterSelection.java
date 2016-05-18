@@ -27,6 +27,7 @@ import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
+import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.TradeValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -307,6 +308,7 @@ public final class RosterSelection {
     }
 
     public void printPitchingSelectionTable(PrintWriter w, Roster roster, TeamStats<PitchingStats> stats) {
+        PlayerValue value = new PlayerValue(predictions, batting, pitching);
         w.println();
         TeamStats<PitchingStats> pitching = predictions.getAllPitching();
         PitcherOverall method = predictions.getPitcherOverall();
@@ -321,7 +323,7 @@ public final class RosterSelection {
 
             w.println(
                 String.format(
-                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s | %2s || %3d %3s | %s",
+                    "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s | %2s || %3d |",
                     p.getPosition(),
                     p.getShortName(),
                     p.getRosterStatus(),
@@ -336,11 +338,7 @@ public final class RosterSelection {
                     method.getPlus(pitching.getSplits(p).getVsRight()),
                     stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsRight()), 999)) : "",
                     p.getIntangibles(),
-                    method.getPlus(pitching.getOverall(p)),
-                    p.getPosition().equals("MR")
-                        ? (int) (MR_CONSTANT * method.getPlus(pitching.getOverall(p)))
-                        : "",
-                    Joiner.on(',').join(Slot.getPlayerSlots(p))
+                    value.getNowValue(p)
                 ));
         }
 
