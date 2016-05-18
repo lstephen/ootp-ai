@@ -8,6 +8,8 @@ import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
+import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.splits.Splits;
 
 /**
@@ -43,7 +45,11 @@ public class PlayerValue {
 
         Double factor = st == Slot.MR ? MR_CONSTANT : Double.valueOf(1.0);
 
-        return (int) Math.round(factor * getNowAbility(p));
+        Double defense = Selections.isHitter(p)
+          ? PlayerDefenseScore$.MODULE$.atBestPosition(p, true).score()
+          : 0.0;
+
+        return (int) Math.round(factor * getNowAbility(p) + defense);
     }
 
     public Function<Player, Integer> getNowAbility() {
@@ -56,32 +62,23 @@ public class PlayerValue {
     }
 
     public Integer getNowAbility(Player p) {
-        Slot st = Slot.getPrimarySlot(p);
-
-        switch (st) {
-            case C:
-            case SS:
-            case CF:
-            case IF:
-            case OF:
-            case H:
-                if (predictions.containsHitter(p)) {
-                    return predictions.getOverallHitting(p);
-                } else {
-                    return batting.predict(p).getOverall().getWobaPlus();
-                }
-            case SP:
-            case MR:
-                Integer value;
-                if (predictions.containsPitcher(p)) {
-                    value = predictions.getOverallPitching(p);
-                } else {
-                    value = predictions.getPitcherOverall().getPlus(pitching.predict(p));
-                }
-                return value;
-            default:
-                throw new IllegalStateException();
+        if (Selections.isHitter(p)) {
+          if (predictions.containsHitter(p)) {
+            return predictions.getOverallHitting(p);
+          } else {
+            return batting.predict(p).getOverall().getWobaPlus();
+          }
         }
+
+        if (Selections.isPitcher(p)) {
+          if (predictions.containsPitcher(p)) {
+            return predictions.getOverallPitching(p);
+          } else {
+            return predictions.getPitcherOverall().getPlus(pitching.predict(p));
+          }
+        }
+
+        throw new IllegalStateException("Player is neither a hitter or pitcher: " + p.getName());
     }
 
     public Function<Player, Integer> getFutureValue() {
