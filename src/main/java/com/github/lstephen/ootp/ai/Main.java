@@ -192,6 +192,7 @@ public class Main {
         LOG.log(Level.INFO, "Extracting current roster and team...");
 
         Roster oldRoster = site.extractRoster();
+        Context$.MODULE$.oldRoster_$eq(oldRoster);
         Team team = site.extractTeam();
 
         LOG.log(Level.INFO, "Running regressions...");
@@ -425,6 +426,8 @@ public class Main {
 
         newRoster.setTargetMinimum(minRosterSize);
         newRoster.setTargetMaximum(maxRosterSize);
+
+        Context$.MODULE$.newRoster_$eq(newRoster);
 
         sw.stop();
 

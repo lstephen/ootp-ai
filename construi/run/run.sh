@@ -10,18 +10,18 @@ printf "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 cp /ssh/id_rsa /root/.ssh/id_rsa
 chmod 600 /root/.ssh/id_rsa
 
-if [ -d "ootp-ai-data/.git" ]; then
-  echo "Pulling latest data..."
-  cd ootp-ai-data
-  git reset --hard HEAD
-  git clean -fd || true
-  git pull --rebase
-  cd ..
-else
-  echo "Cloning latest data..."
-  rm -rf ootp-ai-data
-  git clone --depth 1 git@github.com:lstephen/ootp-ai-data.git
-fi
+#if [ -d "ootp-ai-data/.git" ]; then
+#  echo "Pulling latest data..."
+#  cd ootp-ai-data
+#  git reset --hard HEAD
+#  git clean -fd || true
+#  git pull --rebase
+#  cd ..
+#else
+#  echo "Cloning latest data..."
+#  rm -rf ootp-ai-data
+#  git clone --depth 1 git@github.com:lstephen/ootp-ai-data.git
+#fi
 
 echo "Running..."
 mvn -B exec:java -Dgpg.skip=true

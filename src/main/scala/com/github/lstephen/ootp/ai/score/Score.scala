@@ -8,7 +8,10 @@ class Score(private val n: Double) extends AnyVal with Ordered[Score] {
 
   def compare(that: Score) = n compare that.n
 
-  def +(that: Score) = new Score(n + that.n)
+  def +(that: Score) = Score(n + that.n)
+  def -(that: Score) = Score(n - that.n)
+
+  def /(that: Int) = Score(n / that)
 }
 
 object Score {
@@ -18,6 +21,7 @@ object Score {
 
   implicit class TraversableOfScore(xs: GenTraversableOnce[Score]) {
     def total = xs.foldLeft(zero)(_ + _)
+    def average = total / xs.size
   }
 }
 
