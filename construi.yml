@@ -1,8 +1,8 @@
 image: maven:3-jdk-8
 
 environment:
-  - GIT_AUTHOR_NAME
-  - GIT_AUTHOR_EMAIL
+  - GIT_AUTHOR_NAME=ootp-ai
+  - GIT_AUTHOR_EMAIL=levi.stephen@gmail.com
 
 volumes:
   - ./.m2:/root/.m2
