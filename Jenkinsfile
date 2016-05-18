@@ -3,6 +3,9 @@
 properties(
   [ [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', daysToKeepStr: '30'] ]
   , [$class: 'GithubProjectProperty', projectUrlStr: 'http://github.com/lstephen/ootp-ai']
+  , [$class: 'ChoiceParameterDefinition', name: 'OOTPAI_SITE', choices: 'NONE,TWML']
+  , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_CLEAR_CACHE', defaultValue: false]
+  , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_PLAYOFFS', defaultValue: false]
   ])
 
 def construi(target) {
@@ -21,7 +24,7 @@ def construi_on_node(target) {
 stage 'Build'
 construi_on_node 'build'
 
-if (OOTPAI_SITE != null) {
+if (OOTPAI_SITE != 'NONE') {
   stage 'Run'
   node('construi') {
     checkout scm
