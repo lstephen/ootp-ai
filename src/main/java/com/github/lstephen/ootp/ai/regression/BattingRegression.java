@@ -32,7 +32,7 @@ public final class BattingRegression {
 
     private final TeamStats<BattingStats> stats;
 
-    private final Map<Predicting, SimpleRegression> regressions = new HashMap<>();
+    private final Map<Predicting, Regression> regressions = new HashMap<>();
 
     private final SimpleRegression woba = new SimpleRegression();
 
@@ -51,15 +51,11 @@ public final class BattingRegression {
         return this;
     }
 
-    private SimpleRegression getRegression(Predicting predicting) {
-      return getRegression(regressions, predicting);
-    }
-
-    private SimpleRegression getRegression(Map<Predicting, SimpleRegression> r, Predicting p) {
-      if (!r.containsKey(p)) {
-        r.put(p, new SimpleRegression());
+    private Regression getRegression(Predicting p) {
+      if (!regressions.containsKey(p)) {
+        regressions.put(p, new Regression());
       }
-      return r.get(p);
+      return regressions.get(p);
     }
 
     public Boolean isEmpty() {
@@ -71,24 +67,24 @@ public final class BattingRegression {
            Splits<BattingStats> stats = teamStats.getSplits(p);
            Splits<BattingRatings<?>> ratings = p.getBattingRatings();
 
-           addData(regressions, stats.getVsLeft(), ratings.getVsLeft());
-           addData(regressions, stats.getVsRight(), ratings.getVsRight());
+           addData(stats.getVsLeft(), ratings.getVsLeft());
+           addData(stats.getVsRight(), ratings.getVsRight());
        }
     }
 
-    private void addData(Map<Predicting, SimpleRegression> r, BattingStats stats, BattingRatings<?> ratings) {
+    private void addData(BattingStats stats, BattingRatings<?> ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            getRegression(r, Predicting.HITS).addData(
+            getRegression(Predicting.HITS).addData(
                 ratings.getContact(), stats.getHitsPerPlateAppearance());
-            getRegression(r, Predicting.EXTRA_BASE_HITS).addData(
+            getRegression(Predicting.EXTRA_BASE_HITS).addData(
                 ratings.getGap(), stats.getExtraBaseHitsPerPlateAppearance());
 
-            getRegression(r, Predicting.HOME_RUNS).addData(
+            getRegression(Predicting.HOME_RUNS).addData(
                 ratings.getPower(), stats.getHomeRunsPerPlateAppearance());
-            getRegression(r, Predicting.WALKS).addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
+            getRegression(Predicting.WALKS).addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
 
             if (ratings.getK().isPresent()) {
-                getRegression(r, Predicting.KS).addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
+                getRegression(Predicting.KS).addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
             }
         }
     }
@@ -272,24 +268,20 @@ public final class BattingRegression {
 
         @Override
         public void print(PrintWriter w) {
-            w.println("  |   H%  |  XB%  |  HR%  |  BB%  |   K%  |  wOBA |");
-
-            print(w, "R2", regression.regressions);
+            print(w, regression.regressions);
         }
 
-        private void print(PrintWriter w, String label, Map<Predicting, SimpleRegression> r) {
+        private void print(PrintWriter w, Map<Predicting, Regression> r) {
             if (r.isEmpty()) { return; }
 
-            w.println(
-                String.format(
-                "%2s| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
-                label,
-                r.get(Predicting.HITS).getRSquare(),
-                r.get(Predicting.EXTRA_BASE_HITS).getRSquare(),
-                r.get(Predicting.HOME_RUNS).getRSquare(),
-                r.get(Predicting.WALKS).getRSquare(),
-                r.get(Predicting.KS).getRSquare(),
-                regression.woba.getRSquare()));
+            w.format(" H% | %s%n", r.get(Predicting.HITS).format());
+            w.format("XB% | %s%n", r.get(Predicting.EXTRA_BASE_HITS).format());
+            w.format("HR% | %s%n", r.get(Predicting.HOME_RUNS).format());
+            w.format("BB% | %s%n", r.get(Predicting.WALKS).format());
+            w.format(" K% | %s%n", r.get(Predicting.KS).format());
+            w.format("----|%n");
+            w.format("wOBA| %.3f%n", regression.woba.getRSquare());
+            w.format("    | %.3f%n", Math.sqrt(regression.woba.getMeanSquareError()));
         }
 
         public static CorrelationReport create(BattingRegression regression) {

@@ -28,7 +28,7 @@ def construi_on_node(target) {
 stage 'Build'
 construi_on_node 'build'
 
-if (binding.variables.containsKey('OOTPAI_SITE') && OOTPAI_SITE != 'NONE') {
+if (env.BRANCH_NAME == 'master' && OOTPAI_SITE != 'NONE') {
   stage 'Run'
   node('construi') {
     checkout scm
