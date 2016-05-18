@@ -5,7 +5,7 @@ properties(
   , [$class: 'GithubProjectProperty', projectUrlStr: 'http://github.com/lstephen/ootp-ai']
   , [$class: 'ParametersDefinitionProperty',
       parameterDefinitions:
-      [ [$class: 'ChoiceParameterDefinition', name: 'OOTPAI_SITE', choices: "NONE\nTWML"]
+      [ [$class: 'ChoiceParameterDefinition', name: 'OOTPAI_SITE', choices: "NONE\nBTHUSTLE\nCBL\nHFTC\nLBB\nGABL\nSAVOY\nTWML"]
       , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_CLEAR_CACHE', defaultValue: false]
       , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_PLAYOFFS', defaultValue: false]
       ]
