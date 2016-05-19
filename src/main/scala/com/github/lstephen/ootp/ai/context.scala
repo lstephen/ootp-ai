@@ -4,16 +4,6 @@ import com.github.lstephen.ootp.ai.roster.Roster
 
 import scala.Option
 
-case class UndefinedContext(msg: String) extends RuntimeException
-
-trait WithAnyRoster {
-  def roster = Context
-    .newRoster
-    .getOrElse(Context
-      .oldRoster
-      .getOrElse(throw new UndefinedContext("WithAnyRoster")))
-}
-
 object Context {
   var newRoster: Option[Roster] = None
   def newRoster_=(r: Roster): Unit = { newRoster = Some(r) }
