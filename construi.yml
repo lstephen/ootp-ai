@@ -29,6 +29,7 @@ targets:
       - OOTPAI_CLEAR_CACHE
       - OOTPAI_PLAYOFFS
       - OOTPAI_DATA=/var/ootp-ai-data
+      - SKIP_GIT_SYNC
     volumes:
       - $GIT_SSH_KEY:/ssh/id_rsa:ro
       - ./ootp-ai-data:/var/ootp-ai-data

@@ -16,6 +16,7 @@ import com.github.lstephen.ootp.ai.stats.SplitPercentagesHolder;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -32,15 +33,7 @@ public final class PitchingRegression {
 
     private TeamStats<PitchingStats> stats;
 
-    private final SimpleRegression hits = new SimpleRegression();
-
-    private final SimpleRegression doubles = new SimpleRegression();
-
-    private final SimpleRegression strikeouts = new SimpleRegression();
-
-    private final SimpleRegression walks = new SimpleRegression();
-
-    private final SimpleRegression homeRuns = new SimpleRegression();
+    private final Map<Predicting, Regression> regressions = new HashMap<>();
 
     private final SimpleRegression era = new SimpleRegression();
 
@@ -61,7 +54,7 @@ public final class PitchingRegression {
     }
 
     public Boolean isEmpty() {
-        return walks.getN() == 0;
+        return getRegression(Predicting.WALKS).getN() == 0;
     }
 
     private void addData(TeamStats<PitchingStats> teamStats) {
@@ -76,42 +69,27 @@ public final class PitchingRegression {
        }
     }
 
+    private Regression getRegression(Predicting p) {
+      if (!regressions.containsKey(p)) {
+        regressions.put(p, new Regression());
+      }
+      return regressions.get(p);
+    }
+
     private void addData(PitchingStats stats, PitchingRatings ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            hits.addData(ratings.getHits(), stats.getHitsPerPlateAppearance());
-            doubles.addData(ratings.getGap(), stats.getDoublesPerPlateAppearance());
-            strikeouts.addData(
+            getRegression(Predicting.HITS).addData(ratings.getHits(), stats.getHitsPerPlateAppearance());
+            getRegression(Predicting.DOUBLES).addData(ratings.getGap(), stats.getDoublesPerPlateAppearance());
+            getRegression(Predicting.STRIKEOUTS).addData(
                 ratings.getStuff(), stats.getStrikeoutsPerPlateAppearance());
-            walks.addData(ratings.getControl(), stats.getWalksPerPlateAppearance());
-            homeRuns.addData(
+            getRegression(Predicting.WALKS).addData(ratings.getControl(), stats.getWalksPerPlateAppearance());
+            getRegression(Predicting.HOME_RUNS).addData(
                 ratings.getMovement(), stats.getHomeRunsPerPlateAppearance());
         }
     }
 
     private double predict(Predicting predicting, int rating) {
-        SimpleRegression regression;
-
-        switch (predicting) {
-            case HITS:
-                regression = hits;
-                break;
-            case DOUBLES:
-                regression = doubles;
-                break;
-            case STRIKEOUTS:
-                regression = strikeouts;
-                break;
-            case HOME_RUNS:
-                regression = homeRuns;
-                break;
-            case WALKS:
-                regression = walks;
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-
-        return Math.max(0, regression.predict(rating));
+      return Math.max(0, getRegression(predicting).predict(rating));
     }
 
     public TeamStats<PitchingStats> predict(Iterable<Player> ps) {
@@ -291,17 +269,20 @@ public final class PitchingRegression {
 
         @Override
         public void print(PrintWriter w) {
-            w.println("  |   K%  |  BB%  |  HR%  |   H%  |  2B%  |  ERA  |");
+            Map<Predicting, Regression> r = regression.regressions;
 
-            w.println(
-                String.format(
-                    "R2| %.3f | %.3f | %.3f | %.3f | %.3f | %.3f |",
-                    regression.strikeouts.getRSquare(),
-                    regression.walks.getRSquare(),
-                    regression.homeRuns.getRSquare(),
-                    regression.hits.getRSquare(),
-                    regression.doubles.getRSquare(),
-                    regression.era.getRSquare()));
+            if (r.isEmpty()) { return; }
+
+            w.println();
+
+            w.format(" K%% | %s%n", r.get(Predicting.STRIKEOUTS).format());
+            w.format("BB%% | %s%n", r.get(Predicting.WALKS).format());
+            w.format("HR%% | %s%n", r.get(Predicting.HOME_RUNS).format());
+            w.format(" H%% | %s%n", r.get(Predicting.HITS).format());
+            w.format("2B%% | %s%n", r.get(Predicting.DOUBLES).format());
+            w.format("----|%n");
+            w.format(" ERA| %.3f%n", regression.era.getRSquare());
+            w.format("    | %.3f%n", Math.sqrt(regression.era.getMeanSquareError()));
 
             w.format(
                 "ERA: %.2f, FIP: %.2f%n",

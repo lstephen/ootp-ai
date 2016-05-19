@@ -13,6 +13,6 @@ class Regression {
 
   def predict(x: Double): Double = r predict x
 
-  def format: String = s"${r.getRSquare}.3f"
+  def format: String = f"${r.getRSquare}%.3f"
 
 }
