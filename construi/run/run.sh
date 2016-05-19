@@ -3,7 +3,7 @@
 set -e
 set -x
 
-if [[ -z "SKIP_GIT_SYNC" ]];
+if [[ -z "$SKIP_GIT_SYNC" ]];
 then
   mkdir -p /root/.ssh
 
