@@ -56,12 +56,12 @@ public final class Rotation implements Printable {
         return score;
     }
 
-    private static enum BullpenOption { ENDURANCE, CLUTCH, CONSISTENCY }
+    private static enum BullpenOption { CLUTCH }
 
     private Double scoreBullpen(TeamStats<PitchingStats> predictions, PitcherOverall overall) {
-      Double mrs = score(get(Role.MR), predictions, overall, EnumSet.of(BullpenOption.ENDURANCE));
-      Double sus = score(get(Role.SU), predictions, overall, EnumSet.of(BullpenOption.CONSISTENCY));
-      Double cls = score(get(Role.CL), predictions, overall, EnumSet.of(BullpenOption.CLUTCH, BullpenOption.CONSISTENCY));
+      Double mrs = score(get(Role.MR), predictions, overall, EnumSet.noneOf(BullpenOption.class));
+      Double sus = score(get(Role.SU), predictions, overall, EnumSet.noneOf(BullpenOption.class));
+      Double cls = score(get(Role.CL), predictions, overall, EnumSet.of(BullpenOption.CLUTCH));
 
       return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
     }
@@ -81,13 +81,6 @@ public final class Rotation implements Printable {
       for (Player p : players) {
         SplitStats<PitchingStats> stats = predictions.getSplits(p);
 
-        Double endFactor = 0.0;
-
-        if (options.contains(BullpenOption.ENDURANCE)) {
-          Integer end = p.getPitchingRatings().getVsRight().getEndurance();
-          endFactor = (1000.0 - Math.pow(10 - end, 3)) / 2000.0;
-        }
-
         Double clutchFactor = 0.0;
 
         if (options.contains(BullpenOption.CLUTCH) && p.getClutch().isPresent()) {
@@ -106,26 +99,7 @@ public final class Rotation implements Printable {
           }
         }
 
-        Double consistencyFactor = 0.0;
-
-        if (options.contains(BullpenOption.CONSISTENCY) && p.getConsistency().isPresent()) {
-          switch (p.getConsistency().get()) {
-            case VERY_INCONSISTENT:
-              consistencyFactor = -0.25;
-              break;
-            case AVERAGE:
-              consistencyFactor = 0.0;
-              break;
-            case GOOD:
-              consistencyFactor = 0.25;
-              break;
-            default:
-              throw new IllegalArgumentException();
-          }
-        }
-
-
-        Double f = factor.doubleValue() + endFactor + clutchFactor + consistencyFactor;
+        Double f = factor.doubleValue() + clutchFactor;
 
         score += f * overall.getPlus(stats.getOverall());
         vsL += f * overall.getPlus(stats.getVsLeft());

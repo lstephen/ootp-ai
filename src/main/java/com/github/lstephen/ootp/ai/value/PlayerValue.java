@@ -5,9 +5,11 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
+import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.splits.Splits;
@@ -41,10 +43,6 @@ public class PlayerValue {
     }
 
     public Integer getNowValue(Player p) {
-        Slot st = Slot.getPrimarySlot(p);
-
-        Double factor = st == Slot.MR ? MR_CONSTANT : Double.valueOf(1.0);
-
         Double defense = Selections.isHitter(p)
           ? PlayerDefenseScore$.MODULE$.atBestPosition(p, true).score()
           : 0.0;
@@ -61,6 +59,40 @@ public class PlayerValue {
         }
 
         return (int) Math.round(endurance * getNowAbility(p) + defense);
+    }
+
+    public Integer getNowValue(Player ply, Position pos) {
+        if (Selections.isHitter(ply) && pos.isPitching()) {
+          return 0;
+        }
+
+        if (Selections.isPitcher(ply) && pos.isHitting()) {
+          return 0;
+        }
+
+
+        Double defense = Selections.isHitter(ply)
+          ? new PlayerDefenseScore(ply, pos).score()
+          : 0.0;
+
+        Double endurance = 1.0;
+
+
+        if (Selections.isPitcher(ply)) {
+          switch (pos) {
+            case STARTING_PITCHER:
+              Integer end = ply.getPitchingRatings().getVsRight().getEndurance();
+              endurance = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+              break;
+            case MIDDLE_RELIEVER:
+              endurance = MR_CONSTANT;
+              break;
+            default:
+              // do nothing
+          }
+        }
+
+        return (int) Math.round(endurance * getNowAbility(ply) + defense);
     }
 
     public Function<Player, Integer> getNowAbility() {

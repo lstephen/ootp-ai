@@ -51,6 +51,7 @@ import com.github.lstephen.ootp.ai.stats.SplitPercentagesHolder;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.value.FreeAgentAcquisition;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
+import com.github.lstephen.ootp.ai.value.ReplacementLevels$;
 import com.github.lstephen.ootp.ai.value.TradeValue;
 
 import java.io.File;
@@ -515,6 +516,8 @@ public class Main {
 
         generic.printReplacementLevelReport(out);
 
+        Printables.print(ReplacementLevels$.MODULE$.getForNow(ps)).to(out);
+
         RosterReport rosterReport = RosterReport.create(site, newRoster);
 
         Printables.print(rosterReport).to(out);
@@ -663,8 +666,6 @@ public class Main {
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.AAA));
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.AA));
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.A));
-            Iterables.addAll(minorLeaguers, r.getPlayers(Status.SA));
-            Iterables.addAll(minorLeaguers, r.getPlayers(Status.R));
 
             generic.setPlayers(r.getAllPlayers());
             generic.print(out);
