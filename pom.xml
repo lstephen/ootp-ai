@@ -45,6 +45,7 @@
     <lib.scala-arm.version>1.4</lib.scala-arm.version>
     <lib.scala-library.version>2.11.7</lib.scala-library.version>
     <lib.scala-logging.version>3.1.0</lib.scala-logging.version>
+    <lib.scalaplot.version>0.1</lib.scalaplot.version>
     <lib.slf4j.version>1.7.7</lib.slf4j.version>
 
       <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
@@ -162,6 +163,18 @@
       <groupId>com.typesafe.scala-logging</groupId>
       <artifactId>scala-logging_${scala.version}</artifactId>
       <version>${lib.scala-logging.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sameersingh.scalaplot</groupId>
+      <artifactId>scalaplot</artifactId>
+      <version>${lib.scalaplot.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.scala-lang</groupId>
