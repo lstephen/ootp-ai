@@ -53,7 +53,7 @@ public final class BattingRegression {
 
     private Regression getRegression(Predicting p) {
       if (!regressions.containsKey(p)) {
-        regressions.put(p, new Regression());
+        regressions.put(p, new Regression(p.toString(), "Batting"));
       }
       return regressions.get(p);
     }
@@ -276,14 +276,14 @@ public final class BattingRegression {
 
             w.println();
 
-            w.format(" H%% | %s%n", r.get(Predicting.HITS).format());
-            w.format("XB%% | %s%n", r.get(Predicting.EXTRA_BASE_HITS).format());
-            w.format("HR%% | %s%n", r.get(Predicting.HOME_RUNS).format());
-            w.format("BB%% | %s%n", r.get(Predicting.WALKS).format());
-            w.format(" K%% | %s%n", r.get(Predicting.KS).format());
-            w.format("----|%n");
-            w.format("wOBA| %.3f%n", regression.woba.getRSquare());
-            w.format("    | %.3f%n", Math.sqrt(regression.woba.getMeanSquareError()));
+            w.println(r.get(Predicting.HITS).format());
+            w.println(r.get(Predicting.EXTRA_BASE_HITS).format());
+            w.println(r.get(Predicting.HOME_RUNS).format());
+            w.println(r.get(Predicting.WALKS).format());
+            w.println(r.get(Predicting.KS).format());
+            w.format("------%n");
+            w.format(" wOBA| %.3f%n", regression.woba.getRSquare());
+            w.format("     | %.3f%n", Math.sqrt(regression.woba.getMeanSquareError()));
         }
 
         public static CorrelationReport create(BattingRegression regression) {

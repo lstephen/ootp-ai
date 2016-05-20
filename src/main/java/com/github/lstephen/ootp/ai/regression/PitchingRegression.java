@@ -71,7 +71,7 @@ public final class PitchingRegression {
 
     private Regression getRegression(Predicting p) {
       if (!regressions.containsKey(p)) {
-        regressions.put(p, new Regression());
+        regressions.put(p, new Regression(p.toString(), "Pitching"));
       }
       return regressions.get(p);
     }
@@ -275,14 +275,15 @@ public final class PitchingRegression {
 
             w.println();
 
-            w.format(" K%% | %s%n", r.get(Predicting.STRIKEOUTS).format());
-            w.format("BB%% | %s%n", r.get(Predicting.WALKS).format());
-            w.format("HR%% | %s%n", r.get(Predicting.HOME_RUNS).format());
-            w.format(" H%% | %s%n", r.get(Predicting.HITS).format());
-            w.format("2B%% | %s%n", r.get(Predicting.DOUBLES).format());
-            w.format("----|%n");
-            w.format(" ERA| %.3f%n", regression.era.getRSquare());
-            w.format("    | %.3f%n", Math.sqrt(regression.era.getMeanSquareError()));
+            w.println(r.get(Predicting.STRIKEOUTS).format());
+            w.println(r.get(Predicting.WALKS).format());
+            w.println(r.get(Predicting.HOME_RUNS).format());
+            w.println(r.get(Predicting.HITS).format());
+            w.println(r.get(Predicting.DOUBLES).format());
+
+            w.format("-----|%n");
+            w.format("  ERA| %.3f%n", regression.era.getRSquare());
+            w.format("     | %.3f%n", Math.sqrt(regression.era.getMeanSquareError()));
 
             w.format(
                 "ERA: %.2f, FIP: %.2f%n",
