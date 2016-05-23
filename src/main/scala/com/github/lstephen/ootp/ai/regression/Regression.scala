@@ -1,5 +1,7 @@
 package com.github.lstephen.ootp.ai.regression
 
+import com.github.lstephen.ootp.ai.site.SiteHolder
+
 import org.apache.commons.math3.stat.regression.SimpleRegression
 
 import org.sameersingh.scalaplot.XYPlotStyle
@@ -26,7 +28,7 @@ class Regression(label: String, category: String) {
   def predict(x: Double): Double = r predict x
 
   def format: String = {
-    val dir = s"${sys.env("OOTPAI_DATA")}/charts/${category}/"
+    val dir = s"${sys.env("OOTPAI_DATA")}/charts/${SiteHolder.get.getName}/${category}/"
 
     new File(dir).mkdirs
 
