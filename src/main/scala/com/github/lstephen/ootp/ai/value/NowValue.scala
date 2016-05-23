@@ -18,6 +18,9 @@ class NowValue
   val vsReplacement = ReplacementLevels.getForNow.get(player, position);
 
   val score = now + vsReplacement
+
+  def format: String =
+    f"${position.getAbbreviation}%2s/${now.toLong}%3d/${vsReplacement.toLong}%3d ${score.toLong}%3d"
 }
 
 object NowValue {

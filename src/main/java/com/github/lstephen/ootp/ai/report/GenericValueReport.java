@@ -9,6 +9,7 @@ import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
+import com.github.lstephen.ootp.ai.value.NowValue$;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementValue;
 import com.github.lstephen.ootp.ai.value.SalaryPredictor;
@@ -188,7 +189,7 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %3d%s | %-8s %s | %s %9s | %7s | %7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %s | %3d%s | %-8s %s | %s %9s | %7s | %7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
@@ -199,6 +200,7 @@ public class GenericValueReport implements Printable {
                     getNowVsRight(p),
                     replacementValue.getValueVsReplacement(p),
                     futureReplacementValue.getValueVsReplacement(p),
+                    NowValue$.MODULE$.apply(p, now).format(),
                     value,
                     mv,
                     Selections.isHitter(p)

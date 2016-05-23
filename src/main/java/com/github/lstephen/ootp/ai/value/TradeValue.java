@@ -19,11 +19,8 @@ public class TradeValue {
 
     private final ReplacementValue futureReplacementValue;
 
-    private final ReplacementLevels replacementLevels;
-
     public TradeValue(Iterable<Player> team, Predictions predictions, BattingRegression batting, PitchingRegression pitching) {
         this.playerValue = new PlayerValue(predictions, batting, pitching);
-        this.replacementLevels = ReplacelementLevels$.MODULE$.getForNow(predictions);
         this.replacementValue = new ReplacementValue(
             predictions,
             new Function<Player, Integer>() {
