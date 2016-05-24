@@ -288,7 +288,7 @@ public class SinglePlayer implements PlayerSource {
 
     String raw = doc.select("td.s4:contains(Fielding Ratings)").text();
 
-    for (Position p : Position.values()) {
+    for (Position p : Position.hitting()) {
       if (raw.contains(p.getAbbreviation() + " :")) {
         Integer rating = extractPositionRating(raw, p.getAbbreviation());
 

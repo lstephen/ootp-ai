@@ -22,7 +22,7 @@ class PlayerDefenseScore(defensiveRatings: DefensiveRatings, position: Position,
 
 object PlayerDefenseScore {
   def atBestPosition(p: Player, useBaseline: Boolean = true): PlayerDefenseScore =
-    Position.values
+    Position.hitting
       .map(new PlayerDefenseScore(p.getDefensiveRatings, _, useBaseline))
       .max
 

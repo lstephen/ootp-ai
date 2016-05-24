@@ -14,6 +14,7 @@ import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
@@ -51,6 +52,7 @@ import com.github.lstephen.ootp.ai.stats.SplitPercentagesHolder;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.value.FreeAgentAcquisition;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
+import com.github.lstephen.ootp.ai.value.ReplacementLevels$;
 import com.github.lstephen.ootp.ai.value.TradeValue;
 
 import java.io.File;
@@ -225,6 +227,7 @@ public class Main {
         team.processManualChanges(changes);
 
         LOG.info("Setting up Predictions...");
+        final Predictor predictor = new Predictor(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
@@ -515,6 +518,8 @@ public class Main {
 
         generic.printReplacementLevelReport(out);
 
+        Printables.print(ReplacementLevels$.MODULE$.getForNow(predictor)).to(out);
+
         RosterReport rosterReport = RosterReport.create(site, newRoster);
 
         Printables.print(rosterReport).to(out);
@@ -663,8 +668,6 @@ public class Main {
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.AAA));
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.AA));
             Iterables.addAll(minorLeaguers, r.getPlayers(Status.A));
-            Iterables.addAll(minorLeaguers, r.getPlayers(Status.SA));
-            Iterables.addAll(minorLeaguers, r.getPlayers(Status.R));
 
             generic.setPlayers(r.getAllPlayers());
             generic.print(out);

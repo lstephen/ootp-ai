@@ -9,6 +9,8 @@ import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 import scalaz._
 import Scalaz._
 
+import collection.JavaConversions._
+
 class InLineupScore
   (player: Player, position: Position, vs: Option[VsHand] = None)
   (implicit predictions: Predictions)
@@ -28,11 +30,9 @@ class InLineupScore
 
 object InLineupScore {
   def apply(ply: Player)(implicit ps: Predictions): InLineupScore =
-    Position.values
+    Position.hitting
       .map(InLineupScore(ply, _))
       .max
-
-
 
   def apply(ply: Player, pos: Position)(implicit ps: Predictions): InLineupScore = {
     new InLineupScore(ply, pos, None)

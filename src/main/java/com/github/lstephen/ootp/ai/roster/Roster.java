@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -31,7 +32,7 @@ public final class Roster implements Printable {
 
     private static final Integer DEFAULT_TARGET_MINIMUM = 90;
 
-    public static enum Status { ML, AAA, AA, A, SA, R, DL, UNK }
+    public static enum Status { ML, AAA, AA, A, DL, UNK }
 
     private final PlayerSource source;
 
@@ -54,6 +55,13 @@ public final class Roster implements Printable {
 
     public ImmutableSet<Player> getPlayers(Status status) {
         return ImmutableSet.copyOf(assignments.get(status));
+    }
+
+    public ImmutableSet<Player> getMinorLeaguers() {
+      return ImmutableSet.copyOf(Stream
+        .of(Status.AAA, Status.AA, Status.A)
+        .flatMap(s -> assignments.get(s).stream())
+        .collect(Collectors.toSet()));
     }
 
     public Boolean contains(Player p) {

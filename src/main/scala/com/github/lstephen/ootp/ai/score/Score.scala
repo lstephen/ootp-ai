@@ -16,6 +16,7 @@ class Score(private val n: Double) extends AnyVal with Ordered[Score] {
 
 object Score {
   def apply[N: Numeric](n: N): Score = new Score(implicitly[Numeric[N]] toDouble n)
+  def apply(n: Number): Score = new Score(n.doubleValue)
 
   val zero: Score = Score(0)
 

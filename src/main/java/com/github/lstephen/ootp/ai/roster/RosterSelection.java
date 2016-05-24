@@ -357,7 +357,7 @@ public final class RosterSelection {
         selection.batting = batting;
         selection.pitching = pitching;
 
-        selection.remainingLevels = Lists.newArrayList(Status.AAA, Status.AA, Status.A, Status.SA, Status.R);
+        selection.remainingLevels = Lists.newArrayList(Status.AAA, Status.AA, Status.A);
 
         return selection;
     }
