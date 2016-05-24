@@ -1,8 +1,9 @@
 package com.github.lstephen.ootp.ai
 
+import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.roster.Roster
 
-import scala.Option
+import collection.JavaConversions._
 
 object Context {
   var newRoster: Option[Roster] = None
@@ -10,6 +11,9 @@ object Context {
 
   var oldRoster: Option[Roster] = None
   def oldRoster_=(r: Roster): Unit = { oldRoster = Some(r) }
+
+  var idealRoster: Option[Roster] = None
+  def idealRoster_=(r: Roster): Unit = { idealRoster = Some(r) }
 }
 
 

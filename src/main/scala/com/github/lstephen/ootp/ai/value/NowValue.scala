@@ -33,7 +33,14 @@ trait BatterNowAbility { this: NowAbility =>
 }
 
 trait PitcherNowAbility { this: NowAbility =>
-  override val pitching = Some(predictor.predictPitching(player).overall)
+  val endurance = position match {
+    case Position.MIDDLE_RELIEVER => 0.865
+    case Position.STARTING_PITCHER => {
+      val end = player.getPitchingRatings.getVsRight.getEndurance;
+      (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+    }
+  }
+  override val pitching = Some(endurance *: predictor.predictPitching(player).overall)
 }
 
 object NowAbility {
@@ -55,7 +62,7 @@ class NowValue
 
   val ability = NowAbility(player, position)
 
-  val vsReplacement = Some(ReplacementLevels.getForNow.get(player, position))
+  val vsReplacement = Some(ReplacementLevels.getForIdeal.get(player, position))
 
   def components = ability.components :+ vsReplacement
 
