@@ -14,6 +14,7 @@ import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
@@ -226,6 +227,7 @@ public class Main {
         team.processManualChanges(changes);
 
         LOG.info("Setting up Predictions...");
+        final Predictor predictor = new Predictor(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
@@ -516,7 +518,7 @@ public class Main {
 
         generic.printReplacementLevelReport(out);
 
-        Printables.print(ReplacementLevels$.MODULE$.getForNow(ps)).to(out);
+        Printables.print(ReplacementLevels$.MODULE$.getForNow(predictor)).to(out);
 
         RosterReport rosterReport = RosterReport.create(site, newRoster);
 

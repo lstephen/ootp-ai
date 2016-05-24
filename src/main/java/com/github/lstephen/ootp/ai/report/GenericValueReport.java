@@ -7,6 +7,7 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
 import com.github.lstephen.ootp.ai.value.NowValue$;
@@ -58,10 +59,14 @@ public class GenericValueReport implements Printable {
 
     private final Predictions now;
 
+    private final Predictor predictor;
+
     private Optional<Double> multiplier = Optional.absent();
 
     public GenericValueReport(
         Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryPredictor salary) {
+
+        predictor = new Predictor(batting, pitching, predictions.getPitcherOverall());
 
         this.batting = batting;
         this.pitching = pitching;
@@ -200,12 +205,12 @@ public class GenericValueReport implements Printable {
                     getNowVsRight(p),
                     replacementValue.getValueVsReplacement(p),
                     futureReplacementValue.getValueVsReplacement(p),
-                    NowValue$.MODULE$.apply(p, now).format(),
+                    NowValue$.MODULE$.apply(p, predictor).format(),
                     value,
                     mv,
                     Selections.isHitter(p)
                       ? p.getDefensiveRatings().getPositionScores()
-                      : (p.getListedPosition().or("").equals(p.getPosition()) ? "" : p.getPosition()),
+                      : "",
                     Selections.isHitter(p)
                       ? String.format("%3.0f", PlayerDefenseScore$.MODULE$.atBestPosition(p, true).score())
                       : "   ",

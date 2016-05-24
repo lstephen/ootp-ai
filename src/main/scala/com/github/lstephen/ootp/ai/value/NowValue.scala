@@ -2,26 +2,62 @@ package com.github.lstephen.ootp.ai.value
 
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore
 
 import collection.JavaConversions._
 
-abstract class NowValue
+trait ComponentScore extends Scoreable {
+
+  def components: List[Option[Score]]
+
+  def score: Score = components.map(_.getOrElse(Score.zero)).total
+}
+
+class NowAbility
   (val player: Player, val position: Position)
-  (implicit val predictions: Predictions)
-  extends Scoreable {
+  (implicit val predictor: Predictor)
+  extends ComponentScore {
 
   val batting: Option[Score] = None
   val pitching: Option[Score] = None
   val defense: Option[Score] = None
 
+  def components = List(batting, pitching, defense)
+}
+
+trait BatterNowAbility { this: NowAbility =>
+  override val batting = Some(predictor.predictBatting(player).overall)
+  override val defense = Some(new PlayerDefenseScore(player, position).score)
+}
+
+trait PitcherNowAbility { this: NowAbility =>
+  override val pitching = Some(predictor.predictPitching(player).overall)
+}
+
+object NowAbility {
+  def apply(p: Player, pos: Position)(implicit ps: Predictor): NowAbility = {
+    if (p.isHitter && pos.isHitting) {
+      return new NowAbility(p, pos) with BatterNowAbility
+    } else if (p.isPitcher && pos.isPitching) {
+      return new NowAbility(p, pos) with PitcherNowAbility
+    }
+    new NowAbility(p, pos)
+  }
+}
+
+
+class NowValue
+  (val player: Player, val position: Position)
+  (implicit val predictor: Predictor)
+  extends ComponentScore {
+
+  val ability = NowAbility(player, position)
+
   val vsReplacement = Some(ReplacementLevels.getForNow.get(player, position))
 
-  def components = List(batting, pitching, defense, vsReplacement)
-
-  def score: Score = components.map(_.getOrElse(Score.zero)).total
+  def components = ability.components :+ vsReplacement
 
   def format: String =
     components
@@ -30,27 +66,11 @@ abstract class NowValue
       .mkString(f"${position.getAbbreviation}%2s : ", " ", f" : ${score.toLong}%3d")
 }
 
-trait BatterNowValue { this: NowValue =>
-  override val batting = Some(Score(predictions.getOverallHitting(player).intValue))
-  override val defense = Some(new PlayerDefenseScore(player, position).score)
-}
-
-trait PitcherNowValue { this: NowValue =>
-  override val pitching = Some(Score(predictions.getOverallPitching(player).intValue))
-}
-
-
 object NowValue {
-  def apply(p: Player, pos: Position)(implicit ps: Predictions): NowValue = {
-    if (p.isHitter()) {
-      return new NowValue(p, pos) with BatterNowValue
-    } else if (p.isPitcher()) {
-      return new NowValue(p, pos) with PitcherNowValue
-    }
-    throw new IllegalStateException
-  }
+  def apply(p: Player, pos: Position)(implicit ps: Predictor) =
+    new NowValue(p, pos)
 
-  def apply(p: Player)(implicit ps: Predictions): NowValue =
+  def apply(p: Player)(implicit ps: Predictor): NowValue =
     (Position.hitting ++ Position.pitching)
       .map(NowValue(p, _))
       .max
