@@ -137,6 +137,10 @@ public final class RosterSelection {
         return fourtyManRoster;
     }
 
+    public Roster select(Mode mode) {
+      return select(mode, Changes.empty());
+    }
+
     public Roster select(Mode mode, Changes changes) {
         return select(
             mode,

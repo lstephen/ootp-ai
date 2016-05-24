@@ -44,11 +44,7 @@ public final class Changes {
 
     private final Multimap<ChangeType, Player> changes = HashMultimap.create();
 
-    private final Site site;
-
-    private Changes(Site site) {
-        this.site = site;
-    }
+    private Changes() { }
 
     public ImmutableSet<Player> get(ChangeType type) {
       return ImmutableSet.copyOf(changes.get(type));
@@ -74,8 +70,12 @@ public final class Changes {
             .or(config.getValue("output.dir").or("c:/ootp"));
     }
 
+    public static Changes empty() {
+      return new Changes();
+    }
+
     public static Changes load(Site site) {
-        Changes changes = new Changes(site);
+        Changes changes = Changes.empty();
 
         try {
             File src = new File(getChangesDir(), site.getName() + ".changes.txt");

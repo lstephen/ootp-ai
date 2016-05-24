@@ -11,7 +11,7 @@ import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
 
 import collection.JavaConversions._
 
-import java.io.PrintWriter;
+import java.io.PrintWriter
 
 
 class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) extends Printable {
@@ -34,12 +34,12 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) ex
 object ReplacementLevels {
   private def shouldNotHappen = throw new IllegalStateException()
 
-  private var _forNow: Option[ReplacementLevels] = None
+  private var _forIdeal: Option[ReplacementLevels] = None
 
-  def getForNow(implicit ps: Predictor): ReplacementLevels =
-    _forNow.getOrElse {
-      _forNow = Some(getFor(Context.newRoster.getOrElse(shouldNotHappen)))
-      _forNow getOrElse shouldNotHappen
+  def getForIdeal(implicit ps: Predictor): ReplacementLevels =
+    _forIdeal.getOrElse {
+      _forIdeal = Some(getFor(Context.idealRoster.getOrElse(shouldNotHappen)))
+      _forIdeal getOrElse shouldNotHappen
     }
 
   def getFor(r: Roster)(implicit ps: Predictor): ReplacementLevels = {

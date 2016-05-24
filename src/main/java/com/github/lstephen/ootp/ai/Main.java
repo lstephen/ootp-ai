@@ -415,6 +415,10 @@ public class Main {
 
         selection.setPrevious(oldRoster);
 
+        LOG.log(Level.INFO, "Selecting ideal roster...");
+
+        Context$.MODULE$.idealRoster_$eq(selection.select(Mode.REGULAR_SEASON));
+
         LOG.log(Level.INFO, "Selecting new rosters...");
 
         Stopwatch sw = Stopwatch.createStarted();
@@ -518,7 +522,7 @@ public class Main {
 
         generic.printReplacementLevelReport(out);
 
-        Printables.print(ReplacementLevels$.MODULE$.getForNow(predictor)).to(out);
+        Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
 
         RosterReport rosterReport = RosterReport.create(site, newRoster);
 
