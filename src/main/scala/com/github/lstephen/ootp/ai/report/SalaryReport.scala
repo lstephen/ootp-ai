@@ -1,15 +1,17 @@
 package com.github.lstephen.ootp.ai.report;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Ordering;
-import com.github.lstephen.ootp.ai.io.Printable;
-import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.roster.Team;
-import com.github.lstephen.ootp.ai.site.Financials;
-import com.github.lstephen.ootp.ai.site.Salary;
-import com.github.lstephen.ootp.ai.site.Site;
-import com.github.lstephen.ootp.ai.value.SalaryPredictor;
-import com.github.lstephen.ootp.ai.value.TradeValue;
+import com.google.common.base.Function
+import com.google.common.collect.Ordering
+import com.github.lstephen.ootp.ai.io.Printable
+import com.github.lstephen.ootp.ai.player.Player
+import com.github.lstephen.ootp.ai.regression.Predictor
+import com.github.lstephen.ootp.ai.roster.Team
+import com.github.lstephen.ootp.ai.score.Score
+import com.github.lstephen.ootp.ai.site.Financials
+import com.github.lstephen.ootp.ai.site.Salary
+import com.github.lstephen.ootp.ai.site.Site
+import com.github.lstephen.ootp.ai.value.NowValue
+import com.github.lstephen.ootp.ai.value.SalaryPredictor
 
 import java.io.PrintWriter;
 import java.text.NumberFormat;
@@ -24,29 +26,34 @@ import scala.math._
  *
  * @author lstephen
  */
-class SalaryReport(
-  team: Team, salary: Salary, financials: Financials, tv: TradeValue)
+class SalaryReport
+  (team: Team, salary: Salary, financials: Financials)
+  (implicit predictor: Predictor)
   extends SalaryPredictor with Printable {
 
-    val currentTotal: Int = team.map(salary.getCurrentSalary(_).toInt).sum
-    val nextTotal: Int = team.map(salary.getNextSalary(_).toInt).sum
+    private def vsReplacement(p: Player): Score =
+      NowValue(p).vsReplacement.orElseZero
 
-    val replCurrentTotal: Int = team
-      .filter(tv.getCurrentValueVsReplacement(_) > 0)
-      .map(tv.getCurrentValueVsReplacement(_).toInt)
-      .sum
+    val currentTotal: Long = team.map(salary.getCurrentSalary(_).toLong).sum
+    val nextTotal: Long = team.map(salary.getNextSalary(_).toLong).sum
 
-    val replNextTotal: Int = team
-      .filter(tv.getCurrentValueVsReplacement(_) > 0)
+    val replCurrentTotal: Score = team
+      .map(vsReplacement(_))
+      .filter(_.isPositive)
+      .total
+
+    val replNextTotal: Score = team
       .filter(salary.getNextSalary(_) > 0)
-      .map(tv.getCurrentValueVsReplacement(_).toInt)
-      .sum
+      .map(vsReplacement(_))
+      .filter(_.isPositive)
+      .total
 
     val maxCurrent = currentTotal + financials.getAvailableForFreeAgents
     val maxNext = nextTotal + financials.getAvailableForExtensions
-    val maxReplCurrent = maxCurrent / replCurrentTotal
-    val maxReplNext = maxNext / replNextTotal
+    val maxReplCurrent = maxCurrent / replCurrentTotal.toLong
+    val maxReplNext = maxNext / replNextTotal.toLong
 
+    def format(i: Long): String = NumberFormat.getIntegerInstance().format(i)
     def format(i: Int): String = NumberFormat.getIntegerInstance().format(i)
 
     def print(w: PrintWriter): Unit = {
@@ -79,8 +86,8 @@ class SalaryReport(
         val buffer = " " * 21
 
         val perReplLabel = "$/Repl"
-        val perReplCurrent = format(currentTotal / replCurrentTotal)
-        val perReplNext = format(nextTotal / replNextTotal)
+        val perReplCurrent = format(currentTotal / replCurrentTotal.toLong)
+        val perReplNext = format(nextTotal / replNextTotal.toLong)
 
         val forLabel = "$ Available"
         val forFreeAgents = format(financials.getAvailableForFreeAgents)
@@ -97,9 +104,9 @@ class SalaryReport(
     }
 
     def predictNow(p: Player): Integer =
-      max(tv.getCurrentValueVsReplacement(p) * maxReplCurrent, 0)
+      max(vsReplacement(p).toLong * maxReplCurrent, 0).toInt
 
     def predictNext(p: Player): Integer =
-      max(tv.getCurrentValueVsReplacement(p) * maxReplNext, 0)
+      max(vsReplacement(p).toLong * maxReplNext, 0).toInt
 
 }
