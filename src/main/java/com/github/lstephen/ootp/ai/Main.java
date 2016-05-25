@@ -489,7 +489,7 @@ public class Main {
         Printables.print(lineups).to(out);
 
         LOG.info("Salary report...");
-        SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), tv);
+        SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), predictor);
 
         final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salary);
         generic.setCustomValueFunction(tv.getTradeTargetValue());

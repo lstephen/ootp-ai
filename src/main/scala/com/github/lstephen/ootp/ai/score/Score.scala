@@ -8,6 +8,8 @@ class Score(private val n: Double) extends AnyVal with Ordered[Score] {
 
   def compare(that: Score) = n compare that.n
 
+  def isPositive = n > 0.0
+
   def +(that: Score) = Score(n + that.n)
   def -(that: Score) = Score(n - that.n)
 
@@ -24,6 +26,10 @@ object Score {
   implicit class TraversableOfScore(xs: GenTraversableOnce[Score]) {
     def total = xs.foldLeft(zero)(_ + _)
     def average = total :/ xs.size
+  }
+
+  implicit class OptionOfScore(xs: Option[Score]) {
+    def orElseZero = xs.getOrElse(Score.zero)
   }
 }
 
