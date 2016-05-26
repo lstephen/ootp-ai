@@ -42,13 +42,13 @@ class FutureValue
   (implicit val predictor: Predictor)
   extends ComponentScore {
 
-  val avgReplacement = (Position.hitting() ++ Position.pitching())
-    .map(ReplacementLevels.getForIdeal.get(_))
-    .average
-
   val ability = FutureAbility(player, position)
 
-  val vsReplacement = if (player.getAge < 27) Some(ability.score - avgReplacement) else None
+  val vsReplacement =
+    if (player.getAge < 27)
+      Some(ReplacementLevels.getForIdeal.getVsAverage(ability))
+    else
+      None
 
   def components = ability.components :+ vsReplacement
 

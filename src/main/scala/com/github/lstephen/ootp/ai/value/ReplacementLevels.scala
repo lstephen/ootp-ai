@@ -15,13 +15,25 @@ import java.io.PrintWriter
 
 
 class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) extends Printable {
-  def get(pos: Position): Score =
+  private def get(pos: Position): Score =
     levels.get(pos).getOrElse(throw new IllegalStateException())
 
   def get(ply: Player, pos: Position): Score = get(NowAbility(ply, pos))
 
-  def get(a: Ability): Score = a.score - get(a.position)
-    // TODO: MR value using bullpen chaining
+  def get(a: Ability): Score = getVs(a, get(a.position))
+
+  val average = (Position.hitting() ++ Position.pitching())
+    .map(get(_))
+    .average
+
+  def getVsAverage(a: Ability): Score = getVs(a, average)
+
+  def getVs(a: Ability, level: Score) =
+    if (a.position == Position.MIDDLE_RELIEVER)
+      0.865 *: (a.score - level)
+    else
+      a.score - level
+
 
   def print(w: PrintWriter): Unit = {
     def printLevel(p: Position): Unit
