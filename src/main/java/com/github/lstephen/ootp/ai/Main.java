@@ -645,7 +645,6 @@ public class Main {
                     FreeAgentAcquisition::getRelease),
                 released));
         generic.setLimit(200);
-        generic.setMultiplier(1.1);
         generic.print(out);
 
         Set<Player> all = Sets.newHashSet();
@@ -654,7 +653,6 @@ public class Main {
 
         LOG.log(Level.INFO, "Team reports...");
         generic.setLimit(50);
-        generic.setMultiplier(0.91);
 
         int n = Iterables.size(site.getTeamIds());
 
@@ -702,7 +700,6 @@ public class Main {
         Printables.print(future).to(out);
 
         generic.setLimit(10);
-        generic.clearMultiplier();
         generic.setCustomValueFunction(
             new PlayerValue(ps, battingRegression, pitchingRegression)
                 .getFutureValue());
@@ -758,7 +755,6 @@ public class Main {
         generic.setTitle("Trade Bait");
         generic.setPlayers(newRoster.getAllPlayers());
         generic.setLimit(200);
-        generic.clearMultiplier();
         generic.print(out);
 
         generic.useDefaultValueFunction();
@@ -783,7 +779,6 @@ public class Main {
                     }));
 
         generic.setTitle("Non Top prospects");
-        generic.setMultiplier(0.91);
         generic.setLimit(50);
         generic.setPlayers(nonTopTens);
         generic.print(out);
@@ -822,7 +817,6 @@ public class Main {
         generic.setPlayers(mlNonProspects);
         generic.print(out);
 
-        generic.clearMultiplier();
 
         //LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
 

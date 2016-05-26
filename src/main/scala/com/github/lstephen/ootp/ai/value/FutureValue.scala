@@ -52,11 +52,14 @@ class FutureValue
 
   def components = ability.components :+ vsReplacement
 
-  def format: String =
+  def format: String = {
+    val p = if (score.isPositive) position.getAbbreviation else ""
+
     components
       .map(_.map(s => f"${s.toLong}%3d"))
       .map(_.getOrElse("   "))
-      .mkString(f"${position.getAbbreviation}%2s : ", " ", f" : ${score.toLong}%3d")
+      .mkString(f"${p}%2s : ", " ", f" : ${score.toLong}%3d")
+  }
 }
 
 object FutureValue {

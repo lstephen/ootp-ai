@@ -63,8 +63,6 @@ public class GenericValueReport implements Printable {
 
     private final Predictor predictor;
 
-    private Optional<Double> multiplier = Optional.absent();
-
     public GenericValueReport(
         Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryPredictor salary) {
 
@@ -142,14 +140,6 @@ public class GenericValueReport implements Printable {
       custom = null;
     }
 
-    public void setMultiplier(Double multiplier) {
-        this.multiplier = Optional.of(multiplier);
-    }
-
-    public void clearMultiplier() {
-        this.multiplier = Optional.absent();
-    }
-
     public void print(OutputStream out) {
         Printables.print(this).to(out);
     }
@@ -180,19 +170,13 @@ public class GenericValueReport implements Printable {
         for (Player p : ps) {
             Long value = custom == null ? getValue(p) : custom.apply(p).longValue();
 
-            String mv = "";
-
-            if (multiplier.isPresent()) {
-                mv = String.format(" (%3.0f)", multiplier.get() * value);
-            }
-
             Integer current = playerValue.getNowValue(p);
             Integer ceiling = playerValue.getCeilingValue(p);
             Integer future = playerValue.getFutureValue(p);
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %s | %s | %s || %3d%s || %-8s | %s %9s | %7s | %7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %s | %s | %s || %3d || %-8s | %s %9s | %7s/%7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
@@ -200,7 +184,6 @@ public class GenericValueReport implements Printable {
                     FutureValue$.MODULE$.apply(p, predictor).format(),
                     OverallValue$.MODULE$.apply(p, predictor).format(),
                     value,
-                    mv,
                     Selections.isHitter(p)
                       ? p.getDefensiveRatings().getPositionScores()
                       : "",
