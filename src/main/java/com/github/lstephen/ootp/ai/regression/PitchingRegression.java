@@ -121,16 +121,18 @@ public final class PitchingRegression {
         return SplitStats.create(vsLeft, vsRight);
     }
 
+    public SplitStats<PitchingStats> predictFuture(Player p) {
+        return SplitStats.create(
+            predict(p.getPitchingPotentialRatings().getVsLeft()),
+            predict(p.getPitchingPotentialRatings().getVsRight()));
+    }
+
     public TeamStats<PitchingStats> predictFuture(Iterable<Player> ps) {
         Map<Player, SplitStats<PitchingStats>> results = Maps.newHashMap();
 
         for (Player p : ps) {
             if (p.hasPitchingRatings()) {
-                results.put(
-                    p,
-                    SplitStats.create(
-                        predict(p.getPitchingPotentialRatings().getVsLeft()),
-                        predict(p.getPitchingPotentialRatings().getVsRight())));
+                results.put(p, predictFuture(p));
             }
         }
 

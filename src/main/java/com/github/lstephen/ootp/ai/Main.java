@@ -492,7 +492,6 @@ public class Main {
         SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), predictor);
 
         final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salary);
-        generic.setCustomValueFunction(tv.getTradeTargetValue());
         generic.setReverse(false);
 
         LOG.log(Level.INFO, "Strategy...");
@@ -740,7 +739,7 @@ public class Main {
 
         LOG.log(Level.INFO, "League wide replacement Level...");
 
-        generic.setCustomValueFunction(tv.getTradeTargetValue());
+        generic.useDefaultValueFunction();
 
         /*LOG.log(Level.INFO, "Trade target report...");
         generic.setTitle("Trade Targets");
@@ -762,7 +761,7 @@ public class Main {
         generic.clearMultiplier();
         generic.print(out);
 
-        generic.setCustomValueFunction(tv.getTradeTargetValue());
+        generic.useDefaultValueFunction();
 
         Iterable<Player> topBait = Ordering
             .natural()

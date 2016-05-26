@@ -10,7 +10,9 @@ import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
+import com.github.lstephen.ootp.ai.value.FutureValue$;
 import com.github.lstephen.ootp.ai.value.NowValue$;
+import com.github.lstephen.ootp.ai.value.OverallValue$;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementValue;
 import com.github.lstephen.ootp.ai.value.SalaryPredictor;
@@ -128,20 +130,16 @@ public class GenericValueReport implements Printable {
         this.reverse = reverse;
     }
 
-    public Integer getValue(Player p) {
-        return Math.max(
-            replacementValue.getValueVsReplacement(p),
-            futureReplacementValue.getValueVsReplacement(p));
-    }
-
-    public Integer getOverallValue(Player p) {
-        return Math.max(
-            playerValue.getNowValue(p),
-            playerValue.getFutureValue(p));
+    public Long getValue(Player p) {
+      return Math.round(OverallValue$.MODULE$.apply(p, predictor).score());
     }
 
     public void setCustomValueFunction(Function<Player, Integer> custom) {
         this.custom = custom;
+    }
+
+    public void useDefaultValueFunction() {
+      custom = null;
     }
 
     public void setMultiplier(Double multiplier) {
@@ -163,9 +161,9 @@ public class GenericValueReport implements Printable {
         Iterable<Player> ps = Ordering
             .natural()
             .reverse()
-            .onResultOf(new Function<Player, Integer>() {
-                public Integer apply(Player p) {
-                    return custom == null ? getValue(p) : custom.apply(p);
+            .onResultOf(new Function<Player, Long>() {
+                public Long apply(Player p) {
+                    return custom == null ? getValue(p) : custom.apply(p).longValue();
                 }
             })
             .compound(Player.byTieBreak())
@@ -180,7 +178,7 @@ public class GenericValueReport implements Printable {
         }
 
         for (Player p : ps) {
-            Integer value = custom == null ? getValue(p) : custom.apply(p);
+            Long value = custom == null ? getValue(p) : custom.apply(p).longValue();
 
             String mv = "";
 
@@ -194,26 +192,18 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %3d/%3d%4s %3d/%3d %3d/%3d | %s | %3d%s | %-8s %s | %s %9s | %7s | %7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %s | %s | %s || %3d%s || %-8s | %s %9s | %7s | %7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
-                    current,
-                    ceiling,
-                    ceiling.equals(future) ? "" : String.format("/%3d", future),
-                    getNowVsLeft(p),
-                    getNowVsRight(p),
-                    replacementValue.getValueVsReplacement(p),
-                    futureReplacementValue.getValueVsReplacement(p),
                     NowValue$.MODULE$.apply(p, predictor).format(),
+                    FutureValue$.MODULE$.apply(p, predictor).format(),
+                    OverallValue$.MODULE$.apply(p, predictor).format(),
                     value,
                     mv,
                     Selections.isHitter(p)
                       ? p.getDefensiveRatings().getPositionScores()
                       : "",
-                    Selections.isHitter(p)
-                      ? String.format("%3.0f", PlayerDefenseScore$.MODULE$.atBestPosition(p, true).score())
-                      : "   ",
                     p.getRosterStatus(),
                     StringUtils.abbreviate(p.getSalary(), 9),
                     salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNow(p)),
