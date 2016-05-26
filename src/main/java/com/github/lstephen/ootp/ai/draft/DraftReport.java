@@ -9,8 +9,9 @@ import com.github.lstephen.ootp.ai.config.Config;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.github.lstephen.ootp.ai.value.TradeValue;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,15 +26,15 @@ public final class DraftReport implements Printable {
 
   private final Site site;
 
-  private final TradeValue value;
+  private final Predictor predictor;
 
   private DraftClass current;
 
   private final Set<DraftClass> historical = Sets.newHashSet();
 
-  private DraftReport(Site site, TradeValue value) {
+  private DraftReport(Site site, Predictor predictor) {
     this.site = site;
-    this.value = value;
+    this.predictor = predictor;
   }
 
   private void loadDraftClasses() {
@@ -73,7 +74,7 @@ public final class DraftReport implements Printable {
   }
 
   private RoundValue getValueOfPicks(int start, int n) {
-    RoundValue rv = RoundValue.create(value);
+    RoundValue rv = RoundValue.create(predictor);
 
     Iterable<Player> players = FluentIterable
       .from(byOverall().sortedCopy(current.getPlayers()))
@@ -100,7 +101,7 @@ public final class DraftReport implements Printable {
     return Ordering
       .natural()
       .reverse()
-      .onResultOf(value.getOverall());
+      .onResultOf((Player p) -> JavaAdapter.futureValue(p, predictor).score());
   }
 
   public void print(OutputStream out) {
@@ -160,8 +161,8 @@ public final class DraftReport implements Printable {
     }
   }
 
-  public static DraftReport create(Site site, TradeValue value) {
-    DraftReport report = new DraftReport(site, value);
+  public static DraftReport create(Site site, Predictor predictor) {
+    DraftReport report = new DraftReport(site, predictor);
     report.loadDraftClasses();
     return report;
   }

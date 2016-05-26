@@ -1,8 +1,11 @@
 package com.github.lstephen.ootp.ai.draft;
 
 import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.value.TradeValue;
+import com.github.lstephen.ootp.ai.regression.Predictor;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
+
 import java.io.PrintWriter;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -11,7 +14,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  */
 public final class RoundValue {
 
-  private final TradeValue value;
+  private final Predictor predictor;
 
   private final DescriptiveStatistics overall = new DescriptiveStatistics();
 
@@ -21,8 +24,8 @@ public final class RoundValue {
 
   private final DescriptiveStatistics historicalAcquisition = new DescriptiveStatistics();
 
-  private RoundValue(TradeValue value) {
-    this.value = value;
+  private RoundValue(Predictor predictor) {
+    this.predictor = predictor;
   }
 
   public boolean isEmpty() {
@@ -30,8 +33,8 @@ public final class RoundValue {
   }
 
   public void add(Player p) {
-    overall.addValue(value.getOverall(p));
-    acquisition.addValue(value.getTradeTargetValue(p));
+    overall.addValue(JavaAdapter.futureValue(p, predictor).score());
+    acquisition.addValue(JavaAdapter.overallValue(p, predictor).score());
     addHistorical(p);
   }
 
@@ -40,8 +43,8 @@ public final class RoundValue {
   }
 
   public void addHistorical(Player p) {
-    historicalOverall.addValue(value.getOverall(p));
-    historicalAcquisition.addValue(value.getTradeTargetValue(p));
+    historicalOverall.addValue(JavaAdapter.futureValue(p, predictor).score());
+    historicalAcquisition.addValue(JavaAdapter.overallValue(p, predictor).score());
   }
 
   public void addHistorical(Iterable<Player> ps) {
@@ -56,8 +59,8 @@ public final class RoundValue {
     return acquisition;
   }
 
-  public static RoundValue create(TradeValue value) {
-    return new RoundValue(value);
+  public static RoundValue create(Predictor predictor) {
+    return new RoundValue(predictor);
   }
 
   public void print(PrintWriter w, String label) {

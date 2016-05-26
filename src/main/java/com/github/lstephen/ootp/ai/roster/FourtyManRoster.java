@@ -8,13 +8,14 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
 import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selections;
-import com.github.lstephen.ootp.ai.value.TradeValue;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class FourtyManRoster implements Printable {
 
     private final Predictions predictions;
 
-    private final TradeValue value;
+    private final Predictor predictor;
 
     private Optional<Changes> changes = Optional.absent();
 
@@ -37,10 +38,10 @@ public class FourtyManRoster implements Printable {
 
     private ImmutableSet<Player> desired40Man;
 
-    public FourtyManRoster(Roster roster, Predictions ps, TradeValue value) {
+    public FourtyManRoster(Roster roster, Predictions ps, Predictor predictor) {
         this.roster = roster;
         this.predictions = ps;
-        this.value = value;
+        this.predictor = predictor;
     }
 
     public void setChanges(Changes changes) {
@@ -115,7 +116,13 @@ public class FourtyManRoster implements Printable {
 
         Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
 
-        for (Player p : Ordering.natural().reverse().onResultOf(value.getTradeTargetValue()).compound(Player.byAge()).sortedCopy(roster.getAllPlayers())) {
+        Ordering<Player> ordering = Ordering
+          .natural()
+          .reverse()
+          .onResultOf((Player p) -> JavaAdapter.overallValue(p, predictor).score())
+          .compound(Player.byAge());
+
+        for (Player p : ordering.sortedCopy(roster.getAllPlayers())) {
             if (!fourtyMan.contains(p) && (p.getYearsOfProService().or(0) >= 3 || p.isUpcomingFreeAgent())) {
                 fourtyMan.add(p);
             }
@@ -164,8 +171,8 @@ public class FourtyManRoster implements Printable {
 
 
         for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
-            Integer current = value.getCurrentValueVsReplacement(p);
-            Integer future = value.getFutureValueVsReplacement(p);
+            Long current = JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong();
+            Long future = JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
 
             boolean belowReplacement = 
               Math.min(current, future) < 0
@@ -188,7 +195,7 @@ public class FourtyManRoster implements Printable {
             Iterables.limit(
                 Ordering
                     .natural()
-                    .onResultOf(value.getTradeTargetValue())
+                    .onResultOf((Player p) -> JavaAdapter.overallValue(p, predictor).score())
                     .sortedCopy(
                         ImmutableSet.copyOf(
                             Sets.difference(

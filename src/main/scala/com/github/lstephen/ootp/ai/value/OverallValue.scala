@@ -1,16 +1,24 @@
 package com.github.lstephen.ootp.ai.value
 
 import com.github.lstephen.ootp.ai.player.Player
+import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.score._
 
 class OverallValue
-  (val player: Player)
+  (val player: Player, position: Option[Position] = None)
   (implicit val predictor: Predictor)
   {
 
-  val now = NowValue(player).score
-  val future = FutureValue(player).score
+  val now = position match {
+    case None => NowValue(player).score
+    case Some(p) => NowValue(player, p).score
+  }
+
+  val future = position match {
+    case None => FutureValue(player).score
+    case Some(p) => FutureValue(player, p).score
+  }
 
   def age = {
     val base = 27 - player.getAge
@@ -28,4 +36,5 @@ class OverallValue
 
 object OverallValue {
   def apply(p: Player)(implicit predictor: Predictor) = new OverallValue(p)
+  def apply(p: Player, pos: Position)(implicit predictor: Predictor) = new OverallValue(p, Some(pos))
 }

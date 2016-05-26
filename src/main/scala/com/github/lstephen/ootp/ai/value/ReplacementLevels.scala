@@ -27,7 +27,9 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) ex
     def printLevel(p: Position): Unit
       = w.println(f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d")
 
+    w.println
     Position.hitting.foreach(printLevel(_))
+    w.println
     Position.pitching.foreach(printLevel(_))
   }
 }
