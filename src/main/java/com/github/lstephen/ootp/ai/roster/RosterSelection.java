@@ -145,6 +145,10 @@ public final class RosterSelection {
       return select(mode, Changes.empty());
     }
 
+    public ImmutableSet<Player> getIdeal25Man() {
+      return getFourtyManRoster().getDesired25ManRoster();
+    }
+
     public Roster select(Mode mode, Changes changes) {
         return select(
             mode,

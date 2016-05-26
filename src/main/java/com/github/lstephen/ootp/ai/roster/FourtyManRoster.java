@@ -137,7 +137,7 @@ public class FourtyManRoster implements Printable {
         return desired40Man;
     }
 
-    private ImmutableSet<Player> getDesired25ManRoster() {
+    public ImmutableSet<Player> getDesired25ManRoster() {
         if (desired25Man != null) {
             return desired25Man;
         }
