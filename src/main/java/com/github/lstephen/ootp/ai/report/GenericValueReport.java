@@ -241,19 +241,4 @@ public class GenericValueReport implements Printable {
         return rounded >= 10 ? "T" : rounded.toString();
     }
 
-
-    public void printReplacementLevelReport(OutputStream out) {
-      Printables.print(this::printReplacementLevelReport).to(out);
-    }
-
-    public void printReplacementLevelReport(PrintWriter w) {
-        w.println();
-        w.println("Replacement Level");
-        w.print("Current:");
-        replacementValue.print(w);
-        w.print("Future: ");
-        futureReplacementValue.print(w);
-        w.flush();
-    }
-
 }

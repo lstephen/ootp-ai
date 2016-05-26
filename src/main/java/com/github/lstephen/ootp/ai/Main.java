@@ -519,8 +519,6 @@ public class Main {
                 .to(out);
         }
 
-        generic.printReplacementLevelReport(out);
-
         Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
 
         RosterReport rosterReport = RosterReport.create(site, newRoster);
