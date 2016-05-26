@@ -19,7 +19,6 @@ import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
 import com.github.lstephen.ootp.ai.report.LeagueBattingReport;
-import com.github.lstephen.ootp.ai.report.RosterReport;
 import com.github.lstephen.ootp.ai.report.SalaryReport;
 import com.github.lstephen.ootp.ai.report.TeamPositionReport;
 import com.github.lstephen.ootp.ai.report.TeamReport;
@@ -247,90 +246,6 @@ public class Main {
 
         FreeAgents fas = FreeAgents.create(site, changes, predictor);
 
-        if (INAUGURAL_DRAFT.contains(def)) {
-          RosterReport rr = RosterReport.create(site, team);
-
-          Printables.print(rr).to(out);
-
-          final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, null);
-
-          if (battingRegression.isEmpty() && pitchingRegression.isEmpty()) {
-            generic.setCustomValueFunction((Player p) -> {
-              Double base = 0.0;
-
-              if (p.isPitcher()) {
-                Splits<PitchingRatings<?>> rs = p.getPitchingRatings();
-
-                PitchingRatings<?> vL = rs.getVsLeft();
-                PitchingRatings<?> vR = rs.getVsRight();
-
-                base = (vL.getStuff() + vL.getMovement() + vL.getControl()
-                     + 2.0 * (vR.getStuff() + vR.getMovement() + vR.getControl())) / 3.0;
-              } else {
-                Splits<BattingRatings<?>> rs = p.getBattingRatings();
-
-                BattingRatings<?> vL = rs.getVsLeft();
-                BattingRatings<?> vR = rs.getVsRight();
-
-                base = (vL.getContact() + vL.getPower() + vL.getEye()
-                     + 2.0 * (vR.getContact() + vR.getPower() + vR.getEye())) / 3.0;
-              }
-
-              Integer need = Slot.getPlayerSlots(p)
-                .stream()
-                .filter((s) -> s != Slot.P)
-                .filter((s) -> s != Slot.H || Slot.getPrimarySlot(p) == Slot.H)
-                .map((s) -> rr.getTargetRatio() - rr.getRatio(s))
-                .max(Integer::compare)
-                .orElse(0);
-
-
-              need = Math.max(0, need);
-
-              int intangibles = 0;
-
-              if (p.getClutch().isPresent()) {
-                switch (p.getClutch().get()) {
-                  case GREAT:
-                    intangibles += 1;
-                    break;
-                  case SUFFERS:
-                    intangibles += -1;
-                    break;
-                  default:
-                    // do nothing
-                }
-              }
-
-              if (p.getConsistency().isPresent()) {
-                switch (p.getConsistency().get()) {
-                  case VERY_INCONSISTENT:
-                    intangibles -= 1;
-                    break;
-                  case GOOD:
-                    intangibles += 1;
-                    break;
-                  default:
-                    // do nothing
-                }
-              }
-
-              Double mrFactor = Slot.getPrimarySlot(p) == Slot.MR ? 0.865 : 1.0;
-
-              return new Double(mrFactor * base - p.getAge() + need - PlayerValue.getAgingFactor(p) + intangibles).intValue();
-            });
-          }
-
-          generic.setTitle("Selected");
-          generic.setPlayers(team);
-          generic.print(out);
-
-          generic.setTitle("Free Agents");
-          generic.setPlayers(site.getFreeAgents());
-          generic.print(out);
-          return;
-        }
-
         RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
 
         if (site.getType() == Version.OOTP5) {
@@ -473,10 +388,6 @@ public class Main {
         }
 
         Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
-
-        RosterReport rosterReport = RosterReport.create(site, newRoster);
-
-        Printables.print(rosterReport).to(out);
 
         LOG.info("Draft...");
         ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));

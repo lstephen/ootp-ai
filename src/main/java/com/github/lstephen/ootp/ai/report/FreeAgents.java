@@ -55,14 +55,7 @@ public final class FreeAgents {
     }
 
     public Optional<Player> getPlayerToRelease(Iterable<Player> roster) {
-
-        Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
-
         for (Player r : byValue().sortedCopy(roster)) {
-            if (!Sets.intersection(ImmutableSet.copyOf(r.getSlots()), needed).isEmpty()) {
-                continue;
-            }
-
             return Optional.of(r);
         }
 
