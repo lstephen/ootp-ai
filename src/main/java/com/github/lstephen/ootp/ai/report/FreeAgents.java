@@ -10,11 +10,12 @@ import com.google.common.collect.Sets;
 
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.roster.Changes;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.Version;
-import com.github.lstephen.ootp.ai.value.TradeValue;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
 
 import java.util.List;
 import java.util.Set;
@@ -27,19 +28,16 @@ public final class FreeAgents {
 
     private final Site site;
 
+    private final Predictor predictor;
+
     private final Set<Player> skipped = Sets.newHashSet();
 
     private final ImmutableSet<Player> fas;
 
-    private final Function<Player, Integer> value;
-
-    private TradeValue tv;
-
-    private FreeAgents(Site site, Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
+    private FreeAgents(Site site, Predictor predictor, Iterable<Player> fas) {
         this.site = site;
+        this.predictor = predictor;
         this.fas = ImmutableSet.copyOf(Iterables.filter(fas, Predicates.notNull()));
-        this.value = value;
-        this.tv = tv;
     }
 
     public Iterable<Player> all() {
@@ -60,7 +58,7 @@ public final class FreeAgents {
 
         Set<Slot> needed = RosterReport.create(site, roster).getNeededSlots();
 
-        for (Player r : byValue(value).sortedCopy(roster)) {
+        for (Player r : byValue().sortedCopy(roster)) {
             if (!Sets.intersection(ImmutableSet.copyOf(r.getSlots()), needed).isEmpty()) {
                 continue;
             }
@@ -74,7 +72,7 @@ public final class FreeAgents {
     public Iterable<Player> getTopTargets(Mode mode) {
         Set<Player> targets = Sets.newHashSet();
 
-        List<Player> ps = byValue(value).reverse().sortedCopy(fas);
+        List<Player> ps = byValue().reverse().sortedCopy(fas);
         Set<Slot> remaining = Sets.newHashSet(Slot.values());
 
         while (!remaining.isEmpty() && !ps.isEmpty()) {
@@ -86,7 +84,7 @@ public final class FreeAgents {
                 continue;
             }
 
-            if (mode == Mode.PRESEASON && tv.getCurrentValueVsReplacement(p) < 0) {
+            if (mode == Mode.PRESEASON && JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong() < 0) {
                 continue;
             }
 
@@ -102,10 +100,10 @@ public final class FreeAgents {
         return targets;
     }
 
-    private static Ordering<Player> byValue(Function<Player, Integer> value) {
+    private Ordering<Player> byValue() {
         return Ordering
             .natural()
-            .onResultOf(value)
+            .onResultOf((Player p) -> JavaAdapter.overallValue(p, predictor).score())
             .compound(Player.byTieBreak());
     }
 
@@ -122,16 +120,16 @@ public final class FreeAgents {
         return false;
     }
 
-    public static FreeAgents create(Site site, Changes changes, Function<Player, Integer> value, TradeValue tv) {
-        FreeAgents fas = create(site, site.getFreeAgents(), value, tv);
+    public static FreeAgents create(Site site, Changes changes, Predictor predictor) {
+        FreeAgents fas = create(site, predictor, site.getFreeAgents());
 
         fas.skip(changes.get(Changes.ChangeType.DONT_ACQUIRE));
 
         return fas;
     }
 
-    public static FreeAgents create(Site site, Iterable<Player> fas, Function<Player, Integer> value, TradeValue tv) {
-        return new FreeAgents(site, fas, value, tv);
+    public static FreeAgents create(Site site, Predictor predictor, Iterable<Player> fas) {
+        return new FreeAgents(site, predictor, fas);
     }
 
 }

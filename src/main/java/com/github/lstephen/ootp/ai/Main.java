@@ -50,10 +50,9 @@ import com.github.lstephen.ootp.ai.splits.Splits;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.github.lstephen.ootp.ai.stats.SplitPercentagesHolder;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
-import com.github.lstephen.ootp.ai.value.FreeAgentAcquisition;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementLevels$;
-import com.github.lstephen.ootp.ai.value.TradeValue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -229,7 +228,6 @@ public class Main {
         LOG.info("Setting up Predictions...");
         final Predictor predictor = new Predictor(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
-        final TradeValue tv = new TradeValue(team, ps, battingRegression, pitchingRegression);
 
         boolean isExpandedRosters =
             site.getDate().getMonthOfYear() == DateTimeConstants.SEPTEMBER;
@@ -245,11 +243,9 @@ public class Main {
         }
 
         LOG.info("Loading FAS...");
-        Iterable<FreeAgentAcquisition> faas = Collections.emptyList();
-
         Set<Player> released = Sets.newHashSet();
 
-        FreeAgents fas = FreeAgents.create(site, changes, tv.getTradeTargetValue(), tv);
+        FreeAgents fas = FreeAgents.create(site, changes, predictor);
 
         if (INAUGURAL_DRAFT.contains(def)) {
           RosterReport rr = RosterReport.create(site, team);
@@ -335,6 +331,18 @@ public class Main {
           return;
         }
 
+        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
+
+        if (site.getType() == Version.OOTP5) {
+            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression);
+        }
+
+        selection.setPrevious(oldRoster);
+
+        LOG.log(Level.INFO, "Selecting ideal roster...");
+
+        Context$.MODULE$.idealRoster_$eq(selection.select(Mode.REGULAR_SEASON));
+
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
@@ -360,37 +368,6 @@ public class Main {
             }
         }
 
-        if (site.getDate().getMonthOfYear() < DateTimeConstants.SEPTEMBER
-            && site.getDate().getMonthOfYear() > DateTimeConstants.MARCH
-            && !battingRegression.isEmpty()
-            && !pitchingRegression.isEmpty()) {
-
-            LOG.info("Determining FA acquisition...");
-
-            if (oldRoster.size() <= maxRosterSize) {
-                Integer n = 2;
-
-                if (site.getName().equals("CBL") || site.getName().equals("TWML") || site.getName().equals("BTHUSTLE")) {
-                    n = 1;
-                }
-
-                if (site.getName().equals("SAVOY")
-                  || site.getName().equals("GABL")
-                  || site.getName().equals("BTH")
-                  || site.getName().contains("OLD_BTH")) {
-                    n = 0;
-                }
-
-                faas = FreeAgentAcquisition.select(site, changes, team, fas.all(), tv, n);
-
-                if (oldRoster.size() > minRosterSize) {
-                    for (FreeAgentAcquisition faa : faas) {
-                        team.remove(faa.getRelease());
-                    }
-                }
-            }
-        }
-
         ImmutableSet<Player> futureFas = ImmutableSet.of();
 
         if (isLookToNextSeason) {
@@ -406,18 +383,6 @@ public class Main {
 
             team.remove(futureFas);
         }
-
-        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression, tv);
-
-        if (site.getType() == Version.OOTP5) {
-            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression, tv);
-        }
-
-        selection.setPrevious(oldRoster);
-
-        LOG.log(Level.INFO, "Selecting ideal roster...");
-
-        Context$.MODULE$.idealRoster_$eq(selection.select(Mode.REGULAR_SEASON));
 
         LOG.log(Level.INFO, "Selecting new rosters...");
 
@@ -448,18 +413,6 @@ public class Main {
         LOG.info("Calculating roster changes...");
 
         Printables.print(newRoster.getChangesFrom(oldRoster)).to(out);
-
-        for (FreeAgentAcquisition faa : faas) {
-            Player player = faa.getFreeAgent();
-            out.write(
-                String.format(
-                    "%4s -> %-4s %2s %s%n",
-                    "FA",
-                    "",
-                    player.getListedPosition().or(""),
-                    player.getName())
-                .getBytes(Charsets.ISO_8859_1));
-        }
 
         LOG.log(Level.INFO, "Choosing rotation...");
 
@@ -542,7 +495,7 @@ public class Main {
             generic.print(out);
         }
 
-        DraftReport.create(site, tv).print(out);
+        DraftReport.create(site, predictor).print(out);
 
         Printables.print(salary).to(out);
 
@@ -572,7 +525,7 @@ public class Main {
                 Predictions
                     .predict(newRoster.getAllPlayers())
                     .using(battingRegression, pitchingRegression, ps.getPitcherOverall()),
-                tv);
+                predictor);
 
             Printables.print(fourtyMan).to(out);
 
@@ -613,7 +566,7 @@ public class Main {
                         site.getRuleFiveDraft(),
                         new Predicate<Player>() {
                             public boolean apply(Player p) {
-                                return tv.getCurrentValueVsReplacement(p) >= 0;
+                                return JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong() >= 0;
                             }
                         }));
                 generic.print(out);
@@ -638,9 +591,6 @@ public class Main {
             Iterables.concat(
                 newRoster.getAllPlayers(),
                 futureFas,
-                Iterables.transform(
-                    faas,
-                    FreeAgentAcquisition::getRelease),
                 released));
         generic.setLimit(200);
         generic.print(out);
@@ -686,21 +636,7 @@ public class Main {
 
         Printables.print(now).to(out);
 
-        LOG.info("Team Medium Term Report...");
-        TeamReport future = TeamReport.create(
-            "Medium Term",
-            ps,
-            site,
-            new PlayerValue(ps, battingRegression, pitchingRegression)
-                .getFutureValue());
-
-        future.sortByTalentLevel();
-        Printables.print(future).to(out);
-
         generic.setLimit(10);
-        generic.setCustomValueFunction(
-            new PlayerValue(ps, battingRegression, pitchingRegression)
-                .getFutureValue());
 
         for (final Slot s : Slot.values()) {
             if (s == Slot.P) {
@@ -736,33 +672,6 @@ public class Main {
 
         generic.useDefaultValueFunction();
 
-        /*LOG.log(Level.INFO, "Trade target report...");
-        generic.setTitle("Trade Targets");
-        generic.setLimit(50);
-        generic.setPlayers(all);
-        generic.print(out);*/
-
-        /*LOG.log(Level.INFO, "Minor league report...");
-        generic.setTitle("Minor Leagues");
-        generic.setPlayers(minorLeaguers);
-        generic.setLimit(50);
-        generic.print(out);*/
-
-        LOG.log(Level.INFO, "Trade Bait report...");
-        generic.setCustomValueFunction(tv.getTradeBaitValue(site, salary));
-        generic.setTitle("Trade Bait");
-        generic.setPlayers(newRoster.getAllPlayers());
-        generic.setLimit(200);
-        generic.print(out);
-
-        generic.useDefaultValueFunction();
-
-        Iterable<Player> topBait = Ordering
-            .natural()
-            .reverse()
-            .onResultOf(tv.getTradeBaitValue(site, salary))
-            .sortedCopy(newRoster.getAllPlayers());
-
         LOG.log(Level.INFO, "Non Top 10 prospects...");
         ImmutableSet<Player> nonTopTens =
             ImmutableSet.copyOf(
@@ -781,23 +690,6 @@ public class Main {
         generic.setPlayers(nonTopTens);
         generic.print(out);
 
-        /*idx = 1;
-        for (Trade trade
-            : Iterables.limit(
-                Trade.getTopTrades(
-                    tv,
-                    site,
-                    salaryRegression,
-                    belowReplacementBait,
-                    nonTopTens),
-                20)) {
-
-            generic.setTitle("NTT #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
-            generic.setPlayers(trade);
-            generic.print(out);
-            idx++;
-        }*/
-
 
         LOG.log(Level.INFO, "Minor league non-prospects...");
 
@@ -814,26 +706,6 @@ public class Main {
         generic.setTitle("ML non-prospects");
         generic.setPlayers(mlNonProspects);
         generic.print(out);
-
-
-        //LOG.log(Level.INFO, "Top Trades for non-prospect minor leaguers...");
-
-        /*idx = 1;
-        for (Trade trade
-            : Iterables.limit(
-                Trade.getTopTrades(
-                    tv,
-                    site,
-                    salaryRegression,
-                    belowReplacementBait,
-                    mlNonProspects),
-                20)) {
-
-            generic.setTitle("NP-ML #" + idx + "-" + trade.getValue(tv, site, salaryRegression));
-            generic.setPlayers(trade);
-            generic.print(out);
-            idx++;
-        }*/
 
         LOG.log(Level.INFO, "Done.");
     }

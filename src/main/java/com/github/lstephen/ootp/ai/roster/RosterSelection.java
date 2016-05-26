@@ -13,6 +13,7 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
@@ -27,8 +28,8 @@ import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
-import com.github.lstephen.ootp.ai.value.TradeValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -46,13 +47,13 @@ public final class RosterSelection {
 
     private final Predictions predictions;
 
-    private final TradeValue value;
-
     private Roster previous;
 
-    private BattingRegression batting;
+    private final BattingRegression batting;
 
-    private PitchingRegression pitching;
+    private final PitchingRegression pitching;
+
+    private final Predictor predictor;
 
     private List<Status> remainingLevels =
         Lists.newArrayList(Status.AAA, Status.AA, Status.A);
@@ -60,11 +61,14 @@ public final class RosterSelection {
     private FourtyManRoster fourtyManRoster;
 
     private RosterSelection(
-        Team team, Predictions predictions, TradeValue value) {
+        Team team, Predictions predictions, BattingRegression batting, PitchingRegression pitching) {
 
         this.team = team;
         this.predictions = predictions;
-        this.value = value;
+        this.batting = batting;
+        this.pitching = pitching;
+
+        this.predictor = new Predictor(batting, pitching, predictions.getPitcherOverall());
 
         hitterSelectionFactory = HitterSelectionFactory.using(predictions);
         pitcherSelectionFactory = PitcherSelectionFactory.using(predictions);
@@ -132,7 +136,7 @@ public final class RosterSelection {
                     Predictions
                         .predict(team)
                         .using(batting, pitching, predictions.getPitcherOverall()),
-                value);
+                    predictor);
         }
         return fourtyManRoster;
     }
@@ -194,14 +198,14 @@ public final class RosterSelection {
             && !Sets.difference(ml, forced).isEmpty()) {
             ml.remove(Ordering
                 .natural()
-                .onResultOf(value.getTradeTargetValue())
+                .onResultOf((Player p) -> JavaAdapter.overallValue(p, predictor).score())
                 .min(Sets.difference(ml, forced)));
         }
 
         while (ml.size() > mode.getMajorLeagueRosterLimit()) {
             Player p = Ordering
                 .natural()
-                .onResultOf(value.getTradeTargetValue())
+                .onResultOf((Player ply) -> JavaAdapter.overallValue(ply, predictor).score())
                 .min(ml);
 
             ml.remove(p);
@@ -349,52 +353,28 @@ public final class RosterSelection {
         w.flush();
     }
 
-    public static RosterSelection ootpx(Team team, BattingRegression batting,
-        PitchingRegression pitching, TradeValue value) {
-
-        RosterSelection selection = new RosterSelection(
-            team,
-            Predictions
-                .predict(team)
-                .using(batting, pitching, PitcherOverall.FIP),
-            value);
-        selection.batting = batting;
-        selection.pitching = pitching;
-
-        selection.remainingLevels = Lists.newArrayList(Status.AAA, Status.AA, Status.A);
-
-        return selection;
-    }
-
     public static RosterSelection ootp6(Team team, BattingRegression batting,
-        PitchingRegression pitching, TradeValue value) {
+        PitchingRegression pitching) {
 
-        RosterSelection selection = new RosterSelection(
+        return new RosterSelection(
             team,
             Predictions
                 .predict(team)
                 .using(batting, pitching, PitcherOverall.FIP),
-            value);
-        selection.batting = batting;
-        selection.pitching = pitching;
-
-        return selection;
+            batting,
+            pitching);
     }
 
     public static RosterSelection ootp5(Team team, BattingRegression batting,
-        PitchingRegression pitching, TradeValue value) {
+        PitchingRegression pitching) {
 
-        RosterSelection selection = new RosterSelection(
+        return new RosterSelection(
             team,
             Predictions
                 .predict(team)
                 .using(batting, pitching, PitcherOverall.WOBA_AGAINST),
-            value);
-
-        selection.batting = batting;
-        selection.pitching = pitching;
-
-        return selection;
+            batting,
+            pitching);
     }
 
 }

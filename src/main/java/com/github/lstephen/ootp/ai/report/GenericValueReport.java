@@ -14,7 +14,6 @@ import com.github.lstephen.ootp.ai.value.FutureValue$;
 import com.github.lstephen.ootp.ai.value.NowValue$;
 import com.github.lstephen.ootp.ai.value.OverallValue$;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
-import com.github.lstephen.ootp.ai.value.ReplacementValue;
 import com.github.lstephen.ootp.ai.value.SalaryPredictor;
 
 import java.io.OutputStream;
@@ -45,10 +44,6 @@ public class GenericValueReport implements Printable {
 
     private final PlayerValue playerValue;
 
-    private final ReplacementValue replacementValue;
-
-    private final ReplacementValue futureReplacementValue;
-
     private Function<Player, Integer> custom;
 
     private boolean reverse;
@@ -58,8 +53,6 @@ public class GenericValueReport implements Printable {
     private final PitchingRegression pitching;
 
     private final SalaryPredictor salary;
-
-    private final Predictions now;
 
     private final Predictor predictor;
 
@@ -72,44 +65,7 @@ public class GenericValueReport implements Printable {
         this.pitching = pitching;
         this.salary = salary;
 
-        now =
-            Predictions
-                .predict(ps)
-                .using(batting, pitching, predictions.getPitcherOverall());
-
-        Predictions future =
-            Predictions
-                .predictFuture(ps)
-                .using(batting, pitching, predictions.getPitcherOverall());
-
         this.playerValue = new PlayerValue(predictions, batting, pitching);
-        this.replacementValue = new ReplacementValue(
-            now,
-            new Function<Player, Integer>() {
-                public Integer apply(Player p) {
-                    return playerValue.getNowValue(p);
-                }},
-            new Function<Player, Integer>() {
-                public Integer apply(Player p) {
-                    return playerValue.getNowAbility(p);
-                }}
-            );
-
-
-        this.futureReplacementValue =
-            new ReplacementValue(
-                future,
-                new Function<Player, Integer>() {
-                    public Integer apply(Player p) {
-                        return playerValue.getFutureValue(p);
-                    }
-                },
-                new Function<Player, Integer>() {
-                    public Integer apply(Player p) {
-                        return playerValue.getFutureAbility(p);
-                    }
-                }
-            );
     }
 
     public void setTitle(String title) {
@@ -176,14 +132,13 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %s | %s | %s || %3d || %-8s | %s %9s | %7s/%7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %s | %s | %s | %-8s | %s %9s | %7s/%7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),
                     NowValue$.MODULE$.apply(p, predictor).format(),
                     FutureValue$.MODULE$.apply(p, predictor).format(),
                     OverallValue$.MODULE$.apply(p, predictor).format(),
-                    value,
                     Selections.isHitter(p)
                       ? p.getDefensiveRatings().getPositionScores()
                       : "",
@@ -197,42 +152,6 @@ public class GenericValueReport implements Printable {
         }
 
         w.flush();
-    }
-
-    private Integer getNowVsLeft(Player p) {
-        if (now.containsPlayer(p)) {
-            if (Selections.isHitter(p)) {
-                return now.getAllBatting().getSplits(p).getVsLeft().getWobaPlus();
-            } else {
-                return now
-                    .getPitcherOverall()
-                    .getPlus(now.getAllPitching().getSplits(p).getVsLeft());
-            }
-        } else {
-            if (Selections.isHitter(p)) {
-                return batting.predict(p).getVsLeft().getWobaPlus();
-            } else  {
-                return now.getPitcherOverall().getPlus(pitching.predict(p).getVsLeft());
-            }
-        }
-    }
-
-    private Integer getNowVsRight(Player p) {
-        if (now.containsPlayer(p)) {
-            if (Selections.isHitter(p)) {
-                return now.getAllBatting().getSplits(p).getVsRight().getWobaPlus();
-            } else {
-                return now
-                    .getPitcherOverall()
-                    .getPlus(now.getAllPitching().getSplits(p).getVsRight());
-            }
-        } else {
-            if (Selections.isHitter(p)) {
-                return batting.predict(p).getVsRight().getWobaPlus();
-            } else  {
-                return now.getPitcherOverall().getPlus(pitching.predict(p).getVsRight());
-            }
-        }
     }
 
     private String roundRating(Integer rating) {
