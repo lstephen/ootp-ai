@@ -1,6 +1,7 @@
 package com.github.lstephen.ootp.ai.value;
 
 import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 
 public final class JavaAdapter {
@@ -9,6 +10,10 @@ public final class JavaAdapter {
 
   public static OverallValue overallValue(Player p, Predictor predictor) {
     return OverallValue$.MODULE$.apply(p, predictor);
+  }
+
+  public static OverallValue overallValue(Player p, Position pos, Predictor predictor) {
+    return OverallValue$.MODULE$.apply(p, pos, predictor);
   }
 
   public static NowValue nowValue(Player p, Predictor predictor) {

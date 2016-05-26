@@ -9,7 +9,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
 import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.roster.Changes;
 import com.github.lstephen.ootp.ai.selection.Mode;
@@ -65,29 +65,11 @@ public final class FreeAgents {
     public Iterable<Player> getTopTargets(Mode mode) {
         Set<Player> targets = Sets.newHashSet();
 
-        List<Player> ps = byValue().reverse().sortedCopy(fas);
-        Set<Slot> remaining = Sets.newHashSet(Slot.values());
-
-        while (!remaining.isEmpty() && !ps.isEmpty()) {
-            Player p = ps.get(0);
-
-            ps.remove(p);
-
-            if (skipPlayer(p)) {
-                continue;
-            }
-
-            if (mode == Mode.PRESEASON && JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong() < 0) {
-                continue;
-            }
-
-            for (Slot s : p.getSlots()) {
-                if (remaining.contains(s)) {
-                    targets.add(p);
-                    remaining.remove(s);
-                    break;
-                }
-            }
+        for (Position pos : Iterables.concat(Position.hitting(), Position.pitching())) {
+          targets.add(Ordering
+            .natural()
+            .onResultOf((Player p) -> JavaAdapter.overallValue(p, pos, predictor).score())
+            .max(fas));
         }
 
         return targets;
