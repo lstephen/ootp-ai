@@ -18,8 +18,9 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) ex
   def get(pos: Position): Score =
     levels.get(pos).getOrElse(throw new IllegalStateException())
 
-  def get(ply: Player, pos: Position): Score =
-    NowAbility(ply, pos).score - get(pos)
+  def get(ply: Player, pos: Position): Score = get(NowAbility(ply, pos))
+
+  def get(a: Ability): Score = a.score - get(a.position)
     // TODO: MR value using bullpen chaining
 
   def print(w: PrintWriter): Unit = {

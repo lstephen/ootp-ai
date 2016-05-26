@@ -23,6 +23,8 @@ object Score {
 
   val zero: Score = Score(0)
 
+  def max(lhs: Score, rhs: Score) = if (lhs.n > rhs.n) lhs else rhs
+
   implicit class TraversableOfScore(xs: GenTraversableOnce[Score]) {
     def total = xs.foldLeft(zero)(_ + _)
     def average = total :/ xs.size
@@ -30,6 +32,10 @@ object Score {
 
   implicit class OptionOfScore(xs: Option[Score]) {
     def orElseZero = xs.getOrElse(Score.zero)
+  }
+
+  implicit class TraversableOfOptionScore(xs: GenTraversableOnce[Option[Score]]) {
+    def total = xs.foldLeft(zero)(_ + _.orElseZero)
   }
 }
 

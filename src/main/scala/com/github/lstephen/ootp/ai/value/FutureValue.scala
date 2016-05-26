@@ -3,17 +3,16 @@ package com.github.lstephen.ootp.ai.value
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictor
-import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore
 
 import collection.JavaConversions._
 
-trait BatterNowAbility { this: Ability =>
-  override val batting = Some(predictor.predictBatting(player).overall)
+trait BatterFutureAbility { this: Ability =>
+  override val batting = Some(predictor.predictFutureBatting(player).overall)
   override val defense = Some(new PlayerDefenseScore(player, position).score)
 }
 
-trait PitcherNowAbility { this: Ability =>
+trait PitcherFutureAbility { this: Ability =>
   val endurance = position match {
     case Position.MIDDLE_RELIEVER => 0.865
     case Position.STARTING_PITCHER => {
@@ -21,28 +20,35 @@ trait PitcherNowAbility { this: Ability =>
       (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
     }
   }
-  override val pitching = Some(endurance *: predictor.predictPitching(player).overall)
+  override val pitching = Some(endurance *: predictor.predictFuturePitching(player).overall)
 }
 
-object NowAbility {
+
+object FutureAbility {
   def apply(p: Player, pos: Position)(implicit ps: Predictor): Ability = {
-    if (p.isHitter && pos.isHitting) {
-      return new Ability(p, pos) with BatterNowAbility
-    } else if (p.isPitcher && pos.isPitching) {
-      return new Ability(p, pos) with PitcherNowAbility
+    if (p.getAge < 27) {
+      if (p.isHitter && pos.isHitting) {
+        return new Ability(p, pos) with BatterFutureAbility
+      } else if (p.isPitcher && pos.isPitching) {
+        return new Ability(p, pos) with PitcherFutureAbility
+      }
     }
     new Ability(p, pos)
   }
 }
 
-class NowValue
+class FutureValue
   (val player: Player, val position: Position)
   (implicit val predictor: Predictor)
   extends ComponentScore {
 
-  val ability = NowAbility(player, position)
+  val avgReplacement = (Position.hitting() ++ Position.pitching())
+    .map(ReplacementLevels.getForIdeal.get(_))
+    .average
 
-  val vsReplacement = Some(ReplacementLevels.getForIdeal.get(ability))
+  val ability = FutureAbility(player, position)
+
+  val vsReplacement = if (player.getAge < 27) Some(ability.score - avgReplacement) else None
 
   def components = ability.components :+ vsReplacement
 
@@ -53,14 +59,12 @@ class NowValue
       .mkString(f"${position.getAbbreviation}%2s : ", " ", f" : ${score.toLong}%3d")
 }
 
-object NowValue {
+object FutureValue {
   def apply(p: Player, pos: Position)(implicit ps: Predictor) =
-    new NowValue(p, pos)
+    new FutureValue(p, pos)
 
-  def apply(p: Player)(implicit ps: Predictor): NowValue =
+  def apply(p: Player)(implicit ps: Predictor): FutureValue =
     (Position.hitting ++ Position.pitching)
-      .map(NowValue(p, _))
+      .map(FutureValue(p, _))
       .max
 }
-
-

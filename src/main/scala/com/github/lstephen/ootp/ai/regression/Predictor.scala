@@ -11,8 +11,14 @@ class Predictor(br: BattingRegression, pr: PitchingRegression, po: PitcherOveral
   def predictBatting(p: Player): BattingPrediction =
     new BattingPrediction(br.predict(p))
 
+  def predictFutureBatting(p: Player): BattingPrediction =
+    new BattingPrediction(br.predictFuture(p))
+
   def predictPitching(p: Player): PitchingPrediction =
     new PitchingPrediction(pr.predict(p), po)
+
+  def predictFuturePitching(p: Player): PitchingPrediction =
+    new PitchingPrediction(pr.predictFuture(p), po)
 }
 
 class BattingPrediction(stats: SplitStats[BattingStats]) {

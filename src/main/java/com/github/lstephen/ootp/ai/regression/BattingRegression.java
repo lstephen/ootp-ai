@@ -135,17 +135,18 @@ public final class BattingRegression {
         return SplitStats.create(vsLeft, vsRight);
     }
 
+    public SplitStats<BattingStats> predictFuture(Player p) {
+        return SplitStats.create(
+            predict(p.getBattingPotentialRatings().getVsLeft()),
+            predict(p.getBattingPotentialRatings().getVsRight()));
+    }
+
     public TeamStats<BattingStats> predictFuture(Iterable<Player> ps) {
         Map<Player, SplitStats<BattingStats>> results = Maps.newHashMap();
 
         for (Player p : ps) {
             if (p.getBattingRatings() != null) {
-                SplitStats<BattingStats> prediction =
-                    SplitStats.create(
-                        predict(p.getBattingPotentialRatings().getVsLeft()),
-                        predict(p.getBattingPotentialRatings().getVsRight()));
-
-                results.put(p, prediction);
+                results.put(p, predictFuture(p));
             }
         }
 
