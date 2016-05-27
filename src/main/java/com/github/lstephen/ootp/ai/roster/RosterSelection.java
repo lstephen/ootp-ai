@@ -230,7 +230,9 @@ public final class RosterSelection {
                 .onResultOf((Player ply) -> JavaAdapter.nowValue(ply, predictor).score())
                 .min(ml);
 
-            ml.add(p);
+            if (p.getAge() > 25) {
+              ml.add(p);
+            }
         }
 
         roster.assign(Roster.Status.ML, ml);
