@@ -269,6 +269,7 @@ public final class RotationSelection implements Selection {
         Mode mode, TeamStats<PitchingStats> pitching, PitcherOverall method) {
 
         switch (mode) {
+            case IDEAL:
             case PRESEASON:
             case REGULAR_SEASON:
                 return regularSeason(pitching, method);

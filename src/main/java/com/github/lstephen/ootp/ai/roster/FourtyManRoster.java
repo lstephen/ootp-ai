@@ -172,7 +172,7 @@ public class FourtyManRoster implements Printable {
 
         for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
             Long current = JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong();
-            Long future = JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
+            Long future = JavaAdapter.futureValue(p, predictor).vsReplacement().isEmpty() ? 0 : JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
 
             boolean belowReplacement = 
               Math.min(current, future) < 0

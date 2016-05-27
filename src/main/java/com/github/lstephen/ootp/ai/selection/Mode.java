@@ -7,6 +7,17 @@ import com.google.common.collect.Multiset;
 import com.github.lstephen.ootp.ai.player.Slot;
 
 public enum Mode {
+    IDEAL(25) {
+        @Override
+        public ImmutableMultiset<Slot> getHittingSlots() {
+            return REGULAR_SEASON.getHittingSlots();
+        }
+
+        @Override
+        public ImmutableMultiset<Slot> getPitchingSlots() {
+            return REGULAR_SEASON.getPitchingSlots();
+        }
+    },
     PRESEASON(25) {
         @Override
         public ImmutableMultiset<Slot> getHittingSlots() {
