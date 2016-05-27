@@ -256,7 +256,7 @@ public class Main {
 
         LOG.log(Level.INFO, "Selecting ideal roster...");
 
-        Context$.MODULE$.idealRoster_$eq(selection.getIdeal25Man());
+        Context$.MODULE$.idealRoster_$eq(selection.select(Mode.REGULAR_SEASON));
 
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
