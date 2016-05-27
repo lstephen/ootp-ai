@@ -82,7 +82,10 @@ public final class RosterSelection {
         this.previous = previous;
     }
 
-    private Iterable<Player> getAvailableHitters(Roster roster) {
+    private Iterable<Player> getAvailableHitters(Roster roster, Mode mode) {
+      if (mode == Mode.IDEAL) {
+        return Sets.newHashSet(Selections.onlyHitters(roster.getUnassigned()));
+      } else {
         Set<Player> available = Sets.newHashSet(
                 Selections.onlyHitters(
                     Selections.onlyOn40Man(roster.getUnassigned())));
@@ -90,12 +93,17 @@ public final class RosterSelection {
         available.removeAll(getToBeRemoved(available));
 
         return available;
+      }
     }
 
-    private Iterable<Player> getAvailablePitchers(Roster roster) {
-        Set<Player> available = Sets.newHashSet(Selections.onlyPitchers(Selections.onlyOn40Man(roster.getUnassigned())));
-        available.removeAll(getToBeRemoved(available));
-        return available;
+    private Iterable<Player> getAvailablePitchers(Roster roster, Mode mode) {
+      if (mode == Mode.IDEAL) {
+        return Sets.newHashSet(Selections.onlyPitchers(roster.getUnassigned()));
+      } else {
+          Set<Player> available = Sets.newHashSet(Selections.onlyPitchers(Selections.onlyOn40Man(roster.getUnassigned())));
+          available.removeAll(getToBeRemoved(available));
+          return available;
+      }
     }
 
     private Set<Player> getToBeRemoved(Iterable<Player> available) {
@@ -105,14 +113,14 @@ public final class RosterSelection {
 
             for (Player p : available) {
                 if (p.getClearedWaivers().or(Boolean.FALSE)) {
-					if (toRemoveFromFourtyMan == null) {
-						toRemoveFromFourtyMan =
-							ImmutableSet.copyOf(getFourtyManRoster().getPlayersToRemove());
-					}
+                    if (toRemoveFromFourtyMan == null) {
+                      toRemoveFromFourtyMan =
+                        ImmutableSet.copyOf(getFourtyManRoster().getPlayersToRemove());
+                    }
 
                     if (toRemoveFromFourtyMan.contains(p)) {
-						toRemove.add(p);
-					}
+                      toRemove.add(p);
+                    }
                 }
             }
 
@@ -187,12 +195,12 @@ public final class RosterSelection {
         ml.addAll(
             hitting.select(
                 Selections.onlyHitters(forced),
-                getAvailableHitters(roster)).values());
+                getAvailableHitters(roster, mode)).values());
 
         ml.addAll(
             pitching.select(
                 Selections.onlyPitchers(forced),
-                getAvailablePitchers(roster)).values());
+                getAvailablePitchers(roster, mode)).values());
 
         while (ml.size() > mode.getMajorLeagueRosterLimit()
             && !Sets.difference(ml, forced).isEmpty()) {
