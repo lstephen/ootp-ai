@@ -223,6 +223,16 @@ public final class RosterSelection {
             }
         }
 
+        while (ml.size() < mode.getMajorLeagueRosterLimit()) {
+            Player p = Ordering
+                .natural()
+                .reverse()
+                .onResultOf((Player ply) -> JavaAdapter.nowValue(ply, predictor).score())
+                .min(ml);
+
+            ml.add(p);
+        }
+
         roster.assign(Roster.Status.ML, ml);
         assignMinors(roster);
 
