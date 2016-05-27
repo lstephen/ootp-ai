@@ -24,4 +24,8 @@ public final class JavaAdapter {
     return FutureValue$.MODULE$.apply(p, predictor);
   }
 
+  public static NowAbility nowAbility(Player p, Predictor predictor) {
+    return NowAbility$.MODULE$.apply(p, predictor);
+  }
+
 }

@@ -33,6 +33,11 @@ object NowAbility {
     }
     new Ability(p, pos)
   }
+
+  def apply(p: Player)(implicit ps: Predictor): Ability =
+    (Position.hitting ++ Position.pitching)
+      .map(NowAbility(p, _))
+      .max
 }
 
 class NowValue

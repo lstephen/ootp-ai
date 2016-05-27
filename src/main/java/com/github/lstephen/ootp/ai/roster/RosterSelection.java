@@ -227,7 +227,7 @@ public final class RosterSelection {
             Player p = Ordering
                 .natural()
                 .reverse()
-                .onResultOf((Player ply) -> JavaAdapter.nowValue(ply, predictor).score())
+                .onResultOf((Player ply) -> JavaAdapter.nowAbility(ply, predictor).score())
                 .min(ml);
 
             if (p.getAge() > 25) {
