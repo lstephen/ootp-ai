@@ -228,11 +228,9 @@ public final class RosterSelection {
                 .natural()
                 .reverse()
                 .onResultOf((Player ply) -> JavaAdapter.nowAbility(ply, predictor).score())
-                .min(ml);
+                .min(Iterables.filter(roster.getUnassigned(), pl -> !ml.contains(pl) && pl.getAge() > 25));
 
-            if (p.getAge() > 25) {
-              ml.add(p);
-            }
+            ml.add(p);
         }
 
         roster.assign(Roster.Status.ML, ml);
