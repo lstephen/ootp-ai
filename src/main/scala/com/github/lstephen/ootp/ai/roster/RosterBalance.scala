@@ -15,5 +15,6 @@ class RosterBalance(r: Roster) {
 
   val format: String =
     f"${hitterCount}%.0f/${pitcherCount.toInt}%.0f = ${actual}%.3f (ideal: ${ideal}%.3f)"
+
 }
 

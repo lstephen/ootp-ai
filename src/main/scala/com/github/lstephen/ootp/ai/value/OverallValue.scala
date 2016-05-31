@@ -8,6 +8,7 @@ import com.github.lstephen.ootp.ai.score._
 class OverallValue
   (val player: Player, position: Option[Position] = None)
   (implicit val predictor: Predictor)
+  extends Scoreable
   {
 
   val now = position match {

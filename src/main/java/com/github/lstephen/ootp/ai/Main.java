@@ -25,6 +25,7 @@ import com.github.lstephen.ootp.ai.report.TeamReport;
 import com.github.lstephen.ootp.ai.roster.Changes;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.FourtyManRoster;
+import com.github.lstephen.ootp.ai.roster.Moves;
 import com.github.lstephen.ootp.ai.roster.Roster;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
 import com.github.lstephen.ootp.ai.roster.RosterSelection;
@@ -463,6 +464,15 @@ public class Main {
             }
         }
 
+        Moves moves = new Moves(newRoster, predictor);
+
+        generic.setTitle("Release");
+        generic.setPlayers(moves.getRelease());
+        generic.print(out);
+
+        generic.setTitle("Sign");
+        generic.setPlayers(moves.getSign());
+        generic.print(out);
 
         LOG.info("FA report...");
         generic.setTitle("Top Targets");
