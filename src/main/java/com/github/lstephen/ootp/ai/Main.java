@@ -242,8 +242,6 @@ public class Main {
         }
 
         LOG.info("Loading FAS...");
-        Set<Player> released = Sets.newHashSet();
-
         FreeAgents fas = FreeAgents.create(site, changes, predictor);
 
         RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
@@ -261,27 +259,8 @@ public class Main {
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
-        Integer minRosterSize = 90;
-        Integer maxRosterSize = 110;
-
-        if (site.getName().equals("LBB")) {
-            maxRosterSize = 100;
-        }
-        if (site.getName().equals("PSD")) {
-            maxRosterSize = 165;
-            minRosterSize = 135;
-        }
-
-        if (oldRoster.size() > maxRosterSize) {
-            for (int i = 0; i < 2; i++) {
-                Optional<Player> release = fas.getPlayerToRelease(team);
-
-                if (release.isPresent()) {
-                    team.remove(release.get());
-                    released.add(release.get());
-                }
-            }
-        }
+        Integer minRosterSize = 70;
+        Integer maxRosterSize = 75;
 
         ImmutableSet<Player> futureFas = ImmutableSet.of();
 
@@ -501,8 +480,7 @@ public class Main {
         generic.setPlayers(
             Iterables.concat(
                 newRoster.getAllPlayers(),
-                futureFas,
-                released));
+                futureFas));
         generic.setLimit(200);
         generic.print(out);
 
