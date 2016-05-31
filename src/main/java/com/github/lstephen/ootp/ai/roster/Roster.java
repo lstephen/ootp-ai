@@ -154,8 +154,29 @@ public final class Roster implements Printable {
     public void setTargetMinimum(Integer min) {
         this.targetMinimum = min;
     }
+
     public void setTargetMaximum(Integer max) {
         this.targetMaximum = max;
+    }
+
+    public boolean isLarge() {
+      return size() > targetMaximum;
+    }
+
+    public boolean isSmall() {
+      return size() < targetMinimum;
+    }
+
+    public RosterBalance getBalance() {
+      return new RosterBalance(this);
+    }
+
+    public boolean isHitterHeavy() {
+      return getBalance().isHitterHeavy();
+    }
+
+    public boolean isPitcherHeavy() {
+      return getBalance().isPitcherHeavy();
     }
 
     @Override
@@ -196,6 +217,7 @@ public final class Roster implements Printable {
         }
 
         w.println("Total:" + assignments.size() + " (target " + targetMinimum + "-" + targetMaximum + ")");
+        w.println("Balance:" + getBalance().format());
     }
 
     @Override

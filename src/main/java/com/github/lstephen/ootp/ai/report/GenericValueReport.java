@@ -132,7 +132,7 @@ public class GenericValueReport implements Printable {
 
             w.println(
                 String.format(
-                    "%2s %-25s %2d| %s | %s | %s | %-8s | %s %9s | %7s/%7s | %5s | %-20s | %s",
+                    "%2s %-25s %2d| %s | %s | %s | %-8s | %s %9s | %7s:%7s | %5s | %-20s | %s",
                     p.getListedPosition().or(""),
                     StringUtils.abbreviate(p.getName(), 25),
                     p.getAge(),

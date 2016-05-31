@@ -25,6 +25,7 @@ import com.github.lstephen.ootp.ai.report.TeamReport;
 import com.github.lstephen.ootp.ai.roster.Changes;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.FourtyManRoster;
+import com.github.lstephen.ootp.ai.roster.Moves;
 import com.github.lstephen.ootp.ai.roster.Roster;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
 import com.github.lstephen.ootp.ai.roster.RosterSelection;
@@ -242,8 +243,6 @@ public class Main {
         }
 
         LOG.info("Loading FAS...");
-        Set<Player> released = Sets.newHashSet();
-
         FreeAgents fas = FreeAgents.create(site, changes, predictor);
 
         RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
@@ -261,27 +260,8 @@ public class Main {
         LOG.info("Calculating top FA targets...");
         Iterable<Player> topFaTargets = fas.getTopTargets(mode);
 
-        Integer minRosterSize = 90;
-        Integer maxRosterSize = 110;
-
-        if (site.getName().equals("LBB")) {
-            maxRosterSize = 100;
-        }
-        if (site.getName().equals("PSD")) {
-            maxRosterSize = 165;
-            minRosterSize = 135;
-        }
-
-        if (oldRoster.size() > maxRosterSize) {
-            for (int i = 0; i < 2; i++) {
-                Optional<Player> release = fas.getPlayerToRelease(team);
-
-                if (release.isPresent()) {
-                    team.remove(release.get());
-                    released.add(release.get());
-                }
-            }
-        }
+        Integer minRosterSize = 70;
+        Integer maxRosterSize = 75;
 
         ImmutableSet<Player> futureFas = ImmutableSet.of();
 
@@ -484,6 +464,15 @@ public class Main {
             }
         }
 
+        Moves moves = new Moves(newRoster, predictor);
+
+        generic.setTitle("Release");
+        generic.setPlayers(moves.getRelease());
+        generic.print(out);
+
+        generic.setTitle("Sign");
+        generic.setPlayers(moves.getSign());
+        generic.print(out);
 
         LOG.info("FA report...");
         generic.setTitle("Top Targets");
@@ -501,8 +490,7 @@ public class Main {
         generic.setPlayers(
             Iterables.concat(
                 newRoster.getAllPlayers(),
-                futureFas,
-                released));
+                futureFas));
         generic.setLimit(200);
         generic.print(out);
 
