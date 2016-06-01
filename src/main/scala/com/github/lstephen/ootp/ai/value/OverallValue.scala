@@ -22,7 +22,7 @@ class OverallValue
   }
 
   def age = {
-    val base = 27 - player.getAge
+    val base = 33 - Math.max(player.getAge, 27)
 
     val oldAgePenalty = if (player.getAge <= 33) 0 else Math.pow(player.getAge - 33, 2)
 
