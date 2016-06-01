@@ -13,12 +13,13 @@ import collection.JavaConversions._
 class Moves(roster: Roster)(implicit predictor: Predictor) {
 
   val sign: List[Player] = {
-    SiteHolder
-      .get
-      .getFreeAgents
-      .toList
-      .filter(if (roster.isLarge) NowValue(_).vsReplacement.orElseZero > Score.zero else _ => true)
-      .filter(if (roster.isPitcherHeavy) _.isPitcher else _.isHitter)
+    val fas = SiteHolder.get.getFreeAgents.toList
+
+    val nows = fas.filter(NowValue(_).vsReplacement.orElseZero > Score.zero)
+    val alls = fas.filter(if (roster.isPitcherHeavy) _.isHitter else _.isPitcher)
+
+    (if (roster.isLarge) nows else nows ++ alls)
+      .distinct
       .sortBy(OverallValue(_))
       .reverse
       .take(1)
