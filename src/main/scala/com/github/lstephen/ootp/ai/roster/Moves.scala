@@ -10,7 +10,7 @@ import com.github.lstephen.ootp.ai.value.OverallValue
 import scala.collection.JavaConverters._
 import collection.JavaConversions._
 
-class Moves(roster: Roster)(implicit predictor: Predictor) {
+class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
 
   val sign: List[Player] = {
     val fas = SiteHolder.get.getFreeAgents.toList
@@ -18,8 +18,11 @@ class Moves(roster: Roster)(implicit predictor: Predictor) {
     val nows = fas.filter(NowValue(_).vsReplacement.orElseZero > Score.zero)
     val alls = fas.filter(if (roster.isPitcherHeavy) _.isHitter else _.isPitcher)
 
+    val dontAcquire = changes get Changes.ChangeType.DONT_ACQUIRE
+
     (if (roster.isLarge) nows else nows ++ alls)
       .distinct
+      .filter(!dontAcquire.contains(_))
       .sortBy(OverallValue(_))
       .reverse
       .take(1)
