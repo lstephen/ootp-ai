@@ -464,7 +464,7 @@ public class Main {
             }
         }
 
-        Moves moves = new Moves(newRoster, predictor);
+        Moves moves = new Moves(newRoster, changes, predictor);
 
         generic.setTitle("Release");
         generic.setPlayers(moves.getRelease());
