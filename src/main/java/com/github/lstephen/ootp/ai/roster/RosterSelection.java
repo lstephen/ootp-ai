@@ -10,7 +10,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictor;
@@ -22,7 +22,7 @@ import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selection;
 import com.github.lstephen.ootp.ai.selection.Selections;
-import com.github.lstephen.ootp.ai.selection.SlotSelection;
+import com.github.lstephen.ootp.ai.selection.Tiered;
 import com.github.lstephen.ootp.ai.selection.lineup.Defense;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
@@ -267,41 +267,15 @@ public final class RosterSelection {
             int pitchersSize = ((availablePitchers.size() + remainingLevels
                 .size()) - 1) / remainingLevels.size();
 
-            Multiset<Slot> slots = HashMultiset.create();
-
-            for (Slot s : Slot.values()) {
-                int toAdd = ((Slot.countPlayersWithPrimary(roster
-                    .getUnassigned(), s) + remainingLevels.size()) - 1) /
-                    remainingLevels.size();
-                for (int i = 0; i < toAdd; i++) {
-                    slots.add(s);
-                }
-
-            }
-
             Status level = remainingLevels.get(0);
 
             roster.assign(
                 level,
-                SlotSelection
-                    .builder()
-                    .slots(slots)
-                    .size(hittersSize)
-                    .ordering(hitterSelectionFactory.byOverall())
-                    .build()
-                    .select(ImmutableSet.<Player>of(), availableHitters)
-                    .values());
+                new Tiered(Position.hitting(), predictor).takeAsJava(availableHitters, hittersSize));
 
             roster.assign(
                 level,
-                SlotSelection
-                    .builder()
-                    .slots(slots)
-                    .size(pitchersSize)
-                    .ordering(pitcherSelectionFactory.byOverall())
-                    .build()
-                    .select(ImmutableSet.<Player>of(), availablePitchers)
-                    .values());
+                new Tiered(Position.pitching(), predictor).takeAsJava(availablePitchers, pitchersSize));
 
             remainingLevels.remove(level);
         }
