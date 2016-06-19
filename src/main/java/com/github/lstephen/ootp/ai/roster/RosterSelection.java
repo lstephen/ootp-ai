@@ -37,6 +37,8 @@ import java.util.Set;
 
 public final class RosterSelection {
 
+    private static final int MINIMUM_ML_ROSTER_SIZE = 25;
+
     private static final Double MR_CONSTANT = .865;
 
     private final Team team;
@@ -223,7 +225,7 @@ public final class RosterSelection {
             }
         }
 
-        while (ml.size() < mode.getMajorLeagueRosterLimit()) {
+        while (ml.size() < Math.min(MINIMUM_ML_ROSTER_SIZE, mode.getMajorLeagueRosterLimit())) {
             Player p = Ordering
                 .natural()
                 .reverse()
