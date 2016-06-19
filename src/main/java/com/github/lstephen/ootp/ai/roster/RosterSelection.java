@@ -230,7 +230,10 @@ public final class RosterSelection {
                 .natural()
                 .reverse()
                 .onResultOf((Player ply) -> JavaAdapter.nowAbility(ply, predictor).score())
-                .min(Iterables.filter(roster.getUnassigned(), pl -> !ml.contains(pl) && pl.getAge() > 25));
+                .min(
+                    Iterables.filter(
+                      Iterables.concat(getAvailableHitters(roster, mode), getAvailablePitchers(roster, mode)),
+                      pl -> !ml.contains(pl) && pl.getAge() > 25));
 
             ml.add(p);
         }
