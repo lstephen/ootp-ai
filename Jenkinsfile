@@ -25,6 +25,11 @@ def construi_on_node(target) {
   }
 }
 
+if (env.URL_TRIGGER) {
+  stage 'Wait'
+  sleep time: 1, unit: 'HOURS'
+}
+
 stage 'Build'
 construi_on_node 'build'
 
