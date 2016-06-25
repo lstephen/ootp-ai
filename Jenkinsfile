@@ -8,6 +8,7 @@ properties(
       [ [$class: 'ChoiceParameterDefinition', name: 'OOTPAI_SITE', choices: "NONE\nBTHUSTLE\nCBL\nHFTC\nLBB\nGABL\nSAVOY\nTWML"]
       , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_CLEAR_CACHE', defaultValue: false]
       , [$class: 'BooleanParameterDefinition', name: 'OOTPAI_PLAYOFFS', defaultValue: false]
+      , [$class: 'BooleanParameterDefinition', name: 'URL_TRIGGER', defaultValue: false]
       ]
     ]
   ])
@@ -25,7 +26,7 @@ def construi_on_node(target) {
   }
 }
 
-if (env.URL_TRIGGER) {
+if (URL_TRIGGER) {
   stage 'Wait'
   sleep time: 1, unit: 'HOURS'
 }
