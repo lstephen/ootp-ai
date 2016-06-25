@@ -26,7 +26,7 @@ def construi_on_node(target) {
   }
 }
 
-if (URL_TRIGGER) {
+if (URL_TRIGGER == true) {
   stage 'Wait'
   sleep time: 1, unit: 'HOURS'
 }
