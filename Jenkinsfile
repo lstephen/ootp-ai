@@ -30,7 +30,7 @@ node {
   sh "echo ${URL_TRIGGER}"
 }
 
-if (URL_TRIGGER == true) {
+if (URL_TRIGGER == 'true') {
   stage 'Wait'
   sleep time: 1, unit: 'HOURS'
 }
