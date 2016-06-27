@@ -26,16 +26,16 @@ def construi_on_node(target) {
   }
 }
 
+stage 'Wait'
 if (URL_TRIGGER == 'true') {
-  stage 'Wait'
   sleep time: 1, unit: 'HOURS'
 }
 
 stage 'Build'
 construi_on_node 'build'
 
+stage 'Run'
 if (env.BRANCH_NAME == 'master' && OOTPAI_SITE != 'NONE') {
-  stage 'Run'
   node('construi') {
     checkout scm
     currentBuild.description = "Run ${OOTPAI_SITE}"
