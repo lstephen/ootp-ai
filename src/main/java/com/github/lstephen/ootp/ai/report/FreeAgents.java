@@ -69,7 +69,7 @@ public final class FreeAgents {
           targets.add(Ordering
             .natural()
             .onResultOf((Player p) -> JavaAdapter.overallValue(p, pos, predictor).score())
-            .max(fas.filter(p -> !skipPlayer(p)));
+            .max(Iterables.filter(fas, p -> !skipPlayer(p))));
         }
 
         return targets;
