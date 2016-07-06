@@ -45,9 +45,12 @@ class FutureValue
   val ability = FutureAbility(player, position)
 
   val vsReplacement =
-    if (player.getAge < 27)
-      Some(ReplacementLevels.getForIdeal.getVsAverage(ability))
-    else
+   if (player.getAge < 27) {
+     val vsCurrent = ReplacementLevels.getForIdeal.get(ability)
+     val vsAverage = ReplacementLevels.getForIdeal.getVsAverage(ability);
+
+     Some(List(vsCurrent, vsAverage).average)
+   } else
       None
 
   def components = ability.components :+ vsReplacement
