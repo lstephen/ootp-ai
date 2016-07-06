@@ -32,6 +32,7 @@ import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -165,7 +166,7 @@ public final class RosterSelection {
 
     private Roster select(Mode mode, Changes changes, Selection hitting, Selection pitching) {
         Roster roster = Roster.create(team);
-        Set<Player> forced = Sets.newHashSet(getForced(changes));
+        Set<Player> forced = mode == Mode.IDEAL ? new HashSet<>() : Sets.newHashSet(getForced(changes));
         Set<Player> ml = Sets.newHashSet();
 
         for (Player p : changes.get(ChangeType.FORCE_ML)) {
