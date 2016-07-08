@@ -27,8 +27,12 @@ def construi_on_node(target) {
 }
 
 stage 'Wait'
-if (URL_TRIGGER && URL_TRIGGER == 'true') {
-  sleep time: 1, unit: 'HOURS'
+try {
+  if (URL_TRIGGER == 'true') {
+    sleep time: 1, unit: 'HOURS'
+  }
+} catch (MissingPropertyException e) {
+  // ignore
 }
 
 stage 'Build'
