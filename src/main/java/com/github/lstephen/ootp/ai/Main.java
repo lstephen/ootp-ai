@@ -19,6 +19,7 @@ import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
 import com.github.lstephen.ootp.ai.report.LeagueBattingReport;
+import com.github.lstephen.ootp.ai.report.PitchingStrategyReport;
 import com.github.lstephen.ootp.ai.report.SalaryReport;
 import com.github.lstephen.ootp.ai.report.TeamPositionReport;
 import com.github.lstephen.ootp.ai.report.TeamReport;
@@ -320,6 +321,7 @@ public class Main {
                 .selectRotation(ImmutableSet.<Player>of(), Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));
 
         Printables.print(rotation).to(out);
+        Printables.print(new PitchingStrategyReport(rotation, predictor)).to(out);
 
         LOG.log(Level.INFO, "Choosing lineups...");
 
