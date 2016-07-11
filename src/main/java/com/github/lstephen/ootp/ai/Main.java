@@ -537,40 +537,6 @@ public class Main {
 
         Printables.print(now).to(out);
 
-        generic.setLimit(10);
-
-        for (final Slot s : Slot.values()) {
-            if (s == Slot.P) {
-                continue;
-            }
-
-            LOG.log(Level.INFO, "Slot Report: {0}...", s.name());
-
-            generic.setTitle("Top: " + s.name());
-            generic.setPlayers(Iterables.filter(all, new Predicate<Player>() {
-                public boolean apply(Player p) {
-                    return Slot.getPrimarySlot(p) == s;
-                }
-            }));
-
-            generic.print(out);
-        }
-
-        for (final Position pos : ImmutableList.of(Position.SECOND_BASE, Position.THIRD_BASE)) {
-            LOG.log(Level.INFO, "Position Report: {0}...", pos.name());
-
-            generic.setTitle("Top: " + pos.name());
-            generic.setPlayers(Iterables.filter(all, new Predicate<Player>() {
-                public boolean apply(Player pl) {
-                    return pl.getPosition().equals(pos.getAbbreviation());
-                }
-            }));
-
-            generic.print(out);
-        }
-
-        LOG.log(Level.INFO, "League wide replacement Level...");
-
         generic.useDefaultValueFunction();
 
         LOG.log(Level.INFO, "Non Top 10 prospects...");
