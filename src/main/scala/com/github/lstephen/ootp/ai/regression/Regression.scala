@@ -27,6 +27,9 @@ class Regression(label: String, category: String) {
 
   def predict(x: Double): Double = r predict x
 
+  def mse = (data.map { case (x, y) => math.pow(y - predict(x), 2) }.sum) / data.length
+  def rsme = math.pow(mse, 0.5)
+
   def format: String = {
     val dir = s"${sys.env("OOTPAI_DATA")}/charts/${SiteHolder.get.getName}/${category}/"
 
@@ -34,7 +37,7 @@ class Regression(label: String, category: String) {
 
     output(PNG(dir, label), xyChart(List(XY(data, style=XYPlotStyle.Dots))))
 
-    f"$label%15s | ${r.getRSquare}%.3f"
+    f"$label%15s | ${rsme}%.3f"
   }
 
 }
