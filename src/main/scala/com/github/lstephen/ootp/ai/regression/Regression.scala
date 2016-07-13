@@ -2,41 +2,106 @@ package com.github.lstephen.ootp.ai.regression
 
 import com.github.lstephen.ootp.ai.site.SiteHolder
 
-import org.apache.commons.math3.stat.regression.SimpleRegression
+import org.encog.ConsoleStatusReportable
 
-import org.sameersingh.scalaplot.XYPlotStyle
-import org.sameersingh.scalaplot.Implicits._
+import org.encog.ml.MLRegression
+
+import org.encog.ml.data.versatile.VersatileMLDataSet
+import org.encog.ml.data.versatile.columns.ColumnType
+import org.encog.ml.data.versatile.sources.VersatileDataSource
+
+import org.encog.ml.factory.MLMethodFactory
+
+import org.encog.ml.model.EncogModel
 
 import scala.collection.mutable.ListBuffer
 
-import java.io.File
+class InMemoryDataSource extends VersatileDataSource {
+  var index = 0
+
+  val data = ListBuffer.empty[(Double, Double)]
+
+  def add(x: Double, y: Double): Unit = data += ((y, x))
+
+  def columnIndex(n: String) = -1
+
+  def readLine: Array[String] = {
+    index = index + 1
+
+    if (index >= data.length) return null
+
+    data(index).productIterator.toArray.map(_.toString)
+  }
+
+  def rewind: Unit = { index = -1 }
+}
 
 
 class Regression(label: String, category: String) {
 
-  val r = new SimpleRegression
+  val data = new InMemoryDataSource
 
-  val data = ListBuffer.empty[(Double, Double)]
+  val dataSet = new VersatileMLDataSet(data)
 
-  def addData(x: Double, y: Double): Unit = {
-    r.addData(x, y)
-    data += ((x, y))
+  val inputColumn = dataSet.defineSourceColumn(s"${label}::Input", 1, ColumnType.continuous)
+  val outputColumn = dataSet.defineSourceColumn(s"${label}::Output", 0, ColumnType.continuous)
+
+  dataSet defineSingleOutputOthersInput outputColumn
+
+  var _model: Option[EncogModel] = None
+  var _regression: Option[MLRegression] = None
+
+  def normalizationHelper = dataSet.getNormHelper
+
+  def regression = _regression match {
+    case Some(r) => r
+    case None    =>
+      dataSet.analyze
+
+      val m = new EncogModel(dataSet)
+      m.selectMethod(dataSet, MLMethodFactory.TYPE_FEEDFORWARD)
+      m.setReport(new ConsoleStatusReportable)
+
+      dataSet.normalize
+
+      m.holdBackValidation(0.3, true, 666)
+      m.selectTrainingType(dataSet)
+
+      val bestMethod = m.crossvalidate(5, true).asInstanceOf[MLRegression]
+
+      println(s"Training error: ${m.calculateError(bestMethod, m.getTrainingDataset)}")
+      println(s"Validation error: ${m.calculateError(bestMethod, m.getValidationDataset)}")
+
+      println(s"${normalizationHelper}")
+      println(s"Final model: ${bestMethod}")
+
+      _regression = Some(bestMethod)
+      bestMethod
   }
 
-  def getN: Long = r.getN
+  def addData(x: Double, y: Double): Unit = {
+    data.add(x, y)
+    _regression = None
+  }
 
-  def predict(x: Double): Double = r predict x
+  def getN: Long = data.data.length
 
-  def mse = (data.map { case (x, y) => math.pow(y - predict(x), 2) }.sum) / data.length
+  def predict(x: Double): Double = {
+    val r = regression // Force model computation
+
+    val input = normalizationHelper.allocateInputVector
+
+    normalizationHelper.normalizeInputVector(Array(x.toString), input.getData, false)
+
+    normalizationHelper
+      .denormalizeOutputVectorToString(r.compute(input))(0)
+      .toDouble
+  }
+
+  def mse = (data.data.map { case (y, x) => math.pow(y - predict(x), 2) }.sum) / data.data.length
   def rsme = math.pow(mse, 0.5)
 
   def format: String = {
-    val dir = s"${sys.env("OOTPAI_DATA")}/charts/${SiteHolder.get.getName}/${category}/"
-
-    new File(dir).mkdirs
-
-    output(PNG(dir, label), xyChart(List(XY(data, style=XYPlotStyle.Dots))))
-
     f"$label%15s | ${rsme}%.3f"
   }
 

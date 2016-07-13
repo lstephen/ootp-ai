@@ -35,7 +35,8 @@
     <lib.ai-search.version>1.2</lib.ai-search.version>
     <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.4</lib.commons-lang3.version>
-    <lib.commons-math3.version>3.5</lib.commons-math3.version>
+    <lib.commons-math3.version>3.0</lib.commons-math3.version>
+    <lib.encog.version>3.3.0</lib.encog.version>
     <lib.jackson.version>2.6.0</lib.jackson.version>
     <lib.joda-time.version>2.8.1</lib.joda-time.version>
     <lib.jsr305.version>2.0.2</lib.jsr305.version>
@@ -45,7 +46,6 @@
     <lib.scala-arm.version>1.4</lib.scala-arm.version>
     <lib.scala-library.version>2.11.7</lib.scala-library.version>
     <lib.scala-logging.version>3.1.0</lib.scala-logging.version>
-    <lib.scalaplot.version>0.1</lib.scalaplot.version>
     <lib.slf4j.version>1.7.7</lib.slf4j.version>
 
       <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
@@ -79,6 +79,12 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-math3</artifactId>
       <version>${lib.commons-math3.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.encog</groupId>
+      <artifactId>encog-core</artifactId>
+      <version>${lib.encog.version}</version>
     </dependency>
 
     <dependency>
@@ -163,18 +169,6 @@
       <groupId>com.typesafe.scala-logging</groupId>
       <artifactId>scala-logging_${scala.version}</artifactId>
       <version>${lib.scala-logging.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-library</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sameersingh.scalaplot</groupId>
-      <artifactId>scalaplot</artifactId>
-      <version>${lib.scalaplot.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.scala-lang</groupId>
