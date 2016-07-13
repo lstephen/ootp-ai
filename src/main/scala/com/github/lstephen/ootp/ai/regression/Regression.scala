@@ -16,12 +16,16 @@ import org.encog.ml.model.EncogModel
 
 import scala.collection.mutable.ListBuffer
 
+class DataPoint(val input: Double, val output: Double) {
+  def toArray: Array[Double] = Array(output, input)
+}
+
 class InMemoryDataSource extends VersatileDataSource {
   var index = 0
 
-  val data = ListBuffer.empty[(Double, Double)]
+  val data = ListBuffer.empty[DataPoint]
 
-  def add(x: Double, y: Double): Unit = data += ((y, x))
+  def add(p: DataPoint): Unit = data += p
 
   def columnIndex(n: String) = -1
 
@@ -30,7 +34,7 @@ class InMemoryDataSource extends VersatileDataSource {
 
     if (index >= data.length) return null
 
-    data(index).productIterator.toArray.map(_.toString)
+    data(index).toArray.map(_.toString)
   }
 
   def rewind: Unit = { index = -1 }
@@ -80,7 +84,7 @@ class Regression(label: String, category: String) {
   }
 
   def addData(x: Double, y: Double): Unit = {
-    data.add(x, y)
+    data.add(new DataPoint(x, y))
     _regression = None
   }
 
@@ -98,7 +102,9 @@ class Regression(label: String, category: String) {
       .toDouble
   }
 
-  def mse = (data.data.map { case (y, x) => math.pow(y - predict(x), 2) }.sum) / data.data.length
+  def mse =
+    (data.data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.data.length
+
   def rsme = math.pow(mse, 0.5)
 
   def format: String = {
