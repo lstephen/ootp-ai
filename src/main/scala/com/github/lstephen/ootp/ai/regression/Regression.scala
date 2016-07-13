@@ -16,8 +16,8 @@ import org.encog.ml.model.EncogModel
 
 import scala.collection.mutable.ListBuffer
 
-class DataPoint(val input: Double, val output: Double) {
-  def toArray: Array[Double] = Array(output, input)
+class DataPoint(val input: Array[Double], val output: Double) {
+  def toArray: Array[Double] = output +: input
 }
 
 class InMemoryDataSource extends VersatileDataSource {
@@ -84,18 +84,20 @@ class Regression(label: String, category: String) {
   }
 
   def addData(x: Double, y: Double): Unit = {
-    data.add(new DataPoint(x, y))
+    data.add(new DataPoint(Array(x), y))
     _regression = None
   }
 
   def getN: Long = data.data.length
 
-  def predict(x: Double): Double = {
+  def predict(x: Double): Double = predict(Array(x))
+
+  def predict(xs: Array[Double]): Double = {
     val r = regression // Force model computation
 
     val input = normalizationHelper.allocateInputVector
 
-    normalizationHelper.normalizeInputVector(Array(x.toString), input.getData, false)
+    normalizationHelper.normalizeInputVector(xs.map(_.toString), input.getData, false)
 
     normalizationHelper
       .denormalizeOutputVectorToString(r.compute(input))(0)
@@ -103,7 +105,7 @@ class Regression(label: String, category: String) {
   }
 
   def mse =
-    (data.data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.data.length
+    (data.data.map{ p => math.pow(p.output - predict(p.input(0)), 2) }.sum) / data.data.length
 
   def rsme = math.pow(mse, 0.5)
 
