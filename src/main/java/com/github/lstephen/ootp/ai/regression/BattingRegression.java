@@ -74,23 +74,23 @@ public final class BattingRegression {
 
     private void addData(BattingStats stats, BattingRatings<?> ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            getRegression(Predicting.HITS).addData(
-                ratings.getContact(), stats.getHitsPerPlateAppearance());
-            getRegression(Predicting.EXTRA_BASE_HITS).addData(
-                ratings.getGap(), stats.getExtraBaseHitsPerPlateAppearance());
+            getRegression(Predicting.HITS).addBattingData(
+                ratings, stats.getHitsPerPlateAppearance());
+            getRegression(Predicting.EXTRA_BASE_HITS).addBattingData(
+                ratings, stats.getExtraBaseHitsPerPlateAppearance());
 
-            getRegression(Predicting.HOME_RUNS).addData(
-                ratings.getPower(), stats.getHomeRunsPerPlateAppearance());
-            getRegression(Predicting.WALKS).addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
+            getRegression(Predicting.HOME_RUNS).addBattingData(
+                ratings, stats.getHomeRunsPerPlateAppearance());
+            getRegression(Predicting.WALKS).addBattingData(ratings, stats.getWalksPerPlateAppearance());
 
             if (ratings.getK().isPresent()) {
-                getRegression(Predicting.KS).addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
+                getRegression(Predicting.KS).addBattingData(ratings, stats.getKsPerPlateAppearance());
             }
         }
     }
 
-    private double predict(Predicting predicting, int rating) {
-        return Math.max(0, getRegression(predicting).predict(rating));
+    private double predict(Predicting predicting, BattingRatings<?> rating) {
+        return Math.max(0, getRegression(predicting).predictBatting(rating));
     }
 
     public TeamStats<BattingStats> predict(Iterable<Player> ps) {
@@ -173,11 +173,11 @@ public final class BattingRegression {
 
         long predictedHits =
             Math.round(plateAppearances
-                * predict(Predicting.HITS, ratings.getContact()));
+                * predict(Predicting.HITS, ratings));
 
         long predictedExtraBaseHits =
             Math.round(plateAppearances
-                * predict(Predicting.EXTRA_BASE_HITS, ratings.getGap()));
+                * predict(Predicting.EXTRA_BASE_HITS, ratings));
 
         double triplesPercentage = (double) leagueBatting.getTriples()
             / (leagueBatting.getDoubles() + leagueBatting.getTriples());
@@ -186,15 +186,15 @@ public final class BattingRegression {
 
         long predictedHomeRuns =
              Math.round(plateAppearances
-                * predict(Predicting.HOME_RUNS, ratings.getPower()));
+                * predict(Predicting.HOME_RUNS, ratings));
 
         long predictedWalks =
             Math.round(plateAppearances
-                * predict(Predicting.WALKS, ratings.getEye()));
+                * predict(Predicting.WALKS, ratings));
 
         long predictedKs = ratings.getK().isPresent()
             ? Math.round(plateAppearances
-                * predict(Predicting.KS, ratings.getK().get()))
+                * predict(Predicting.KS, ratings))
             : 0;
 
         BattingStats predicted = new BattingStats();

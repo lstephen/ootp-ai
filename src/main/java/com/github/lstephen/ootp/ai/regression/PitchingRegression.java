@@ -78,18 +78,18 @@ public final class PitchingRegression {
 
     private void addData(PitchingStats stats, PitchingRatings ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            getRegression(Predicting.HITS).addData(ratings.getHits(), stats.getHitsPerPlateAppearance());
-            getRegression(Predicting.DOUBLES).addData(ratings.getGap(), stats.getDoublesPerPlateAppearance());
-            getRegression(Predicting.STRIKEOUTS).addData(
+            getRegression(Predicting.HITS).addPitchingData(ratings.getHits(), stats.getHitsPerPlateAppearance());
+            getRegression(Predicting.DOUBLES).addPitchingData(ratings.getGap(), stats.getDoublesPerPlateAppearance());
+            getRegression(Predicting.STRIKEOUTS).addPitchingData(
                 ratings.getStuff(), stats.getStrikeoutsPerPlateAppearance());
-            getRegression(Predicting.WALKS).addData(ratings.getControl(), stats.getWalksPerPlateAppearance());
-            getRegression(Predicting.HOME_RUNS).addData(
+            getRegression(Predicting.WALKS).addPitchingData(ratings.getControl(), stats.getWalksPerPlateAppearance());
+            getRegression(Predicting.HOME_RUNS).addPitchingData(
                 ratings.getMovement(), stats.getHomeRunsPerPlateAppearance());
         }
     }
 
     private double predict(Predicting predicting, int rating) {
-      return Math.max(0, getRegression(predicting).predict(rating));
+      return Math.max(0, getRegression(predicting).predictPitching(rating));
     }
 
     public TeamStats<PitchingStats> predict(Iterable<Player> ps) {
