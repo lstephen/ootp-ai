@@ -74,23 +74,23 @@ public final class BattingRegression {
 
     private void addData(BattingStats stats, BattingRatings<?> ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            getRegression(Predicting.HITS).addData(
+            getRegression(Predicting.HITS).addBattingData(
                 ratings.getContact(), stats.getHitsPerPlateAppearance());
-            getRegression(Predicting.EXTRA_BASE_HITS).addData(
+            getRegression(Predicting.EXTRA_BASE_HITS).addBattingData(
                 ratings.getGap(), stats.getExtraBaseHitsPerPlateAppearance());
 
-            getRegression(Predicting.HOME_RUNS).addData(
+            getRegression(Predicting.HOME_RUNS).addBattingData(
                 ratings.getPower(), stats.getHomeRunsPerPlateAppearance());
-            getRegression(Predicting.WALKS).addData(ratings.getEye(), stats.getWalksPerPlateAppearance());
+            getRegression(Predicting.WALKS).addBattingData(ratings.getEye(), stats.getWalksPerPlateAppearance());
 
             if (ratings.getK().isPresent()) {
-                getRegression(Predicting.KS).addData(ratings.getK().get(), stats.getKsPerPlateAppearance());
+                getRegression(Predicting.KS).addBattingData(ratings.getK().get(), stats.getKsPerPlateAppearance());
             }
         }
     }
 
     private double predict(Predicting predicting, int rating) {
-        return Math.max(0, getRegression(predicting).predict(rating));
+        return Math.max(0, getRegression(predicting).predictBatting(rating));
     }
 
     public TeamStats<BattingStats> predict(Iterable<Player> ps) {
