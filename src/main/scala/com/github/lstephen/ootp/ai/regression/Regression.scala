@@ -1,5 +1,6 @@
 package com.github.lstephen.ootp.ai.regression
 
+import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
 import com.github.lstephen.ootp.ai.site.SiteHolder
 
 import org.encog.ConsoleStatusReportable
@@ -48,7 +49,7 @@ class InMemoryDataSource extends VersatileDataSource {
   def rewind: Unit = { index = -1 }
 }
 
-trait Regressable[T] {
+trait Regressable[-T] {
   def registerSourceColumns(ds: VersatileMLDataSet, label: String): List[ColumnDefinition]
   def toArray(t: T): Array[Option[Double]]
 }
@@ -59,6 +60,26 @@ object Regressable {
       List(ds.defineSourceColumn(s"${label}::Input", 1, ColumnType.continuous))
 
     def toArray(d: Double) = Array(Some(d))
+  }
+
+  implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
+    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
+      List( ds.defineSourceColumn(s"${label}::Contact", 1, ColumnType.continuous)
+          , ds.defineSourceColumn(s"${label}::Gap", 2, ColumnType.continuous)
+          , ds.defineSourceColumn(s"${label}::Power", 3, ColumnType.continuous)
+          , ds.defineSourceColumn(s"${label}::Eye", 4, ColumnType.continuous)
+          , ds.defineSourceColumn(s"${label}::K", 5, ColumnType.continuous)
+          )
+
+    // Note that this is java.lang.Integer
+    def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
+
+    def toArray(r: BattingRatings[_ <: Object]) = {
+      var k = if (r.getK.isPresent) Some(r.getK.get.doubleValue) else None
+
+      Array(r.getContact, r.getGap, r.getPower, r.getEye).map(toSomeDouble(_)) :+ k
+    }
+
   }
 }
 
@@ -110,13 +131,13 @@ class Regression(label: String, category: String) {
   }
 
 
-  def addData[T: Regressable](x: T, y: Double): Unit = {
+  def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
     if (data.data.isEmpty) {
-      implicitly[Regressable[T]].registerSourceColumns(dataSet, label)
+      regressable.registerSourceColumns(dataSet, label)
         .foreach { c => dataSet.getNormHelper.defineMissingHandler(c, new MeanMissingHandler) }
     }
 
-    data.add(new DataPoint(implicitly[Regressable[T]].toArray(x), y))
+    data.add(new DataPoint(regressable.toArray(x), y))
     _regression = None
   }
 
@@ -148,9 +169,9 @@ class Regression(label: String, category: String) {
   }
 
   // For Java interop
-  def addBattingData(x: Double, y: Double): Unit = addData(x, y)
+  def addBattingData(x: BattingRatings[_ <: Object], y: Double): Unit = addData(x, y)(Regressable.RegressableBattingRatings)
   def addPitchingData(x: Double, y: Double): Unit = addData(x, y)
 
-  def predictBatting(x: Double): Double = predict(x)
+  def predictBatting(x: BattingRatings[_ <: Object]): Double = predict(x)(Regressable.RegressableBattingRatings)
   def predictPitching(x: Double): Double = predict(x)
 }
