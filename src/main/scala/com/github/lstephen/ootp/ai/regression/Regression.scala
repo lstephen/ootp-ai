@@ -1,6 +1,7 @@
 package com.github.lstephen.ootp.ai.regression
 
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
+import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings
 import com.github.lstephen.ootp.ai.site.SiteHolder
 
 import org.encog.ConsoleStatusReportable
@@ -55,6 +56,9 @@ trait Regressable[-T] {
 }
 
 object Regressable {
+  // Note that this is java.lang.Integer
+  def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
+
   implicit object RegressableDouble extends Regressable[Double] {
     def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
       List(ds.defineSourceColumn(s"${label}::Input", 1, ColumnType.continuous))
@@ -64,22 +68,30 @@ object Regressable {
 
   implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
     def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      List( ds.defineSourceColumn(s"${label}::Contact", 1, ColumnType.continuous)
-          , ds.defineSourceColumn(s"${label}::Gap", 2, ColumnType.continuous)
-          , ds.defineSourceColumn(s"${label}::Power", 3, ColumnType.continuous)
-          , ds.defineSourceColumn(s"${label}::Eye", 4, ColumnType.continuous)
-          , ds.defineSourceColumn(s"${label}::K", 5, ColumnType.continuous)
+      List( ds.defineSourceColumn(s"Batting::${label}::Contact", 1, ColumnType.continuous)
+          , ds.defineSourceColumn(s"Batting::${label}::Gap", 2, ColumnType.continuous)
+          , ds.defineSourceColumn(s"Batting::${label}::Power", 3, ColumnType.continuous)
+          , ds.defineSourceColumn(s"Batting::${label}::Eye", 4, ColumnType.continuous)
+          , ds.defineSourceColumn(s"Batting::${label}::K", 5, ColumnType.continuous)
           )
 
-    // Note that this is java.lang.Integer
-    def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
     def toArray(r: BattingRatings[_ <: Object]) = {
       var k = if (r.getK.isPresent) Some(r.getK.get.doubleValue) else None
 
       Array(r.getContact, r.getGap, r.getPower, r.getEye).map(toSomeDouble(_)) :+ k
     }
+  }
 
+  implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_ <: Object]] {
+    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
+      List( ds.defineSourceColumn(s"${label}::Power", 1, ColumnType.continuous)
+          , ds.defineSourceColumn(s"${label}::Eye", 2, ColumnType.continuous)
+          , ds.defineSourceColumn(s"${label}::K", 3, ColumnType.continuous)
+          )
+
+    def toArray(r: PitchingRatings[_ <: Object]) =
+      Array(r.getMovement, r.getControl, r.getStuff).map(toSomeDouble(_))
   }
 }
 
@@ -170,8 +182,8 @@ class Regression(label: String, category: String) {
 
   // For Java interop
   def addBattingData(x: BattingRatings[_ <: Object], y: Double): Unit = addData(x, y)(Regressable.RegressableBattingRatings)
-  def addPitchingData(x: Double, y: Double): Unit = addData(x, y)
+  def addPitchingData(x: PitchingRatings[_ <: Object], y: Double): Unit = addData(x, y)(Regressable.RegressablePitchingRatings)
 
   def predictBatting(x: BattingRatings[_ <: Object]): Double = predict(x)(Regressable.RegressableBattingRatings)
-  def predictPitching(x: Double): Double = predict(x)
+  def predictPitching(x: PitchingRatings[_ <: Object]): Double = predict(x)(Regressable.RegressablePitchingRatings)
 }

@@ -78,17 +78,17 @@ public final class PitchingRegression {
 
     private void addData(PitchingStats stats, PitchingRatings ratings) {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
-            getRegression(Predicting.HITS).addPitchingData(ratings.getHits(), stats.getHitsPerPlateAppearance());
-            getRegression(Predicting.DOUBLES).addPitchingData(ratings.getGap(), stats.getDoublesPerPlateAppearance());
+            getRegression(Predicting.HITS).addPitchingData(ratings, stats.getHitsPerPlateAppearance());
+            getRegression(Predicting.DOUBLES).addPitchingData(ratings, stats.getDoublesPerPlateAppearance());
             getRegression(Predicting.STRIKEOUTS).addPitchingData(
-                ratings.getStuff(), stats.getStrikeoutsPerPlateAppearance());
-            getRegression(Predicting.WALKS).addPitchingData(ratings.getControl(), stats.getWalksPerPlateAppearance());
+                ratings, stats.getStrikeoutsPerPlateAppearance());
+            getRegression(Predicting.WALKS).addPitchingData(ratings, stats.getWalksPerPlateAppearance());
             getRegression(Predicting.HOME_RUNS).addPitchingData(
-                ratings.getMovement(), stats.getHomeRunsPerPlateAppearance());
+                ratings, stats.getHomeRunsPerPlateAppearance());
         }
     }
 
-    private double predict(Predicting predicting, int rating) {
+    private double predict(Predicting predicting, PitchingRatings<?> rating) {
       return Math.max(0, getRegression(predicting).predictPitching(rating));
     }
 
@@ -159,38 +159,20 @@ public final class PitchingRegression {
     public PitchingStats predict(PitchingRatings<?> ratings, Long plateAppearances) {
         long predictedStrikeouts =
             Math.round(plateAppearances
-                * predict(Predicting.STRIKEOUTS, ratings.getStuff()));
+                * predict(Predicting.STRIKEOUTS, ratings));
 
         long predictedHomeRuns =
             Math.round(plateAppearances
-                * predict(Predicting.HOME_RUNS, ratings.getMovement()));
+                * predict(Predicting.HOME_RUNS, ratings));
 
         long predictedWalks =
             Math.round(plateAppearances
-                * predict(Predicting.WALKS, ratings.getControl()));
+                * predict(Predicting.WALKS, ratings));
 
-        long predictedHits;
-        long predictedDoubles;
-        switch (site.getType()) {
-            case OOTP5:
-                predictedHits =
-                    Math.round(plateAppearances * predict(Predicting.HITS, ratings.getHits()));
-                predictedDoubles =
-                    Math.round(plateAppearances * predict(Predicting.DOUBLES, ratings.getGap()));
-                break;
-            case OOTP6:
-                predictedDoubles = 0;
-                predictedHits =
-                    Math.round(
-                        (plateAppearances
-                            - predictedWalks
-                            - predictedStrikeouts
-                            - predictedHomeRuns)
-                        * leaguePitching.getBabip());
-                break;
-            default:
-                throw new IllegalStateException();
-        }
+        long predictedHits =
+            Math.round(plateAppearances * predict(Predicting.HITS, ratings));
+        long predictedDoubles =
+            Math.round(plateAppearances * predict(Predicting.DOUBLES, ratings));
 
         PitchingStats predicted = new PitchingStats();
         predicted.setLeaguePitching(leaguePitching);

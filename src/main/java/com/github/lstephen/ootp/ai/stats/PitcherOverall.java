@@ -13,25 +13,26 @@ import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 /**
  *
  * @author lstephen
+ * @deprecated Both FIP and WOBA against are the same now
  */
 public enum PitcherOverall {
     FIP {
         public Double get(
             TeamStats<PitchingStats> predictions, Player p) {
-            return getEraEstimate(predictions.getOverall(p));
+          return WOBA_AGAINST.get(predictions, p);
         }
 
         public Integer getPlus(
             TeamStats<PitchingStats> predictions, Player p) {
-            return getPlus(predictions.getOverall(p));
+          return WOBA_AGAINST.getPlus(predictions, p);
         }
 
         public Integer getPlus(PitchingStats stats) {
-            return stats.getBaseRunsPlus(FipBaseRuns.get());
+          return WOBA_AGAINST.getPlus(stats);
         }
 
         public Double getEraEstimate(PitchingStats stats) {
-            return stats.getBaseRuns(FipBaseRuns.get());
+          return WOBA_AGAINST.getEraEstimate(stats);
         }
     }, WOBA_AGAINST {
         public Double get(
