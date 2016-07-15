@@ -5,7 +5,7 @@ require 'java'
 java_import com.github.lstephen.ootp.ai.report.TeamReport
 java_import com.github.lstephen.ootp.ai.site.Site
 java_import com.github.lstephen.ootp.ai.stats.BattingStats
-java_import com.github.lstephen.ootp.ai.stats.FipBaseRuns
+java_import com.github.lstephen.ootp.ai.stats.EraBaseRuns
 java_import com.github.lstephen.ootp.ai.stats.PitcherOverall
 java_import com.github.lstephen.ootp.ai.stats.PitchingStats
 
@@ -16,10 +16,10 @@ RSpec.describe TeamReport do
   let(:title) { 'TEST_TITLE' }
 
   let(:stats) { PitchingStats.new }
-  let(:pitcher_overall) { PitcherOverall::FIP }
+  let(:pitcher_overall) { PitcherOverall::WOBA_AGAINST }
 
-  before(:each) { FipBaseRuns.factor = 0 }
-  before(:each) { FipBaseRuns.leagueContext = BattingStats.new }
+  before(:each) { EraBaseRuns.factor = 0 }
+  before(:each) { EraBaseRuns.leagueContext = BattingStats.new }
 
   let(:league_structure) { double('LeagueStructure', :getLeagues => []) }
 
