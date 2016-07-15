@@ -143,10 +143,10 @@ class Regression(label: String, category: String) {
 
       dataSet.normalize
 
-      m.holdBackValidation(0.3, true, 1001)
+      m.holdBackValidation(0.0, true, 1001)
       m.selectTrainingType(dataSet)
 
-      val bestMethod = m.crossvalidate(5, true).asInstanceOf[MLRegression]
+      val bestMethod = m.crossvalidate(2, true).asInstanceOf[MLRegression]
 
       println(s"Training error: ${m.calculateError(bestMethod, m.getTrainingDataset)}")
       println(s"Validation error: ${m.calculateError(bestMethod, m.getValidationDataset)}")
