@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.regression
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
 import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings
 import com.github.lstephen.ootp.ai.site.SiteHolder
+import com.github.lstephen.ootp.ai.site.Version
 
 import org.encog.ConsoleStatusReportable
 
@@ -59,6 +60,13 @@ object Regressable {
   // Note that this is java.lang.Integer
   def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
+  def toSourceColumns(cs: List[String], ds: VersatileMLDataSet, label: String) =
+    cs
+      .zipWithIndex
+      .map { case (name, idx) =>
+        ds.defineSourceColumn(s"${label}::${name}", idx + 1, ColumnType.continuous)
+      }
+
   implicit object RegressableDouble extends Regressable[Double] {
     def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
       List(ds.defineSourceColumn(s"${label}::Input", 1, ColumnType.continuous))
@@ -68,13 +76,8 @@ object Regressable {
 
   implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
     def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      List( ds.defineSourceColumn(s"Batting::${label}::Contact", 1, ColumnType.continuous)
-          , ds.defineSourceColumn(s"Batting::${label}::Gap", 2, ColumnType.continuous)
-          , ds.defineSourceColumn(s"Batting::${label}::Power", 3, ColumnType.continuous)
-          , ds.defineSourceColumn(s"Batting::${label}::Eye", 4, ColumnType.continuous)
-          , ds.defineSourceColumn(s"Batting::${label}::K", 5, ColumnType.continuous)
-          )
-
+      toSourceColumns(
+        List("Contact", "Gap", "Power", "Eye", "K"), ds, s"Batting::${label}")
 
     def toArray(r: BattingRatings[_ <: Object]) = {
       var k = if (r.getK.isPresent) Some(r.getK.get.doubleValue) else None
@@ -84,14 +87,24 @@ object Regressable {
   }
 
   implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_ <: Object]] {
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      List( ds.defineSourceColumn(s"${label}::Power", 1, ColumnType.continuous)
-          , ds.defineSourceColumn(s"${label}::Eye", 2, ColumnType.continuous)
-          , ds.defineSourceColumn(s"${label}::K", 3, ColumnType.continuous)
-          )
+    val version = SiteHolder.get.getType
 
-    def toArray(r: PitchingRatings[_ <: Object]) =
-      Array(r.getMovement, r.getControl, r.getStuff).map(toSomeDouble(_))
+    def registerSourceColumns(ds: VersatileMLDataSet, label: String) = {
+      var columns = List("Power", "Eye", "K") ++
+        (if (version == Version.OOTP5) List("Hits", "Doubles") else List())
+
+      toSourceColumns(columns, ds, s"Pitching::${label}")
+    }
+
+    def toArray(r: PitchingRatings[_ <: Object]) = {
+      var as = Array(r.getMovement, r.getControl, r.getStuff)
+
+      if (version == Version.OOTP5) {
+        as = as ++ Array(r.getHits, r.getGap)
+      }
+
+      as.map(toSomeDouble(_))
+    }
   }
 }
 
