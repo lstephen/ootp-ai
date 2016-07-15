@@ -90,20 +90,23 @@ object Regressable {
     val version = SiteHolder.get.getType
 
     def registerSourceColumns(ds: VersatileMLDataSet, label: String) = {
-      var columns = List("Power", "Eye", "K") ++
+      var columns = List("Power", "Eye", "K", "GBP") ++
         (if (version == Version.OOTP5) List("Hits", "Doubles") else List())
 
       toSourceColumns(columns, ds, s"Pitching::${label}")
     }
 
     def toArray(r: PitchingRatings[_ <: Object]) = {
-      var as = Array(r.getMovement, r.getControl, r.getStuff)
+      var as: Array[Option[Double]] =
+        Array(r.getMovement, r.getControl, r.getStuff).map(toSomeDouble(_))
+
+      as = as :+ (if (r.getGroundBallPct.isPresent) Some(r.getGroundBallPct.get.doubleValue) else None)
 
       if (version == Version.OOTP5) {
-        as = as ++ Array(r.getHits, r.getGap)
+        as = as ++ (Array(r.getHits, r.getGap).map(toSomeDouble(_)))
       }
 
-      as.map(toSomeDouble(_))
+      as
     }
   }
 }
@@ -140,7 +143,7 @@ class Regression(label: String, category: String) {
 
       dataSet.normalize
 
-      m.holdBackValidation(0.3, true, 666)
+      m.holdBackValidation(0.3, true, 1001)
       m.selectTrainingType(dataSet)
 
       val bestMethod = m.crossvalidate(5, true).asInstanceOf[MLRegression]

@@ -80,6 +80,18 @@ RSpec.describe SinglePlayer do
           its(:position_scores) { is_expected.to eq('-2---325') }
         end
       end
+
+      context 'Calvin Rosati' do
+        let(:file) { 'calvin_rosati' }
+
+        it_behaves_like :pitcher, 'Calvin Rosati', 26
+
+        context '#pitching_ratings', :property => :pitching_ratings do
+
+        its("vs_right.endurance") { is_expected.to eq(6) }
+        its("vs_right.ground_ball_pct.get") { is_expected.to eq(48) }
+        end
+      end
     end
 
     context 'OOTP6' do
@@ -152,6 +164,20 @@ RSpec.describe SinglePlayer do
 
           context '#defensive_ratings', :property => :defensive_ratings do
             its(:position_scores) { is_expected.to eq('-3266---') }
+          end
+        end
+
+        context 'Alex Gutierrez' do
+          let(:file) { 'alex_gutierrez' }
+
+          it_behaves_like :pitcher, 'Alex Gutierrez', 31
+
+          context '#pitching_ratings', :property => :pitching_ratings do
+            its(:vs_left) { is_expected.to be_ootp6_pitching_ratings 100, 68, 92 }
+            its(:vs_right) { is_expected.to be_ootp6_pitching_ratings 100, 70, 92 }
+
+            its("vs_right.endurance") { is_expected.to eq(4) }
+            its("vs_right.ground_ball_pct.get") { is_expected.to eq(63) }
           end
         end
       end

@@ -26,3 +26,28 @@ RSpec::Matchers.define :be_batting_ratings do |contact, gap, power, eye, k|
   end
 end
 
+RSpec::Matchers.define :be_ootp6_pitching_ratings do |stuff, control, movement|
+  def normalize(value)
+    scale.normalize(value).get
+  end
+
+  def ratings_to_string(r)
+    "#{r.stuff}/#{r.control}/#{r.movement}"
+  end
+
+  match do |ratings|
+    ratings != nil &&
+      ratings.stuff == normalize(stuff) &&
+      ratings.control == normalize(control) &&
+      ratings.movement == normalize(movement)
+  end
+
+  description do
+    "be ratings of #{stuff}/#{control}/#{movement}"
+  end
+
+  failure_message do |actual|
+    "expected that #{ratings_to_string(actual)} would #{description}"
+  end
+end
+

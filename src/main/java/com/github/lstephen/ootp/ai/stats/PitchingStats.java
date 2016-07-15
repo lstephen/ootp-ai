@@ -75,6 +75,10 @@ public class PitchingStats implements Stats<PitchingStats> {
         return perPlateAppearance(doubles);
     }
 
+    public double getTriplesPerPlateAppearance() {
+      return perPlateAppearance(triples);
+    }
+
     public double getDoublesPerHit() {
         return perHit(doubles);
     }

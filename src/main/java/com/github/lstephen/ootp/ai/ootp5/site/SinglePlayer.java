@@ -250,6 +250,10 @@ public class SinglePlayer implements PlayerSource {
     return site.getBuntScale().parse(extractRunningText(doc, " Bunt for Hit :"));
   }
 
+  private Rating<?, ?> extractRunningSpeed(Document doc) {
+    return site.getRunningScale().parse(extractRunningText(doc, " Running Speed :"));
+  }
+
   private Rating<?, ?> extractStealing(Document doc) {
     return site.getRunningScale().parse(extractRunningText(doc, " Stealing Ability :"));
   }
@@ -320,21 +324,26 @@ public class SinglePlayer implements PlayerSource {
     }
 
     String raw = doc.select("td.s1:contains(Pitching Ratings) + td").html();
+    String[] ratings = StringUtils.splitByWholeSeparator(raw, "<br />");
 
     int endurance;
+    int gbp;
     switch (site.getType()) {
       case OOTP6:
-        endurance = Integer.parseInt(StringUtils.substringBetween(raw, "<br />", "<br />").trim());
+        endurance = Integer.parseInt(ratings[0].trim());
+        gbp = Integer.parseInt(ratings[1].trim());
         break;
       case OOTP5:
-        String starter = StringUtils.substringBetween(raw, "<br />", "<br />").trim();
+        gbp = Integer.parseInt(ratings[2].trim());
+
+        String starter = ratings[0].trim();
 
         if (!starter.equals("-")) {
           endurance = 10 - (starter.charAt(0) - 'A');
           break;
         }
 
-        String reliever = StringUtils.substringBetween(raw, "-<br />", "<br />").trim();
+        String reliever = ratings[1].trim();
 
         if (!reliever.equals("-")) {
           endurance = 5 - (reliever.charAt(0) - 'A');
@@ -347,8 +356,8 @@ public class SinglePlayer implements PlayerSource {
         throw new IllegalStateException();
     }
 
-    PitchingRatings<?> l = extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance);
-    PitchingRatings<?> r = extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance);
+    PitchingRatings<?> l = extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
+    PitchingRatings<?> r = extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
 
     return Splits.create(l, r);
   }
@@ -356,10 +365,13 @@ public class SinglePlayer implements PlayerSource {
   private PitchingRatings<?> extractPitchingPotential(Document doc) {
     Elements talent = doc.select("tr.g:has(td:contains(Talent))");
 
+    Splits<PitchingRatings<?>> current = extractPitchingRatings(doc);
+
     return extractPitchingRatings(
         talent.get(0),
         site.getPotentialRatingScale(),
-        extractPitchingRatings(doc).getVsLeft().getEndurance());
+        current.getVsLeft().getEndurance(),
+        current.getVsLeft().getGroundBallPct().get());
   }
 
   private Integer extractRange(String raw, String position) {
@@ -499,7 +511,7 @@ public class SinglePlayer implements PlayerSource {
     }
   }
 
-  private <T> PitchingRatings<T> extractPitchingRatings(Element el, Scale<T> scale, int endurance) {
+  private <T> PitchingRatings<T> extractPitchingRatings(Element el, Scale<T> scale, int endurance, int gbp) {
     Elements line = el.children();
 
     ImmutableMap<PitchingRatingsType, Integer> idx;
@@ -522,6 +534,7 @@ public class SinglePlayer implements PlayerSource {
       .control(line.get(idx.get(PitchingRatingsType.CONTROL)).text())
       .movement(line.get(idx.get(PitchingRatingsType.MOVEMENT)).text())
       .endurance(endurance)
+      .groundBallPct(gbp)
       .build();
 
     return ratings;
