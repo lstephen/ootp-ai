@@ -1,6 +1,7 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
 import com.github.lstephen.ootp.ai.rating.OneToTen;
+import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
 
@@ -35,6 +37,8 @@ public class PitchingRatings<T> {
 
     private final Rating<Integer, ? super OneToTen> endurance;
 
+    private final Rating<Integer, ? super OneToOneHundred> groundBallPct;
+
     private PitchingRatings(Builder<T> builder) {
         Preconditions.checkNotNull(builder.scale);
         Preconditions.checkNotNull(builder.hits);
@@ -51,6 +55,7 @@ public class PitchingRatings<T> {
         this.control = builder.control;
         this.movement = builder.movement;
         this.endurance = builder.endurance;
+        this.groundBallPct = builder.groundBallPct;
     }
 
     public Integer getHits() { return hits.normalize().get(); }
@@ -64,6 +69,12 @@ public class PitchingRatings<T> {
     public Integer getMovement() { return movement.normalize().get(); }
 
     public Integer getEndurance() { return endurance.get(); }
+
+    public Optional<Integer> getGroundBallPct() {
+        return groundBallPct == null
+            ? Optional.<Integer>absent()
+            : Optional.of(groundBallPct.normalize().get());
+    }
 
     @Override
     public String toString() {
@@ -100,6 +111,8 @@ public class PitchingRatings<T> {
         private Rating<T, ? extends Scale<T>> movement;
 
         private Rating<Integer, ? super OneToTen> endurance;
+
+        private Rating<Integer, ? super OneToOneHundred> groundBallPct;
 
         private Builder(Scale<T> scale) {
             this.scale = scale;
@@ -198,6 +211,21 @@ public class PitchingRatings<T> {
             return endurance(new Rating<>(value, new OneToTen()));
         }
 
+        public Builder<T> groundBallPct(Rating<Integer, ? super OneToOneHundred> groundBallPct) {
+            this.groundBallPct = groundBallPct;
+            return this;
+        }
+
+        @JsonProperty("groundBallPct")
+        public Builder<T> groundBallPct(String s) {
+            return s == null || s.equals("null")
+                ? this
+                : groundBallPct(new OneToOneHundred().parse(s));
+        }
+
+        public Builder<T> groundBallPct(Integer value) {
+            return groundBallPct(new Rating<>(value, new OneToOneHundred()));
+        }
 
         public PitchingRatings<T> build() {
             return PitchingRatings.build(this);

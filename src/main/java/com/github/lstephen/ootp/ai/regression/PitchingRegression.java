@@ -27,7 +27,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
  */
 public final class PitchingRegression {
 
-    private enum Predicting { HITS, DOUBLES, STRIKEOUTS, WALKS, HOME_RUNS }
+    private enum Predicting { HITS, DOUBLES, TRIPLES, STRIKEOUTS, WALKS, HOME_RUNS }
 
     private static final Long DEFAULT_PLATE_APPEARANCES = 700L;
 
@@ -80,6 +80,7 @@ public final class PitchingRegression {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
             getRegression(Predicting.HITS).addPitchingData(ratings, stats.getHitsPerPlateAppearance());
             getRegression(Predicting.DOUBLES).addPitchingData(ratings, stats.getDoublesPerPlateAppearance());
+            getRegression(Predicting.TRIPLES).addPitchingData(ratings, stats.getTriplesPerPlateAppearance());
             getRegression(Predicting.STRIKEOUTS).addPitchingData(
                 ratings, stats.getStrikeoutsPerPlateAppearance());
             getRegression(Predicting.WALKS).addPitchingData(ratings, stats.getWalksPerPlateAppearance());
@@ -173,12 +174,15 @@ public final class PitchingRegression {
             Math.round(plateAppearances * predict(Predicting.HITS, ratings));
         long predictedDoubles =
             Math.round(plateAppearances * predict(Predicting.DOUBLES, ratings));
+        long predictedTriples =
+            Math.round(plateAppearances * predict(Predicting.TRIPLES, ratings));
 
         PitchingStats predicted = new PitchingStats();
         predicted.setLeaguePitching(leaguePitching);
         predicted.setAtBats((int) (plateAppearances - predictedWalks));
         predicted.setHits(predictedHits);
         predicted.setDoubles(predictedDoubles);
+        predicted.setTriples(predictedTriples);
         predicted.setHomeRuns(predictedHomeRuns);
         predicted.setWalks(predictedWalks);
         predicted.setStrikeouts(predictedStrikeouts);
@@ -264,6 +268,7 @@ public final class PitchingRegression {
             w.println(r.get(Predicting.HOME_RUNS).format());
             w.println(r.get(Predicting.HITS).format());
             w.println(r.get(Predicting.DOUBLES).format());
+            w.println(r.get(Predicting.TRIPLES).format());
 
             w.format("-----|%n");
             w.format("  ERA| %.3f%n", regression.era.getRSquare());
