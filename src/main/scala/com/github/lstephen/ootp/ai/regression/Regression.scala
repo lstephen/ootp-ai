@@ -1,25 +1,38 @@
 package com.github.lstephen.ootp.ai.regression
 
+import collection.JavaConversions._
+
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
 import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings
 import com.github.lstephen.ootp.ai.site.SiteHolder
 import com.github.lstephen.ootp.ai.site.Version
 
-import org.encog.ConsoleStatusReportable
+import com.typesafe.scalalogging.StrictLogging
+
+import org.encog.engine.network.activation.ActivationSigmoid
+
+import org.encog.mathutil.randomize.generate.BasicGenerateRandom
 
 import org.encog.ml.MLRegression
 
+import org.encog.ml.data.versatile.NormalizationHelper
 import org.encog.ml.data.versatile.VersatileMLDataSet
 import org.encog.ml.data.versatile.columns.ColumnDefinition
 import org.encog.ml.data.versatile.columns.ColumnType
 import org.encog.ml.data.versatile.missing.MeanMissingHandler
+import org.encog.ml.data.versatile.missing.MissingHandler
+import org.encog.ml.data.versatile.normalizers.PassThroughNormalizer
+import org.encog.ml.data.versatile.normalizers.strategies.BasicNormalizationStrategy
 import org.encog.ml.data.versatile.sources.VersatileDataSource
 
-import org.encog.ml.factory.MLMethodFactory
+import org.encog.ml.train.strategy.StopTrainingStrategy
 
-import org.encog.ml.model.EncogModel
+import org.encog.neural.networks.BasicNetwork
+import org.encog.neural.networks.layers.BasicLayer
+import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation
 
 import scala.collection.mutable.ListBuffer
+
 
 class DataPoint(val input: Array[Option[Double]], val output: Double) {
   def toArray: Array[Option[Double]] = Some(output) +: input
@@ -115,15 +128,28 @@ class Regression(label: String, category: String) {
 
   import Regressable._
 
+  class LoggingMissingHandler extends MissingHandler with StrictLogging {
+    val handler = new MeanMissingHandler
+
+    def init(n: NormalizationHelper) =
+      handler.init(n)
+
+    def processString(c: ColumnDefinition) = handler.processString(c)
+
+    def processDouble(c: ColumnDefinition) = {
+      val d = handler.processDouble(c)
+      logger.info(s"Replaced unknown with: ${d})")
+      d
+    }
+  }
+
   val data = new InMemoryDataSource
 
   val dataSet = new VersatileMLDataSet(data)
 
-  dataSet.getNormHelper defineUnknownValue "?"
 
   val outputColumn = dataSet.defineSourceColumn(s"${label}::Output", 0, ColumnType.continuous)
 
-  var _model: Option[EncogModel] = None
   var _regression: Option[MLRegression] = None
 
   def normalizationHelper = dataSet.getNormHelper
@@ -134,14 +160,45 @@ class Regression(label: String, category: String) {
       println(s"Creating regression for $label, size: ${data.data.length}")
 
       dataSet defineSingleOutputOthersInput outputColumn
-
       dataSet.analyze
 
-      val m = new EncogModel(dataSet)
+      val normalization = new BasicNormalizationStrategy
+      normalization.assignInputNormalizer(ColumnType.continuous, new PassThroughNormalizer)
+      normalization.assignOutputNormalizer(ColumnType.continuous, new PassThroughNormalizer)
+
+      dataSet.getNormHelper.setStrategy(normalization)
+      dataSet.getNormHelper.defineUnknownValue("?")
+      dataSet.normalize
+
+      println(s"${normalizationHelper}")
+
+      val network = new BasicNetwork
+
+      network.addLayer(new BasicLayer(null, true, dataSet.getCalculatedInputSize))
+      network.addLayer(new BasicLayer(new ActivationSigmoid(), false, 1))
+
+      network.getStructure.finalizeStructure
+      network.reset
+
+      val train = new ResilientPropagation(network, dataSet)
+
+      val strategy = new StopTrainingStrategy
+
+      train.addStrategy(strategy)
+
+      while (!train.isTrainingDone) {
+        train.iteration();
+
+        println(f"${train.getIteration}%3d: ${train.getError}%.8f")
+      }
+
+      throw new IllegalStateException
+
+
+      /*val m = new EncogModel(dataSet)
       m.selectMethod(dataSet, MLMethodFactory.TYPE_FEEDFORWARD)
       m.setReport(new ConsoleStatusReportable)
 
-      dataSet.normalize
 
       m.holdBackValidation(0.0, true, 1001)
       m.selectTrainingType(dataSet)
@@ -155,14 +212,14 @@ class Regression(label: String, category: String) {
       println(s"Final model: ${bestMethod}")
 
       _regression = Some(bestMethod)
-      bestMethod
+      bestMethod*/
   }
 
 
   def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
     if (data.data.isEmpty) {
       regressable.registerSourceColumns(dataSet, label)
-        .foreach { c => dataSet.getNormHelper.defineMissingHandler(c, new MeanMissingHandler) }
+        .foreach { c => dataSet.getNormHelper.defineMissingHandler(c, new LoggingMissingHandler) }
     }
 
     data.add(new DataPoint(regressable.toArray(x), y))
