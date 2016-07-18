@@ -9,114 +9,127 @@ import com.github.lstephen.ootp.ai.site.Version
 
 import com.typesafe.scalalogging.StrictLogging
 
-import org.encog.engine.network.activation.ActivationSigmoid
+import org.encog.engine.network.activation.ActivationLinear
 
 import org.encog.mathutil.randomize.generate.BasicGenerateRandom
 
 import org.encog.ml.MLRegression
 
-import org.encog.ml.data.versatile.NormalizationHelper
-import org.encog.ml.data.versatile.VersatileMLDataSet
-import org.encog.ml.data.versatile.columns.ColumnDefinition
-import org.encog.ml.data.versatile.columns.ColumnType
-import org.encog.ml.data.versatile.missing.MeanMissingHandler
-import org.encog.ml.data.versatile.missing.MissingHandler
-import org.encog.ml.data.versatile.normalizers.PassThroughNormalizer
-import org.encog.ml.data.versatile.normalizers.strategies.BasicNormalizationStrategy
-import org.encog.ml.data.versatile.sources.VersatileDataSource
+import org.encog.ml.data.MLData
+import org.encog.ml.data.MLDataPair
+import org.encog.ml.data.MLDataSet
+import org.encog.ml.data.basic.BasicMLData
+import org.encog.ml.data.basic.BasicMLDataPair
+import org.encog.ml.data.basic.BasicMLDataSet
+import org.encog.ml.data.folded.FoldedDataSet
 
 import org.encog.ml.train.strategy.StopTrainingStrategy
 
 import org.encog.neural.networks.BasicNetwork
 import org.encog.neural.networks.layers.BasicLayer
+import org.encog.neural.networks.training.cross.CrossValidationKFold
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation
+import org.encog.neural.networks.training.propagation.quick.QuickPropagation
 
-import scala.collection.mutable.ListBuffer
+import scala.math.ScalaNumericAnyConversions
 
+class Input(private val is: List[Option[Double]]) {
+  def :+(rhs: Double): Input = this :+ Some(rhs)
+  def :+(rhs: Option[Double]): Input = new Input(is :+ rhs)
+  def ++(rhs: Input): Input = new Input(is ++ rhs.is)
 
-class DataPoint(val input: Array[Option[Double]], val output: Double) {
-  def toArray: Array[Option[Double]] = Some(output) +: input
-  def toStringArray = DataPoint.toStringArray(toArray)
+  val length = is.length
+
+  def get(idx: Integer): Option[Double] = is get idx
+
+  def toArray(f: Int => Double): Array[Double] =
+    is
+      .zipWithIndex
+      .map {
+        case (d, idx) => d getOrElse f(idx)
+      }
+      .toArray
+
+    def toMLData(f: Int => Double): MLData = new BasicMLData(toArray(f))
 }
 
-object DataPoint {
-  def toStringArray(xs: Array[Option[Double]]): Array[String] =
-    xs.map { x => x.map(_.toString).getOrElse("?") }
+object Input {
+  def apply(ds: Integer*): Input = apply(ds.toList.map(_.doubleValue))
+  def apply(ds: List[Double]): Input = new Input(ds.map(Some(_)))
 }
 
-class InMemoryDataSource extends VersatileDataSource {
-  var index = 0
 
-  val data = ListBuffer.empty[DataPoint]
+class DataPoint(val input: Input, val output: Double) {
+  def toMLDataPair(implicit ds: DataSet): MLDataPair =
+    new BasicMLDataPair(input.toMLData(ds.averageForColumn(_)), new BasicMLData(Array(output)))
+}
 
-  def add(p: DataPoint): Unit = data += p
 
-  def columnIndex(n: String) = -1
+class DataSet(ds: List[DataPoint]) extends StrictLogging {
+  def :+(rhs: DataPoint): DataSet = {
+    if (!ds.isEmpty && rhs.input.length != ds.head.input.length) {
+      throw new IllegalArgumentException
+    }
 
-  def readLine: Array[String] = {
-    index = index + 1
-
-    if (index >= data.length) return null
-
-    data(index).toStringArray
+    new DataSet(ds :+ rhs)
   }
 
-  def rewind: Unit = { index = -1 }
+  lazy val averages: List[Double] = {
+    logger.info("Calculating averages...")
+
+    (0 to (ds.head.input.length - 1))
+      .map { idx =>
+        val vs = ds.map(_.input.get(idx)).flatten
+
+        vs.sum / vs.length
+      }
+      .toList
+  }
+
+  def averageForColumn(i: Integer): Double = averages.get(i)
+
+  def map[T](f: DataPoint => T): List[T] = ds.map(f)
+
+  val length = ds.length
+
+  def toMLDataSet: MLDataSet = {
+    implicit val ds = this
+    new BasicMLDataSet(ds.map(_.toMLDataPair))
+  }
 }
 
+object DataSet {
+  def apply(): DataSet = new DataSet(List())
+}
+
+
 trait Regressable[-T] {
-  def registerSourceColumns(ds: VersatileMLDataSet, label: String): List[ColumnDefinition]
-  def toArray(t: T): Array[Option[Double]]
+  def toInput(t: T): Input
 }
 
 object Regressable {
   // Note that this is java.lang.Integer
   def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
-  def toSourceColumns(cs: List[String], ds: VersatileMLDataSet, label: String) =
-    cs
-      .zipWithIndex
-      .map { case (name, idx) =>
-        ds.defineSourceColumn(s"${label}::${name}", idx + 1, ColumnType.continuous)
-      }
-
-  implicit object RegressableDouble extends Regressable[Double] {
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      List(ds.defineSourceColumn(s"${label}::Input", 1, ColumnType.continuous))
-
-    def toArray(d: Double) = Array(Some(d))
-  }
-
   implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      toSourceColumns(
-        List("Contact", "Gap", "Power", "Eye", "K"), ds, s"Batting::${label}")
-
-    def toArray(r: BattingRatings[_ <: Object]) = {
+    def toInput(r: BattingRatings[_ <: Object]) = {
       var k = if (r.getK.isPresent) Some(r.getK.get.doubleValue) else None
 
-      Array(r.getContact, r.getGap, r.getPower, r.getEye).map(toSomeDouble(_)) :+ k
+      Input(r.getContact, r.getGap, r.getPower, r.getEye) :+ k
     }
   }
 
   implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_ <: Object]] {
     val version = SiteHolder.get.getType
 
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) = {
-      var columns = List("Power", "Eye", "K", "GBP") ++
-        (if (version == Version.OOTP5) List("Hits", "Doubles") else List())
-
-      toSourceColumns(columns, ds, s"Pitching::${label}")
-    }
-
-    def toArray(r: PitchingRatings[_ <: Object]) = {
-      var as: Array[Option[Double]] =
-        Array(r.getMovement, r.getControl, r.getStuff).map(toSomeDouble(_))
+    def toInput(r: PitchingRatings[_ <: Object]) = {
+      var as: Input =
+        Input(r.getMovement, r.getControl, r.getStuff)
 
       as = as :+ (if (r.getGroundBallPct.isPresent) Some(r.getGroundBallPct.get.doubleValue) else None)
 
       if (version == Version.OOTP5) {
-        as = as ++ (Array(r.getHits, r.getGap).map(toSomeDouble(_)))
+        as = as ++ Input(r.getHits, r.getGap)
       }
 
       as
@@ -124,128 +137,68 @@ object Regressable {
   }
 }
 
-class Regression(label: String, category: String) {
+
+class Regression(label: String, category: String) extends StrictLogging {
 
   import Regressable._
 
-  class LoggingMissingHandler extends MissingHandler with StrictLogging {
-    val handler = new MeanMissingHandler
-
-    def init(n: NormalizationHelper) =
-      handler.init(n)
-
-    def processString(c: ColumnDefinition) = handler.processString(c)
-
-    def processDouble(c: ColumnDefinition) = {
-      val d = handler.processDouble(c)
-      logger.info(s"Replaced unknown with: ${d})")
-      d
-    }
-  }
-
-  val data = new InMemoryDataSource
-
-  val dataSet = new VersatileMLDataSet(data)
-
-
-  val outputColumn = dataSet.defineSourceColumn(s"${label}::Output", 0, ColumnType.continuous)
+  var data: DataSet = DataSet()
 
   var _regression: Option[MLRegression] = None
-
-  def normalizationHelper = dataSet.getNormHelper
 
   def regression = _regression match {
     case Some(r) => r
     case None    =>
-      println(s"Creating regression for $label, size: ${data.data.length}")
+      logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
-      dataSet defineSingleOutputOthersInput outputColumn
-      dataSet.analyze
-
-      val normalization = new BasicNormalizationStrategy
-      normalization.assignInputNormalizer(ColumnType.continuous, new PassThroughNormalizer)
-      normalization.assignOutputNormalizer(ColumnType.continuous, new PassThroughNormalizer)
-
-      dataSet.getNormHelper.setStrategy(normalization)
-      dataSet.getNormHelper.defineUnknownValue("?")
-      dataSet.normalize
-
-      println(s"${normalizationHelper}")
+      val dataSet = data.toMLDataSet
 
       val network = new BasicNetwork
 
-      network.addLayer(new BasicLayer(null, true, dataSet.getCalculatedInputSize))
-      network.addLayer(new BasicLayer(new ActivationSigmoid(), false, 1))
+      network.addLayer(new BasicLayer(null, true, dataSet.getInputSize))
+      network.addLayer(new BasicLayer(new ActivationLinear(), false, 1))
 
       network.getStructure.finalizeStructure
       network.reset
 
-      val train = new ResilientPropagation(network, dataSet)
+      val folded = new FoldedDataSet(dataSet)
+
+      val train = new CrossValidationKFold(new ResilientPropagation(network, folded), 10)
 
       val strategy = new StopTrainingStrategy
 
       train.addStrategy(strategy)
 
+      var iteration = 0;
       while (!train.isTrainingDone) {
         train.iteration();
 
-        println(f"${train.getIteration}%3d: ${train.getError}%.8f")
+        iteration += 1;
+        println(f"${iteration}%3d: ${train.getError}%.8f")
       }
 
-      throw new IllegalStateException
-
-
-      /*val m = new EncogModel(dataSet)
-      m.selectMethod(dataSet, MLMethodFactory.TYPE_FEEDFORWARD)
-      m.setReport(new ConsoleStatusReportable)
-
-
-      m.holdBackValidation(0.0, true, 1001)
-      m.selectTrainingType(dataSet)
-
-      val bestMethod = m.crossvalidate(2, true).asInstanceOf[MLRegression]
-
-      println(s"Training error: ${m.calculateError(bestMethod, m.getTrainingDataset)}")
-      println(s"Validation error: ${m.calculateError(bestMethod, m.getValidationDataset)}")
-
-      println(s"${normalizationHelper}")
-      println(s"Final model: ${bestMethod}")
-
-      _regression = Some(bestMethod)
-      bestMethod*/
+      _regression = Some(network)
+      network
   }
 
 
   def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
-    if (data.data.isEmpty) {
-      regressable.registerSourceColumns(dataSet, label)
-        .foreach { c => dataSet.getNormHelper.defineMissingHandler(c, new LoggingMissingHandler) }
-    }
+    if (data.length < 20000)
+      data = data :+ new DataPoint(regressable.toInput(x), y)
 
-    data.add(new DataPoint(regressable.toArray(x), y))
     _regression = None
   }
 
-  def getN: Long = data.data.length
+  def getN: Long = data.length
 
   def predict[T: Regressable](x: T): Double =
-    predict(implicitly[Regressable[T]].toArray(x))
+    predict(implicitly[Regressable[T]].toInput(x))
 
-  def predict(xs: Array[Option[Double]]): Double = {
-    val r = regression // Force model computation
-
-    val input = normalizationHelper.allocateInputVector
-
-    normalizationHelper.normalizeInputVector(
-      DataPoint.toStringArray(xs), input.getData, false)
-
-    normalizationHelper
-      .denormalizeOutputVectorToString(r.compute(input))(0)
-      .toDouble
-  }
+  def predict(xs: Input): Double =
+    regression.compute(xs.toMLData(data.averageForColumn(_))).getData(0)
 
   def mse =
-    (data.data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.data.length
+    (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
 
   def rsme = math.pow(mse, 0.5)
 
