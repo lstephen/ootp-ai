@@ -75,7 +75,7 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
       .map { idx =>
         val vs = ds.map(_.input.get(idx)).flatten
 
-        vs.sum / vs.length
+        if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
       }
       .toList
   }
