@@ -26,7 +26,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
  */
 public final class BattingRegression {
 
-    private enum Predicting { HITS, EXTRA_BASE_HITS, HOME_RUNS, WALKS, KS }
+    private enum Predicting { HITS, DOUBLES, TRIPLES, HOME_RUNS, WALKS, KS }
 
     private static final Long DEFAULT_PLATE_APPEARANCES = 700L;
 
@@ -76,8 +76,10 @@ public final class BattingRegression {
         for (int i = 0; i < stats.getPlateAppearances(); i++) {
             getRegression(Predicting.HITS).addBattingData(
                 ratings, stats.getHitsPerPlateAppearance());
-            getRegression(Predicting.EXTRA_BASE_HITS).addBattingData(
-                ratings, stats.getExtraBaseHitsPerPlateAppearance());
+            getRegression(Predicting.DOUBLES).addBattingData(
+                ratings, stats.getDoublesPerPlateAppearance());
+            getRegression(Predicting.TRIPLES).addBattingData(
+                ratings, stats.getTriplesPerPlateAppearance());
 
             getRegression(Predicting.HOME_RUNS).addBattingData(
                 ratings, stats.getHomeRunsPerPlateAppearance());
@@ -175,14 +177,13 @@ public final class BattingRegression {
             Math.round(plateAppearances
                 * predict(Predicting.HITS, ratings));
 
-        long predictedExtraBaseHits =
+        long predictedDoubles =
             Math.round(plateAppearances
-                * predict(Predicting.EXTRA_BASE_HITS, ratings));
+                * predict(Predicting.DOUBLES, ratings));
 
-        double triplesPercentage = (double) leagueBatting.getTriples()
-            / (leagueBatting.getDoubles() + leagueBatting.getTriples());
-        long predictedTriples = Math.round(predictedExtraBaseHits * triplesPercentage);
-        long predictedDoubles = predictedExtraBaseHits - predictedTriples;
+        long predictedTriples =
+            Math.round(plateAppearances
+                * predict(Predicting.TRIPLES, ratings));
 
         long predictedHomeRuns =
              Math.round(plateAppearances
@@ -278,7 +279,8 @@ public final class BattingRegression {
             w.println();
 
             w.println(r.get(Predicting.HITS).format());
-            w.println(r.get(Predicting.EXTRA_BASE_HITS).format());
+            w.println(r.get(Predicting.DOUBLES).format());
+            w.println(r.get(Predicting.TRIPLES).format());
             w.println(r.get(Predicting.HOME_RUNS).format());
             w.println(r.get(Predicting.WALKS).format());
             w.println(r.get(Predicting.KS).format());
