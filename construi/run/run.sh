@@ -27,7 +27,7 @@ then
 fi
 
 echo "Running..."
-mvn -B exec:java -Dgpg.skip=true
+MAVEN_OPTS="-Xmx1G" mvn -B exec:java -Dgpg.skip=true
 
 echo "Updating data..."
 cd ootp-ai-data

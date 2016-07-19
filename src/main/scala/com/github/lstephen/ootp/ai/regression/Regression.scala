@@ -1,109 +1,129 @@
 package com.github.lstephen.ootp.ai.regression
 
+import collection.JavaConversions._
+
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
 import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings
 import com.github.lstephen.ootp.ai.site.SiteHolder
 import com.github.lstephen.ootp.ai.site.Version
 
-import org.encog.ConsoleStatusReportable
+import com.typesafe.scalalogging.StrictLogging
 
-import org.encog.ml.MLRegression
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
-import org.encog.ml.data.versatile.VersatileMLDataSet
-import org.encog.ml.data.versatile.columns.ColumnDefinition
-import org.encog.ml.data.versatile.columns.ColumnType
-import org.encog.ml.data.versatile.missing.MeanMissingHandler
-import org.encog.ml.data.versatile.sources.VersatileDataSource
+import org.apache.spark.rdd.RDD
 
-import org.encog.ml.factory.MLMethodFactory
+import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.mllib.linalg.DenseVector
+import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.tree.RandomForest
+import org.apache.spark.mllib.tree.model.RandomForestModel
 
-import org.encog.ml.model.EncogModel
+import scala.math.ScalaNumericAnyConversions
 
-import scala.collection.mutable.ListBuffer
-
-class DataPoint(val input: Array[Option[Double]], val output: Double) {
-  def toArray: Array[Option[Double]] = Some(output) +: input
-  def toStringArray = DataPoint.toStringArray(toArray)
+object Spark {
+  val context = new SparkContext(new SparkConf().setAppName("ootp-ai").setMaster("local"))
 }
 
-object DataPoint {
-  def toStringArray(xs: Array[Option[Double]]): Array[String] =
-    xs.map { x => x.map(_.toString).getOrElse("?") }
+
+class Input(private val is: List[Option[Double]]) {
+  def :+(rhs: Double): Input = this :+ Some(rhs)
+  def :+(rhs: Option[Double]): Input = new Input(is :+ rhs)
+  def ++(rhs: Input): Input = new Input(is ++ rhs.is)
+
+  val length = is.length
+
+  def get(idx: Integer): Option[Double] = is get idx
+
+  def toArray(f: Int => Double): Array[Double] =
+    is
+      .zipWithIndex
+      .map {
+        case (d, idx) => d getOrElse f(idx)
+      }
+      .toArray
+
+  def toVector(f: Int => Double): Vector = new DenseVector(toArray(f))
 }
 
-class InMemoryDataSource extends VersatileDataSource {
-  var index = 0
+object Input {
+  def apply(ds: Integer*): Input = apply(ds.toList.map(_.doubleValue))
+  def apply(ds: List[Double]): Input = new Input(ds.map(Some(_)))
+}
 
-  val data = ListBuffer.empty[DataPoint]
 
-  def add(p: DataPoint): Unit = data += p
+class DataPoint(val input: Input, val output: Double) {
+  def toLabeledPoint(f: Int => Double): LabeledPoint =
+    new LabeledPoint(output, input.toVector(f))
+}
 
-  def columnIndex(n: String) = -1
 
-  def readLine: Array[String] = {
-    index = index + 1
+class DataSet(ds: List[DataPoint]) extends StrictLogging {
+  def :+(rhs: DataPoint): DataSet = {
+    if (!ds.isEmpty && rhs.input.length != ds.head.input.length) {
+      throw new IllegalArgumentException
+    }
 
-    if (index >= data.length) return null
-
-    data(index).toStringArray
+    new DataSet(ds :+ rhs)
   }
 
-  def rewind: Unit = { index = -1 }
+  lazy val averages: List[Double] = {
+    logger.info("Calculating averages...")
+
+    (0 to (inputSize - 1))
+      .map { idx =>
+        val vs = ds.map(_.input.get(idx)).flatten
+
+        vs.sum / vs.length
+      }
+      .toList
+  }
+
+  def averageForColumn(i: Integer): Double = averages.get(i)
+
+  def map[T](f: DataPoint => T): List[T] = ds.map(f)
+
+  val length = ds.length
+
+  def inputSize = ds.head.input.length
+
+  def toRdd: RDD[LabeledPoint] =
+    Spark.context.parallelize(ds.map(_.toLabeledPoint(averageForColumn(_))))
 }
 
+object DataSet {
+  def apply(): DataSet = new DataSet(List())
+}
+
+
 trait Regressable[-T] {
-  def registerSourceColumns(ds: VersatileMLDataSet, label: String): List[ColumnDefinition]
-  def toArray(t: T): Array[Option[Double]]
+  def toInput(t: T): Input
 }
 
 object Regressable {
   // Note that this is java.lang.Integer
   def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
-  def toSourceColumns(cs: List[String], ds: VersatileMLDataSet, label: String) =
-    cs
-      .zipWithIndex
-      .map { case (name, idx) =>
-        ds.defineSourceColumn(s"${label}::${name}", idx + 1, ColumnType.continuous)
-      }
-
-  implicit object RegressableDouble extends Regressable[Double] {
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      List(ds.defineSourceColumn(s"${label}::Input", 1, ColumnType.continuous))
-
-    def toArray(d: Double) = Array(Some(d))
-  }
-
   implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) =
-      toSourceColumns(
-        List("Contact", "Gap", "Power", "Eye", "K"), ds, s"Batting::${label}")
-
-    def toArray(r: BattingRatings[_ <: Object]) = {
+    def toInput(r: BattingRatings[_ <: Object]) = {
       var k = if (r.getK.isPresent) Some(r.getK.get.doubleValue) else None
 
-      Array(r.getContact, r.getGap, r.getPower, r.getEye).map(toSomeDouble(_)) :+ k
+      Input(r.getContact, r.getGap, r.getPower, r.getEye) :+ k
     }
   }
 
   implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_ <: Object]] {
     val version = SiteHolder.get.getType
 
-    def registerSourceColumns(ds: VersatileMLDataSet, label: String) = {
-      var columns = List("Power", "Eye", "K", "GBP") ++
-        (if (version == Version.OOTP5) List("Hits", "Doubles") else List())
-
-      toSourceColumns(columns, ds, s"Pitching::${label}")
-    }
-
-    def toArray(r: PitchingRatings[_ <: Object]) = {
-      var as: Array[Option[Double]] =
-        Array(r.getMovement, r.getControl, r.getStuff).map(toSomeDouble(_))
+    def toInput(r: PitchingRatings[_ <: Object]) = {
+      var as: Input =
+        Input(r.getMovement, r.getControl, r.getStuff)
 
       as = as :+ (if (r.getGroundBallPct.isPresent) Some(r.getGroundBallPct.get.doubleValue) else None)
 
       if (version == Version.OOTP5) {
-        as = as ++ (Array(r.getHits, r.getGap).map(toSomeDouble(_)))
+        as = as ++ Input(r.getHits, r.getGap)
       }
 
       as
@@ -111,84 +131,49 @@ object Regressable {
   }
 }
 
-class Regression(label: String, category: String) {
+
+class Regression(label: String, category: String) extends StrictLogging {
 
   import Regressable._
 
-  val data = new InMemoryDataSource
+  var data: DataSet = DataSet()
 
-  val dataSet = new VersatileMLDataSet(data)
-
-  dataSet.getNormHelper defineUnknownValue "?"
-
-  val outputColumn = dataSet.defineSourceColumn(s"${label}::Output", 0, ColumnType.continuous)
-
-  var _model: Option[EncogModel] = None
-  var _regression: Option[MLRegression] = None
-
-  def normalizationHelper = dataSet.getNormHelper
+  var _regression: Option[RandomForestModel] = None
 
   def regression = _regression match {
     case Some(r) => r
     case None    =>
-      println(s"Creating regression for $label, size: ${data.data.length}")
+      logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
-      dataSet defineSingleOutputOthersInput outputColumn
+      val model = RandomForest.trainRegressor(
+        data.toRdd, Map[Int, Int](), 30, "auto", "variance", 5, 32)
 
-      dataSet.analyze
+      _regression = Some(model)
 
-      val m = new EncogModel(dataSet)
-      m.selectMethod(dataSet, MLMethodFactory.TYPE_FEEDFORWARD)
-      m.setReport(new ConsoleStatusReportable)
+      logger.info(s"Model: ${model.toDebugString}")
 
-      dataSet.normalize
-
-      m.holdBackValidation(0.0, true, 1001)
-      m.selectTrainingType(dataSet)
-
-      val bestMethod = m.crossvalidate(2, true).asInstanceOf[MLRegression]
-
-      println(s"Training error: ${m.calculateError(bestMethod, m.getTrainingDataset)}")
-      println(s"Validation error: ${m.calculateError(bestMethod, m.getValidationDataset)}")
-
-      println(s"${normalizationHelper}")
-      println(s"Final model: ${bestMethod}")
-
-      _regression = Some(bestMethod)
-      bestMethod
+      model
   }
 
 
   def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
-    if (data.data.isEmpty) {
-      regressable.registerSourceColumns(dataSet, label)
-        .foreach { c => dataSet.getNormHelper.defineMissingHandler(c, new MeanMissingHandler) }
-    }
-
-    data.add(new DataPoint(regressable.toArray(x), y))
+    data = data :+ new DataPoint(regressable.toInput(x), y)
     _regression = None
   }
 
-  def getN: Long = data.data.length
+  def getN: Long = data.length
 
   def predict[T: Regressable](x: T): Double =
-    predict(implicitly[Regressable[T]].toArray(x))
+    predict(implicitly[Regressable[T]].toInput(x))
 
-  def predict(xs: Array[Option[Double]]): Double = {
-    val r = regression // Force model computation
-
-    val input = normalizationHelper.allocateInputVector
-
-    normalizationHelper.normalizeInputVector(
-      DataPoint.toStringArray(xs), input.getData, false)
-
-    normalizationHelper
-      .denormalizeOutputVectorToString(r.compute(input))(0)
-      .toDouble
-  }
+  def predict(xs: Input): Double =
+    regression.predict(xs.toVector(data.averageForColumn(_)))
+    //regression
+    //  .output(Nd4j.create(xs.toArray(data.averageForColumn(_)).map(_ / 100.0)))
+    //  .getDouble(0)
 
   def mse =
-    (data.data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.data.length
+    (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
 
   def rsme = math.pow(mse, 0.5)
 
