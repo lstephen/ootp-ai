@@ -1,4 +1,4 @@
-build: construi
+image: maven:3-jdk-8
 
 environment:
   - GIT_AUTHOR_NAME=ootp-ai

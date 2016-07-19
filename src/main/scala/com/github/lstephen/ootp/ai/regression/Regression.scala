@@ -9,27 +9,23 @@ import com.github.lstephen.ootp.ai.site.Version
 
 import com.typesafe.scalalogging.StrictLogging
 
-import org.encog.engine.network.activation.ActivationLinear
+import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator
+import org.deeplearning4j.nn.conf.GradientNormalization
+import org.deeplearning4j.nn.conf.NeuralNetConfiguration
+import org.deeplearning4j.nn.conf.Updater
+import org.deeplearning4j.nn.conf.layers.DenseLayer
+import org.deeplearning4j.nn.conf.layers.OutputLayer
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
+import org.deeplearning4j.nn.weights.WeightInit
 
-import org.encog.mathutil.randomize.generate.BasicGenerateRandom
+import org.deeplearning4j.optimize.listeners.ScoreIterationListener
 
-import org.encog.ml.MLRegression
+//import org.deeplearning4j.ui.weights.HistogramIterationListener
 
-import org.encog.ml.data.MLData
-import org.encog.ml.data.MLDataPair
-import org.encog.ml.data.MLDataSet
-import org.encog.ml.data.basic.BasicMLData
-import org.encog.ml.data.basic.BasicMLDataPair
-import org.encog.ml.data.basic.BasicMLDataSet
-import org.encog.ml.data.folded.FoldedDataSet
-
-import org.encog.ml.train.strategy.StopTrainingStrategy
-
-import org.encog.neural.networks.BasicNetwork
-import org.encog.neural.networks.layers.BasicLayer
-import org.encog.neural.networks.training.cross.CrossValidationKFold
-import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation
-import org.encog.neural.networks.training.propagation.quick.QuickPropagation
+import org.nd4j.linalg.dataset.{ DataSet => Nd4jDataSet }
+import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
+import org.nd4j.linalg.factory.Nd4j
+import org.nd4j.linalg.lossfunctions.LossFunctions
 
 import scala.math.ScalaNumericAnyConversions
 
@@ -49,8 +45,6 @@ class Input(private val is: List[Option[Double]]) {
         case (d, idx) => d getOrElse f(idx)
       }
       .toArray
-
-    def toMLData(f: Int => Double): MLData = new BasicMLData(toArray(f))
 }
 
 object Input {
@@ -60,8 +54,6 @@ object Input {
 
 
 class DataPoint(val input: Input, val output: Double) {
-  def toMLDataPair(implicit ds: DataSet): MLDataPair =
-    new BasicMLDataPair(input.toMLData(ds.averageForColumn(_)), new BasicMLData(Array(output)))
 }
 
 
@@ -77,7 +69,7 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
   lazy val averages: List[Double] = {
     logger.info("Calculating averages...")
 
-    (0 to (ds.head.input.length - 1))
+    (0 to (inputSize - 1))
       .map { idx =>
         val vs = ds.map(_.input.get(idx)).flatten
 
@@ -92,9 +84,21 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
 
   val length = ds.length
 
-  def toMLDataSet: MLDataSet = {
-    implicit val ds = this
-    new BasicMLDataSet(ds.map(_.toMLDataPair))
+  def inputSize = ds.head.input.length
+
+  def toDataSet: DataSetIterator = {
+    val inArray = Nd4j.vstack(
+      map { d: DataPoint =>
+        Nd4j.create(d.input.toArray(averageForColumn(_)).map(_ / 100.0), Array(1, inputSize))
+      })
+
+    //logger.info(s"$inArray")
+
+    val outArray = Nd4j.create(map(_.output).toArray)
+
+    //logger.info(s"$outArray")
+
+    new ListDataSetIterator(new Nd4jDataSet(inArray, outArray).asList, 1)
   }
 }
 
@@ -144,38 +148,48 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   var data: DataSet = DataSet()
 
-  var _regression: Option[MLRegression] = None
+  var _regression: Option[MultiLayerNetwork] = None
 
   def regression = _regression match {
     case Some(r) => r
     case None    =>
       logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
-      val dataSet = data.toMLDataSet
+      val dataSet = data.toDataSet
 
-      val network = new BasicNetwork
+      val conf = new NeuralNetConfiguration.Builder()
+        .seed(42)
+        .iterations(1)
+        .learningRate(1e-6)
+        .weightInit(WeightInit.ZERO)
+        //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
+        .updater(Updater.RMSPROP).rmsDecay(0.9)
+        .list
+        //.layer(0, new DenseLayer.Builder()
+        //  .nIn(data.inputSize)
+        //  .nOut(data.inputSize * 2)
+        //  .activation("tanh")
+        //  .build)
+        .layer(0, new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
+          .nIn(data.inputSize)
+          .nOut(1)
+          .activation("identity")
+          .build)
+        .pretrain(false)
+        .backprop(true)
+        .build
 
-      network.addLayer(new BasicLayer(null, true, dataSet.getInputSize))
-      network.addLayer(new BasicLayer(new ActivationLinear(), false, 1))
+      val network = new MultiLayerNetwork(conf)
+      network.init
+      network.setListeners(new ScoreIterationListener(50))
+      //network.setListeners(new HistogramIterationListener(1))
 
-      network.getStructure.finalizeStructure
-      network.reset
-
-      val folded = new FoldedDataSet(dataSet)
-
-      val train = new CrossValidationKFold(new ResilientPropagation(network, folded), 10)
-
-      val strategy = new StopTrainingStrategy
-
-      train.addStrategy(strategy)
-
-      var iteration = 0;
-      while (!train.isTrainingDone) {
-        train.iteration();
-
-        iteration += 1;
-        println(f"${iteration}%3d: ${train.getError}%.8f")
+      for( i <- 0 to 1000 ) {
+        dataSet.reset
+        network.fit(dataSet);
       }
+
+      logger.info(s"${network}")
 
       _regression = Some(network)
       network
@@ -183,9 +197,7 @@ class Regression(label: String, category: String) extends StrictLogging {
 
 
   def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
-    if (data.length < 20000)
-      data = data :+ new DataPoint(regressable.toInput(x), y)
-
+    data = data :+ new DataPoint(regressable.toInput(x), y)
     _regression = None
   }
 
@@ -195,7 +207,9 @@ class Regression(label: String, category: String) extends StrictLogging {
     predict(implicitly[Regressable[T]].toInput(x))
 
   def predict(xs: Input): Double =
-    regression.compute(xs.toMLData(data.averageForColumn(_))).getData(0)
+    regression
+      .output(Nd4j.create(xs.toArray(data.averageForColumn(_)).map(_ / 100.0)))
+      .getDouble(0)
 
   def mse =
     (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
