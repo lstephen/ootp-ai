@@ -24,6 +24,8 @@ import scala.math.ScalaNumericAnyConversions
 
 object Spark {
   val context = new SparkContext(new SparkConf().setAppName("ootp-ai").setMaster("local"))
+
+  sys.ShutdownHookThread { context.stop }
 }
 
 
