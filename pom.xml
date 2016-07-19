@@ -32,22 +32,26 @@
     <scala.version>2.11</scala.version>
     <scala.target>jvm-1.6</scala.target>
 
+    <!-- Too much work to keep these enabled with a library such
+         as Spark that has issues internally with dependencies -->
+    <duplicate-finder.skip>true</duplicate-finder.skip>
+    <enforcer.skip>true</enforcer.skip>
+
     <lib.ai-search.version>1.2</lib.ai-search.version>
     <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.3.1</lib.commons-lang3.version>
-    <lib.commons-math3.version>3.3</lib.commons-math3.version>
-    <lib.deeplearning4j.version>0.4.0</lib.deeplearning4j.version>
+    <lib.commons-math3.version>3.4.1</lib.commons-math3.version>
     <lib.findbugs.version>2.0.1</lib.findbugs.version>
     <lib.guava.version>18.0</lib.guava.version>
     <lib.humanize-slim.version>1.2.2</lib.humanize-slim.version>
-    <lib.jackson.version>2.5.1</lib.jackson.version>
+    <lib.jackson.version>2.4.4</lib.jackson.version>
     <lib.joda-time.version>2.9.2</lib.joda-time.version>
-    <lib.nd4j.version>0.4.0</lib.nd4j.version>
     <lib.scalaz.version>7.1.3</lib.scalaz.version>
     <lib.scala-arm.version>1.4</lib.scala-arm.version>
     <lib.scala-library.version>2.11.7</lib.scala-library.version>
     <lib.scala-logging.version>3.1.0</lib.scala-logging.version>
-    <lib.slf4j.version>1.7.7</lib.slf4j.version>
+    <lib.slf4j.version>1.7.21</lib.slf4j.version>
+    <lib.spark.version>1.6.2</lib.spark.version>
 
       <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
@@ -81,74 +85,6 @@
       <artifactId>commons-math3</artifactId>
       <version>${lib.commons-math3.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.deeplearning4j</groupId>
-      <artifactId>deeplearning4j-core</artifactId>
-      <version>${lib.deeplearning4j.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-compress</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-math3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-annotations</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!--<dependency>
-      <groupId>org.deeplearning4j</groupId>
-      <artifactId>deeplearning4j-ui</artifactId>
-      <version>${lib.deeplearning4j.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.freemarker</groupId>
-          <artifactId>freemarker</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>-->
 
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -211,47 +147,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-api</artifactId>
-      <version>${lib.nd4j.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-math3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.bytedeco</groupId>
-          <artifactId>javacpp</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-native</artifactId>
-      <version>${lib.nd4j.version}</version>
-      <scope>runtime</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.bytedeco</groupId>
-          <artifactId>javacpp</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.scalaz</groupId>
       <artifactId>scalaz-core_${scala.version}</artifactId>
       <version>${lib.scalaz.version}</version>
@@ -295,9 +190,21 @@
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
       <version>${lib.slf4j.version}</version>
       <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_${scala.version}</artifactId>
+      <version>${lib.spark.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-mllib_${scala.version}</artifactId>
+      <version>${lib.spark.version}</version>
     </dependency>
 
     <dependency>

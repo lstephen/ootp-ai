@@ -9,25 +9,23 @@ import com.github.lstephen.ootp.ai.site.Version
 
 import com.typesafe.scalalogging.StrictLogging
 
-import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator
-import org.deeplearning4j.nn.conf.GradientNormalization
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration
-import org.deeplearning4j.nn.conf.Updater
-import org.deeplearning4j.nn.conf.layers.DenseLayer
-import org.deeplearning4j.nn.conf.layers.OutputLayer
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
-import org.deeplearning4j.nn.weights.WeightInit
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
 
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener
+import org.apache.spark.rdd.RDD
 
-//import org.deeplearning4j.ui.weights.HistogramIterationListener
-
-import org.nd4j.linalg.dataset.{ DataSet => Nd4jDataSet }
-import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
-import org.nd4j.linalg.factory.Nd4j
-import org.nd4j.linalg.lossfunctions.LossFunctions
+import org.apache.spark.mllib.linalg.Vector
+import org.apache.spark.mllib.linalg.DenseVector
+import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.tree.RandomForest
+import org.apache.spark.mllib.tree.model.RandomForestModel
 
 import scala.math.ScalaNumericAnyConversions
+
+object Spark {
+  val context = new SparkContext(new SparkConf().setAppName("ootp-ai").setMaster("local"))
+}
+
 
 class Input(private val is: List[Option[Double]]) {
   def :+(rhs: Double): Input = this :+ Some(rhs)
@@ -45,6 +43,8 @@ class Input(private val is: List[Option[Double]]) {
         case (d, idx) => d getOrElse f(idx)
       }
       .toArray
+
+  def toVector(f: Int => Double): Vector = new DenseVector(toArray(f))
 }
 
 object Input {
@@ -54,6 +54,8 @@ object Input {
 
 
 class DataPoint(val input: Input, val output: Double) {
+  def toLabeledPoint(f: Int => Double): LabeledPoint =
+    new LabeledPoint(output, input.toVector(f))
 }
 
 
@@ -86,20 +88,8 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
 
   def inputSize = ds.head.input.length
 
-  def toDataSet: DataSetIterator = {
-    val inArray = Nd4j.vstack(
-      map { d: DataPoint =>
-        Nd4j.create(d.input.toArray(averageForColumn(_)).map(_ / 100.0), Array(1, inputSize))
-      })
-
-    //logger.info(s"$inArray")
-
-    val outArray = Nd4j.create(map(_.output).toArray)
-
-    //logger.info(s"$outArray")
-
-    new ListDataSetIterator(new Nd4jDataSet(inArray, outArray).asList, 1)
-  }
+  def toRdd: RDD[LabeledPoint] =
+    Spark.context.parallelize(ds.map(_.toLabeledPoint(averageForColumn(_))))
 }
 
 object DataSet {
@@ -148,51 +138,21 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   var data: DataSet = DataSet()
 
-  var _regression: Option[MultiLayerNetwork] = None
+  var _regression: Option[RandomForestModel] = None
 
   def regression = _regression match {
     case Some(r) => r
     case None    =>
       logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
-      val dataSet = data.toDataSet
+      val model = RandomForest.trainRegressor(
+        data.toRdd, Map[Int, Int](), 30, "auto", "variance", 5, 32)
 
-      val conf = new NeuralNetConfiguration.Builder()
-        .seed(42)
-        .iterations(1)
-        .learningRate(1e-6)
-        .weightInit(WeightInit.ZERO)
-        //.gradientNormalization(GradientNormalization.RenormalizeL2PerLayer)
-        .updater(Updater.RMSPROP).rmsDecay(0.9)
-        .list
-        //.layer(0, new DenseLayer.Builder()
-        //  .nIn(data.inputSize)
-        //  .nOut(data.inputSize * 2)
-        //  .activation("tanh")
-        //  .build)
-        .layer(0, new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
-          .nIn(data.inputSize)
-          .nOut(1)
-          .activation("identity")
-          .build)
-        .pretrain(false)
-        .backprop(true)
-        .build
+      _regression = Some(model)
 
-      val network = new MultiLayerNetwork(conf)
-      network.init
-      network.setListeners(new ScoreIterationListener(50))
-      //network.setListeners(new HistogramIterationListener(1))
+      logger.info(s"Model: ${model.toDebugString}")
 
-      for( i <- 0 to 1000 ) {
-        dataSet.reset
-        network.fit(dataSet);
-      }
-
-      logger.info(s"${network}")
-
-      _regression = Some(network)
-      network
+      model
   }
 
 
@@ -207,9 +167,10 @@ class Regression(label: String, category: String) extends StrictLogging {
     predict(implicitly[Regressable[T]].toInput(x))
 
   def predict(xs: Input): Double =
-    regression
-      .output(Nd4j.create(xs.toArray(data.averageForColumn(_)).map(_ / 100.0)))
-      .getDouble(0)
+    regression.predict(xs.toVector(data.averageForColumn(_)))
+    //regression
+    //  .output(Nd4j.create(xs.toArray(data.averageForColumn(_)).map(_ / 100.0)))
+    //  .getDouble(0)
 
   def mse =
     (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
