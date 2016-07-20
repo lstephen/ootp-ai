@@ -148,11 +148,11 @@ class Regression(label: String, category: String) extends StrictLogging {
       logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
       val model = RandomForest.trainRegressor(
-        data.toRdd, Map[Int, Int](), 30, "auto", "variance", 5, 32)
+        data.toRdd, Map[Int, Int](), 100, "auto", "variance", 5, 32)
 
       _regression = Some(model)
 
-      logger.info(s"Model: ${model.toDebugString}")
+      //logger.info(s"Model: ${model.toDebugString}")
 
       model
   }
