@@ -109,9 +109,10 @@ object Regressable {
 
   implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
     def toInput(r: BattingRatings[_ <: Object]) = {
-      var k = if (r.getK.isPresent) Some(r.getK.get.doubleValue) else None
+      var extras = List(r.getK, r.getRunningSpeed)
+        .map { o => if (o.isPresent) Some(o.get.doubleValue) else None }
 
-      Input(r.getContact, r.getGap, r.getPower, r.getEye) :+ k
+      Input(r.getContact, r.getGap, r.getPower, r.getEye) ++ new Input(extras)
     }
   }
 
@@ -152,8 +153,6 @@ class Regression(label: String, category: String) extends StrictLogging {
 
       _regression = Some(model)
 
-      //logger.info(s"Model: ${model.toDebugString}")
-
       model
   }
 
@@ -170,9 +169,6 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   def predict(xs: Input): Double =
     regression.predict(xs.toVector(data.averageForColumn(_)))
-    //regression
-    //  .output(Nd4j.create(xs.toArray(data.averageForColumn(_)).map(_ / 100.0)))
-    //  .getDouble(0)
 
   def mse =
     (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
