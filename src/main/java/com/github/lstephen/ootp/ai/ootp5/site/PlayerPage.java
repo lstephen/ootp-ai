@@ -15,6 +15,8 @@ import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -114,6 +116,7 @@ public final class PlayerPage {
             .power(line.get(idx.get(BattingRatingsType.POWER)).text())
             .eye(line.get(idx.get(BattingRatingsType.EYE)).text())
             .k(line.get(idx.get(BattingRatingsType.K)).text())
+            .runningSpeed(extractRunningSpeed().normalize())
             .build();
     }
 
@@ -125,6 +128,47 @@ public final class PlayerPage {
 
     private Rating<?, ?> parseOotp6PotentialRating(String s) {
         return site.getPotentialRatingScale().parse(s);
+    }
+
+    public Rating<?, ?> extractBuntForHit() {
+      return site.getBuntScale().parse(extractRunningText("Bunt for Hit"));
+    }
+
+    public Rating<?, ?> extractRunningSpeed() {
+      return site.getRunningScale().parse(extractRunningText("Running Speed"));
+    }
+
+    public Rating<?, ?> extractStealing() {
+      return site.getRunningScale().parse(extractRunningText("Stealing Ability"));
+    }
+
+    private String extractRunningText(String title) {
+      return extractLabelledText("Bunting Ratings", title);
+    }
+
+    public String extractLabelledText(String category, String title) {
+      String titles = html.select("td.s4:contains(" + category + ")").html();
+
+      String[] splitTitles = StringUtils.splitByWholeSeparatorPreserveAllTokens(titles, "<br />");
+
+      int idx = -1;
+
+      for (int i = 0; i < splitTitles.length; i++) {
+        if (splitTitles[i].trim().startsWith(title)) {
+          idx = i;
+          break;
+        }
+      }
+
+      if (idx < 0) {
+        throw new IllegalStateException("Could not find labelled text: " + category + "/" + title);
+      }
+
+      String raw = html.select("td.s4:contains(" + category + ") + td.s4").html();
+
+      String[] split = StringUtils.splitByWholeSeparatorPreserveAllTokens(raw, "<br />");
+
+      return split[idx];
     }
 
 

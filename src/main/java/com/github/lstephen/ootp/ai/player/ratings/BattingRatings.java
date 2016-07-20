@@ -1,5 +1,6 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
@@ -35,6 +36,8 @@ public final class BattingRatings<T> {
 
     private final Rating<T, ?> k;
 
+    private final Rating<?, ?> runningSpeed;
+
     private BattingRatings(Builder<T> builder) {
         Preconditions.checkNotNull(builder.scale);
         Preconditions.checkNotNull(builder.contact);
@@ -48,6 +51,7 @@ public final class BattingRatings<T> {
         this.power = builder.power;
         this.eye = builder.eye;
         this.k = builder.k;
+        this.runningSpeed = builder.runningSpeed;
     }
 
     public Integer getContact() {
@@ -70,6 +74,12 @@ public final class BattingRatings<T> {
         return k == null
             ? Optional.<Integer>absent()
             : Optional.of(k.normalize().get());
+    }
+
+    public Optional<Integer> getRunningSpeed() {
+      return runningSpeed == null
+        ? Optional.<Integer>absent()
+        : Optional.of(runningSpeed.normalize().get());
     }
 
     public BattingRatings<T> build() {
@@ -144,6 +154,8 @@ public final class BattingRatings<T> {
         private Rating<T, ? extends Scale<T>> eye;
 
         private Rating<T, ? extends Scale<T>> k;
+
+        private Rating<Integer, ? super OneToOneHundred> runningSpeed;
 
         private Builder(Scale<T> scale) {
             this.scale = scale;
@@ -230,6 +242,21 @@ public final class BattingRatings<T> {
             return value == null ? this : k(new Rating<>(value, scale));
         }
 
+        public Builder<T> runningSpeed(Rating<Integer, ? super OneToOneHundred> rs) {
+          this.runningSpeed = rs;
+          return this;
+        }
+
+        @JsonProperty("runningSpeed")
+        public Builder<T> runningSpeed(String s) {
+          return s == null || s.equals("null")
+            ? this
+            : runningSpeed(new OneToOneHundred().parse(s));
+        }
+
+        public Builder<T> runningSpeed(Integer value) {
+          return value == null ? this : runningSpeed(new Rating<>(value, new OneToOneHundred()));
+        }
 
         public BattingRatings<T> build() {
             return BattingRatings.build(this);

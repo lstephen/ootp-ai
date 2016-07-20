@@ -99,7 +99,8 @@ public class SinglePlayer implements PlayerSource {
     } catch (Exception e) {
       LOG.log(Level.WARNING, "Player not found. ID: " + id);
       LOG.log(Level.FINE, "Reason for not finding " + id, e);
-      return null;
+      throw e;
+      //return null;
     }
   }
 
@@ -142,8 +143,8 @@ public class SinglePlayer implements PlayerSource {
       ratings.setPitchingPotential(extractPitchingPotential(doc));
     }
 
-    ratings.setBuntForHit(extractBuntForHit(doc));
-    ratings.setStealing(extractStealing(doc));
+    ratings.setBuntForHit(page.extractBuntForHit());
+    ratings.setStealing(page.extractStealing());
 
     Player player = Player.create(id, name, ratings);
 
@@ -169,7 +170,7 @@ public class SinglePlayer implements PlayerSource {
     }
 
     if (doc.html().contains("Rule 5 Draft Eligibility")) {
-      player.setRuleFiveEligible(isRuleFiveEligible(doc));
+      player.setRuleFiveEligible(isRuleFiveEligible(page));
     }
 
     if (doc.html().contains("Rule 5 Draft Eligibility")) {
@@ -189,7 +190,7 @@ public class SinglePlayer implements PlayerSource {
     }
 
     if (doc.html().contains("Years of Pro Service")) {
-      player.setYearsOfProService(getYearsOfProService(doc));
+      player.setYearsOfProService(getYearsOfProService(page));
     }
 
     Optional<Integer> teamTopProspectPosition =
@@ -232,60 +233,20 @@ public class SinglePlayer implements PlayerSource {
     return ps.get(p);
   }
 
-  private Boolean isRuleFiveEligible(Document doc) {
-    return extractContractText(doc, "Rule 5 Draft Eligibility :").contains("Eligible");
+  private Boolean isRuleFiveEligible(PlayerPage page) {
+    return extractContractText(page, "Rule 5 Draft Eligibility :").contains("Eligible");
   }
 
-  private Integer getYearsOfProService(Document doc) {
-    String raw = extractContractText(doc, "Years of Pro Service :");
+  private Integer getYearsOfProService(PlayerPage page) {
+    String raw = extractContractText(page, "Years of Pro Service :");
 
     return Integer.parseInt(StringUtils.substringBefore(raw, " "));
   }
 
-  private String extractContractText(Document doc, String title) {
-    return extractLabelledText(doc, "Contract", title);
+  private String extractContractText(PlayerPage page, String title) {
+    return page.extractLabelledText("Contract", title);
   }
 
-  private Rating<?, ?> extractBuntForHit(Document doc) {
-    return site.getBuntScale().parse(extractRunningText(doc, " Bunt for Hit :"));
-  }
-
-  private Rating<?, ?> extractRunningSpeed(Document doc) {
-    return site.getRunningScale().parse(extractRunningText(doc, " Running Speed :"));
-  }
-
-  private Rating<?, ?> extractStealing(Document doc) {
-    return site.getRunningScale().parse(extractRunningText(doc, " Stealing Ability :"));
-  }
-
-  private String extractRunningText(Document doc, String title) {
-    return extractLabelledText(doc, "Bunting Ratings", title);
-  }
-
-  private String extractLabelledText(Document doc, String category, String title) {
-    String titles = doc.select("td.s4:contains(" + category + ")").html();
-
-    String[] splitTitles = StringUtils.splitByWholeSeparatorPreserveAllTokens(titles, "<br />");
-
-    int idx = -1;
-
-    for (int i = 0; i < splitTitles.length; i++) {
-      if (splitTitles[i].equals(title)) {
-        idx = i;
-        break;
-      }
-    }
-
-    if (idx < 0) {
-      throw new IllegalStateException("Coulld not find labelled text: " + category + "/" + title);
-    }
-
-    String raw = doc.select("td.s4:contains(" + category + ") + td.s4").html();
-
-    String[] split = StringUtils.splitByWholeSeparatorPreserveAllTokens(raw, "<br />");
-
-    return split[idx];
-  }
 
   private DefensiveRatings extractDefensiveRatings(Document doc) {
     DefensiveRatings ratings = new DefensiveRatings();

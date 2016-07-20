@@ -1,6 +1,7 @@
 
 RSpec.shared_examples :player do |name, age|
   it { is_expected.to_not be_nil }
+  it { expect { subject }.to_not raise_error }
   its(:name) { is_expected.to eq(name) }
   its(:age) { is_expected.to eq(age) }
 end
