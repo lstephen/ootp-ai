@@ -23,6 +23,8 @@ class Predictor(br: BattingRegression, pr: PitchingRegression, po: PitcherOveral
 
 class BattingPrediction(stats: SplitStats[BattingStats]) {
   val overall = Score(stats.getOverall.getWobaPlus)
+  val vsLeft = stats.getVsLeft
+  val vsRight = stats.getVsRight
 }
 
 

@@ -2,6 +2,7 @@ package com.github.lstephen.ootp.ai.selection.lineup;
 
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 
 import java.io.PrintWriter;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+
 
 public final class AllLineups implements Iterable<Lineup>, Printable {
 
@@ -99,6 +101,14 @@ public final class AllLineups implements Iterable<Lineup>, Printable {
                     all.getVsLhpPlusDh().getEntry(i).format(LINEUP_ENTRY_FORMAT)
                 ));
         }
+    }
+
+    public double getHomeRunsPerPlateAppearance(Predictor predictor) {
+      return ( all.getVsRhp().getHomeRunsPerPlateAppearance(predictor, Lineup.VsHand.VS_RHP)
+             + all.getVsRhpPlusDh().getHomeRunsPerPlateAppearance(predictor, Lineup.VsHand.VS_RHP)
+             + all.getVsLhp().getHomeRunsPerPlateAppearance(predictor, Lineup.VsHand.VS_LHP)
+             + all.getVsLhpPlusDh().getHomeRunsPerPlateAppearance(predictor, Lineup.VsHand.VS_LHP) )
+          / 4.0;
     }
 
     public static AllLineups create(All<Lineup> all) {

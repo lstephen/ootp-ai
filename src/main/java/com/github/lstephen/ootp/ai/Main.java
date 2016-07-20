@@ -353,13 +353,17 @@ public class Main {
             .collect(Collectors.toSet()));
         generic.print(out);
 
-        generic.setTitle("Stealing");
+        double stealingBreakEven = 0.590 + 3.33 * lineups.getHomeRunsPerPlateAppearance(predictor);
+        generic.setTitle("Stealing @ " + String.format("%.1f", stealingBreakEven * 100.0));
         generic.setPlayers(newRoster
             .getPlayers(Status.ML)
             .stream()
-            .filter(p -> p.getStealingRating().normalize().get() > 80)
+            .filter(p -> p.getStealingRating().normalize().get() > stealingBreakEven * 100.0)
             .collect(Collectors.toSet()));
         generic.print(out);
+
+
+        //Break Even Rate = 0.590 + 3.33 x (HR/PA)
 
         if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
             LOG.log(Level.INFO, "Spring training...");

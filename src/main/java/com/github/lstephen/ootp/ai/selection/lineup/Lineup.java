@@ -5,6 +5,7 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
@@ -65,6 +66,10 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
     public static enum VsHand {
 
         VS_LHP {
+            public BattingStats getStats(Predictor pred, Player p) {
+              return pred.predictBatting(p).vsLeft();
+            }
+
             public BattingStats getStats(TeamStats predictions, Player p) {
                 return (BattingStats) predictions.getSplits(p).getVsLeft();
             }
@@ -76,6 +81,10 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
             public VsHand getOther() { return VS_RHP; }
         },
         VS_RHP {
+            public BattingStats getStats(Predictor pred, Player p) {
+              return pred.predictBatting(p).vsRight();
+            }
+
             public BattingStats getStats(TeamStats<BattingStats> predictions, Player p) {
                 SplitStats<BattingStats> splits = predictions.getSplits(p);
 
@@ -90,6 +99,8 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
 
             public VsHand getOther() { return VS_LHP; }
         };
+
+        public abstract BattingStats getStats(Predictor pred, Player p);
 
         public abstract BattingStats getStats(TeamStats<BattingStats> teamstats, Player player);
 
@@ -144,6 +155,28 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
     public Position getPosition(Player p) {
         return defense.contains(p)  ? defense.getPosition(p) : Position.DESIGNATED_HITTER;
     }
+
+    public BattingStats getBattingStats(Predictor predictor, VsHand vs) {
+      BattingStats total = null;
+
+      for (Entry e : this) {
+        if (e.getPlayer() == null) {
+          continue;
+        }
+        if (total == null) {
+          total = vs.getStats(predictor, e.getPlayer());
+        } else {
+          total = total.add(vs.getStats(predictor, e.getPlayer()));
+        }
+      }
+
+      return total;
+    }
+
+    public double getHomeRunsPerPlateAppearance(Predictor predictor, VsHand vs) {
+      return getBattingStats(predictor, vs).getHomeRunsPerPlateAppearance();
+    }
+
 
     @Override
     public void print(PrintWriter w) {
