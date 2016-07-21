@@ -43,7 +43,7 @@ public final class DraftClass {
   }
 
   public Collection<Player> getPlayers() {
-    return ImmutableSet.copyOf(playersStream().collect(Collectors.toList()));
+    return playersStream().collect(Collectors.toSet());
   }
 
   private Stream<Player> playersStream() {
