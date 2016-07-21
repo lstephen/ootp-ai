@@ -418,6 +418,7 @@ public class Main {
             LOG.info("40 man roster reports...");
 
             FourtyManRoster fourtyMan = new FourtyManRoster(
+                team,
                 newRoster,
                 Predictions
                     .predict(newRoster.getAllPlayers())

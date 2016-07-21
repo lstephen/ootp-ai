@@ -26,6 +26,8 @@ import java.util.Set;
  */
 public class FourtyManRoster implements Printable {
 
+    private final Team team;
+
     private final Roster roster;
 
     private final Predictions predictions;
@@ -38,7 +40,8 @@ public class FourtyManRoster implements Printable {
 
     private ImmutableSet<Player> desired40Man;
 
-    public FourtyManRoster(Roster roster, Predictions ps, Predictor predictor) {
+    public FourtyManRoster(Team team, Roster roster, Predictions ps, Predictor predictor) {
+        this.team = team;
         this.roster = roster;
         this.predictions = ps;
         this.predictor = predictor;
@@ -85,7 +88,9 @@ public class FourtyManRoster implements Printable {
 
         Set<Player> fourtyMan = Sets.newHashSet();
 
-        Iterable<Player> available = roster.getAllPlayers();
+        Set<Player> available = Sets.newHashSet(roster.getAllPlayers());
+
+        available.removeAll(team.getInjuries());
 
         fourtyMan.addAll(
             Selections

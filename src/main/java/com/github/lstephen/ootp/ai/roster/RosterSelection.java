@@ -143,6 +143,7 @@ public final class RosterSelection {
 
             fourtyManRoster =
                 new FourtyManRoster(
+                    team,
                     roster,
                     Predictions
                         .predict(team)

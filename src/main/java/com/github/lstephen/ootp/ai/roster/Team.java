@@ -52,7 +52,7 @@ public final class Team implements Iterable<Player>, PlayerSource {
         }
     }
 
-    public Iterable<Player> getInjuries() {
+    public ImmutableSet<Player> getInjuries() {
         return ImmutableSet.copyOf(injured);
     }
 
