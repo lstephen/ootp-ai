@@ -88,9 +88,7 @@ public class FourtyManRoster implements Printable {
 
         Set<Player> fourtyMan = Sets.newHashSet();
 
-        Set<Player> available = Sets.newHashSet(roster.getAllPlayers());
-
-        available.removeAll(team.getInjuries());
+        Iterable<Player> available = roster.getAllPlayers();
 
         fourtyMan.addAll(
             Selections

@@ -192,7 +192,9 @@ public final class RosterSelection {
           }
         }
 
-        assignToDisabledList(roster, team.getInjuries());
+        if (mode != Mode.IDEAL) {
+          assignToDisabledList(roster, team.getInjuries());
+        }
 
         forced.removeAll(roster.getPlayers(Status.DL));
 
