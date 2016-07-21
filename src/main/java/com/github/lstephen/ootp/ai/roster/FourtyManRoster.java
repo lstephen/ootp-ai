@@ -89,7 +89,7 @@ public class FourtyManRoster implements Printable {
             roster.getAllPlayers(),
             new Predicate<Player>() {
                 public boolean apply(Player p) {
-                    return roster.getStatus(p) != Status.DL
+                    return (! (roster.getStatus(p) == Status.DL && p.isInjured()))
                         || p.getOn40Man().or(true)
                         || (changes.isPresent() && changes.get().get(Changes.ChangeType.FOURTY_MAN).contains(p));
                 }
