@@ -2,6 +2,7 @@ package com.github.lstephen.ootp.ai.draft;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
@@ -16,7 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -31,6 +34,10 @@ public final class DraftReport implements Printable {
   private DraftClass current;
 
   private final Set<DraftClass> historical = Sets.newHashSet();
+
+  private ImmutableList<Player> currentPlayersSorted;
+
+  private List<ImmutableList<Player>> historicalPlayersSorted;
 
   private DraftReport(Site site, Predictor predictor) {
     this.site = site;
@@ -52,6 +59,13 @@ public final class DraftReport implements Printable {
         historical.add(DraftClass.load(dcFile, site.getDefinition()));
       }
     }
+
+    currentPlayersSorted = byOverall().immutableSortedCopy(current.getPlayers());
+
+    historicalPlayersSorted = historical
+      .stream()
+      .map(dc -> byOverall().immutableSortedCopy(dc.getPlayers()))
+      .collect(Collectors.toList());
   }
 
   private File getDraftClassFile(int year) {
@@ -77,17 +91,17 @@ public final class DraftReport implements Printable {
     RoundValue rv = RoundValue.create(predictor);
 
     Iterable<Player> players = FluentIterable
-      .from(byOverall().sortedCopy(current.getPlayers()))
+      .from(currentPlayersSorted)
       .skip(start)
       .limit(n);
 
     rv.add(players);
 
-    historical
+    historicalPlayersSorted
       .stream()
-      .forEach(dc -> {
+      .forEach(playersSorted -> {
         Iterable<Player> ps = FluentIterable
-          .from(byOverall().sortedCopy(dc.getPlayers()))
+          .from(playersSorted)
           .skip(start)
           .limit(n);
 
