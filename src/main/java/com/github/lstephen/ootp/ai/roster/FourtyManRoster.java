@@ -85,16 +85,7 @@ public class FourtyManRoster implements Printable {
 
         Set<Player> fourtyMan = Sets.newHashSet();
 
-        Iterable<Player> available = Iterables.filter(
-            roster.getAllPlayers(),
-            new Predicate<Player>() {
-                public boolean apply(Player p) {
-                    return (! (roster.getStatus(p) == Status.DL && p.isInjured()))
-                        || p.getOn40Man().or(true)
-                        || (changes.isPresent() && changes.get().get(Changes.ChangeType.FOURTY_MAN).contains(p));
-                }
-            });
-
+        Iterable<Player> available = roster.getAllPlayers();
 
         fourtyMan.addAll(
             Selections
