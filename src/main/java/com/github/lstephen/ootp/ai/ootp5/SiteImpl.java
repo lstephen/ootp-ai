@@ -258,7 +258,7 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
-  public TeamStats<BattingStats> getTeamBatting() {
+  public TeamStats.Batting getTeamBatting() {
     return new TeamBattingImpl(this, definition.getTeam()).extract();
   }
 

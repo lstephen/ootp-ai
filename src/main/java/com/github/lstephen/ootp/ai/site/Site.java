@@ -80,7 +80,7 @@ public interface Site {
 
     Standings getStandings();
 
-    TeamStats<BattingStats> getTeamBatting();
+    TeamStats.Batting getTeamBatting();
 
     TeamStats<PitchingStats> getTeamPitching();
 

@@ -12,17 +12,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 /**
- * TODO: Two maps should be unnecessary. Probably need a custom serializer
- * to use with just one though. Jackson needs to serialize the key to a String.
  * @author lstephen
  */
-public final class TeamStats<S extends Stats<S>> {
+public class TeamStats<S extends Stats<S>> {
 
     private final Map<PlayerId, SplitStats<S>> stats = Maps.newHashMap();
 
     private final Map<PlayerId, Player> players = Maps.newHashMap();
 
-    private TeamStats(Map<Player, SplitStats<S>> stats) {
+    protected TeamStats(Map<Player, SplitStats<S>> stats) {
         for (Map.Entry<Player, SplitStats<S>> entry : stats.entrySet()) {
             players.put(entry.getKey().getId(), entry.getKey());
             this.stats.put(entry.getKey().getId(), entry.getValue());
@@ -30,7 +28,7 @@ public final class TeamStats<S extends Stats<S>> {
     }
 
     @JsonCreator
-    private TeamStats(
+    protected TeamStats(
         @JsonProperty("stats") Map<PlayerId, SplitStats<S>> stats,
         @JsonProperty("players") Map<PlayerId, Player> players) {
 
@@ -65,6 +63,35 @@ public final class TeamStats<S extends Stats<S>> {
         Map<Player, SplitStats<S>> stats) {
 
         return new TeamStats<S>(stats);
+    }
+
+    public static class Batting extends TeamStats<BattingStats> {
+      private final Map<PlayerId, RunningStats> running = Maps.newHashMap();
+
+      private Batting(TeamStats<BattingStats> batting, Map<Player, RunningStats> running) {
+        super(batting.stats, batting.players);
+
+        for (Map.Entry<Player, RunningStats> entry : running.entrySet()) {
+          this.running.put(entry.getKey().getId(), entry.getValue());
+        }
+      }
+
+      @JsonCreator
+      private Batting(
+          @JsonProperty("stats") Map<PlayerId, SplitStats<BattingStats>> stats,
+          @JsonProperty("players") Map<PlayerId, Player> players,
+          @JsonProperty("running") Map<PlayerId, RunningStats> running) {
+
+        super(stats, players);
+
+        if (running != null) {
+          this.running.putAll(running);
+        }
+      }
+
+      public static Batting create(TeamStats<BattingStats> batting, Map<Player, RunningStats> running) {
+        return new Batting(batting, running);
+      }
     }
 
 }
