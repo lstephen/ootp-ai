@@ -38,6 +38,8 @@ public final class BattingRatings<T> {
 
     private final Rating<?, ?> runningSpeed;
 
+    private final Rating<?, ?> stealingAbility;
+
     private BattingRatings(Builder<T> builder) {
         Preconditions.checkNotNull(builder.scale);
         Preconditions.checkNotNull(builder.contact);
@@ -52,6 +54,7 @@ public final class BattingRatings<T> {
         this.eye = builder.eye;
         this.k = builder.k;
         this.runningSpeed = builder.runningSpeed;
+        this.stealingAbility = builder.stealingAbility;
     }
 
     public Integer getContact() {
@@ -80,6 +83,12 @@ public final class BattingRatings<T> {
       return runningSpeed == null
         ? Optional.<Integer>absent()
         : Optional.of(runningSpeed.normalize().get());
+    }
+
+    public Optional<Integer> getStealingAbility() {
+      return stealingAbility == null
+        ? Optional.<Integer>absent()
+        : Optional.of(stealingAbility.normalize().get());
     }
 
     public BattingRatings<T> build() {
@@ -156,6 +165,8 @@ public final class BattingRatings<T> {
         private Rating<T, ? extends Scale<T>> k;
 
         private Rating<Integer, ? super OneToOneHundred> runningSpeed;
+
+        private Rating<Integer, ? super OneToOneHundred> stealingAbility;
 
         private Builder(Scale<T> scale) {
             this.scale = scale;
@@ -256,6 +267,22 @@ public final class BattingRatings<T> {
 
         public Builder<T> runningSpeed(Integer value) {
           return value == null ? this : runningSpeed(new Rating<>(value, new OneToOneHundred()));
+        }
+
+        public Builder<T> stealingAbility(Rating<Integer, ? super OneToOneHundred> sa) {
+          this.stealingAbility = sa;
+          return this;
+        }
+
+        @JsonProperty("stealingAbility")
+        public Builder<T> stealingAbility(String s) {
+          return s == null || s.equals("null")
+            ? this
+            : stealingAbility(new OneToOneHundred().parse(s));
+        }
+
+        public Builder<T> stealingAbility(Integer value) {
+          return value == null ? this : stealingAbility(new Rating<>(value, new OneToOneHundred()));
         }
 
         public BattingRatings<T> build() {

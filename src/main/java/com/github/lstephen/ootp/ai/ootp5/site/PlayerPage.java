@@ -117,6 +117,7 @@ public final class PlayerPage {
             .eye(line.get(idx.get(BattingRatingsType.EYE)).text())
             .k(line.get(idx.get(BattingRatingsType.K)).text())
             .runningSpeed(extractRunningSpeed().normalize())
+            .stealingAbility(extractStealing().normalize())
             .build();
     }
 
