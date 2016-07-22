@@ -38,7 +38,7 @@ public final class History {
 
             if (in.exists()) {
                 try {
-                    result.add(Jackson.getMapper(site).readValue(in, TeamStats.class));
+                    result.add(Jackson.getMapper(site).readValue(in, TeamStats.Batting.class));
                 } catch (IOException e) {
                     throw Throwables.propagate(e);
                 }

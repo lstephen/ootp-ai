@@ -34,12 +34,20 @@ public abstract class SingleTeamStats<S extends Stats<S>> {
         this.page = page;
     }
 
+    protected Team getTeam() {
+      return team;
+    }
+
+    protected Document getDocument() {
+      return page.load();
+    }
+
     public Integer getYear() {
         return extractDate().getYear();
     }
 
     public LocalDate extractDate() {
-        Document doc = page.load();
+        Document doc = getDocument();
 
         return LocalDate.parse(
             StringUtils.substringAfterLast(doc.select("td.title").text(), ",").trim(),
@@ -47,7 +55,7 @@ public abstract class SingleTeamStats<S extends Stats<S>> {
     }
 
     public TeamStats<S> extract() {
-        Document doc = page.load();
+        Document doc = getDocument();
 
         ImmutableMap<Player, S> vLhp = extractStatsVsLeft(doc);
         ImmutableMap<Player, S> vRhp = extractStatsVsRight(doc);
