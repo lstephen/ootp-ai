@@ -12,14 +12,6 @@ import com.typesafe.scalalogging.StrictLogging
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
-import org.apache.spark.rdd.RDD
-
-import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.mllib.linalg.DenseVector
-import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.RandomForest
-import org.apache.spark.mllib.tree.model.RandomForestModel
-
 import scala.math.ScalaNumericAnyConversions
 
 object Spark {
@@ -27,77 +19,6 @@ object Spark {
 
   sys.ShutdownHookThread { context.stop }
 }
-
-
-class Input(private val is: List[Option[Double]]) {
-  def :+(rhs: Double): Input = this :+ Some(rhs)
-  def :+(rhs: Option[Double]): Input = new Input(is :+ rhs)
-  def ++(rhs: Input): Input = new Input(is ++ rhs.is)
-
-  val length = is.length
-
-  def get(idx: Integer): Option[Double] = is get idx
-
-  def toArray(f: Int => Double): Array[Double] =
-    is
-      .zipWithIndex
-      .map {
-        case (d, idx) => d getOrElse f(idx)
-      }
-      .toArray
-
-  def toVector(f: Int => Double): Vector = new DenseVector(toArray(f))
-}
-
-object Input {
-  def apply(ds: Integer*): Input = apply(ds.toList.map(_.doubleValue))
-  def apply(ds: List[Double]): Input = new Input(ds.map(Some(_)))
-}
-
-
-class DataPoint(val input: Input, val output: Double) {
-  def toLabeledPoint(f: Int => Double): LabeledPoint =
-    new LabeledPoint(output, input.toVector(f))
-}
-
-
-class DataSet(ds: List[DataPoint]) extends StrictLogging {
-  def :+(rhs: DataPoint): DataSet = {
-    if (!ds.isEmpty && rhs.input.length != ds.head.input.length) {
-      throw new IllegalArgumentException
-    }
-
-    new DataSet(ds :+ rhs)
-  }
-
-  lazy val averages: List[Double] = {
-    logger.info("Calculating averages...")
-
-    (0 to (inputSize - 1))
-      .map { idx =>
-        val vs = ds.map(_.input.get(idx)).flatten
-
-        if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
-      }
-      .toList
-  }
-
-  def averageForColumn(i: Integer): Double = averages.get(i)
-
-  def map[T](f: DataPoint => T): List[T] = ds.map(f)
-
-  val length = ds.length
-
-  def inputSize = ds.head.input.length
-
-  def toRdd: RDD[LabeledPoint] =
-    Spark.context.parallelize(ds.map(_.toLabeledPoint(averageForColumn(_))))
-}
-
-object DataSet {
-  def apply(): DataSet = new DataSet(List())
-}
-
 
 trait Regressable[-T] {
   def toInput(t: T): Input
@@ -141,19 +62,20 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   var data: DataSet = DataSet()
 
-  var _regression: Option[RandomForestModel] = None
+  var _regression: Option[Model.Predict] = None
+
+  val model = new CompositeModel(List(new RandomForestModel, new LinearRegressionModel))
 
   def regression = _regression match {
     case Some(r) => r
     case None    =>
       logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
-      val model = RandomForest.trainRegressor(
-        data.toRdd, Map[Int, Int](), 100, "auto", "variance", 5, 32)
+      val p = model train data
 
-      _regression = Some(model)
+      _regression = Some(p)
 
-      model
+      p
   }
 
 
@@ -167,8 +89,7 @@ class Regression(label: String, category: String) extends StrictLogging {
   def predict[T: Regressable](x: T): Double =
     predict(implicitly[Regressable[T]].toInput(x))
 
-  def predict(xs: Input): Double =
-    regression.predict(xs.toVector(data.averageForColumn(_)))
+  def predict(xs: Input): Double = regression(xs)
 
   def mse =
     (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
