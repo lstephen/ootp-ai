@@ -35,6 +35,8 @@ object Input {
 
 
 class DataPoint(val input: Input, val output: Double) {
+  def features = input.length
+
   def toLabeledPoint(f: Int => Double): LabeledPoint =
     new LabeledPoint(output, input.toVector(f))
 }
@@ -42,7 +44,7 @@ class DataPoint(val input: Input, val output: Double) {
 
 class DataSet(ds: List[DataPoint]) extends StrictLogging {
   def :+(rhs: DataPoint): DataSet = {
-    if (!ds.isEmpty && rhs.input.length != ds.head.input.length) {
+    if (!ds.isEmpty && rhs.input.length != features) {
       throw new IllegalArgumentException
     }
 
@@ -52,7 +54,7 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
   lazy val averages: List[Double] = {
     logger.info("Calculating averages...")
 
-    (0 to (inputSize - 1))
+    (0 to (features - 1))
       .map { idx =>
         val vs = ds.map(_.input.get(idx)).flatten
 
@@ -65,9 +67,11 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
 
   def map[T](f: DataPoint => T): List[T] = ds.map(f)
 
+  def toList = ds
+
   val length = ds.length
 
-  def inputSize = ds.head.input.length
+  def features = ds.head.input.length
 
   def toRdd: RDD[LabeledPoint] =
     Spark.context.parallelize(ds.map(_.toLabeledPoint(averageForColumn(_))))

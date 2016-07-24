@@ -12,8 +12,6 @@ import com.typesafe.scalalogging.StrictLogging
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
-import org.apache.spark.mllib.tree.RandomForest
-
 import scala.math.ScalaNumericAnyConversions
 
 object Spark {
@@ -66,7 +64,7 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   var _regression: Option[Model.Predict] = None
 
-  val model = new RandomForestModel
+  val model = new CompositeModel(List(new RandomForestModel, new LinearRegressionModel))
 
   def regression = _regression match {
     case Some(r) => r
