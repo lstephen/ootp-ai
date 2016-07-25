@@ -64,7 +64,8 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   var _regression: Option[Model.Predict] = None
 
-  val model = new CompositeModel(List(new RandomForestModel, new LinearRegressionModel))
+  //val model = new CompositeModel(List(new RandomForestModel, new LinearRegressionModel))
+  val model = new RandomForestModel
 
   def regression = _regression match {
     case Some(r) => r
