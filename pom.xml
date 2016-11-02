@@ -50,6 +50,7 @@
     <lib.scala-arm.version>1.4</lib.scala-arm.version>
     <lib.scala-library.version>2.11.7</lib.scala-library.version>
     <lib.scala-logging.version>3.1.0</lib.scala-logging.version>
+    <lib.scala-reflect.version>2.11.7</lib.scala-reflect.version>
     <lib.slf4j.version>1.7.21</lib.slf4j.version>
     <lib.spark.version>2.0.0</lib.spark.version>
 
@@ -150,36 +151,18 @@
       <groupId>org.scalaz</groupId>
       <artifactId>scalaz-core_${scala.version}</artifactId>
       <version>${lib.scalaz.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-library</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>com.jsuereth</groupId>
       <artifactId>scala-arm_${scala.version}</artifactId>
       <version>${lib.scala-arm.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-library</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>com.typesafe.scala-logging</groupId>
       <artifactId>scala-logging_${scala.version}</artifactId>
       <version>${lib.scala-logging.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.scala-lang</groupId>
-          <artifactId>scala-library</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
