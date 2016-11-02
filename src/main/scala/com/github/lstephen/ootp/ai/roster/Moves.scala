@@ -37,6 +37,7 @@ class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
       .getAllPlayers
       .toList
       .filter(if (roster.isPitcherHeavy) _.isPitcher else _.isHitter)
+      .filter(roster.getStatus(_) != Roster.Status.ML)
       .sortBy(OverallValue(_))
       .take(1)
   }
