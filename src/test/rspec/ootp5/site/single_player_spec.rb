@@ -163,7 +163,7 @@ RSpec.describe SinglePlayer do
           end
 
           context '#defensive_ratings', :property => :defensive_ratings do
-            its(:position_scores) { is_expected.to eq('-3266---') }
+            its(:position_scores) { is_expected.to eq('-3366---') }
           end
         end
 

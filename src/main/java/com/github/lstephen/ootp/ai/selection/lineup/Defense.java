@@ -127,12 +127,10 @@ public final class Defense {
         switch (p) {
             case CATCHER:
             case SHORTSTOP:
-                return 5;
+                return 4;
 
             case SECOND_BASE:
             case THIRD_BASE:
-                return 4;
-
             case CENTER_FIELD:
                 return 3;
 
