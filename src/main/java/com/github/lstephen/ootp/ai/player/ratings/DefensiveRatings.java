@@ -26,9 +26,9 @@ public class DefensiveRatings {
 
     private static final ImmutableMap<Position, Double> MINIMUMS =
         ImmutableMap.<Position, Double>builder()
-            .put(Position.SHORTSTOP, 5.0) // C
-            .put(Position.SECOND_BASE, 4.0) // C
-            .put(Position.THIRD_BASE, 4.0) // C
+            .put(Position.SHORTSTOP, 4.0) // C
+            .put(Position.SECOND_BASE, 3.0) // C
+            .put(Position.THIRD_BASE, 3.0) // C
             .put(Position.CENTER_FIELD, 3.0)  // D
             .put(Position.LEFT_FIELD, 2.0) // D
             .put(Position.RIGHT_FIELD, 2.0) //D
