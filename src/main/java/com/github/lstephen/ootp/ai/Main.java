@@ -54,6 +54,7 @@ import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementLevels$;
+import com.github.lstephen.ootp.extract.html.Page;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,6 +66,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
@@ -188,6 +190,17 @@ public class Main {
         final Site site = def.getSite();
 
         SiteHolder.set(site);
+
+        LOG.log(Level.INFO, "Warming team cache...");
+        site.getTeamIds()
+          .parallelStream()
+          .flatMap(id -> Stream.of("team%s.html", "team%spr.html", "team%ssa.html").map(s -> String.format(s, id.get())))
+          .map(site::getPage)
+          .forEach(Page::load);
+
+        LOG.log(Level.INFO, "Warming player cache...");
+        site.getPage("pagents.html").load();
+        site.getAllPlayers();
 
         Printables.print(LeagueBattingReport.create(site)).to(out);
 

@@ -5,7 +5,13 @@ import com.github.lstephen.ootp.extract.html.Page;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.github.lstephen.ootp.ai.site.Site;
+
 import java.util.Set;
+
+import java.util.regex.Pattern;
+
+import java.util.stream.Collectors;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,6 +21,8 @@ import org.jsoup.select.Elements;
  * @author lstephen
  */
 public final class PlayerList {
+
+    private static final Pattern PLAYER_ID_REGEX = Pattern.compile("p\\d+\\.html");
 
     private final Site site;
 
@@ -33,18 +41,21 @@ public final class PlayerList {
         return site.getPlayers(extractIds());
     }
 
-    public Iterable<PlayerId> extractIds() {
-        Document doc = page.load();
+    public Set<PlayerId> extractIds() {
+        return page
+          .load()
+          .select("a")
+          .stream()
+          .map(e -> e.attr("href"))
+          .distinct()
+          .filter(href -> PLAYER_ID_REGEX.matcher(href).matches())
+          .map(href -> href.replaceAll(".html", ""))
+          .map(PlayerId::new)
+          .collect(Collectors.toSet());
+    }
 
-        Elements els = doc.select("tr td a");
-
-        Set<PlayerId> ids = Sets.newHashSet();
-
-        for (Element el : els) {
-            ids.add(new PlayerId(el.attr("href").replaceAll(".html", "")));
-        }
-
-        return ids;
+    public static PlayerList allPlayers(Site site) {
+        return new PlayerList(site, "players.html");
     }
 
     public static PlayerList freeAgents(Site site) {

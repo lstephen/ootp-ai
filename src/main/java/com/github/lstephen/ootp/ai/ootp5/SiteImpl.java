@@ -43,7 +43,11 @@ import com.github.lstephen.ootp.extract.html.loader.PageLoaderBuilder;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+
+import java.util.stream.Collectors;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -150,6 +154,11 @@ public final class SiteImpl implements Site, SalarySource {
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
+  }
+
+  @Override
+  public Iterable<Player> getAllPlayers() {
+    return PlayerList.allPlayers(this).extract();
   }
 
   @Override
@@ -286,13 +295,8 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
-  public Iterable<Player> getPlayers(Iterable<PlayerId> ids) {
-    return Iterables.transform(ids, new Function<PlayerId, Player>() {
-      @Override
-      public Player apply(PlayerId id) {
-        return getPlayer(id);
-      }
-    });
+  public List<Player> getPlayers(Collection<PlayerId> ids) {
+    return ids.parallelStream().map(id -> getPlayer(id)).collect(Collectors.toList());
   }
 
   @Override
