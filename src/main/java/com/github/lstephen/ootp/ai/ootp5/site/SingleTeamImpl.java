@@ -93,7 +93,7 @@ public class SingleTeamImpl implements SingleTeam {
     }
 
     @Override
-    public Iterable<PlayerId> getInjuries() {
+    public Set<PlayerId> getInjuries() {
         Set<PlayerId> results = injuriesCache.getIfPresent(site.getName() + teamId);
 
         if (results != null) {

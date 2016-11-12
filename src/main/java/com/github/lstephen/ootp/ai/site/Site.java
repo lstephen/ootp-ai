@@ -18,6 +18,9 @@ import com.google.common.base.Predicate;
 
 import org.joda.time.LocalDate;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  *
  * @author lstephen
@@ -34,6 +37,8 @@ public interface Site {
 
     SiteDefinition getDefinition();
 
+    Iterable<Player> getAllPlayers();
+
     Iterable<Player> getDraft();
 
     Iterable<Player> getFreeAgents();
@@ -44,7 +49,7 @@ public interface Site {
 
     String getName();
 
-    Iterable<Id<Team>> getTeamIds();
+    Collection<Id<Team>> getTeamIds();
 
     LeagueStructure getLeagueStructure();
 
@@ -56,8 +61,7 @@ public interface Site {
 
     Player getPlayer(PlayerId id);
 
-    Iterable<Player> getPlayers(
-        Iterable<PlayerId> ids);
+    List<Player> getPlayers(Collection<PlayerId> ids);
 
     Iterable<Player> getRuleFiveDraft();
 
