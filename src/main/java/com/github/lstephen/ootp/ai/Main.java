@@ -221,11 +221,6 @@ public class Main {
         final PitchingRegression pitchingRegression = PitchingRegression.run(site);
         Printables.print(pitchingRegression.correlationReport()).to(out);
 
-        if (isLookToNextSeason) {
-            battingRegression.ignoreStatsInPredictions();
-            pitchingRegression.ignoreStatsInPredictions();
-        }
-
         pcts.print(out);
 
 

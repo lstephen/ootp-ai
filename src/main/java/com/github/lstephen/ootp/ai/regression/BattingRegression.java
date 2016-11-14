@@ -38,17 +38,10 @@ public final class BattingRegression {
 
     private final BattingStats leagueBatting;
 
-    private Boolean ignoreStatsInPredictions = Boolean.FALSE;
-
     private BattingRegression(BattingStats leagueBatting, TeamStats<BattingStats> stats) {
         super();
         this.leagueBatting = leagueBatting;
         this.stats = stats;
-    }
-
-    public BattingRegression ignoreStatsInPredictions() {
-        this.ignoreStatsInPredictions = true;
-        return this;
     }
 
     private Regression getRegression(Predicting p) {
@@ -108,33 +101,7 @@ public final class BattingRegression {
     }
 
     public SplitStats<BattingStats> predict(Player p) {
-        return predict(
-            p.getBattingRatings(),
-            !ignoreStatsInPredictions && stats.contains(p)
-                ? Optional.of(stats.getSplits(p))
-                : Optional.<SplitStats<BattingStats>>absent());
-    }
-
-    private SplitStats<BattingStats> predict(
-        Splits<? extends BattingRatings<?>> ratings,
-        Optional<SplitStats<BattingStats>> stats) {
-
-        Long paToProject = Math.round(DEFAULT_PLATE_APPEARANCES + DEFAULT_PLATE_APPEARANCES * woba.getRSquare());
-
-        Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhpPercentage());
-        Long vsLeftPa = paToProject - vsRightPa;
-
-        BattingStats vsLeft = predict(ratings.getVsLeft(), vsLeftPa * 100);
-        BattingStats vsRight = predict(ratings.getVsRight(), vsRightPa * 100);
-
-        if (stats.isPresent()) {
-            SplitStats<BattingStats> splits = stats.get();
-
-            vsLeft = vsLeft.add(splits.getVsLeft().multiply(100.0));
-            vsRight = vsRight.add(splits.getVsRight().multiply(100.0));
-        }
-
-        return SplitStats.create(vsLeft, vsRight);
+        return predict(p.getBattingRatings());
     }
 
     public SplitStats<BattingStats> predictFuture(Player p) {

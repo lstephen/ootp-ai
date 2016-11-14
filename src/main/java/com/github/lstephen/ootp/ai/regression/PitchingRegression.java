@@ -41,16 +41,9 @@ public final class PitchingRegression {
 
     private final PitchingStats leaguePitching;
 
-    private Boolean ignoreStatsInPredictions = Boolean.FALSE;
-
     private PitchingRegression(Site site) {
         this.site = site;
         this.leaguePitching = site.getLeaguePitching();
-    }
-
-    public PitchingRegression ignoreStatsInPredictions() {
-        this.ignoreStatsInPredictions = true;
-        return this;
     }
 
     public Boolean isEmpty() {
@@ -106,18 +99,11 @@ public final class PitchingRegression {
     }
 
     public SplitStats<PitchingStats> predict(Player p) {
-        Long paToProject = Math.round(DEFAULT_PLATE_APPEARANCES + DEFAULT_PLATE_APPEARANCES * era.getRSquare());
+        Long paToProject = DEFAULT_PLATE_APPEARANCES;
 
         SplitStats<PitchingStats> base = predict(p.getPitchingRatings(), paToProject * 100);
         PitchingStats vsLeft = base.getVsLeft();
         PitchingStats vsRight = base.getVsRight();
-
-        if (!ignoreStatsInPredictions && stats.contains(p)) {
-            SplitStats<PitchingStats> splits = stats.getSplits(p);
-
-            vsLeft = vsLeft.add(splits.getVsLeft().multiply(100.0));
-            vsRight = vsRight.add(splits.getVsRight().multiply(100.0));
-        }
 
         return SplitStats.create(vsLeft, vsRight);
     }
