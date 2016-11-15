@@ -5,7 +5,7 @@ import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.selection.lineup.AllLineups;
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup;
-import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
@@ -55,16 +55,16 @@ public class Bench implements Printable {
 
     private final Integer maxSize;
 
-    private final Predictions predictions;
+    private final Predictor predictor;
 
     private static SplitPercentages pcts;
 
-    private Bench(AllLineups lineups, Iterable<Player> selected, Iterable<Player> players, Integer maxSize, Predictions predictions) {
+    private Bench(AllLineups lineups, Iterable<Player> selected, Iterable<Player> players, Integer maxSize, Predictor predictor) {
         this.lineups = lineups;
         this.players = ImmutableSet.copyOf(players);
         this.selected = ImmutableSet.copyOf(selected);
         this.maxSize = maxSize;
-        this.predictions = predictions;
+        this.predictor = predictor;
     }
 
     public static void setPercentages(SplitPercentages pcts) {
@@ -77,7 +77,7 @@ public class Bench implements Printable {
             selected,
             Iterables.concat(players, ImmutableSet.of(p)),
             maxSize,
-            predictions);
+            predictor);
     }
 
     private Bench without(Player p) {
@@ -86,7 +86,7 @@ public class Bench implements Printable {
             selected,
             Iterables.filter(players, Predicates.not(Predicates.equalTo(p))),
             maxSize,
-            predictions);
+            predictor);
     }
 
     public ImmutableSet<Player> players() {
@@ -105,7 +105,7 @@ public class Bench implements Printable {
     }
 
     private Double score(Lineup lineup, Lineup.VsHand vs) {
-        return new BenchScorer(predictions)
+        return new BenchScorer(predictor)
             .score(
                 Iterables.concat(
                     Sets.difference(selected, lineup.playerSet()), players),
@@ -181,7 +181,7 @@ public class Bench implements Printable {
         };
     }
 
-    private static Supplier<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final Predictions predictions, final Iterable<Player> available, final Integer maxSize) {
+    private static Supplier<Bench> initialStateGenerator(final AllLineups lineups, final Iterable<Player> selected, final Predictor predictor, final Iterable<Player> available, final Integer maxSize) {
         return new Supplier<Bench>() {
             public Bench get() {
                 List<Player> candidates = new ArrayList<>(
@@ -191,12 +191,12 @@ public class Bench implements Printable {
 
                 Collections.shuffle(candidates);
 
-                return new Bench(lineups, selected, Iterables.limit(candidates, maxSize - Iterables.size(selected)), maxSize, predictions);
+                return new Bench(lineups, selected, Iterables.limit(candidates, maxSize - Iterables.size(selected)), maxSize, predictor);
             }
         };
     }
 
-    public static Bench select(AllLineups lineups, Iterable<Player> selected, Predictions predictions, Iterable<Player> available, Integer maxSize) {
+    public static Bench select(AllLineups lineups, Iterable<Player> selected, Predictor predictor, Iterable<Player> available, Integer maxSize) {
         HillClimbing<Bench> hc = HillClimbing
             .<Bench>builder()
             .heuristic(heuristic())
@@ -204,7 +204,7 @@ public class Bench implements Printable {
             .actionGenerator(actionGenerator(available))
             .build();
 
-       Bench result = new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictions, available, maxSize), hc).search();
+       Bench result = new RepeatedHillClimbing<Bench>(initialStateGenerator(lineups, selected, predictor, available, maxSize), hc).search();
 
        Printables.print(result).to(System.out);
 

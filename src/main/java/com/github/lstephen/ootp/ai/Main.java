@@ -13,7 +13,6 @@ import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
-import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
@@ -235,8 +234,7 @@ public class Main {
         team.processManualChanges(changes);
 
         LOG.info("Setting up Predictions...");
-        final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
-        final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
+        final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression);
 
         boolean isExpandedRosters =
             site.getDate().getMonthOfYear() == DateTimeConstants.SEPTEMBER;
@@ -309,7 +307,7 @@ public class Main {
 
         LOG.log(Level.INFO, "Roster selection time: " + sw);
 
-        Printables.print(new HittingSelectionReport(newRoster, ps, site.getTeamBatting())).to(out);
+        Printables.print(new HittingSelectionReport(newRoster, predictor, site.getTeamBatting())).to(out);
         selection.printPitchingSelectionTable(out, newRoster, site.getTeamPitching());
 
         Printables.print(newRoster).to(out);
@@ -322,10 +320,7 @@ public class Main {
 
         Rotation rotation =
             RotationSelection
-                .forMode(
-                    selectionMode,
-                    pitchingRegression.predict(team),
-                    site.getPitcherSelectionMethod())
+                .forMode(selectionMode, predictor)
                 .selectRotation(ImmutableSet.<Player>of(), Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));
 
         Printables.print(rotation).to(out);
@@ -334,12 +329,12 @@ public class Main {
         LOG.log(Level.INFO, "Choosing lineups...");
 
         AllLineups lineups =
-          new LineupSelection(Predictions.predict(newRoster.getAllPlayers()).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod()))
+          new LineupSelection(predictor)
                 .select(Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         LOG.log(Level.INFO, "Choosing Depth Charts...");
 
-        AllDepthCharts depthCharts = new DepthChartSelection(ps)
+        AllDepthCharts depthCharts = new DepthChartSelection(predictor)
             .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
 
         Printables.print(depthCharts).to(out);
@@ -349,7 +344,7 @@ public class Main {
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), predictor);
 
-        final GenericValueReport generic = new GenericValueReport(team, predictor, ps, battingRegression, pitchingRegression, salary);
+        final GenericValueReport generic = new GenericValueReport(team, predictor, battingRegression, pitchingRegression, salary);
         generic.setReverse(false);
 
         LOG.log(Level.INFO, "Strategy...");
@@ -428,9 +423,6 @@ public class Main {
             FourtyManRoster fourtyMan = new FourtyManRoster(
                 team,
                 newRoster,
-                Predictions
-                    .predict(newRoster.getAllPlayers())
-                    .using(battingRegression, pitchingRegression, ps.getPitcherOverall()),
                 predictor);
 
             Printables.print(fourtyMan).to(out);
@@ -499,7 +491,7 @@ public class Main {
         generic.setLimit(50);
         generic.print(out);
 
-        Printables.print(new TeamPositionReport(newRoster, ps)).to(out);
+        Printables.print(new TeamPositionReport(newRoster, predictor)).to(out);
 
         generic.setTitle("Trade Values");
         generic.setPlayers(
@@ -539,9 +531,9 @@ public class Main {
 
         TeamReport now = TeamReport.create(
             "Now",
-            ps,
+            predictor,
             site,
-            new PlayerValue(ps, battingRegression, pitchingRegression)
+            new PlayerValue(predictor, battingRegression, pitchingRegression)
                 .getNowValue());
 
         LOG.info("Team Now Report...");

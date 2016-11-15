@@ -3,7 +3,7 @@ package com.github.lstephen.ootp.ai.selection;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
-import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.bench.Bench;
 import com.github.lstephen.ootp.ai.selection.lineup.AllLineups;
 import com.github.lstephen.ootp.ai.selection.lineup.Defense;
@@ -37,11 +37,11 @@ public class BestStartersSelection implements Selection {
 
   private final int targetSize;
 
-  private final Predictions predictions;
+  private final Predictor predictor;
 
-  public BestStartersSelection(int targetSize, Predictions predictions) {
+  public BestStartersSelection(int targetSize, Predictor predictor) {
     this.targetSize = targetSize;
-    this.predictions = predictions;
+    this.predictor = predictor;
   }
 
   public static void setPercentages(SplitPercentages pcts) {
@@ -101,7 +101,7 @@ public class BestStartersSelection implements Selection {
       }
       System.out.println();
 
-      Double score = SelectedPlayers.create(ps, predictions, pcts).score();
+      Double score = SelectedPlayers.create(ps, predictor, pcts).score();
 
       System.out.println("limit:" + limit + " score:" + score);
 
@@ -123,9 +123,9 @@ public class BestStartersSelection implements Selection {
       return partial;
     }
 
-    AllLineups lineups = new LineupSelection(predictions).select(partial);
+    AllLineups lineups = new LineupSelection(predictor).select(partial);
 
-    Bench bench = Bench.select(lineups, partial, predictions, available, targetSize);
+    Bench bench = Bench.select(lineups, partial, predictor, available, targetSize);
 
     return ImmutableSet.copyOf(Iterables.concat(partial, bench.players()));
   }
@@ -135,7 +135,7 @@ public class BestStartersSelection implements Selection {
     Set<Player> selected = Sets.newHashSet(best);
 
     while (selected.size() > size) {
-      AllLineups lineups = new LineupSelection(predictions).select(selected);
+      AllLineups lineups = new LineupSelection(predictor).select(selected);
       Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
 
       Iterables.removeAll(ps, forced);
@@ -153,7 +153,7 @@ public class BestStartersSelection implements Selection {
       selected.remove(byValueProvided(lineups, selected).min(ps));
     }
 
-    AllLineups lineups = new LineupSelection(predictions).select(selected);
+    AllLineups lineups = new LineupSelection(predictor).select(selected);
 
     System.out.print("Limited:");
     for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
@@ -165,7 +165,7 @@ public class BestStartersSelection implements Selection {
   }
 
   private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
-    StarterSelection starters = new StarterSelection(predictions);
+    StarterSelection starters = new StarterSelection(predictor);
 
     return ImmutableSet.copyOf(
         Iterables.concat(
@@ -198,7 +198,7 @@ public class BestStartersSelection implements Selection {
 
   private Double getValueProvided(Player p, Lineup l, Iterable<Player> selected, Double pct, Lineup.VsHand vs) {
     Double score = 0.0;
-    Integer wobaPlus = predictions.getHitting(p, vs);
+    Integer wobaPlus = vs.getStats(predictor, p).getWobaPlus();
 
     if (l.contains(p)) {
       score += wobaPlus;

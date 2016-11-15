@@ -10,6 +10,8 @@ import com.google.common.collect.Maps;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.regression.Predictor;
+import com.github.lstephen.ootp.ai.regression.PitchingPrediction;
 import com.github.lstephen.ootp.ai.site.SiteHolder;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
@@ -33,22 +35,20 @@ public final class Rotation implements Printable {
         this.rotation = ImmutableMap.copyOf(rotation);
     }
 
-    public Double score(TeamStats<PitchingStats> predictions, PitcherOverall overall) {
-        return scoreRotation(predictions, overall)
-            + scoreBullpen(predictions, overall);
+    public Double score(Predictor predictor) {
+        return scoreRotation(predictor) + scoreBullpen(predictor);
     }
 
-    private Double scoreRotation(TeamStats<PitchingStats> predictions, PitcherOverall overall) {
-        Double score = 0.0;
-        Integer spFactor = 10;
+    private double scoreRotation(Predictor predictor) {
+        double score = 0.0;
+        int spFactor = 10;
 
         for (Player p : get(Role.SP)) {
-            Integer end = p.getPitchingRatings().getVsRight().getEndurance();
-            SplitStats<PitchingStats> stats = predictions.getSplits(p);
+            int end = p.getPitchingRatings().getVsRight().getEndurance();
 
-            Double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+            double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
 
-            score += spFactor * endFactor * overall.getPlus(stats.getOverall());
+            score += spFactor * endFactor * predictor.predictPitching(p).overall();
 
             spFactor--;
         }
@@ -58,30 +58,29 @@ public final class Rotation implements Printable {
 
     private static enum BullpenOption { CLUTCH }
 
-    private Double scoreBullpen(TeamStats<PitchingStats> predictions, PitcherOverall overall) {
-      Double mrs = score(get(Role.MR), predictions, overall, EnumSet.noneOf(BullpenOption.class));
-      Double sus = score(get(Role.SU), predictions, overall, EnumSet.noneOf(BullpenOption.class));
-      Double cls = score(get(Role.CL), predictions, overall, EnumSet.of(BullpenOption.CLUTCH));
+    private Double scoreBullpen(Predictor predictor) {
+      Double mrs = score(get(Role.MR), predictor, EnumSet.noneOf(BullpenOption.class));
+      Double sus = score(get(Role.SU), predictor, EnumSet.noneOf(BullpenOption.class));
+      Double cls = score(get(Role.CL), predictor, EnumSet.of(BullpenOption.CLUTCH));
 
       return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
     }
 
-    private Double score(
+    private double score(
         ImmutableList<Player> players,
-        TeamStats<PitchingStats> predictions,
-        PitcherOverall overall,
+        Predictor predictor,
         EnumSet<BullpenOption> options) {
 
-      Double score = 0.0;
-      Double vsL = 0.0;
-      Double vsR = 0.0;
+      double score = 0.0;
+      double vsL = 0.0;
+      double vsR = 0.0;
 
-      Integer factor = 5;
+      int factor = 5;
 
       for (Player p : players) {
-        SplitStats<PitchingStats> stats = predictions.getSplits(p);
+        PitchingPrediction stats = predictor.predictPitching(p);
 
-        Double clutchFactor = 0.0;
+        double clutchFactor = 0.0;
 
         if (options.contains(BullpenOption.CLUTCH) && p.getClutch().isPresent()) {
           switch (p.getClutch().get()) {
@@ -99,21 +98,21 @@ public final class Rotation implements Printable {
           }
         }
 
-        Double f = factor.doubleValue() + clutchFactor;
+        double f = factor + clutchFactor;
 
-        score += f * overall.getPlus(stats.getOverall());
-        vsL += f * overall.getPlus(stats.getVsLeft());
-        vsR += f * overall.getPlus(stats.getVsRight());
+        score += f * stats.overall();
+        vsL += f * stats.vsLeft().getBaseRunsPlus();
+        vsR += f * stats.vsRight().getBaseRunsPlus();
 
         if (factor > 1) {
             factor--;
         }
       }
 
-      Double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
-      Double actBalance = vsL * vsR;
+      double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
+      double actBalance = vsL * vsR;
 
-      Double balanceFactor = Math.pow(actBalance / maxBalance, players.size());
+      double balanceFactor = Math.pow(actBalance / maxBalance, players.size());
 
       return score * balanceFactor;
     }

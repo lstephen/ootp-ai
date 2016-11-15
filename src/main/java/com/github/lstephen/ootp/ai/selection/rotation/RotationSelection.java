@@ -1,12 +1,9 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   RotationSelection.java
 package com.github.lstephen.ootp.ai.selection.rotation;
 
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.Selection;
 import com.github.lstephen.ootp.ai.selection.rotation.Rotation.Role;
@@ -32,22 +29,14 @@ import com.google.common.collect.*;
 
 public final class RotationSelection implements Selection {
 
-    private final TeamStats<PitchingStats> predictions;
-
-    private final PitcherOverall method;
+    private final Predictor predictor;
 
     private final RotationDefinition definition;
 
     private final Multiset<Slot> slots;
 
-    private RotationSelection(
-        TeamStats<PitchingStats> predictions,
-        PitcherOverall method,
-        RotationDefinition definition,
-        Multiset<Slot> slots) {
-
-        this.predictions = predictions;
-        this.method = method;
+    private RotationSelection(Predictor predictor, RotationDefinition definition, Multiset<Slot> slots) {
+        this.predictor = predictor;
         this.definition = definition;
         this.slots = slots;
     }
@@ -97,22 +86,14 @@ public final class RotationSelection implements Selection {
     private Ordering<Rotation> heuristic() {
       Ordering<Rotation> byOverall = Ordering
         .natural()
-        .onResultOf(new Function<Rotation, Double>() {
-          public Double apply(Rotation r) {
-            Double score = 0.0;
-            for (Player p : r.getAll()) {
-              score += method.getPlus(predictions.getOverall(p));
-            }
-            return score;
-          }});
+        .onResultOf((Rotation r) ->
+            r.getAll().stream().mapToDouble(p -> predictor.predictPitching(p).overall()).sum()
+          );
+
 
       return Ordering
         .natural()
-        .onResultOf(new Function<Rotation, Double>() {
-            public Double apply(Rotation r) {
-                return r.score(predictions, method);
-            }
-        })
+        .onResultOf((Rotation r) -> r.score(predictor))
         .compound(byOverall);
     }
 
@@ -244,39 +225,18 @@ public final class RotationSelection implements Selection {
         };
     }
 
-    public static RotationSelection regularSeason(
-        TeamStats<PitchingStats> pitching, PitcherOverall method) {
-
-        return new RotationSelection(
-            pitching, method, RotationDefinition.regularSeason(), Mode.REGULAR_SEASON.getPitchingSlots());
-    }
-
-    public static RotationSelection expanded(
-        TeamStats<PitchingStats> pitching, PitcherOverall method) {
-
-        return new RotationSelection(
-            pitching, method, RotationDefinition.regularSeason(), Mode.EXPANDED.getPitchingSlots());
-    }
-
-    public static RotationSelection playoffs(
-        TeamStats<PitchingStats> pitching, PitcherOverall method) {
-
-        return new RotationSelection(
-            pitching, method, RotationDefinition.playoffs(), Mode.PLAYOFFS.getPitchingSlots());
-    }
-
     public static RotationSelection forMode(
-        Mode mode, TeamStats<PitchingStats> pitching, PitcherOverall method) {
+        Mode mode, Predictor predictor) {
 
         switch (mode) {
             case IDEAL:
             case PRESEASON:
             case REGULAR_SEASON:
-                return regularSeason(pitching, method);
+                return new RotationSelection(predictor, RotationDefinition.regularSeason(), Mode.REGULAR_SEASON.getPitchingSlots());
             case EXPANDED:
-                return expanded(pitching, method);
+                return new RotationSelection(predictor, RotationDefinition.regularSeason(), Mode.EXPANDED.getPitchingSlots());
             case PLAYOFFS:
-                return playoffs(pitching, method);
+                return new RotationSelection(predictor, RotationDefinition.playoffs(), Mode.PLAYOFFS.getPitchingSlots());
             default:
                 throw new IllegalStateException();
         }

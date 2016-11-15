@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.selection.lineup
 
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 import com.github.lstephen.ootp.ai.search._
@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
 
 import java.lang.{ Iterable => JavaIterable }
 
-class StarterSelection(implicit predictions: Predictions) {
+class StarterSelection(implicit predictor: Predictor) {
 
   type Starters = Map[Position, Player]
 

@@ -3,14 +3,14 @@ package com.github.lstephen.ootp.ai.selection.lineup;
 
 import com.google.common.collect.ImmutableSet;
 import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 
 public class LineupSelection {
 
-    private final Predictions predictions;
+    private final Predictor predictor;
 
-    public LineupSelection(Predictions predictions) {
-        this.predictions = predictions;
+    public LineupSelection(Predictor predictor) {
+        this.predictor = predictor;
     }
 
     public AllLineups select(Iterable<Player> available) {
@@ -26,7 +26,7 @@ public class LineupSelection {
     private Lineup selectWithoutDh(
         Lineup.VsHand vs, Iterable<Player> available) {
 
-        StarterSelection ss = new StarterSelection(predictions);
+        StarterSelection ss = new StarterSelection(predictor);
 
         ImmutableSet<Player> withoutDhStarters =
             ImmutableSet.copyOf(ss.select(vs, available));
@@ -35,7 +35,7 @@ public class LineupSelection {
     }
 
     private Lineup selectWithDh(Lineup.VsHand vs, Iterable<Player> available) {
-        StarterSelection ss = new StarterSelection(predictions);
+        StarterSelection ss = new StarterSelection(predictor);
 
         ImmutableSet<Player> withDhStarters =
             ImmutableSet.copyOf(ss.selectWithDh(vs, available));
@@ -45,7 +45,7 @@ public class LineupSelection {
 
     private Lineup arrange(Lineup.VsHand vs, Iterable<Player> available, Iterable<Player> selected) {
         Lineup lineup = new Lineup();
-        lineup.setOrder(new LineupOrdering(predictions.getAllBatting()).order(vs, selected));
+        lineup.setOrder(new LineupOrdering(predictor).order(vs, selected));
         lineup.setDefense(new DefenseSelection().select(selected));
         return lineup;
     }

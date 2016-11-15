@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.report
 
 import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.roster.Roster
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
@@ -14,7 +14,7 @@ import java.io.PrintWriter
 
 import collection.JavaConversions._
 
-class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, stats: TeamStats[BattingStats]) extends Printable {
+class HittingSelectionReport(roster: Roster)(implicit predictor: Predictor, stats: TeamStats[BattingStats]) extends Printable {
 
   def print(w: PrintWriter): Unit = {
     w.println()
@@ -38,7 +38,7 @@ class HittingSelectionReport(roster: Roster)(implicit predictions: Predictions, 
     def hitting: String = s"${hitting(VsHand.VS_LHP)} | ${hitting(VsHand.VS_RHP)}"
 
     def hitting(vs: VsHand): String = {
-      val ps = vs.getStats(predictions, p)
+      val ps = vs.getStats(predictor, p)
       val ss = if (stats.contains(p)) Some(vs.getStats(stats, p)) else None
 
       f"${ps.getSlashLine}%14s ${ps.getWobaPlus}%3d ${ss map (_.getWobaPlus) getOrElse ""}%3s"

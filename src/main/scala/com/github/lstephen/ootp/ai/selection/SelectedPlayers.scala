@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.selection
 
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.bench.BenchScorer
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
@@ -16,10 +16,10 @@ import collection.JavaConversions._
 import scalaz._
 import Scalaz._
 
-class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, splits: SplitPercentages) {
+class SelectedPlayers(players: Set[Player])(implicit predictor: Predictor, splits: SplitPercentages) {
 
   def score: Double = {
-    val lineups = new LineupSelection(predictions).select(players)
+    val lineups = new LineupSelection(predictor).select(players)
 
     splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhpPlusDh()) +
       splits.getVsRhpPercentage() * score(VsHand.VS_RHP, lineups.getVsRhp()) +
@@ -42,7 +42,7 @@ class SelectedPlayers(players: Set[Player])(implicit predictions: Predictions, s
 }
 
 object SelectedPlayers {
-  def create(players: java.lang.Iterable[Player], predictions: Predictions, splits: SplitPercentages): SelectedPlayers =
-    new SelectedPlayers(Set() ++ players)(predictions, splits)
+  def create(players: java.lang.Iterable[Player], predictor: Predictor, splits: SplitPercentages): SelectedPlayers =
+    new SelectedPlayers(Set() ++ players)(predictor, splits)
 }
 

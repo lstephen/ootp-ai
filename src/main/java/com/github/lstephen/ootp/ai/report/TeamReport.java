@@ -4,7 +4,7 @@ import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
-import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
@@ -56,9 +56,9 @@ public final class TeamReport implements Printable, RecordPredictor {
 
     private Ordering<TeamScore> ordering;
 
-    private Predictions ps;
+    private Predictor ps;
 
-    private TeamReport(String title, Site site, Predictions ps, Function<Player, Integer> value) {
+    private TeamReport(String title, Site site, Predictor ps, Function<Player, Integer> value) {
         this.title = title;
         this.site = site;
         this.ps = ps;
@@ -292,7 +292,13 @@ public final class TeamReport implements Printable, RecordPredictor {
 
     private Double calculatePitching(Iterable<Player> players) {
         return calculateScore(
-            PitcherSelectionFactory.using(value).slot(Mode.REGULAR_SEASON),
+            SlotSelection
+              .builder()
+              .ordering(Ordering.natural().reverse().onResultOf(value))
+              .slots(Mode.REGULAR_SEASON.getPitchingSlots())
+              .size(Mode.REGULAR_SEASON.getPitchingSlots().size())
+              .fillToSize(Slot.P)
+              .build(),
             Selections.onlyPitchers(players));
     }
 
@@ -333,7 +339,7 @@ public final class TeamReport implements Printable, RecordPredictor {
         }
     }
 
-    public static TeamReport create(String title, Predictions ps, Site site, Function<Player, Integer> value) {
+    public static TeamReport create(String title, Predictor ps, Site site, Function<Player, Integer> value) {
         return new TeamReport(title, site, ps, value);
     }
 
