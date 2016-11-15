@@ -200,7 +200,7 @@ public class Main {
 
         LOG.log(Level.INFO, "Warming player cache...");
         site.getPage("pagents.html").load();
-        site.getAllPlayers();
+        Iterable<Player> allPlayers = site.getAllPlayers();
 
         Printables.print(LeagueBattingReport.create(site)).to(out);
 
@@ -235,7 +235,7 @@ public class Main {
         team.processManualChanges(changes);
 
         LOG.info("Setting up Predictions...");
-        final Predictor predictor = new Predictor(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
+        final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
         final Predictions ps = Predictions.predict(team).using(battingRegression, pitchingRegression, site.getPitcherSelectionMethod());
 
         boolean isExpandedRosters =
@@ -349,7 +349,7 @@ public class Main {
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), predictor);
 
-        final GenericValueReport generic = new GenericValueReport(team, ps, battingRegression, pitchingRegression, salary);
+        final GenericValueReport generic = new GenericValueReport(team, predictor, ps, battingRegression, pitchingRegression, salary);
         generic.setReverse(false);
 
         LOG.log(Level.INFO, "Strategy...");
