@@ -309,7 +309,7 @@ public final class RosterSelection {
     }
 
     public void printPitchingSelectionTable(PrintWriter w, Roster roster, TeamStats<PitchingStats> stats) {
-        PlayerValue value = new PlayerValue(predictor, batting, pitching);
+        PlayerValue value = new PlayerValue(predictor);
         w.println();
         Integer statusLength = Iterables.getFirst(roster.getAllPlayers(), null).getRosterStatus().length();
 

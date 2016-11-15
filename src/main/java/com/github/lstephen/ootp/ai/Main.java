@@ -344,7 +344,7 @@ public class Main {
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), predictor);
 
-        final GenericValueReport generic = new GenericValueReport(team, predictor, battingRegression, pitchingRegression, salary);
+        final GenericValueReport generic = new GenericValueReport(team, predictor, salary);
         generic.setReverse(false);
 
         LOG.log(Level.INFO, "Strategy...");
@@ -533,8 +533,7 @@ public class Main {
             "Now",
             predictor,
             site,
-            new PlayerValue(predictor, battingRegression, pitchingRegression)
-                .getNowValue());
+            new PlayerValue(predictor).getNowValue());
 
         LOG.info("Team Now Report...");
 
