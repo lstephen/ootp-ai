@@ -57,9 +57,9 @@ public class GenericValueReport implements Printable {
     private final Predictor predictor;
 
     public GenericValueReport(
-        Iterable<Player> ps, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryPredictor salary) {
+        Iterable<Player> ps, Predictor predictor, Predictions predictions, BattingRegression batting, PitchingRegression pitching, SalaryPredictor salary) {
 
-        predictor = new Predictor(batting, pitching, predictions.getPitcherOverall());
+        this.predictor = predictor;
 
         this.batting = batting;
         this.pitching = pitching;

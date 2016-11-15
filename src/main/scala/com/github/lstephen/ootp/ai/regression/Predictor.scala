@@ -7,18 +7,47 @@ import com.github.lstephen.ootp.ai.stats.PitcherOverall
 import com.github.lstephen.ootp.ai.stats.PitchingStats
 import com.github.lstephen.ootp.ai.stats.SplitStats
 
-class Predictor(br: BattingRegression, pr: PitchingRegression, po: PitcherOverall) {
-  def predictBatting(p: Player): BattingPrediction =
-    new BattingPrediction(br.predict(p))
+import com.typesafe.scalalogging.LazyLogging
 
-  def predictFutureBatting(p: Player): BattingPrediction =
-    new BattingPrediction(br.predictFuture(p))
+import humanize.Humanize
 
-  def predictPitching(p: Player): PitchingPrediction =
-    new PitchingPrediction(pr.predict(p), po)
+import scala.collection.JavaConverters._
 
-  def predictFuturePitching(p: Player): PitchingPrediction =
-    new PitchingPrediction(pr.predictFuture(p), po)
+class Predictor(ps: Seq[Player], private val br: BattingRegression, private val pr: PitchingRegression, private val po: PitcherOverall) extends LazyLogging {
+
+  private def time[R](label: String, block: => R): R = {
+    val t0 = System.nanoTime
+
+    try {
+      block
+    } finally {
+      val t1 = System.nanoTime
+      logger info s"$label predict execution time: ${Humanize.nanoTime(t1 - t0)}"
+    }
+  }
+
+  val batting = time("batting", ps.map(p => (p, new BattingPrediction(br predict p))).toMap)
+  val battingFuture = time("battingFuture", ps.map(p => (p, new BattingPrediction(br predictFuture p))).toMap)
+
+  val pitching = time("pitching", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predict p, po))).toMap)
+  val pitchingFuture = time("pitchingFuture", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predictFuture p, po))).toMap)
+
+  private def getPrediction[P](ps: Map[Player, P], p: Player): P =
+    ps.get(p).getOrElse(throw new IllegalArgumentException(s"Unable to predict for: ${p.getId}, ${p.getShortName}"))
+
+  def predictBatting(p: Player): BattingPrediction = getPrediction(batting, p)
+  def predictFutureBatting(p: Player): BattingPrediction = getPrediction(battingFuture, p)
+
+  def predictPitching(p: Player): PitchingPrediction = getPrediction(pitching, p)
+  def predictFuturePitching(p: Player): PitchingPrediction = getPrediction(pitchingFuture, p)
+
+  def this(ps: Seq[Player], pr: Predictor) = this(ps, pr.br, pr.pr, pr.po)
+
+  // Java compatability
+  def this(ps: java.lang.Iterable[Player], br: BattingRegression, pr: PitchingRegression, po: PitcherOverall) =
+    this(ps.asScala.toSeq, br, pr, po)
+
+  def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps, pr.br, pr.pr, pr.po)
 }
 
 class BattingPrediction(stats: SplitStats[BattingStats]) {

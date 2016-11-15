@@ -17,9 +17,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -29,7 +31,7 @@ public final class DraftReport implements Printable {
 
   private final Site site;
 
-  private final Predictor predictor;
+  private Predictor predictor;
 
   private DraftClass current;
 
@@ -60,12 +62,16 @@ public final class DraftReport implements Printable {
       }
     }
 
-    currentPlayersSorted = byOverall().immutableSortedCopy(current.getPlayers());
+    currentPlayersSorted = byOverall(predictor).immutableSortedCopy(current.getPlayers());
 
     historicalPlayersSorted = historical
       .stream()
-      .map(dc -> byOverall().immutableSortedCopy(dc.getPlayers()))
+      .map(dc -> byOverall(new Predictor(dc.getPlayers(), predictor)).immutableSortedCopy(dc.getPlayers()))
       .collect(Collectors.toList());
+
+    List<Player> allPlayers = Stream.concat(historicalPlayersSorted.stream().flatMap(Collection::stream), currentPlayersSorted.stream()).collect(Collectors.toList());
+
+    predictor = new Predictor(allPlayers, predictor);
   }
 
   private File getDraftClassFile(int year) {
@@ -111,11 +117,11 @@ public final class DraftReport implements Printable {
     return rv;
   }
 
-  private Ordering<Player> byOverall() {
+  private Ordering<Player> byOverall(Predictor pred) {
     return Ordering
       .natural()
       .reverse()
-      .onResultOf((Player p) -> JavaAdapter.futureValue(p, predictor).score());
+      .onResultOf((Player p) -> JavaAdapter.futureValue(p, pred).score());
   }
 
   public void print(OutputStream out) {
@@ -180,7 +186,5 @@ public final class DraftReport implements Printable {
     report.loadDraftClasses();
     return report;
   }
-
-
 
 }

@@ -71,7 +71,7 @@ public final class RosterSelection {
         this.batting = batting;
         this.pitching = pitching;
 
-        this.predictor = new Predictor(batting, pitching, predictions.getPitcherOverall());
+        this.predictor = new Predictor(team, batting, pitching, predictions.getPitcherOverall());
 
         hitterSelectionFactory = HitterSelectionFactory.using(predictions);
         pitcherSelectionFactory = PitcherSelectionFactory.using(predictions);
