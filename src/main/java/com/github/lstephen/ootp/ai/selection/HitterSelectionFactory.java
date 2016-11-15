@@ -23,9 +23,8 @@ public final class HitterSelectionFactory implements SelectionFactory {
     @Override
     public Selection create(Mode mode) {
         return new BestStartersSelection(
-            mode.getHittingSlots(),
-            predictions,
-            value);
+            mode.getHittingSlots().size(),
+            predictions);
     }
 
     public Selection slot(Mode mode) {

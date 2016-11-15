@@ -33,200 +33,185 @@ import com.google.common.collect.Sets;
  */
 public class BestStartersSelection implements Selection {
 
-    private static SplitPercentages pcts;
+  private static SplitPercentages pcts;
 
-	private final Multiset<Slot> slots;
+  private final int targetSize;
 
-	private final Predictions predictions;
+  private final Predictions predictions;
 
-	private final Function<Player, Integer> value;
+  public BestStartersSelection(int targetSize, Predictions predictions) {
+    this.targetSize = targetSize;
+    this.predictions = predictions;
+  }
 
-	public BestStartersSelection(Iterable<Slot> slots, Predictions predictions, Function<Player, Integer> value) {
-		this.slots = HashMultiset.create(slots);
-		this.predictions = predictions;
-		this.value = value;
-	}
+  public static void setPercentages(SplitPercentages pcts) {
+    BestStartersSelection.pcts = pcts;
+  }
 
-    public static void setPercentages(SplitPercentages pcts) {
-        BestStartersSelection.pcts = pcts;
+  @Override
+  public ImmutableMultimap<Slot, Player> select(Iterable<Player> forced, Iterable<Player> available) {
+
+    ImmutableSet<Player> best = ImmutableSet.copyOf(Iterables.concat(selectStarters(available), forced));
+
+    System.out.println("Best:");
+    for (Player p : Player.byShortName().sortedCopy(best)) {
+      System.out.print(p.getShortName() + "/");
+    }
+    System.out.println();
+
+
+    best = optimize(best, forced, available);
+
+    Multimap<Slot, Player> result = HashMultimap.create();
+
+    for (Player p : best) {
+      result.put(Slot.getPrimarySlot(p), p);
     }
 
-    private Integer getTargetSize() {
-        return slots.size();
+    return ImmutableMultimap.copyOf(result);
+  }
+
+  private ImmutableSet<Player> optimize(Iterable<Player> best, Iterable<Player> forced, Iterable<Player> available) {
+    return optimize(ImmutableSet.copyOf(best), ImmutableSet.copyOf(forced), ImmutableSet.copyOf(available));
+
+  }
+
+  private ImmutableSet<Player> optimize(ImmutableSet<Player> best, ImmutableSet<Player> forced, ImmutableSet<Player> available) {
+
+    if (forced.size() >= targetSize) {
+      return forced;
     }
 
-	@Override
-	public ImmutableMultimap<Slot, Player> select(Iterable<Player> forced, Iterable<Player> available) {
-
-        ImmutableSet<Player> best = ImmutableSet.copyOf(Iterables.concat(selectStarters(available), forced));
-
-        System.out.println("Best:");
-        for (Player p : Player.byShortName().sortedCopy(best)) {
-            System.out.print(p.getShortName() + "/");
-        }
-        System.out.println();
-
-
-        best = optimize(best, forced, available);
-
-        Multimap<Slot, Player> result = HashMultimap.create();
-
-        for (Player p : best) {
-            result.put(Slot.getPrimarySlot(p), p);
-        }
-
-        return ImmutableMultimap.copyOf(result);
-	}
-
-    private ImmutableSet<Player> optimize(Iterable<Player> best, Iterable<Player> forced, Iterable<Player> available) {
-        return optimize(ImmutableSet.copyOf(best), ImmutableSet.copyOf(forced), ImmutableSet.copyOf(available));
-
+    if (best.size() > targetSize) {
+      return optimize(limit(best, forced, targetSize), forced, available);
     }
 
-    private ImmutableSet<Player> optimize(ImmutableSet<Player> best, ImmutableSet<Player> forced, ImmutableSet<Player> available) {
+    Double bestScore = 0.0;
+    ImmutableSet<Player> bestPlayers = null;
 
-        if (forced.size() >= getTargetSize()) {
-            return forced;
-        }
+    Integer limit = best.size();
 
-        if (best.size() > getTargetSize()) {
-            return optimize(limit(best, forced, getTargetSize()), forced, available);
-        }
+    while (limit >= 9) {
+      ImmutableSet<Player> ps = limit(best, forced, limit);
 
-        Double bestScore = 0.0;
-        ImmutableSet<Player> bestPlayers = null;
+      ps = fill(ps, available);
+      System.out.print("Filled: ");
+      for (Player p : Player.byShortName().sortedCopy(ps)) {
+        System.out.print(p.getShortName() + "/");
+      }
+      System.out.println();
 
-        Integer limit = best.size();
+      Double score = SelectedPlayers.create(ps, predictions, pcts).score();
 
-        while (limit >= 9) {
-            ImmutableSet<Player> ps = limit(best, forced, limit);
+      System.out.println("limit:" + limit + " score:" + score);
 
-            ps = fill(ps, available);
-            System.out.print("Filled: ");
-            for (Player p : Player.byShortName().sortedCopy(ps)) {
-                System.out.print(p.getShortName() + "/");
-            }
-            System.out.println();
-
-            Double score = SelectedPlayers.create(ps, predictions, pcts).score();
-
-            System.out.println("limit:" + limit + " score:" + score);
-
-            if (score < bestScore || ps.equals(bestPlayers)) {
-                return bestPlayers;
-            }
-
-            bestScore = score;
-            bestPlayers = ps;
-
-            limit--;
-        }
-
+      if (score < bestScore || ps.equals(bestPlayers)) {
         return bestPlayers;
+      }
+
+      bestScore = score;
+      bestPlayers = ps;
+
+      limit--;
     }
 
-    private ImmutableSet<Player> fill(ImmutableSet<Player> partial, ImmutableSet<Player> available) {
-        if (partial.size() == getTargetSize()) {
-            return partial;
+    return bestPlayers;
+  }
+
+  private ImmutableSet<Player> fill(ImmutableSet<Player> partial, ImmutableSet<Player> available) {
+    if (partial.size() == targetSize) {
+      return partial;
+    }
+
+    AllLineups lineups = new LineupSelection(predictions).select(partial);
+
+    Bench bench = Bench.select(lineups, partial, predictions, available, targetSize);
+
+    return ImmutableSet.copyOf(Iterables.concat(partial, bench.players()));
+  }
+
+  private ImmutableSet<Player> limit(ImmutableSet<Player> best, ImmutableSet<Player> forced, Integer size) {
+
+    Set<Player> selected = Sets.newHashSet(best);
+
+    while (selected.size() > size) {
+      AllLineups lineups = new LineupSelection(predictions).select(selected);
+      Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
+
+      Iterables.removeAll(ps, forced);
+
+      if (ps.isEmpty()) {
+        break;
+      }
+
+      System.out.print("Selected:");
+      for (Player p : byValueProvided(lineups, Iterables.concat(forced, ps)).reverse().sortedCopy(selected)) {
+        System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, Iterables.concat(forced, ps))) + "/");
+      }
+      System.out.println();
+
+      selected.remove(byValueProvided(lineups, selected).min(ps));
+    }
+
+    AllLineups lineups = new LineupSelection(predictions).select(selected);
+
+    System.out.print("Limited:");
+    for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
+      System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, selected)) + "/");
+    }
+    System.out.println();
+
+    return ImmutableSet.copyOf(selected);
+  }
+
+  private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
+    StarterSelection starters = new StarterSelection(predictions);
+
+    return ImmutableSet.copyOf(
+        Iterables.concat(
+          starters.selectWithDh(Lineup.VsHand.VS_LHP, ps),
+          starters.selectWithDh(Lineup.VsHand.VS_RHP, ps)));
+  }
+
+  private Ordering<Player> byValueProvided(final AllLineups lineups, final Iterable<Player> selected) {
+    return Ordering
+      .natural()
+      .onResultOf(new Function<Player, Double>() {
+        public Double apply(Player p) {
+          return getValueProvided(p, lineups, selected);
         }
+      })
+    .compound(Player.byTieBreak());
+  }
 
-        AllLineups lineups = new LineupSelection(predictions).select(partial);
+  private Double getValueProvided(Player p, AllLineups lineups, Iterable<Player> selected) {
+    Double score = 0.0;
 
-        Bench bench = Bench.select(lineups, partial, predictions, available, getTargetSize());
+    score += getValueProvided(p, lineups.getVsLhpPlusDh(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
+    score += getValueProvided(p, lineups.getVsLhp(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
 
-        return ImmutableSet.copyOf(Iterables.concat(partial, bench.players()));
+    score += getValueProvided(p, lineups.getVsRhpPlusDh(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
+    score += getValueProvided(p, lineups.getVsRhp(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
+
+    return score;
+  }
+
+  private Double getValueProvided(Player p, Lineup l, Iterable<Player> selected, Double pct, Lineup.VsHand vs) {
+    Double score = 0.0;
+    Integer wobaPlus = predictions.getHitting(p, vs);
+
+    if (l.contains(p)) {
+      score += wobaPlus;
+
+      Position pos = l.getPosition(p);
+      score += (Defense.getPositionFactor(pos) * p.getDefensiveRatings().getPositionScore(pos));
+
+      /*if (p.canPlay(l.getPosition(p))) {
+        score += wobaPlus;
+        }*/
     }
 
-    private ImmutableSet<Player> limit(ImmutableSet<Player> best, ImmutableSet<Player> forced, Integer size) {
-
-        Set<Player> selected = Sets.newHashSet(best);
-
-        while (selected.size() > size) {
-            AllLineups lineups = new LineupSelection(predictions).select(selected);
-            Set<Player> ps = Sets.newHashSet(lineups.getAllPlayers());
-
-            Iterables.removeAll(ps, forced);
-
-            if (ps.isEmpty()) {
-                break;
-            }
-
-            System.out.print("Selected:");
-            for (Player p : byValueProvided(lineups, Iterables.concat(forced, ps)).reverse().sortedCopy(selected)) {
-                System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, Iterables.concat(forced, ps))) + "/");
-            }
-            System.out.println();
-
-            selected.remove(byValueProvided(lineups, selected).min(ps));
-        }
-
-        AllLineups lineups = new LineupSelection(predictions).select(selected);
-
-        System.out.print("Limited:");
-        for (Player p : byValueProvided(lineups, selected).reverse().sortedCopy(selected)) {
-            System.out.print(p.getShortName() + "-" + Math.round(getValueProvided(p, lineups, selected)) + "/");
-        }
-        System.out.println();
-
-        return ImmutableSet.copyOf(selected);
-    }
-
-    private ImmutableSet<Player> selectStarters(Iterable<Player> ps) {
-        StarterSelection starters = new StarterSelection(predictions);
-
-        return ImmutableSet.copyOf(
-            Iterables.concat(
-                starters.selectWithDh(Lineup.VsHand.VS_LHP, ps),
-                starters.selectWithDh(Lineup.VsHand.VS_RHP, ps)));
-    }
-
-	private Ordering<Player> byOverall() {
-		return Ordering
-			.natural()
-			.reverse()
-			.onResultOf(value)
-			.compound(Player.byTieBreak());
-	}
-
-    private Ordering<Player> byValueProvided(final AllLineups lineups, final Iterable<Player> selected) {
-        return Ordering
-            .natural()
-            .onResultOf(new Function<Player, Double>() {
-                public Double apply(Player p) {
-                    return getValueProvided(p, lineups, selected);
-                }
-            })
-            .compound(Player.byTieBreak());
-    }
-
-    private Double getValueProvided(Player p, AllLineups lineups, Iterable<Player> selected) {
-        Double score = 0.0;
-
-        score += getValueProvided(p, lineups.getVsLhpPlusDh(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
-        score += getValueProvided(p, lineups.getVsLhp(), selected, pcts.getVsLhpPercentage(), Lineup.VsHand.VS_LHP);
-
-        score += getValueProvided(p, lineups.getVsRhpPlusDh(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
-        score += getValueProvided(p, lineups.getVsRhp(), selected, pcts.getVsRhpPercentage(), Lineup.VsHand.VS_RHP);
-
-        return score;
-    }
-
-    private Double getValueProvided(Player p, Lineup l, Iterable<Player> selected, Double pct, Lineup.VsHand vs) {
-        Double score = 0.0;
-        Integer wobaPlus = predictions.getHitting(p, vs);
-
-        if (l.contains(p)) {
-            score += wobaPlus;
-
-            Position pos = l.getPosition(p);
-            score += (Defense.getPositionFactor(pos) * p.getDefensiveRatings().getPositionScore(pos));
-
-            /*if (p.canPlay(l.getPosition(p))) {
-                score += wobaPlus;
-            }*/
-        }
-
-        return pct * score;
-    }
+    return pct * score;
+  }
 
 }
