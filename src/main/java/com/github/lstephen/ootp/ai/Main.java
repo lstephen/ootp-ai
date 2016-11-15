@@ -252,11 +252,7 @@ public class Main {
         LOG.info("Loading FAS...");
         FreeAgents fas = FreeAgents.create(site, changes, predictor);
 
-        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
-
-        if (site.getType() == Version.OOTP5) {
-            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression);
-        }
+        RosterSelection selection = new RosterSelection(team, predictor);
 
         selection.setPrevious(oldRoster);
 

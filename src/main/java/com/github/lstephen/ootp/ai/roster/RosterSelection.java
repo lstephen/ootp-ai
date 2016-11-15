@@ -11,8 +11,6 @@ import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
-import com.github.lstephen.ootp.ai.regression.BattingRegression;
-import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
@@ -25,7 +23,6 @@ import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.selection.Tiered;
 import com.github.lstephen.ootp.ai.selection.lineup.Defense;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
-import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.ai.value.JavaAdapter;
@@ -44,13 +41,7 @@ public final class RosterSelection {
 
     private final Team team;
 
-    private final PitcherSelectionFactory pitcherSelectionFactory;
-
     private Roster previous;
-
-    private final BattingRegression batting;
-
-    private final PitchingRegression pitching;
 
     private final Predictor predictor;
 
@@ -59,16 +50,9 @@ public final class RosterSelection {
 
     private FourtyManRoster fourtyManRoster;
 
-    private RosterSelection(
-        Team team, BattingRegression batting, PitchingRegression pitching) {
-
+    public RosterSelection(Team team, Predictor predictor) {
         this.team = team;
-        this.batting = batting;
-        this.pitching = pitching;
-
-        this.predictor = new Predictor(team, batting, pitching);
-
-        pitcherSelectionFactory = new PitcherSelectionFactory(predictor);
+        this.predictor = predictor;
     }
 
     public void remove(Player p) {
@@ -152,7 +136,7 @@ public final class RosterSelection {
         return select(
             mode,
             changes,
-            pitcherSelectionFactory.create(mode));
+            new PitcherSelectionFactory(predictor).create(mode));
     }
 
     private Roster select(Mode mode, Changes changes, Selection pitching) {
@@ -342,24 +326,6 @@ public final class RosterSelection {
         }
 
         w.flush();
-    }
-
-    public static RosterSelection ootp6(Team team, BattingRegression batting,
-        PitchingRegression pitching) {
-
-        return new RosterSelection(
-            team,
-            batting,
-            pitching);
-    }
-
-    public static RosterSelection ootp5(Team team, BattingRegression batting,
-        PitchingRegression pitching) {
-
-        return new RosterSelection(
-            team,
-            batting,
-            pitching);
     }
 
 }
