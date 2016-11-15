@@ -124,6 +124,10 @@ public class PitchingStats implements Stats<PitchingStats> {
         return brs.calculate(this);
     }
 
+    public Integer getBaseRunsPlus() {
+      return getBaseRunsPlus(EraBaseRuns.get());
+    }
+
     public Integer getBaseRunsPlus(BaseRuns brs) {
         return (int) (leaguePitching.getBaseRuns(brs) * 100 / getBaseRuns(brs));
     }

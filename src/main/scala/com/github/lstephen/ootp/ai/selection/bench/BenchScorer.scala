@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.selection.bench
 
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.selection.depthchart.DepthChart.Backup
 import com.github.lstephen.ootp.ai.selection.depthchart.DepthChartSelection
 import com.github.lstephen.ootp.ai.selection.depthchart.WithPlayingTimeScore
@@ -13,7 +13,7 @@ import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 
 import collection.JavaConversions._
 
-class BenchScorer(implicit predictions: Predictions) {
+class BenchScorer(implicit predictor: Predictor) {
   val depthChartSelection = new DepthChartSelection
 
   def score(bench: java.lang.Iterable[Player], lineup: Lineup, vs: VsHand): Double = {

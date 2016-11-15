@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.Predictor;
-import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
 import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Mode;
@@ -30,8 +29,6 @@ public class FourtyManRoster implements Printable {
 
     private final Roster roster;
 
-    private final Predictions predictions;
-
     private final Predictor predictor;
 
     private Optional<Changes> changes = Optional.absent();
@@ -40,10 +37,9 @@ public class FourtyManRoster implements Printable {
 
     private ImmutableSet<Player> desired40Man;
 
-    public FourtyManRoster(Team team, Roster roster, Predictions ps, Predictor predictor) {
+    public FourtyManRoster(Team team, Roster roster, Predictor predictor) {
         this.team = team;
         this.roster = roster;
-        this.predictions = ps;
         this.predictor = predictor;
     }
 
@@ -93,18 +89,14 @@ public class FourtyManRoster implements Printable {
         fourtyMan.addAll(
             Selections
                 .select(
-                    HitterSelectionFactory
-                        .using(predictions)
-                        .create(Mode.EXPANDED),
+                    new HitterSelectionFactory(predictor).create(Mode.EXPANDED),
                     Selections.onlyHitters(available))
                 .values());
 
         fourtyMan.addAll(
             Selections
                 .select(
-                    PitcherSelectionFactory
-                        .using(predictions)
-                        .create(Mode.EXPANDED),
+                    new PitcherSelectionFactory(predictor).create(Mode.EXPANDED),
                     Selections.onlyPitchers(available))
                 .values());
 
@@ -141,18 +133,14 @@ public class FourtyManRoster implements Printable {
         ml.addAll(
             Selections
                 .select(
-                    HitterSelectionFactory
-                        .using(predictions)
-                        .create(Mode.REGULAR_SEASON),
+                  new HitterSelectionFactory(predictor).create(Mode.REGULAR_SEASON),
                     Selections.onlyHitters(roster.getAllPlayers()))
                 .values());
 
         ml.addAll(
             Selections
                 .select(
-                    PitcherSelectionFactory
-                        .using(predictions)
-                        .create(Mode.REGULAR_SEASON),
+                  new PitcherSelectionFactory(predictor).create(Mode.REGULAR_SEASON),
                     Selections.onlyPitchers(roster.getAllPlayers()))
                 .values());
 

@@ -14,11 +14,11 @@ import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictor;
-import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
-import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
+import com.github.lstephen.ootp.ai.selection.BestStartersSelection;
 import com.github.lstephen.ootp.ai.selection.Mode;
+import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selection;
 import com.github.lstephen.ootp.ai.selection.Selections;
@@ -44,11 +44,7 @@ public final class RosterSelection {
 
     private final Team team;
 
-    private final HitterSelectionFactory hitterSelectionFactory;
-
     private final PitcherSelectionFactory pitcherSelectionFactory;
-
-    private final Predictions predictions;
 
     private Roster previous;
 
@@ -64,17 +60,15 @@ public final class RosterSelection {
     private FourtyManRoster fourtyManRoster;
 
     private RosterSelection(
-        Team team, Predictions predictions, BattingRegression batting, PitchingRegression pitching) {
+        Team team, BattingRegression batting, PitchingRegression pitching) {
 
         this.team = team;
-        this.predictions = predictions;
         this.batting = batting;
         this.pitching = pitching;
 
-        this.predictor = new Predictor(team, batting, pitching, predictions.getPitcherOverall());
+        this.predictor = new Predictor(team, batting, pitching);
 
-        hitterSelectionFactory = HitterSelectionFactory.using(predictions);
-        pitcherSelectionFactory = PitcherSelectionFactory.using(predictions);
+        pitcherSelectionFactory = new PitcherSelectionFactory(predictor);
     }
 
     public void remove(Player p) {
@@ -145,9 +139,6 @@ public final class RosterSelection {
                 new FourtyManRoster(
                     team,
                     roster,
-                    Predictions
-                        .predict(team)
-                        .using(batting, pitching, predictions.getPitcherOverall()),
                     predictor);
         }
         return fourtyManRoster;
@@ -161,11 +152,12 @@ public final class RosterSelection {
         return select(
             mode,
             changes,
-            hitterSelectionFactory.create(mode),
             pitcherSelectionFactory.create(mode));
     }
 
-    private Roster select(Mode mode, Changes changes, Selection hitting, Selection pitching) {
+    private Roster select(Mode mode, Changes changes, Selection pitching) {
+        Selection hitting = new HitterSelectionFactory(predictor).create(mode);
+
         Roster roster = Roster.create(team);
         Set<Player> forced = mode == Mode.IDEAL ? new HashSet<>() : Sets.newHashSet(getForced(changes));
         Set<Player> ml = Sets.newHashSet();
@@ -317,18 +309,16 @@ public final class RosterSelection {
     }
 
     public void printPitchingSelectionTable(PrintWriter w, Roster roster, TeamStats<PitchingStats> stats) {
-        PlayerValue value = new PlayerValue(predictions, batting, pitching);
+        PlayerValue value = new PlayerValue(predictor, batting, pitching);
         w.println();
-        TeamStats<PitchingStats> pitching = predictions.getAllPitching();
-        PitcherOverall method = predictions.getPitcherOverall();
-
         Integer statusLength = Iterables.getFirst(roster.getAllPlayers(), null).getRosterStatus().length();
 
         w.format("%" + (25 + statusLength) + "s |  H/9  K/9 BB/9 HR/9 |%n", "");
 
-        for (Player p : pitcherSelectionFactory
-            .byOverall()
-            .sortedCopy(Selections.onlyPitchers(pitching.getPlayers()))) {
+        for (Player p : Ordering.natural().reverse().onResultOf((Player ply) -> value.getNowValue(ply))
+            .sortedCopy(Selections.onlyPitchers(roster.getAllPlayers()))) {
+
+            PitchingStats prediction = predictor.predictPitching(p).vsBoth();
 
             w.println(
                 String.format(
@@ -338,14 +328,14 @@ public final class RosterSelection {
                     p.getRosterStatus(),
                     roster.getStatus(p) == null ? "" : roster.getStatus(p),
                     Integer.valueOf(p.getAge()),
-                    pitching.getSplits(p).getOverall().getHitsPerNine(),
-                    pitching.getSplits(p).getOverall().getStrikeoutsPerNine(),
-                    pitching.getSplits(p).getOverall().getWalksPerNine(),
-                    pitching.getSplits(p).getOverall().getHomeRunsPerNine(),
-                    method.getPlus(pitching.getSplits(p).getVsLeft()),
-                    stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsLeft()), 999)) : "",
-                    method.getPlus(pitching.getSplits(p).getVsRight()),
-                    stats.contains(p) ? Math.max(0, Math.min(method.getPlus(stats.getSplits(p).getVsRight()), 999)) : "",
+                    prediction.getHitsPerNine(),
+                    prediction.getStrikeoutsPerNine(),
+                    prediction.getWalksPerNine(),
+                    prediction.getHomeRunsPerNine(),
+                    predictor.predictPitching(p).vsLeft().getBaseRunsPlus(),
+                    stats.contains(p) ? Math.max(0, Math.min(stats.getSplits(p).getVsLeft().getBaseRunsPlus(), 999)) : "",
+                    predictor.predictPitching(p).vsRight().getBaseRunsPlus(),
+                    stats.contains(p) ? Math.max(0, Math.min(stats.getSplits(p).getVsRight().getBaseRunsPlus(), 999)) : "",
                     p.getIntangibles(),
                     value.getNowValue(p)
                 ));
@@ -359,9 +349,6 @@ public final class RosterSelection {
 
         return new RosterSelection(
             team,
-            Predictions
-                .predict(team)
-                .using(batting, pitching, PitcherOverall.FIP),
             batting,
             pitching);
     }
@@ -371,9 +358,6 @@ public final class RosterSelection {
 
         return new RosterSelection(
             team,
-            Predictions
-                .predict(team)
-                .using(batting, pitching, PitcherOverall.WOBA_AGAINST),
             batting,
             pitching);
     }

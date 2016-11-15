@@ -8,7 +8,7 @@ import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.BattingRegression;
 import com.github.lstephen.ootp.ai.regression.PitchingRegression;
-import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
 import com.github.lstephen.ootp.ai.selection.Selections;
@@ -22,14 +22,14 @@ public class PlayerValue {
 
     public static final Double MR_CONSTANT = .865;
 
-    private final Predictions predictions;
+    private final Predictor predictor;
 
     private final BattingRegression batting;
 
     private final PitchingRegression pitching;
 
-    public PlayerValue(Predictions predictions, BattingRegression batting, PitchingRegression pitching) {
-        this.predictions = predictions;
+    public PlayerValue(Predictor predictor, BattingRegression batting, PitchingRegression pitching) {
+        this.predictor = predictor;
         this.batting = batting;
         this.pitching = pitching;
     }
@@ -95,30 +95,22 @@ public class PlayerValue {
         return (int) Math.round(endurance * getNowAbility(ply) + defense);
     }
 
-    public Function<Player, Integer> getNowAbility() {
-        return new Function<Player, Integer>() {
+    public Function<Player, Double> getNowAbility() {
+        return new Function<Player, Double>() {
             @Override
-            public Integer apply(Player p) {
+            public Double apply(Player p) {
                 return getNowAbility(p);
             }
         };
     }
 
-    public Integer getNowAbility(Player p) {
+    public double getNowAbility(Player p) {
         if (Selections.isHitter(p)) {
-          if (predictions.containsHitter(p)) {
-            return predictions.getOverallHitting(p);
-          } else {
-            return batting.predict(p).getOverall().getWobaPlus();
-          }
+          return predictor.predictBatting(p).overall();
         }
 
         if (Selections.isPitcher(p)) {
-          if (predictions.containsPitcher(p)) {
-            return predictions.getOverallPitching(p);
-          } else {
-            return predictions.getPitcherOverall().getPlus(pitching.predict(p));
-          }
+          return predictor.predictPitching(p).overall();
         }
 
         throw new IllegalStateException("Player is neither a hitter or pitcher: " + p.getName());
@@ -163,19 +155,19 @@ public class PlayerValue {
         return (int) Math.round(endurance * getFutureAbility(p) + defense);
     }
 
-    public Function<Player, Integer> getFutureAbility() {
-        return new Function<Player, Integer>() {
+    public Function<Player, Double> getFutureAbility() {
+        return new Function<Player, Double>() {
             @Override
-            public Integer apply(Player p) {
+            public Double apply(Player p) {
                 return getFutureAbility(p);
             }
         };
     }
 
-    public Integer getFutureAbility(Player p) {
+    public double getFutureAbility(Player p) {
         Slot st = Slot.getPrimarySlot(p);
 
-        Integer value;
+        double value;
 
         switch (st) {
             case C:
@@ -192,7 +184,7 @@ public class PlayerValue {
             case MR:
                 Splits<PitchingRatings<Integer>> splitsP = p.getPitchingPotentialRatings();
 
-                value = predictions.getPitcherOverall().getPlus(pitching.predict(splitsP).getOverall());
+                value = predictor.predictFuturePitching(p).overall();
                 break;
             default:
                 throw new IllegalStateException();

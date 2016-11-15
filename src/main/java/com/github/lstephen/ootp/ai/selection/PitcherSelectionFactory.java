@@ -6,7 +6,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
-import com.github.lstephen.ootp.ai.regression.Predictions;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.rotation.RotationSelection;
 import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
@@ -19,85 +19,15 @@ import java.util.Arrays;
  */
 public final class PitcherSelectionFactory implements SelectionFactory {
 
-    private final TeamStats<PitchingStats> predictions;
+    private final Predictor predictor;
 
-    private final PitcherOverall overall;
-
-    private final Function<Player, Integer> value;
-
-    private PitcherSelectionFactory(
-        TeamStats<PitchingStats> predictions, PitcherOverall overall, Function<Player, Integer> value) {
-
-        this.value = value;
-        this.predictions = predictions;
-        this.overall = overall;
+    public PitcherSelectionFactory(Predictor predictor) {
+        this.predictor = predictor;
     }
 
     @Override
     public Selection create(Mode mode) {
-        return RotationSelection.forMode(mode, predictions, overall);
+        return RotationSelection.forMode(mode, predictor);
     }
-
-    public Selection slot(Mode mode) {
-        return slot(mode.getPitchingSlots());
-    }
-
-    public Selection slot(Slot... slots) {
-        return slot(Arrays.asList(slots));
-    }
-
-    public Selection slot(Iterable<Slot> slots) {
-        return SlotSelection
-            .builder()
-            .ordering(byOverall())
-            .slots(slots)
-            .size(Iterables.size(slots))
-            .fillToSize(Slot.P)
-            .build();
-    }
-
-    public Ordering<Player> byOverall() {
-        return Ordering
-            .natural()
-            .reverse()
-            .onResultOf(value)
-            .compound(Player.byTieBreak());
-    }
-
-    public static PitcherSelectionFactory using(Predictions predictions) {
-        return using(
-            predictions.getAllPitching(),
-            predictions.getPitcherOverall());
-    }
-
-    public static PitcherSelectionFactory using(
-        TeamStats<PitchingStats> stats, PitcherOverall overall) {
-
-        return new PitcherSelectionFactory(stats, overall, defaultValueFunction(stats, overall));
-    }
-
-    public static PitcherSelectionFactory using(
-        final Function<Player, Integer> value) {
-
-        return new PitcherSelectionFactory(null, null, value);
-    }
-
-    private static Function<Player, Integer> defaultValueFunction(
-        final TeamStats<PitchingStats> pitching, final PitcherOverall overall) {
-
-        return new Function<Player, Integer>() {
-            public Integer apply(Player p) {
-                try {
-                    return overall.getPlus(pitching, p);
-                } catch (Exception e) {
-                    throw Throwables.propagate(e);
-                }
-            }
-        };
-    }
-
-
-
-
 
 }

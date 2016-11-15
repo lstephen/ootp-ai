@@ -3,7 +3,7 @@ package com.github.lstephen.ootp.ai.report
 import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.roster.Roster
 import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand
 import com.github.lstephen.ootp.ai.selection.lineup.InLineupScore
@@ -12,7 +12,7 @@ import java.io.PrintWriter
 
 import collection.JavaConversions._
 
-class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) extends Printable {
+class TeamPositionReport(roster: Roster)(implicit predictor: Predictor) extends Printable {
 
   override def print(pw: PrintWriter): Unit = {
     implicit val w = pw
@@ -38,7 +38,7 @@ class TeamPositionReport(roster: Roster)(implicit predictions: Predictions) exte
   }
 
   def format(s: InLineupScore): String = {
-    f"${s.name}%-16s ${s.hitting}%3d ${s.defense.toLong}%3d ${s.toLong}%3d"
+    f"${s.name}%-16s ${s.hitting.toLong}%3d ${s.defense.toLong}%3d ${s.toLong}%3d"
   }
 
   def top(p: Position, vs: Option[VsHand] = None): List[InLineupScore] =

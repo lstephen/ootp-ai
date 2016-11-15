@@ -13,7 +13,7 @@ import humanize.Humanize
 
 import scala.collection.JavaConverters._
 
-class Predictor(ps: Seq[Player], private val br: BattingRegression, private val pr: PitchingRegression, private val po: PitcherOverall) extends LazyLogging {
+class Predictor(ps: Seq[Player], private val br: BattingRegression, private val pr: PitchingRegression) extends LazyLogging {
 
   private def time[R](label: String, block: => R): R = {
     val t0 = System.nanoTime
@@ -29,8 +29,8 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
   val batting = time("batting", ps.map(p => (p, new BattingPrediction(br predict p))).toMap)
   val battingFuture = time("battingFuture", ps.map(p => (p, new BattingPrediction(br predictFuture p))).toMap)
 
-  val pitching = time("pitching", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predict p, po))).toMap)
-  val pitchingFuture = time("pitchingFuture", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predictFuture p, po))).toMap)
+  val pitching = time("pitching", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predict p))).toMap)
+  val pitchingFuture = time("pitchingFuture", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predictFuture p))).toMap)
 
   private def getPrediction[P](ps: Map[Player, P], p: Player): P =
     ps.get(p).getOrElse(throw new IllegalArgumentException(s"Unable to predict for: ${p.getId}, ${p.getShortName}"))
@@ -41,14 +41,15 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
   def predictPitching(p: Player): PitchingPrediction = getPrediction(pitching, p)
   def predictFuturePitching(p: Player): PitchingPrediction = getPrediction(pitchingFuture, p)
 
-  def this(ps: Seq[Player], pr: Predictor) = this(ps, pr.br, pr.pr, pr.po)
+  def this(ps: Seq[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 
   // Java compatability
-  def this(ps: java.lang.Iterable[Player], br: BattingRegression, pr: PitchingRegression, po: PitcherOverall) =
-    this(ps.asScala.toSeq, br, pr, po)
+  def this(ps: java.lang.Iterable[Player], br: BattingRegression, pr: PitchingRegression) =
+    this(ps.asScala.toSeq, br, pr)
 
-  def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps, pr.br, pr.pr, pr.po)
+  def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 }
+
 
 class BattingPrediction(stats: SplitStats[BattingStats]) {
   val overall = Score(stats.getOverall.getWobaPlus)
@@ -57,6 +58,9 @@ class BattingPrediction(stats: SplitStats[BattingStats]) {
 }
 
 
-class PitchingPrediction(stats: SplitStats[PitchingStats], po: PitcherOverall) {
-  val overall = Score(po.getPlus(stats.getOverall))
+class PitchingPrediction(stats: SplitStats[PitchingStats]) {
+  val overall = Score(stats.getOverall.getBaseRunsPlus)
+  val vsBoth = stats.getOverall
+  val vsLeft = stats.getVsLeft
+  val vsRight = stats.getVsRight
 }

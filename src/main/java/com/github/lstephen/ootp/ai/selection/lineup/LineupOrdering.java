@@ -13,6 +13,8 @@ import com.github.lstephen.ootp.ai.selection.lineup.Lineup.VsHand;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 
+import com.github.lstephen.ootp.ai.regression.Predictor;
+
 import com.github.lstephen.ai.search.HillClimbing;
 import com.github.lstephen.ai.search.RepeatedHillClimbing;
 import com.github.lstephen.ai.search.action.Action;
@@ -65,10 +67,10 @@ public class LineupOrdering {
     private static final Map<Pair<Lineup.VsHand, ImmutableSet<Player>>, ImmutableList<Player>> CACHE
         = Maps.newConcurrentMap();
 
-    private final TeamStats<BattingStats> predictions;
+    private final Predictor predictor;
 
-    public LineupOrdering(TeamStats<BattingStats> predictions) {
-        this.predictions = predictions;
+    public LineupOrdering(Predictor predictor) {
+        this.predictor = predictor;
     }
 
     private Boolean isValid(Order order) {
@@ -109,7 +111,7 @@ public class LineupOrdering {
 
         double[] ws = WEIGHTS[pos];
 
-        BattingStats ps = vs.getStats(predictions, p);
+        BattingStats ps = vs.getStats(predictor, p);
 
         score += ws[WEIGHT_1B] * ps.getSinglesPerPlateAppearance();
         score += ws[WEIGHT_2B] * ps.getDoublesPerPlateAppearance();

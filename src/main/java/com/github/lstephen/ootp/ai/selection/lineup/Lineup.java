@@ -4,7 +4,6 @@ import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
-import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
@@ -107,10 +106,6 @@ public class Lineup implements Iterable<Lineup.Entry>, Printable {
         public abstract BattingRatings getRatings(Player player);
 
         public abstract VsHand getOther();
-
-        public BattingStats getStats(Predictions ps, Player p) {
-          return getStats(ps.getAllBatting(), p);
-        }
     }
 
     public Lineup() { }

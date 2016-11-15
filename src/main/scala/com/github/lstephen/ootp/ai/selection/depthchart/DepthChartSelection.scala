@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.selection.depthchart
 
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
-import com.github.lstephen.ootp.ai.regression.Predictions
+import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.selection.bench.BenchScorer
 import com.github.lstephen.ootp.ai.selection.lineup.All
 import com.github.lstephen.ootp.ai.selection.lineup.AllLineups
@@ -20,7 +20,7 @@ import com.github.lstephen.ai.search.action.SequencedAction
 
 import collection.JavaConversions._
 
-class DepthChartSelection(implicit predictions: Predictions) {
+class DepthChartSelection(implicit predictor: Predictor) {
 
   def select(lineups: AllLineups, available: java.lang.Iterable[Player]): AllDepthCharts =
     select(lineups, Set() ++ available)
@@ -78,7 +78,7 @@ class DepthChartSelection(implicit predictions: Predictions) {
 
 class WithPlayingTimeScore
   (player: Player, percentage: Integer, position: Position, vs: VsHand)
-  (implicit predictions: Predictions) {
+  (implicit predictor: Predictor) {
 
   val base = InLineupScore(player, position, vs).score.toDouble * percentage
   val fatigue = (Defense.getPositionFactor(position) * percentage * percentage / 10.0) / 2.0
