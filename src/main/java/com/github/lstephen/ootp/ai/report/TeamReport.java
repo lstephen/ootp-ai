@@ -6,7 +6,6 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.roster.Team;
-import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selection;
@@ -269,7 +268,13 @@ public final class TeamReport implements Printable, RecordPredictor {
 
     private Double calculateBatting(Iterable<Player> players) {
         return calculateScore(
-            HitterSelectionFactory.using(ps, value).slot(Mode.REGULAR_SEASON),
+            SlotSelection
+                .builder()
+                .ordering(Ordering.natural().reverse().onResultOf(value))
+                .slots(Mode.REGULAR_SEASON.getHittingSlots())
+                .size(Mode.REGULAR_SEASON.getHittingSlots().size())
+                .fillToSize(Slot.H)
+                .build(),
             Selections.onlyHitters(players));
     }
 

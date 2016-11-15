@@ -17,7 +17,7 @@ import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.Predictions;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
-import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
+import com.github.lstephen.ootp.ai.selection.BestStartersSelection;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selection;
@@ -43,8 +43,6 @@ public final class RosterSelection {
     private static final Double MR_CONSTANT = .865;
 
     private final Team team;
-
-    private final HitterSelectionFactory hitterSelectionFactory;
 
     private final PitcherSelectionFactory pitcherSelectionFactory;
 
@@ -73,7 +71,6 @@ public final class RosterSelection {
 
         this.predictor = new Predictor(team, batting, pitching, predictions.getPitcherOverall());
 
-        hitterSelectionFactory = HitterSelectionFactory.using(predictions);
         pitcherSelectionFactory = PitcherSelectionFactory.using(predictions);
     }
 
@@ -161,11 +158,12 @@ public final class RosterSelection {
         return select(
             mode,
             changes,
-            hitterSelectionFactory.create(mode),
             pitcherSelectionFactory.create(mode));
     }
 
-    private Roster select(Mode mode, Changes changes, Selection hitting, Selection pitching) {
+    private Roster select(Mode mode, Changes changes, Selection pitching) {
+        Selection hitting = new BestStartersSelection(mode.getHittingSlots().size(), predictions);
+
         Roster roster = Roster.create(team);
         Set<Player> forced = mode == Mode.IDEAL ? new HashSet<>() : Sets.newHashSet(getForced(changes));
         Set<Player> ml = Sets.newHashSet();
