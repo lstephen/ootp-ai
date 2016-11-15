@@ -4,8 +4,6 @@ import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.io.SalaryFormat;
 import com.github.lstephen.ootp.ai.player.Player;
-import com.github.lstephen.ootp.ai.regression.BattingRegression;
-import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
@@ -47,24 +45,17 @@ public class GenericValueReport implements Printable {
 
     private boolean reverse;
 
-    private final BattingRegression batting;
-
-    private final PitchingRegression pitching;
-
     private final SalaryPredictor salary;
 
     private final Predictor predictor;
 
     public GenericValueReport(
-        Iterable<Player> ps, Predictor predictor, BattingRegression batting, PitchingRegression pitching, SalaryPredictor salary) {
+        Iterable<Player> ps, Predictor predictor, SalaryPredictor salary) {
 
         this.predictor = predictor;
-
-        this.batting = batting;
-        this.pitching = pitching;
         this.salary = salary;
 
-        this.playerValue = new PlayerValue(predictor, batting, pitching);
+        this.playerValue = new PlayerValue(predictor);
     }
 
     public void setTitle(String title) {

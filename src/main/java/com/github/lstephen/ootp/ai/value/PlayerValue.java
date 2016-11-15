@@ -6,8 +6,6 @@ import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
-import com.github.lstephen.ootp.ai.regression.BattingRegression;
-import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore;
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore$;
@@ -24,14 +22,8 @@ public class PlayerValue {
 
     private final Predictor predictor;
 
-    private final BattingRegression batting;
-
-    private final PitchingRegression pitching;
-
-    public PlayerValue(Predictor predictor, BattingRegression batting, PitchingRegression pitching) {
+    public PlayerValue(Predictor predictor) {
         this.predictor = predictor;
-        this.batting = batting;
-        this.pitching = pitching;
     }
 
     public Function<Player, Integer> getNowValue() {
@@ -176,14 +168,10 @@ public class PlayerValue {
             case IF:
             case OF:
             case H:
-                Splits<BattingRatings<Integer>> splitsB = p.getBattingPotentialRatings();
-
-                value = batting.predict(splitsB).getOverall().getWobaPlus();
+                value = predictor.predictFutureBatting(p).overall();
                 break;
             case SP:
             case MR:
-                Splits<PitchingRatings<Integer>> splitsP = p.getPitchingPotentialRatings();
-
                 value = predictor.predictFuturePitching(p).overall();
                 break;
             default:

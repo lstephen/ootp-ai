@@ -252,11 +252,7 @@ public class Main {
         LOG.info("Loading FAS...");
         FreeAgents fas = FreeAgents.create(site, changes, predictor);
 
-        RosterSelection selection = RosterSelection.ootp6(team, battingRegression, pitchingRegression);
-
-        if (site.getType() == Version.OOTP5) {
-            selection = RosterSelection.ootp5(team, battingRegression, pitchingRegression);
-        }
+        RosterSelection selection = new RosterSelection(team, predictor);
 
         selection.setPrevious(oldRoster);
 
@@ -344,7 +340,7 @@ public class Main {
         LOG.info("Salary report...");
         SalaryReport salary = new SalaryReport(team, site.getSalary(), site.getFinancials(), predictor);
 
-        final GenericValueReport generic = new GenericValueReport(team, predictor, battingRegression, pitchingRegression, salary);
+        final GenericValueReport generic = new GenericValueReport(team, predictor, salary);
         generic.setReverse(false);
 
         LOG.log(Level.INFO, "Strategy...");
@@ -533,8 +529,7 @@ public class Main {
             "Now",
             predictor,
             site,
-            new PlayerValue(predictor, battingRegression, pitchingRegression)
-                .getNowValue());
+            new PlayerValue(predictor).getNowValue());
 
         LOG.info("Team Now Report...");
 
