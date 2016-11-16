@@ -60,6 +60,7 @@
     <gem.rspec-its.version>1.2.0</gem.rspec-its.version>
 
     <plugin.exec.version>1.4.0</plugin.exec.version>
+    <plugin.scalariform.version>0.1.4</plugin.scalariform.version>
   </properties>
 
   <dependencies>
@@ -222,23 +223,12 @@
           <mainClass>com.github.lstephen.ootp.ai.Main</mainClass>
         </configuration>
       </plugin>
-    </plugins>
 
-    <plugin>
-      <groupId>org.scalariform</groupId>
-      <artifactId>scalariform-maven-plugin</artifactId>
-      <version>0.1.4</version>
-      <executions>
-        <execution>
-          <phase>process-sources</phase>
-          <goals>
-            <goal>format</goal>
-          </goals>
-          <configuration>
-            <rewriteArrowSymbols>true</rewriteArrowSymbols>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
+      <plugin>
+        <groupId>org.scalariform</groupId>
+        <artifactId>scalariform-maven-plugin</artifactId>
+        <version>${plugin.scalariform.version}</version>
+      </plugin>
+    </plugins>
   </build>
 </project>
