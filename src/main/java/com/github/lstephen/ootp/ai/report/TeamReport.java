@@ -111,7 +111,7 @@ public final class TeamReport implements Printable, RecordPredictor {
     }
 
     private Double getExpectedRunsPerGame() {
-        return site.getPitcherSelectionMethod().getEraEstimate(leaguePitching);
+      return leaguePitching.getBaseRuns();
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.roster.Roster;
 import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
-import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
@@ -56,8 +55,6 @@ public interface Site {
     void clearCache();
 
     Page getPage(String url, Object... args);
-
-    PitcherOverall getPitcherSelectionMethod();
 
     Player getPlayer(PlayerId id);
 

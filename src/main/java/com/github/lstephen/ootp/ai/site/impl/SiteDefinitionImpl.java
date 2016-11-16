@@ -16,7 +16,6 @@ import com.github.lstephen.ootp.ai.roster.Team;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.SiteDefinition;
 import com.github.lstephen.ootp.ai.site.Version;
-import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 
 /**
  *
@@ -69,15 +68,6 @@ public final class SiteDefinitionImpl implements SiteDefinition {
 
     @Override
     public Integer getNumberOfTeams() { return nTeams; }
-
-    @Override
-    public PitcherOverall getPitcherSelectionMethod() {
-        switch (type) {
-            case OOTP5: return PitcherOverall.WOBA_AGAINST;
-            case OOTP6: return PitcherOverall.FIP;
-            default: throw new IllegalStateException();
-        }
-    }
 
     @Override
     public Double getYearlyRatingsIncrease() {

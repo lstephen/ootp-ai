@@ -120,6 +120,10 @@ public class PitchingStats implements Stats<PitchingStats> {
         }
     }
 
+    public Double getBaseRuns() {
+      return getBaseRuns(EraBaseRuns.get());
+    }
+
     public Double getBaseRuns(BaseRuns brs) {
         return brs.calculate(this);
     }

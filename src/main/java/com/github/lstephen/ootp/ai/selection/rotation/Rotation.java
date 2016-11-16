@@ -13,7 +13,6 @@ import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.PitchingPrediction;
 import com.github.lstephen.ootp.ai.site.SiteHolder;
-import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;

@@ -4,7 +4,6 @@ import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.player.ratings.RatingsDefinition;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.roster.Team;
-import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 
 /**
  *
@@ -18,7 +17,6 @@ public interface SiteDefinition extends RatingsDefinition {
     Version getType();
     String getLeague();
     Integer getNumberOfTeams();
-    PitcherOverall getPitcherSelectionMethod();
 
     Site getSite();
     Scale<?> getAbilityRatingScale();

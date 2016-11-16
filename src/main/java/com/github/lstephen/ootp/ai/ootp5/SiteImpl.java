@@ -31,7 +31,6 @@ import com.github.lstephen.ootp.ai.site.SiteDefinition;
 import com.github.lstephen.ootp.ai.site.Standings;
 import com.github.lstephen.ootp.ai.site.Version;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
-import com.github.lstephen.ootp.ai.stats.PitcherOverall;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
@@ -99,11 +98,6 @@ public final class SiteImpl implements Site, SalarySource {
   @Override
   public LocalDate getDate() {
     return getLeagueBattingPage().extractDate();
-  }
-
-  @Override
-  public PitcherOverall getPitcherSelectionMethod() {
-    return definition.getPitcherSelectionMethod();
   }
 
   @Override

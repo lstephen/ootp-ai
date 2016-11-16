@@ -211,16 +211,12 @@ public final class PitchingRegression {
 
                 for (int i = 0; i < splits.getVsLeft().getPlateAppearances(); i++) {
                     if (splits.getVsLeft().getInningsPitched() > 0) {
-                        era.addData(
-                            site.getPitcherSelectionMethod().getEraEstimate(splits.getVsLeft()),
-                            site.getPitcherSelectionMethod().getEraEstimate(predicted.getVsLeft()));
+                      era.addData(splits.getVsLeft().getBaseRuns(), predicted.getVsLeft().getBaseRuns());
                     }
                 }
                 for (int i = 0; i < splits.getVsRight().getPlateAppearances(); i++) {
                     if (splits.getVsRight().getInningsPitched() > 0) {
-                        era.addData(
-                            site.getPitcherSelectionMethod().getEraEstimate(splits.getVsRight()),
-                            site.getPitcherSelectionMethod().getEraEstimate(predicted.getVsRight()));
+                        era.addData(splits.getVsRight().getBaseRuns(), predicted.getVsRight().getBaseRuns());
                     }
                 }
             }
