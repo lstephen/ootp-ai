@@ -1,21 +1,17 @@
 package com.github.lstephen.ootp.ai.stats;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class SplitPercentagesHolder {
 
-    private static SplitPercentages pcts;
+  private static SplitPercentages pcts;
 
-    private SplitPercentagesHolder() { }
+  private SplitPercentagesHolder() {}
 
-    public static SplitPercentages get() {
-        return pcts;
-    }
+  public static SplitPercentages get() {
+    return pcts;
+  }
 
-    public static void set(SplitPercentages pcts) {
-        SplitPercentagesHolder.pcts = pcts;
-    }
-
+  public static void set(SplitPercentages pcts) {
+    SplitPercentagesHolder.pcts = pcts;
+  }
 }

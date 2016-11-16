@@ -33,3 +33,12 @@ targets:
       - ./ootp-ai-data:/var/ootp-ai-data
     run: /bin/bash construi/run/run.sh
 
+
+  fmt:
+    environment:
+      - GOOGLE_JAVA_FORMAT_JAR=target/google-java-format-all-deps.jar
+      - SCALARIFORM_JAR=target/scalariform.jar
+    run:
+      - mkdir -p target
+      - /bin/bash -c '[ -e "$GOOGLE_JAVA_FORMAT_JAR" ] || curl -sSL https://github.com/google/google-java-format/releases/download/google-java-format-1.1/google-java-format-1.1-all-deps.jar -o $GOOGLE_JAVA_FORMAT_JAR'
+      - /bin/bash -c 'find src -name *.java | xargs java -jar target/google-java-format-all-deps.jar --replace'

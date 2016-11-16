@@ -3,57 +3,53 @@ package com.github.lstephen.ootp.ai.data;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class Id<T> {
 
-    private final String id;
+  private final String id;
 
-    private Id(String id) {
-        Preconditions.checkNotNull(id);
+  private Id(String id) {
+    Preconditions.checkNotNull(id);
 
-        this.id = id;
+    this.id = id;
+  }
+
+  public String get() {
+    return id;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
+      return true;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
     }
 
-    public String get() {
-        return id;
-    }
+    Id rhs = Id.class.cast(obj);
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+    return Objects.equal(id, rhs.id);
+  }
 
-        Id rhs = Id.class.cast(obj);
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-        return Objects.equal(id, rhs.id);
-    }
+  @Override
+  public String toString() {
+    return Objects.toStringHelper(this).add("id", id).toString();
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
+  public static <T> Id<T> valueOf(String id) {
+    return new Id<T>(id);
+  }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this).add("id", id).toString();
-    }
-
-    public static <T> Id<T> valueOf(String id) {
-        return new Id<T>(id);
-    }
-
-    public static <T> Id<T> valueOf(Integer id) {
-        return valueOf(id.toString());
-    }
-
+  public static <T> Id<T> valueOf(Integer id) {
+    return valueOf(id.toString());
+  }
 }

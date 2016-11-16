@@ -1,11 +1,7 @@
 package com.github.lstephen.ootp.ai.selection;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface SelectionFactory {
 
-    Selection create(Mode mode);
-
+  Selection create(Mode mode);
 }

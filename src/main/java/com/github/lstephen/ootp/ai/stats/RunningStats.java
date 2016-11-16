@@ -6,10 +6,19 @@ public class RunningStats {
 
   private int caughtStealing;
 
-  public int getStolenBases() { return stolenBases; }
-  public void setStolenBases(int stolenBases) { this.stolenBases = stolenBases; }
+  public int getStolenBases() {
+    return stolenBases;
+  }
 
-  public int getCaughtStealing() { return caughtStealing; }
-  public void setCaughtStealing(int caughtStealing) { this.caughtStealing = caughtStealing; }
+  public void setStolenBases(int stolenBases) {
+    this.stolenBases = stolenBases;
+  }
+
+  public int getCaughtStealing() {
+    return caughtStealing;
+  }
+
+  public void setCaughtStealing(int caughtStealing) {
+    this.caughtStealing = caughtStealing;
+  }
 }
-

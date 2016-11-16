@@ -4,32 +4,27 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.lstephen.ootp.ai.splits.Splits;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public class SplitStats<S extends Stats<S>> extends Splits<S> {
 
-    private static SplitPercentages percentages;
+  private static SplitPercentages percentages;
 
-    protected SplitStats(S vsLeft, S vsRight) {
-        super(vsLeft, vsRight);
-    }
+  protected SplitStats(S vsLeft, S vsRight) {
+    super(vsLeft, vsRight);
+  }
 
-    public S getOverall() {
-        return percentages.combine(getVsLeft(), getVsRight());
-    }
+  public S getOverall() {
+    return percentages.combine(getVsLeft(), getVsRight());
+  }
 
-    public static void setPercentages(SplitPercentages percentages) {
-        SplitStats.percentages = percentages;
-    }
+  public static void setPercentages(SplitPercentages percentages) {
+    SplitStats.percentages = percentages;
+  }
 
-    @JsonCreator
-    public static <S extends Stats<S>> SplitStats<S> create(
-        @JsonProperty("vsLeft") S vsLeft,
-        @JsonProperty("vsRight") S vsRight) {
+  @JsonCreator
+  public static <S extends Stats<S>> SplitStats<S> create(
+      @JsonProperty("vsLeft") S vsLeft, @JsonProperty("vsRight") S vsRight) {
 
-        return new SplitStats<S>(vsLeft, vsRight);
-    }
-
+    return new SplitStats<S>(vsLeft, vsRight);
+  }
 }

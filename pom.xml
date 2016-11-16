@@ -54,7 +54,7 @@
     <lib.slf4j.version>1.7.21</lib.slf4j.version>
     <lib.spark.version>2.0.0</lib.spark.version>
 
-      <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
+    <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
 
     <gem.rspec-its.version>1.2.0</gem.rspec-its.version>
@@ -223,5 +223,22 @@
         </configuration>
       </plugin>
     </plugins>
+
+    <plugin>
+      <groupId>org.scalariform</groupId>
+      <artifactId>scalariform-maven-plugin</artifactId>
+      <version>0.1.4</version>
+      <executions>
+        <execution>
+          <phase>process-sources</phase>
+          <goals>
+            <goal>format</goal>
+          </goals>
+          <configuration>
+            <rewriteArrowSymbols>true</rewriteArrowSymbols>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
   </build>
 </project>

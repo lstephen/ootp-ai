@@ -1,21 +1,18 @@
 package com.github.lstephen.ootp.ai.elo;
 
-import com.google.common.collect.Maps;
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.roster.Team;
+import com.google.common.collect.Maps;
 import java.util.Map;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class EloRatings {
 
   private final Map<Id<Team>, Long> ratings = Maps.newHashMap();
 
   private Double kFactor = 4.0;
 
-  private EloRatings() { }
+  private EloRatings() {}
 
   public void setKFactor(Double kFactor) {
     this.kFactor = kFactor;
@@ -32,11 +29,18 @@ public final class EloRatings {
     Long visitorRating = get(result.getVisitor());
     Long homeRating = get(result.getHome());
 
-    ratings.put(result.getVisitor(), newRating(visitorRating, homeRating, result.getVisitorScore(), result.getHomeScore(), false));
-    ratings.put(result.getHome(), newRating(homeRating, visitorRating, result.getHomeScore(), result.getVisitorScore(), true));
+    ratings.put(
+        result.getVisitor(),
+        newRating(
+            visitorRating, homeRating, result.getVisitorScore(), result.getHomeScore(), false));
+    ratings.put(
+        result.getHome(),
+        newRating(
+            homeRating, visitorRating, result.getHomeScore(), result.getVisitorScore(), true));
   }
 
-  private Long newRating(Long ratingFor, Long ratingAgainst, Integer scoreFor, Integer scoreAgainst, boolean home) {
+  private Long newRating(
+      Long ratingFor, Long ratingAgainst, Integer scoreFor, Integer scoreAgainst, boolean home) {
     Integer w = scoreFor > scoreAgainst ? 1 : 0;
 
     Double k = kFactor * Math.pow(Math.abs(scoreFor - scoreAgainst), 0.33);
@@ -48,7 +52,6 @@ public final class EloRatings {
     return (long) (ratingFor + k * (w - we));
   }
 
-
   public void setRating(Id<Team> team, Long rating) {
     ratings.put(team, rating);
   }
@@ -56,5 +59,4 @@ public final class EloRatings {
   public static EloRatings create() {
     return new EloRatings();
   }
-
 }

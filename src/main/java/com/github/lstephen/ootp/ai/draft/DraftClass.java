@@ -2,14 +2,14 @@ package com.github.lstephen.ootp.ai.draft;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.SiteDefinition;
 import com.github.lstephen.scratch.util.Jackson;
+import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -17,15 +17,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class DraftClass {
 
   private final Set<Player> players = Sets.newHashSet();
 
-  private DraftClass() { }
+  private DraftClass() {}
 
   @JsonCreator
   private DraftClass(@JsonProperty("players") Set<Player> players) {
@@ -79,5 +76,4 @@ public final class DraftClass {
       return create(ImmutableSet.<Player>of());
     }
   }
-
 }

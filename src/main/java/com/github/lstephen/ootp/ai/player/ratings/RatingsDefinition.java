@@ -1,13 +1,9 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface RatingsDefinition {
 
-    Double getYearlyRatingsIncrease();
+  Double getYearlyRatingsIncrease();
 
-    Boolean isFreezeOneRatings();
-
+  Boolean isFreezeOneRatings();
 }

@@ -4,27 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.lstephen.scratch.util.Wrapped;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public class PlayerId extends Wrapped<String> {
 
-    @JsonCreator
-    public PlayerId(String id) {
-        super(id);
-    }
+  @JsonCreator
+  public PlayerId(String id) {
+    super(id);
+  }
 
-    /**
-     * Override so that it can be useful as a key in maps after serialization
-     * to JSON.
-     * 
-     * @return 
-     */
-    @JsonValue
-    @Override
-    public String toString() {
-        return unwrap();
-    }
-
+  /**
+   * Override so that it can be useful as a key in maps after serialization to JSON.
+   *
+   * @return
+   */
+  @JsonValue
+  @Override
+  public String toString() {
+    return unwrap();
+  }
 }

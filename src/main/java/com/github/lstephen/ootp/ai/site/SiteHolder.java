@@ -1,21 +1,17 @@
 package com.github.lstephen.ootp.ai.site;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class SiteHolder {
 
-    private static Site site;
+  private static Site site;
 
-    private SiteHolder() { }
+  private SiteHolder() {}
 
-    public static void set(Site site) {
-        SiteHolder.site = site;
-    }
+  public static void set(Site site) {
+    SiteHolder.site = site;
+  }
 
-    public static Site get() {
-        return site;
-    }
-
+  public static Site get() {
+    return site;
+  }
 }

@@ -7,24 +7,19 @@ import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
 import com.github.lstephen.ootp.ai.site.Site;
 import java.io.IOException;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public class BattingPotentialSerializer extends JsonSerializer<BattingRatings> {
 
-    private static Site site;
+  private static Site site;
 
-    public static void setSite(Site site) {
-        BattingPotentialSerializer.site = site;
-    }
+  public static void setSite(Site site) {
+    BattingPotentialSerializer.site = site;
+  }
 
-    @Override
-    public void serialize(
-        BattingRatings ratings, JsonGenerator json, SerializerProvider provider)
-        throws IOException {
+  @Override
+  public void serialize(BattingRatings ratings, JsonGenerator json, SerializerProvider provider)
+      throws IOException {
 
-        json.writeObject(ratings);
-    }
-
+    json.writeObject(ratings);
+  }
 }

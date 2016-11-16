@@ -1,116 +1,108 @@
 package com.github.lstephen.ootp.ai.stats;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import com.github.lstephen.ootp.ai.config.Config;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.scratch.util.Jackson;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class History {
 
-    private static final Logger LOG =
-        Logger.getLogger(History.class.getName());
+  private static final Logger LOG = Logger.getLogger(History.class.getName());
 
-    private final Config config;
+  private final Config config;
 
-    private History(Config config) {
-        this.config = config;
-    }
+  private History(Config config) {
+    this.config = config;
+  }
 
-    public Iterable<TeamStats<BattingStats>> loadBatting(Site site, int season, int years) {
+  public Iterable<TeamStats<BattingStats>> loadBatting(Site site, int season, int years) {
 
-        List<TeamStats<BattingStats>> result = Lists.newArrayList();
+    List<TeamStats<BattingStats>> result = Lists.newArrayList();
 
-        for (int y = season - years; y < season; y++) {
-            LOG.log(Level.INFO, "Loading batting for season {0}...", y);
+    for (int y = season - years; y < season; y++) {
+      LOG.log(Level.INFO, "Loading batting for season {0}...", y);
 
-            File in = getBattingFile(site, y);
+      File in = getBattingFile(site, y);
 
-            if (in.exists()) {
-                try {
-                    result.add(Jackson.getMapper(site).readValue(in, TeamStats.Batting.class));
-                } catch (IOException e) {
-                    throw Throwables.propagate(e);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public Iterable<TeamStats<PitchingStats>> loadPitching(Site site, int season, int years) {
-        List<TeamStats<PitchingStats>> result = Lists.newArrayList();
-
-        for (int y = season - years; y < season; y++) {
-            LOG.log(Level.INFO, "Loading pitching for season {0}...", y);
-
-            File in = getPitchingFile(site, y);
-
-            if (in.exists()) {
-                try {
-                    result.add(Jackson.getMapper(site).readValue(in, TeamStats.class));
-                } catch (IOException e) {
-                    throw Throwables.propagate(e);
-                }
-            }
-        }
-
-        return result;
-    }
-
-    public void saveBatting(TeamStats<BattingStats> stats, Site site, int season) {
-        save(getBattingFile(site, season), stats, site, season);
-    }
-
-    public void savePitching(TeamStats<PitchingStats> stats, Site site, int season) {
-        save(getPitchingFile(site, season), stats, site, season);
-
-    }
-
-    private void save(File f, TeamStats<?> stats, Site site, int season) {
+      if (in.exists()) {
         try {
-            Files.createParentDirs(f);
-
-            Jackson.getMapper(site).writeValue(f, stats);
+          result.add(Jackson.getMapper(site).readValue(in, TeamStats.Batting.class));
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+          throw Throwables.propagate(e);
         }
+      }
     }
 
-    
+    return result;
+  }
 
-    private File getBattingFile(Site site, int season) {
-        return new File(getHistoryDir(), site.getName() + season + ".batting.json");
-    }
+  public Iterable<TeamStats<PitchingStats>> loadPitching(Site site, int season, int years) {
+    List<TeamStats<PitchingStats>> result = Lists.newArrayList();
 
-    private File getPitchingFile(Site site, int season) {
-        return new File(getHistoryDir(), site.getName() + season + ".pitching.json");
-    }
+    for (int y = season - years; y < season; y++) {
+      LOG.log(Level.INFO, "Loading pitching for season {0}...", y);
 
-    private String getHistoryDir() {
-        return config.getValue("history.dir").or("c:/ootp/history");
-    }
+      File in = getPitchingFile(site, y);
 
-    public static History create() {
+      if (in.exists()) {
         try {
-            return new History(Config.createDefault());
+          result.add(Jackson.getMapper(site).readValue(in, TeamStats.class));
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+          throw Throwables.propagate(e);
         }
+      }
     }
 
-    public static History create(Config config) {
-        return new History(config);
-    }
+    return result;
+  }
 
+  public void saveBatting(TeamStats<BattingStats> stats, Site site, int season) {
+    save(getBattingFile(site, season), stats, site, season);
+  }
+
+  public void savePitching(TeamStats<PitchingStats> stats, Site site, int season) {
+    save(getPitchingFile(site, season), stats, site, season);
+  }
+
+  private void save(File f, TeamStats<?> stats, Site site, int season) {
+    try {
+      Files.createParentDirs(f);
+
+      Jackson.getMapper(site).writeValue(f, stats);
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  private File getBattingFile(Site site, int season) {
+    return new File(getHistoryDir(), site.getName() + season + ".batting.json");
+  }
+
+  private File getPitchingFile(Site site, int season) {
+    return new File(getHistoryDir(), site.getName() + season + ".pitching.json");
+  }
+
+  private String getHistoryDir() {
+    return config.getValue("history.dir").or("c:/ootp/history");
+  }
+
+  public static History create() {
+    try {
+      return new History(Config.createDefault());
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  public static History create(Config config) {
+    return new History(config);
+  }
 }

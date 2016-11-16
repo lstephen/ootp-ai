@@ -12,69 +12,72 @@ import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.player.ratings.StarRating;
-import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.Version;
 import com.github.lstephen.ootp.ai.splits.Splits;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Ordering;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public class SinglePlayer implements PlayerSource {
 
   private static final Logger LOG = Logger.getLogger(SinglePlayer.class.getName());
 
-  private static enum BattingRatingsType { CONTACT, GAP, POWER, EYE }
+  private static enum BattingRatingsType {
+    CONTACT,
+    GAP,
+    POWER,
+    EYE
+  }
 
-  private static enum PitchingRatingsType { HITS, GAP, TRIPLES, STUFF, CONTROL, MOVEMENT }
+  private static enum PitchingRatingsType {
+    HITS,
+    GAP,
+    TRIPLES,
+    STUFF,
+    CONTROL,
+    MOVEMENT
+  }
 
   private static final ImmutableMap<Position, Double> AVERAGE_FPCT =
-    ImmutableMap
-      .<Position, Double>builder()
-      .put(Position.CATCHER, .952)
-      .put(Position.FIRST_BASE, .993)
-      .put(Position.SECOND_BASE, .981)
-      .put(Position.THIRD_BASE, .953)
-      .put(Position.SHORTSTOP, .967)
-      .put(Position.LEFT_FIELD, .977)
-      .put(Position.CENTER_FIELD, .984)
-      .put(Position.RIGHT_FIELD, .981)
-      .build();
+      ImmutableMap.<Position, Double>builder()
+          .put(Position.CATCHER, .952)
+          .put(Position.FIRST_BASE, .993)
+          .put(Position.SECOND_BASE, .981)
+          .put(Position.THIRD_BASE, .953)
+          .put(Position.SHORTSTOP, .967)
+          .put(Position.LEFT_FIELD, .977)
+          .put(Position.CENTER_FIELD, .984)
+          .put(Position.RIGHT_FIELD, .981)
+          .build();
 
   private static final ImmutableMap<PitchingRatingsType, Integer> OOTP6_PITCHING =
-    ImmutableMap.<PitchingRatingsType, Integer>builder()
-      .put(PitchingRatingsType.HITS, 1)
-      .put(PitchingRatingsType.GAP, 3)
-      .put(PitchingRatingsType.STUFF, 1)
-      .put(PitchingRatingsType.CONTROL, 2)
-      .put(PitchingRatingsType.MOVEMENT, 3)
-      .build();
+      ImmutableMap.<PitchingRatingsType, Integer>builder()
+          .put(PitchingRatingsType.HITS, 1)
+          .put(PitchingRatingsType.GAP, 3)
+          .put(PitchingRatingsType.STUFF, 1)
+          .put(PitchingRatingsType.CONTROL, 2)
+          .put(PitchingRatingsType.MOVEMENT, 3)
+          .build();
 
   private static final ImmutableMap<PitchingRatingsType, Integer> OOTP5_PITCHING =
-    ImmutableMap.<PitchingRatingsType, Integer>builder()
-      .put(PitchingRatingsType.HITS, 2)
-      .put(PitchingRatingsType.GAP, 3)
-      .put(PitchingRatingsType.STUFF, 6)
-      .put(PitchingRatingsType.CONTROL, 5)
-      .put(PitchingRatingsType.MOVEMENT, 4)
-      .build();
+      ImmutableMap.<PitchingRatingsType, Integer>builder()
+          .put(PitchingRatingsType.HITS, 2)
+          .put(PitchingRatingsType.GAP, 3)
+          .put(PitchingRatingsType.STUFF, 6)
+          .put(PitchingRatingsType.CONTROL, 5)
+          .put(PitchingRatingsType.MOVEMENT, 4)
+          .build();
 
   private Site site;
 
@@ -107,15 +110,14 @@ public class SinglePlayer implements PlayerSource {
   private Player extract(PlayerId id, Document doc) {
     Elements title = doc.select("title");
 
-    String team = CharMatcher.WHITESPACE.trimAndCollapseFrom(
-        StringUtils.substringBefore(StringUtils.substringAfterLast(title.text(), ","), "-"),
-        ' ');
+    String team =
+        CharMatcher.WHITESPACE.trimAndCollapseFrom(
+            StringUtils.substringBefore(StringUtils.substringAfterLast(title.text(), ","), "-"),
+            ' ');
 
     Elements info = doc.select("td.s4:has(b:contains(Name)) + td.s4");
 
-    String[] splitInfo =
-      StringUtils.splitByWholeSeparatorPreserveAllTokens(
-          info.html(), "<br />");
+    String[] splitInfo = StringUtils.splitByWholeSeparatorPreserveAllTokens(info.html(), "<br />");
 
     if (splitInfo.length < 9) {
       LOG.log(Level.WARNING, "Error extracting player. ID: {0}", id);
@@ -125,17 +127,16 @@ public class SinglePlayer implements PlayerSource {
     String name = Parser.unescapeEntities(splitInfo[0], false);
     Integer age = Integer.valueOf(splitInfo[3]);
 
-
     String listedPosition = getListedPosition(splitInfo[8]);
 
     PlayerPage page = PlayerPage.create(doc, site);
 
     PlayerRatings ratings =
-      PlayerRatings.create(
-          page.extractBattingRatings(),
-          extractDefensiveRatings(doc),
-          extractPitchingRatings(doc),
-          site.getDefinition());
+        PlayerRatings.create(
+            page.extractBattingRatings(),
+            extractDefensiveRatings(doc),
+            extractPitchingRatings(doc),
+            site.getDefinition());
 
     ratings.setBattingPotential(page.extractBattingPotential());
 
@@ -193,13 +194,11 @@ public class SinglePlayer implements PlayerSource {
       player.setYearsOfProService(getYearsOfProService(page));
     }
 
-    Optional<Integer> teamTopProspectPosition =
-      site.getTeamTopProspectPosition(id);
+    Optional<Integer> teamTopProspectPosition = site.getTeamTopProspectPosition(id);
 
     if (teamTopProspectPosition.isPresent()) {
       player.setTeamTopProspectPosition(teamTopProspectPosition.get());
     }
-
 
     player.setSalary(salaries.getSalary(player));
 
@@ -209,22 +208,22 @@ public class SinglePlayer implements PlayerSource {
   private String getListedPosition(String src) {
     String p = CharMatcher.WHITESPACE.trimFrom(src);
 
-    ImmutableMap<String, String> ps = ImmutableMap
-      .<String, String>builder()
-      .put("Starting Pitcher", "SP")
-      .put("Pitcher", "P")
-      .put("Reliever", "MR")
-      .put("Closer", "CL")
-      .put("Catcher", "C")
-      .put("First Base", "1B")
-      .put("Second Base", "2B")
-      .put("Third Base", "3B")
-      .put("Shortstop", "SS")
-      .put("Leftfield", "LF")
-      .put("Centerfield", "CF")
-      .put("Rightfield", "RF")
-      .put("Designated Hitter", "DH")
-      .build();
+    ImmutableMap<String, String> ps =
+        ImmutableMap.<String, String>builder()
+            .put("Starting Pitcher", "SP")
+            .put("Pitcher", "P")
+            .put("Reliever", "MR")
+            .put("Closer", "CL")
+            .put("Catcher", "C")
+            .put("First Base", "1B")
+            .put("Second Base", "2B")
+            .put("Third Base", "3B")
+            .put("Shortstop", "SS")
+            .put("Leftfield", "LF")
+            .put("Centerfield", "CF")
+            .put("Rightfield", "RF")
+            .put("Designated Hitter", "DH")
+            .build();
 
     if (!ps.containsKey(p)) {
       throw new IllegalStateException("Unknown Position:" + p);
@@ -246,7 +245,6 @@ public class SinglePlayer implements PlayerSource {
   private String extractContractText(PlayerPage page, String title) {
     return page.extractLabelledText("Contract", title);
   }
-
 
   private DefensiveRatings extractDefensiveRatings(Document doc) {
     DefensiveRatings ratings = new DefensiveRatings();
@@ -317,8 +315,10 @@ public class SinglePlayer implements PlayerSource {
         throw new IllegalStateException();
     }
 
-    PitchingRatings<?> l = extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
-    PitchingRatings<?> r = extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
+    PitchingRatings<?> l =
+        extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
+    PitchingRatings<?> r =
+        extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
 
     return Splits.create(l, r);
   }
@@ -355,18 +355,21 @@ public class SinglePlayer implements PlayerSource {
   private Integer extractPositionRating(String raw, String position) {
     /*String rawPosStr = StringUtils.substringBetween(raw, position + " :", "(Fielding Pct.)");
 
-      Double fpct = Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
+    Double fpct = Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
 
-      return extractRange(raw, position).doubleValue() + (fpct / 1000.0);*/
+    return extractRange(raw, position).doubleValue() + (fpct / 1000.0);*/
     return extractRange(raw, position);
   }
 
   private FieldingRatings extractCatcherRating(String raw) {
-    return FieldingRatings
-      .builder()
-      .ability(extractRange(raw, "C") * 10)
-      .arm(ratingFromString(StringUtils.substringBetween(raw, "Catcher Arm :", raw.contains("Infield") ? "Infield" : "Outfield")) * 10)
-      .build();
+    return FieldingRatings.builder()
+        .ability(extractRange(raw, "C") * 10)
+        .arm(
+            ratingFromString(
+                    StringUtils.substringBetween(
+                        raw, "Catcher Arm :", raw.contains("Infield") ? "Infield" : "Outfield"))
+                * 10)
+        .build();
   }
 
   private FieldingRatings extractInfieldRating(String raw) {
@@ -376,32 +379,27 @@ public class SinglePlayer implements PlayerSource {
     Integer shortstop = 10 * extractRange(raw, "SS");
 
     Integer range = Ordering.natural().max(first, second, third, shortstop);
-    Integer arm = site.getType() == Version.OOTP5
-      ? 50
-      : ratingFromString(StringUtils.substringBetween(raw, "Infield Arm :", "Outfield")) * 10;
-
+    Integer arm =
+        site.getType() == Version.OOTP5
+            ? 50
+            : ratingFromString(StringUtils.substringBetween(raw, "Infield Arm :", "Outfield")) * 10;
 
     Integer firstErrors = extractAndAdapt(raw, Position.FIRST_BASE);
     Integer secondErrors = extractAndAdapt(raw, Position.SECOND_BASE);
     Integer thirdErrors = extractAndAdapt(raw, Position.THIRD_BASE);
     Integer shortstopErrors = extractAndAdapt(raw, Position.SHORTSTOP);
 
-    Integer n = 2*firstErrors + 8*secondErrors + 8*thirdErrors + 10*shortstopErrors;
+    Integer n = 2 * firstErrors + 8 * secondErrors + 8 * thirdErrors + 10 * shortstopErrors;
 
-    Integer d = (first == 0 ? 0 : 2)
-      + (second == 0 ? 0 : 8)
-      + (third == 0 ? 0 : 8)
-      + (shortstop == 0 ? 0 : 10);
+    Integer d =
+        (first == 0 ? 0 : 2)
+            + (second == 0 ? 0 : 8)
+            + (third == 0 ? 0 : 8)
+            + (shortstop == 0 ? 0 : 10);
 
     Integer errors = d == 0 ? 0 : (int) Math.round((double) n / d);
 
-    return FieldingRatings
-      .builder()
-      .range(range)
-      .arm(arm)
-      .errors(errors)
-      .dp(arm)
-      .build();
+    return FieldingRatings.builder().range(range).arm(arm).errors(errors).dp(arm).build();
   }
 
   private FieldingRatings extractOutfieldRating(String raw) {
@@ -418,20 +416,12 @@ public class SinglePlayer implements PlayerSource {
     Integer cfErrors = extractAndAdapt(raw, Position.CENTER_FIELD);
     Integer rfErrors = extractAndAdapt(raw, Position.RIGHT_FIELD);
 
-    Integer n = 3*firstErrors + 7*lfErrors + 10*cfErrors + 7*rfErrors;
-    Integer d = (first == 0 ? 0 : 3)
-      + (lf == 0 ? 0 : 7)
-      + (cf == 0 ? 0 : 10)
-      + (rf == 0 ? 0 : 7);
+    Integer n = 3 * firstErrors + 7 * lfErrors + 10 * cfErrors + 7 * rfErrors;
+    Integer d = (first == 0 ? 0 : 3) + (lf == 0 ? 0 : 7) + (cf == 0 ? 0 : 10) + (rf == 0 ? 0 : 7);
 
     Integer errors = d == 0 ? 0 : (int) Math.round((double) n / d);
 
-    return FieldingRatings
-      .builder()
-      .range(range)
-      .arm(arm)
-      .errors(errors)
-      .build();
+    return FieldingRatings.builder().range(range).arm(arm).errors(errors).build();
   }
 
   private Integer extractAndAdapt(String raw, Position p) {
@@ -449,7 +439,9 @@ public class SinglePlayer implements PlayerSource {
   }
 
   private Integer ratingFromString(String s) {
-    if (s == null) { return 0; }
+    if (s == null) {
+      return 0;
+    }
 
     switch (site.getType()) {
       case OOTP6:
@@ -459,20 +451,28 @@ public class SinglePlayer implements PlayerSource {
         return Integer.parseInt(s.trim());
       case OOTP5:
         switch (s.trim()) {
-          case "A": return 9;
-          case "B": return 7;
-          case "C": return 5;
-          case "D": return 3;
-          case "E": return 1;
-          case "-": return 0;
-          default: throw new IllegalStateException();
+          case "A":
+            return 9;
+          case "B":
+            return 7;
+          case "C":
+            return 5;
+          case "D":
+            return 3;
+          case "E":
+            return 1;
+          case "-":
+            return 0;
+          default:
+            throw new IllegalStateException();
         }
       default:
         throw new IllegalStateException();
     }
   }
 
-  private <T> PitchingRatings<T> extractPitchingRatings(Element el, Scale<T> scale, int endurance, int gbp) {
+  private <T> PitchingRatings<T> extractPitchingRatings(
+      Element el, Scale<T> scale, int endurance, int gbp) {
     Elements line = el.children();
 
     ImmutableMap<PitchingRatingsType, Integer> idx;
@@ -487,18 +487,17 @@ public class SinglePlayer implements PlayerSource {
         throw new IllegalStateException();
     }
 
-    PitchingRatings<T> ratings = PitchingRatings
-      .builder(scale)
-      .hits(line.get(idx.get(PitchingRatingsType.HITS)).text())
-      .gap(line.get(idx.get(PitchingRatingsType.GAP)).text())
-      .stuff(line.get(idx.get(PitchingRatingsType.STUFF)).text())
-      .control(line.get(idx.get(PitchingRatingsType.CONTROL)).text())
-      .movement(line.get(idx.get(PitchingRatingsType.MOVEMENT)).text())
-      .endurance(endurance)
-      .groundBallPct(gbp)
-      .build();
+    PitchingRatings<T> ratings =
+        PitchingRatings.builder(scale)
+            .hits(line.get(idx.get(PitchingRatingsType.HITS)).text())
+            .gap(line.get(idx.get(PitchingRatingsType.GAP)).text())
+            .stuff(line.get(idx.get(PitchingRatingsType.STUFF)).text())
+            .control(line.get(idx.get(PitchingRatingsType.CONTROL)).text())
+            .movement(line.get(idx.get(PitchingRatingsType.MOVEMENT)).text())
+            .endurance(endurance)
+            .groundBallPct(gbp)
+            .build();
 
     return ratings;
   }
-
 }
