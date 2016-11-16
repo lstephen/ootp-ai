@@ -6,7 +6,6 @@ java_import com.github.lstephen.ootp.ai.report.TeamReport
 java_import com.github.lstephen.ootp.ai.site.Site
 java_import com.github.lstephen.ootp.ai.stats.BattingStats
 java_import com.github.lstephen.ootp.ai.stats.EraBaseRuns
-java_import com.github.lstephen.ootp.ai.stats.PitcherOverall
 java_import com.github.lstephen.ootp.ai.stats.PitchingStats
 
 java_import java.io.PrintWriter
@@ -16,7 +15,6 @@ RSpec.describe TeamReport do
   let(:title) { 'TEST_TITLE' }
 
   let(:stats) { PitchingStats.new }
-  let(:pitcher_overall) { PitcherOverall::WOBA_AGAINST }
 
   before(:each) { EraBaseRuns.factor = 0 }
   before(:each) { EraBaseRuns.leagueContext = BattingStats.new }
@@ -26,7 +24,6 @@ RSpec.describe TeamReport do
   let(:site) do
     double('Site',
       getLeaguePitching: stats,
-      getPitcherSelectionMethod: pitcher_overall,
       getLeagueStructure: league_structure)
   end
 

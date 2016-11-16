@@ -3,7 +3,6 @@ package com.github.lstephen.ootp.ai.regression
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.stats.BattingStats
-import com.github.lstephen.ootp.ai.stats.PitcherOverall
 import com.github.lstephen.ootp.ai.stats.PitchingStats
 import com.github.lstephen.ootp.ai.stats.SplitStats
 
