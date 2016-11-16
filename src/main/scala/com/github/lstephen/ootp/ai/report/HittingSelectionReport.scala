@@ -47,7 +47,7 @@ class HittingSelectionReport(roster: Roster)(implicit predictor: Predictor, stat
     def positionScores = p.getDefensiveRatings.getPositionScores
     def atBestPosition = PlayerDefenseScore.atBestPosition(p).score
 
-    def defense: String =  f"$positionScores%8s ${atBestPosition.toLong}%3d"
+    def defense: String = f"$positionScores%8s ${atBestPosition.toLong}%3d"
 
     def intangibles: String = p.getIntangibles
 

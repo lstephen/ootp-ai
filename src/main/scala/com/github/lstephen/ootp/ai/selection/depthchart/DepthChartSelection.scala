@@ -76,9 +76,7 @@ class DepthChartSelection(implicit predictor: Predictor) {
   }
 }
 
-class WithPlayingTimeScore
-  (player: Player, percentage: Integer, position: Position, vs: VsHand)
-  (implicit predictor: Predictor) {
+class WithPlayingTimeScore(player: Player, percentage: Integer, position: Position, vs: VsHand)(implicit predictor: Predictor) {
 
   val base = InLineupScore(player, position, vs).score.toDouble * percentage
   val fatigue = (Defense.getPositionFactor(position) * percentage * percentage / 10.0) / 2.0

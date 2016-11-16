@@ -33,14 +33,12 @@ object Input {
   def apply(ds: List[Double]): Input = new Input(ds.map(Some(_)))
 }
 
-
 class DataPoint(val input: Input, val output: Double) {
   def features = input.length
 
   def toLabeledPoint(f: Int => Double): LabeledPoint =
     new LabeledPoint(output, input.toVector(f))
 }
-
 
 class DataSet(ds: List[DataPoint]) extends StrictLogging {
   def :+(rhs: DataPoint): DataSet = {

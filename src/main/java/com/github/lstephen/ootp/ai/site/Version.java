@@ -1,9 +1,7 @@
 package com.github.lstephen.ootp.ai.site;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public enum Version {
-    OOTP5, OOTP6
+  OOTP5,
+  OOTP6
 }

@@ -40,10 +40,8 @@ object NowAbility {
       .max
 }
 
-class NowValue
-  (val player: Player, val position: Position)
-  (implicit val predictor: Predictor)
-  extends ComponentScore {
+class NowValue(val player: Player, val position: Position)(implicit val predictor: Predictor)
+    extends ComponentScore {
 
   val ability = NowAbility(player, position)
 
@@ -67,5 +65,4 @@ object NowValue {
       .map(NowValue(p, _))
       .max
 }
-
 

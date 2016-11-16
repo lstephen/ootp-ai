@@ -1,11 +1,7 @@
 package com.github.lstephen.ootp.ai.player;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface PlayerSource {
 
-    Player get(PlayerId player);
-
+  Player get(PlayerId player);
 }

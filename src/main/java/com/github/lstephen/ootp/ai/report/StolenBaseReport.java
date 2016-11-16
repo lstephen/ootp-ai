@@ -1,7 +1,6 @@
 package com.github.lstephen.ootp.ai.report;
 
 import com.github.lstephen.ootp.ai.io.Printable;
-
 import java.io.PrintWriter;
 
 public class StolenBaseReport implements Printable {
@@ -19,8 +18,4 @@ public class StolenBaseReport implements Printable {
     //   If expect sb > break even
     //     print as green light
   }
-
-
 }
-
-

@@ -16,4 +16,3 @@ object Context {
   def idealRoster_=(r: Roster): Unit = { idealRoster = Some(r) }
 }
 
-

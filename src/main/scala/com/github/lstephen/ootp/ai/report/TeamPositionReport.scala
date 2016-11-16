@@ -32,8 +32,9 @@ class TeamPositionReport(roster: Roster)(implicit predictor: Predictor) extends 
       .toSeq
       .take(10)
       .zipWithIndex
-      .foreach { case ((o, l, r), idx) =>
-        w.println(f"${idx + 1}%2d | ${format(o)} | ${format(l)} | ${format(r)}")
+      .foreach {
+        case ((o, l, r), idx) =>
+          w.println(f"${idx + 1}%2d | ${format(o)} | ${format(l)} | ${format(r)}")
       }
   }
 

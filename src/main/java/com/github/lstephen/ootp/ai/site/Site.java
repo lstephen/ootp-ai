@@ -11,97 +11,92 @@ import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-
-import org.joda.time.LocalDate;
-
 import java.util.Collection;
 import java.util.List;
+import org.joda.time.LocalDate;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface Site {
 
-    Roster extractRoster();
+  Roster extractRoster();
 
-    Team extractTeam();
+  Team extractTeam();
 
-    Integer getCurrentSalary(Player p);
+  Integer getCurrentSalary(Player p);
 
-    LocalDate getDate();
+  LocalDate getDate();
 
-    SiteDefinition getDefinition();
+  SiteDefinition getDefinition();
 
-    Iterable<Player> getAllPlayers();
+  Iterable<Player> getAllPlayers();
 
-    Iterable<Player> getDraft();
+  Iterable<Player> getDraft();
 
-    Iterable<Player> getFreeAgents();
+  Iterable<Player> getFreeAgents();
 
-    BattingStats getLeagueBatting();
+  BattingStats getLeagueBatting();
 
-    PitchingStats getLeaguePitching();
+  PitchingStats getLeaguePitching();
 
-    String getName();
+  String getName();
 
-    Collection<Id<Team>> getTeamIds();
+  Collection<Id<Team>> getTeamIds();
 
-    LeagueStructure getLeagueStructure();
+  LeagueStructure getLeagueStructure();
 
-    void clearCache();
+  void clearCache();
 
-    Page getPage(String url, Object... args);
+  Page getPage(String url, Object... args);
 
-    Player getPlayer(PlayerId id);
+  Player getPlayer(PlayerId id);
 
-    List<Player> getPlayers(Collection<PlayerId> ids);
+  List<Player> getPlayers(Collection<PlayerId> ids);
 
-    Iterable<Player> getRuleFiveDraft();
+  Iterable<Player> getRuleFiveDraft();
 
-    Iterable<Player> getSalariedPlayers(Id<Team> id);
+  Iterable<Player> getSalariedPlayers(Id<Team> id);
 
-    Salary getSalary();
+  Salary getSalary();
 
-    Salary getSalary(Id<Team> id);
+  Salary getSalary(Id<Team> id);
 
-    Salary getSalary(int teamId);
+  Salary getSalary(int teamId);
 
-    Financials getFinancials();
+  Financials getFinancials();
 
-    SingleTeam getSingleTeam();
+  SingleTeam getSingleTeam();
 
-    SingleTeam getSingleTeam(
-        Id<Team> id);
+  SingleTeam getSingleTeam(Id<Team> id);
 
-    SingleTeam getSingleTeam(int teamId);
+  SingleTeam getSingleTeam(int teamId);
 
-    Standings getStandings();
+  Standings getStandings();
 
-    TeamStats.Batting getTeamBatting();
+  TeamStats.Batting getTeamBatting();
 
-    TeamStats<PitchingStats> getTeamPitching();
+  TeamStats<PitchingStats> getTeamPitching();
 
-    Optional<Integer> getTeamTopProspectPosition(PlayerId id);
+  Optional<Integer> getTeamTopProspectPosition(PlayerId id);
 
-    Version getType();
+  Version getType();
 
-    Iterable<Player> getWaiverWire();
+  Iterable<Player> getWaiverWire();
 
-    boolean isFutureFreeAgent(Player p);
+  boolean isFutureFreeAgent(Player p);
 
-    Predicate<Player> isFutureFreeAgent();
+  Predicate<Player> isFutureFreeAgent();
 
-    boolean isInjured(Player p);
+  boolean isInjured(Player p);
 
-    Scale<?> getAbilityRatingScale();
-    Scale<?> getPotentialRatingScale();
-    Scale<?> getBuntScale();
-    Scale<?> getRunningScale();
+  Scale<?> getAbilityRatingScale();
 
-    Printable getPowerRankingsReport(RecordPredictor recordPredictor);
+  Scale<?> getPotentialRatingScale();
 
+  Scale<?> getBuntScale();
+
+  Scale<?> getRunningScale();
+
+  Printable getPowerRankingsReport(RecordPredictor recordPredictor);
 }

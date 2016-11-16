@@ -18,13 +18,12 @@ class StarterSelection(implicit predictor: Predictor) {
   type Starters = Map[Position, Player]
 
   def selectWithDh(ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] =
-      selectForPositions(Position.hitting.toSet, ps, vs)
+    selectForPositions(Position.hitting.toSet, ps, vs)
 
   def select(ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] =
-      selectForPositions(Position.hitting.toSet - Position.DESIGNATED_HITTER, ps, vs)
+    selectForPositions(Position.hitting.toSet - Position.DESIGNATED_HITTER, ps, vs)
 
-  def selectForPositions
-    (pos: Set[Position], ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] = {
+  def selectForPositions(pos: Set[Position], ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] = {
 
     val initial = (pos.toList, ps.toList.sortBy(InLineupScore(_)).reverse).zipped.toMap
 
@@ -49,10 +48,9 @@ class StarterSelection(implicit predictor: Predictor) {
   def subs(s: Starters, p: Player): List[Starters] = {
     s.values.find(_ == p) match {
       case Some(_) => List()
-      case None    => (for ((k, v) <- s) yield s + (k -> p)).toList
+      case None => (for ((k, v) <- s) yield s + (k -> p)).toList
     }
   }
-
 
   // For Java compat
   def select(vs: VsHand, ps: JavaIterable[Player]): JavaIterable[Player] =
@@ -62,6 +60,4 @@ class StarterSelection(implicit predictor: Predictor) {
     selectWithDh(List() ++ ps, vs)
 
 }
-
-
 

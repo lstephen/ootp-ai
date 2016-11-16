@@ -3,16 +3,12 @@ package com.github.lstephen.ootp.ai.site;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.github.lstephen.ootp.ai.roster.Roster;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface SingleTeam {
 
-    String getName();
+  String getName();
 
-    Roster getRoster();
+  Roster getRoster();
 
-    Iterable<PlayerId> getInjuries();
-
+  Iterable<PlayerId> getInjuries();
 }

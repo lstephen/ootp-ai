@@ -6,8 +6,7 @@ import com.github.lstephen.ootp.ai.site.SiteHolder
 import scala.beans.BeanProperty
 
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
-
+import com.fasterxml.jackson.databind.{ DeserializationContext, JsonDeserializer }
 
 class BuntForHitDeserializer extends JsonDeserializer[Rating[_, _]] {
   override def deserialize(jp: JsonParser, ctx: DeserializationContext): Rating[_, _] =

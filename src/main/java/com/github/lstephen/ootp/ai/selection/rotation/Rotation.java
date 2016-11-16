@@ -1,22 +1,17 @@
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 package com.github.lstephen.ootp.ai.selection.rotation;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
-import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.PitchingPrediction;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.site.SiteHolder;
-import com.github.lstephen.ootp.ai.stats.PitchingStats;
-import com.github.lstephen.ootp.ai.stats.SplitStats;
-import com.github.lstephen.ootp.ai.stats.TeamStats;
-import java.io.OutputStream;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -26,260 +21,273 @@ import java.util.stream.Stream;
 
 public final class Rotation implements Printable {
 
-    public static enum Role { SP, MR, SU, CL, NONE };
+  public static enum Role {
+    SP,
+    MR,
+    SU,
+    CL,
+    NONE
+  };
 
-    private final ImmutableMap<Role, ImmutableList<Player>> rotation;
+  private final ImmutableMap<Role, ImmutableList<Player>> rotation;
 
-    private Rotation(Map<Role, ImmutableList<Player>> rotation) {
-        this.rotation = ImmutableMap.copyOf(rotation);
+  private Rotation(Map<Role, ImmutableList<Player>> rotation) {
+    this.rotation = ImmutableMap.copyOf(rotation);
+  }
+
+  public Double score(Predictor predictor) {
+    return scoreRotation(predictor) + scoreBullpen(predictor);
+  }
+
+  private double scoreRotation(Predictor predictor) {
+    double score = 0.0;
+    int spFactor = 10;
+
+    for (Player p : get(Role.SP)) {
+      int end = p.getPitchingRatings().getVsRight().getEndurance();
+
+      double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+
+      score += spFactor * endFactor * predictor.predictPitching(p).overall();
+
+      spFactor--;
     }
 
-    public Double score(Predictor predictor) {
-        return scoreRotation(predictor) + scoreBullpen(predictor);
-    }
+    return score;
+  }
 
-    private double scoreRotation(Predictor predictor) {
-        double score = 0.0;
-        int spFactor = 10;
+  private static enum BullpenOption {
+    CLUTCH
+  }
 
-        for (Player p : get(Role.SP)) {
-            int end = p.getPitchingRatings().getVsRight().getEndurance();
+  private Double scoreBullpen(Predictor predictor) {
+    Double mrs = score(get(Role.MR), predictor, EnumSet.noneOf(BullpenOption.class));
+    Double sus = score(get(Role.SU), predictor, EnumSet.noneOf(BullpenOption.class));
+    Double cls = score(get(Role.CL), predictor, EnumSet.of(BullpenOption.CLUTCH));
 
-            double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
+    return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
+  }
 
-            score += spFactor * endFactor * predictor.predictPitching(p).overall();
+  private double score(
+      ImmutableList<Player> players, Predictor predictor, EnumSet<BullpenOption> options) {
 
-            spFactor--;
-        }
+    double score = 0.0;
+    double vsL = 0.0;
+    double vsR = 0.0;
 
-        return score;
-    }
+    int factor = 5;
 
-    private static enum BullpenOption { CLUTCH }
+    for (Player p : players) {
+      PitchingPrediction stats = predictor.predictPitching(p);
 
-    private Double scoreBullpen(Predictor predictor) {
-      Double mrs = score(get(Role.MR), predictor, EnumSet.noneOf(BullpenOption.class));
-      Double sus = score(get(Role.SU), predictor, EnumSet.noneOf(BullpenOption.class));
-      Double cls = score(get(Role.CL), predictor, EnumSet.of(BullpenOption.CLUTCH));
+      double clutchFactor = 0.0;
 
-      return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
-    }
-
-    private double score(
-        ImmutableList<Player> players,
-        Predictor predictor,
-        EnumSet<BullpenOption> options) {
-
-      double score = 0.0;
-      double vsL = 0.0;
-      double vsR = 0.0;
-
-      int factor = 5;
-
-      for (Player p : players) {
-        PitchingPrediction stats = predictor.predictPitching(p);
-
-        double clutchFactor = 0.0;
-
-        if (options.contains(BullpenOption.CLUTCH) && p.getClutch().isPresent()) {
-          switch (p.getClutch().get()) {
-            case SUFFERS:
-              clutchFactor = -0.25;
-              break;
-            case NORMAL:
-              clutchFactor = 0.0;
-              break;
-            case GREAT:
-              clutchFactor = 0.25;
-              break;
-            default:
-              throw new IllegalArgumentException();
-          }
-        }
-
-        double f = factor + clutchFactor;
-
-        score += f * stats.overall();
-        vsL += f * stats.vsLeft().getBaseRunsPlus();
-        vsR += f * stats.vsRight().getBaseRunsPlus();
-
-        if (factor > 1) {
-            factor--;
+      if (options.contains(BullpenOption.CLUTCH) && p.getClutch().isPresent()) {
+        switch (p.getClutch().get()) {
+          case SUFFERS:
+            clutchFactor = -0.25;
+            break;
+          case NORMAL:
+            clutchFactor = 0.0;
+            break;
+          case GREAT:
+            clutchFactor = 0.25;
+            break;
+          default:
+            throw new IllegalArgumentException();
         }
       }
 
-      double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
-      double actBalance = vsL * vsR;
+      double f = factor + clutchFactor;
 
-      double balanceFactor = Math.pow(actBalance / maxBalance, players.size());
+      score += f * stats.overall();
+      vsL += f * stats.vsLeft().getBaseRunsPlus();
+      vsR += f * stats.vsRight().getBaseRunsPlus();
 
-      return score * balanceFactor;
+      if (factor > 1) {
+        factor--;
+      }
     }
 
-    public Boolean isValid() {
-      List<Player> all = Lists.newArrayList();
-      for (Role r : Role.values()) {
-        if (rotation.get(r) != null) {
-          all.addAll(rotation.get(r));
-        }
+    double maxBalance = Math.pow((vsL + vsR) / 2.0, 2.0);
+    double actBalance = vsL * vsR;
+
+    double balanceFactor = Math.pow(actBalance / maxBalance, players.size());
+
+    return score * balanceFactor;
+  }
+
+  public Boolean isValid() {
+    List<Player> all = Lists.newArrayList();
+    for (Role r : Role.values()) {
+      if (rotation.get(r) != null) {
+        all.addAll(rotation.get(r));
       }
-
-      if (getAll().size() != all.size()) {
-        return false;
-      }
-
-      if (rotation.containsKey(Role.MR) && rotation.get(Role.MR).size() > 4) { return false; }
-      if (rotation.containsKey(Role.SU) && rotation.get(Role.SU).size() > 2) { return false; }
-      if (rotation.containsKey(Role.CL) && rotation.get(Role.CL).size() > 1) { return false; }
-
-      if (SiteHolder.get().getName().equals("CBL")) {
-          for (Player p : rotation.get(Role.SP)) {
-              if (!p.getSlots().contains(Slot.SP)) {
-                  return false;
-              }
-          }
-      }
-
-      return true;
     }
 
-    public Rotation substitute(Player in, Player out) {
-        Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
-
-        for (Role r : Role.values()) {
-            if (!rotation.containsKey(r)) {
-              continue;
-            }
-
-            List<Player> ps = Lists.newArrayList(rotation.get(r));
-
-            if (ps.contains(out)) {
-                int index = ps.indexOf(out);
-                ps.add(index, in);
-                ps.remove(out);
-            }
-
-            newRotation.put(r, ImmutableList.copyOf(ps));
-        }
-
-        return create(newRotation);
+    if (getAll().size() != all.size()) {
+      return false;
     }
 
-    public Rotation move(Player p, Role r, int idx) {
-      Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(remove(p).rotation);
+    if (rotation.containsKey(Role.MR) && rotation.get(Role.MR).size() > 4) {
+      return false;
+    }
+    if (rotation.containsKey(Role.SU) && rotation.get(Role.SU).size() > 2) {
+      return false;
+    }
+    if (rotation.containsKey(Role.CL) && rotation.get(Role.CL).size() > 1) {
+      return false;
+    }
 
-      if (newRotation.containsKey(r)) {
-        List<Player> ps = Lists.newArrayList(newRotation.get(r));
-        if (idx > ps.size()) {
-          ps.add(p);
-        } else {
-          ps.add(idx, p);
+    if (SiteHolder.get().getName().equals("CBL")) {
+      for (Player p : rotation.get(Role.SP)) {
+        if (!p.getSlots().contains(Slot.SP)) {
+          return false;
         }
-        newRotation.put(r, ImmutableList.copyOf(ps));
+      }
+    }
+
+    return true;
+  }
+
+  public Rotation substitute(Player in, Player out) {
+    Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
+
+    for (Role r : Role.values()) {
+      if (!rotation.containsKey(r)) {
+        continue;
+      }
+
+      List<Player> ps = Lists.newArrayList(rotation.get(r));
+
+      if (ps.contains(out)) {
+        int index = ps.indexOf(out);
+        ps.add(index, in);
+        ps.remove(out);
+      }
+
+      newRotation.put(r, ImmutableList.copyOf(ps));
+    }
+
+    return create(newRotation);
+  }
+
+  public Rotation move(Player p, Role r, int idx) {
+    Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(remove(p).rotation);
+
+    if (newRotation.containsKey(r)) {
+      List<Player> ps = Lists.newArrayList(newRotation.get(r));
+      if (idx > ps.size()) {
+        ps.add(p);
       } else {
-        newRotation.put(r, ImmutableList.of(p));
+        ps.add(idx, p);
+      }
+      newRotation.put(r, ImmutableList.copyOf(ps));
+    } else {
+      newRotation.put(r, ImmutableList.of(p));
+    }
+
+    Rotation next = create(newRotation);
+
+    return next;
+  }
+
+  private Rotation remove(Player p) {
+    Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
+
+    for (Map.Entry<Role, ImmutableList<Player>> r : newRotation.entrySet()) {
+      if (r.getValue().contains(p)) {
+        List<Player> ps = Lists.newArrayList(rotation.get(r.getKey()));
+
+        ps.remove(p);
+
+        newRotation.put(r.getKey(), ImmutableList.copyOf(ps));
+      }
+    }
+
+    return create(newRotation);
+  }
+
+  public Rotation swap(Player lhs, Player rhs) {
+    Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
+
+    for (Role r : Role.values()) {
+      if (!rotation.containsKey(r)) {
+        continue;
       }
 
-      Rotation next = create(newRotation);
+      List<Player> ps = Lists.newArrayList(rotation.get(r));
 
-      return next;
-    }
+      int rindex = ps.indexOf(rhs);
+      int lindex = ps.indexOf(lhs);
 
-    private Rotation remove(Player p) {
-      Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
+      if (rindex >= 0 && lindex >= 0) {
+        Collections.swap(ps, lindex, rindex);
+      } else {
 
-      for (Map.Entry<Role, ImmutableList<Player>> r : newRotation.entrySet()) {
-        if (r.getValue().contains(p)) {
-          List<Player> ps = Lists.newArrayList(rotation.get(r.getKey()));
+        if (rindex >= 0) {
+          ps.remove(rindex);
+          ps.add(rindex, lhs);
+        }
 
-          ps.remove(p);
-
-          newRotation.put(r.getKey(), ImmutableList.copyOf(ps));
+        if (lindex >= 0) {
+          ps.remove(lindex);
+          ps.add(lindex, rhs);
         }
       }
 
-      return create(newRotation);
+      newRotation.put(r, ImmutableList.copyOf(ps));
     }
 
-    public Rotation swap(Player lhs, Player rhs) {
-        Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
+    return create(newRotation);
+  }
 
-        for (Role r : Role.values()) {
-            if (!rotation.containsKey(r)) {
-              continue;
-            }
+  public ImmutableList<Player> get(Role... roles) {
+    List<Player> result = Lists.newArrayList();
 
-            List<Player> ps = Lists.newArrayList(rotation.get(r));
-
-            int rindex = ps.indexOf(rhs);
-            int lindex = ps.indexOf(lhs);
-
-            if (rindex >= 0 && lindex >= 0) {
-                Collections.swap(ps, lindex, rindex);
-            } else {
-
-                if (rindex >= 0) {
-                    ps.remove(rindex);
-                    ps.add(rindex, lhs);
-                }
-
-                if (lindex >= 0) {
-                    ps.remove(lindex);
-                    ps.add(lindex, rhs);
-                }
-            }
-
-            newRotation.put(r, ImmutableList.copyOf(ps));
-        }
-
-        return create(newRotation);
+    for (Role r : roles) {
+      if (rotation.containsKey(r)) {
+        result.addAll(rotation.get(r));
+      }
     }
 
-    public ImmutableList<Player> get(Role... roles) {
-        List<Player> result = Lists.newArrayList();
+    return ImmutableList.copyOf(result);
+  }
 
-        for (Role r : roles) {
-          if (rotation.containsKey(r)) {
-            result.addAll(rotation.get(r));
-          }
-        }
+  public ImmutableSet<Player> getAll() {
+    return ImmutableSet.copyOf(get(Role.values()));
+  }
 
-        return ImmutableList.copyOf(result);
-    }
+  public ImmutableList<Player> getStarters() {
+    return get(Role.SP);
+  }
 
-    public ImmutableSet<Player> getAll() {
-        return ImmutableSet.copyOf(get(Role.values()));
-    }
+  public ImmutableList<Player> getNonStarters() {
+    return get(Role.MR, Role.SU, Role.CL, Role.NONE);
+  }
 
-    public ImmutableList<Player> getStarters() {
-        return get(Role.SP);
-    }
+  public void print(PrintWriter w) {
+    w.println();
 
-    public ImmutableList<Player> getNonStarters() {
-        return get(Role.MR, Role.SU, Role.CL, Role.NONE);
-    }
-
-    public void print(PrintWriter w) {
-        w.println();
-
-        Stream
-          .of(Role.SP, Role.MR, Role.SU, Role.CL, Role.NONE)
-          .forEach(r -> {
+    Stream.of(Role.SP, Role.MR, Role.SU, Role.CL, Role.NONE)
+        .forEach(
+            r -> {
               w.println(r);
               get(r).forEach(p -> w.println(p.getName()));
               w.println();
-          });
-    }
+            });
+  }
 
-    public static final Rotation create(Iterable<Player> sps, Iterable<Player> mrs, Iterable<Player> rest) {
-        return create(ImmutableMap.of(
+  public static final Rotation create(
+      Iterable<Player> sps, Iterable<Player> mrs, Iterable<Player> rest) {
+    return create(
+        ImmutableMap.of(
             Role.SP, ImmutableList.copyOf(sps),
             Role.MR, ImmutableList.copyOf(mrs),
             Role.NONE, ImmutableList.copyOf(rest)));
-    }
+  }
 
-    private static final Rotation create(Map<Role, ImmutableList<Player>> rotation) {
-        return new Rotation(rotation);
-    }
-
+  private static final Rotation create(Map<Role, ImmutableList<Player>> rotation) {
+    return new Rotation(rotation);
+  }
 }

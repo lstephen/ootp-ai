@@ -1,15 +1,11 @@
 package com.github.lstephen.ootp.ai.config;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface RunConfig {
 
-    String getLeague();
+  String getLeague();
 
-    Boolean isPlayoffs();
+  Boolean isPlayoffs();
 
-    Boolean isLookToNextYear();
-
+  Boolean isLookToNextYear();
 }

@@ -15,8 +15,7 @@ class RandomForestModel extends Model with StrictLogging {
       algo = Algo.Regression,
       impurity = Variance,
       maxDepth = 5,
-      minInstancesPerNode = ds.length / 200
-      )
+      minInstancesPerNode = ds.length / 200)
 
     val model = RandomForest.trainRegressor(ds.toRdd, strategy, 100, "auto", seed)
 

@@ -55,7 +55,6 @@ object Regressable {
   }
 }
 
-
 class Regression(label: String, category: String) extends StrictLogging {
 
   import Regressable._
@@ -69,7 +68,7 @@ class Regression(label: String, category: String) extends StrictLogging {
 
   def regression = _regression match {
     case Some(r) => r
-    case None    =>
+    case None =>
       logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
       val p = model train data
@@ -78,7 +77,6 @@ class Regression(label: String, category: String) extends StrictLogging {
 
       p
   }
-
 
   def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
     data = data :+ new DataPoint(regressable.toInput(x), y)
@@ -93,7 +91,7 @@ class Regression(label: String, category: String) extends StrictLogging {
   def predict(xs: Input): Double = regression(xs)
 
   def mse =
-    (data.map{ p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
+    (data.map { p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
 
   def rsme = math.pow(mse, 0.5)
 

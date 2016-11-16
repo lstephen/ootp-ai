@@ -1,9 +1,6 @@
 package com.github.lstephen.ootp.ai.stats;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public interface BaseRuns {
 
   Double COEFFICIENT_SINGLE = 0.726;
@@ -15,5 +12,4 @@ public interface BaseRuns {
   Double COEFFICIENT_OUT = -0.004;
 
   Double calculate(PitchingStats stats);
-
 }

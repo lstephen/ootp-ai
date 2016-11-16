@@ -1,11 +1,5 @@
 package com.github.lstephen.ootp.ai.draft;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 import com.github.lstephen.ootp.ai.config.Config;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.io.Printables;
@@ -13,6 +7,12 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.value.JavaAdapter;
+import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,10 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class DraftReport implements Printable {
 
   private final Site site;
@@ -47,8 +44,7 @@ public final class DraftReport implements Printable {
   }
 
   private void loadDraftClasses() {
-    current = DraftClass.load(
-        getDraftClassFile(site.getDate().getYear()), site.getDefinition());
+    current = DraftClass.load(getDraftClassFile(site.getDate().getYear()), site.getDefinition());
 
     site.getDraft().forEach(current::addIfNotPresent);
 
@@ -64,19 +60,28 @@ public final class DraftReport implements Printable {
 
     currentPlayersSorted = byOverall(predictor).immutableSortedCopy(current.getPlayers());
 
-    historicalPlayersSorted = historical
-      .stream()
-      .map(dc -> byOverall(new Predictor(dc.getPlayers(), predictor)).immutableSortedCopy(dc.getPlayers()))
-      .collect(Collectors.toList());
+    historicalPlayersSorted =
+        historical
+            .stream()
+            .map(
+                dc ->
+                    byOverall(new Predictor(dc.getPlayers(), predictor))
+                        .immutableSortedCopy(dc.getPlayers()))
+            .collect(Collectors.toList());
 
-    List<Player> allPlayers = Stream.concat(historicalPlayersSorted.stream().flatMap(Collection::stream), currentPlayersSorted.stream()).collect(Collectors.toList());
+    List<Player> allPlayers =
+        Stream.concat(
+                historicalPlayersSorted.stream().flatMap(Collection::stream),
+                currentPlayersSorted.stream())
+            .collect(Collectors.toList());
 
     predictor = new Predictor(allPlayers, predictor);
   }
 
   private File getDraftClassFile(int year) {
     try {
-      String historyDirectory = Config.createDefault().getValue("history.dir").or("c:/ootp/history");
+      String historyDirectory =
+          Config.createDefault().getValue("history.dir").or("c:/ootp/history");
       return new File(historyDirectory + "/" + site.getName() + year + ".draft.json");
     } catch (IOException e) {
       throw Throwables.propagate(e);
@@ -96,32 +101,26 @@ public final class DraftReport implements Printable {
   private RoundValue getValueOfPicks(int start, int n) {
     RoundValue rv = RoundValue.create(predictor);
 
-    Iterable<Player> players = FluentIterable
-      .from(currentPlayersSorted)
-      .skip(start)
-      .limit(n);
+    Iterable<Player> players = FluentIterable.from(currentPlayersSorted).skip(start).limit(n);
 
     rv.add(players);
 
     historicalPlayersSorted
-      .stream()
-      .forEach(playersSorted -> {
-        Iterable<Player> ps = FluentIterable
-          .from(playersSorted)
-          .skip(start)
-          .limit(n);
+        .stream()
+        .forEach(
+            playersSorted -> {
+              Iterable<Player> ps = FluentIterable.from(playersSorted).skip(start).limit(n);
 
-        rv.addHistorical(ps);
-      });
+              rv.addHistorical(ps);
+            });
 
     return rv;
   }
 
   private Ordering<Player> byOverall(Predictor pred) {
-    return Ordering
-      .natural()
-      .reverse()
-      .onResultOf((Player p) -> JavaAdapter.futureValue(p, pred).score());
+    return Ordering.natural()
+        .reverse()
+        .onResultOf((Player p) -> JavaAdapter.futureValue(p, pred).score());
   }
 
   public void print(OutputStream out) {
@@ -186,5 +185,4 @@ public final class DraftReport implements Printable {
     report.loadDraftClasses();
     return report;
   }
-
 }

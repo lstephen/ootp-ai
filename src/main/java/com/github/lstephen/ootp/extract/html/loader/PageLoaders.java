@@ -3,23 +3,18 @@ package com.github.lstephen.ootp.extract.html.loader;
 import java.util.concurrent.Callable;
 import org.jsoup.nodes.Document;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class PageLoaders {
 
-    private PageLoaders() { }
+  private PageLoaders() {}
 
-    public static Callable<Document> asCallable(
-        final PageLoader loader, final String url) {
+  public static Callable<Document> asCallable(final PageLoader loader, final String url) {
 
-        return new Callable<Document>() {
-            @Override
-            public Document call() {
-                return loader.load(url);
-            }
-        };
-    }
-
+    return new Callable<Document>() {
+      @Override
+      public Document call() {
+        return loader.load(url);
+      }
+    };
+  }
 }

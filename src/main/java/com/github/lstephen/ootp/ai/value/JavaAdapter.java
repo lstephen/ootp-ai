@@ -6,7 +6,7 @@ import com.github.lstephen.ootp.ai.regression.Predictor;
 
 public final class JavaAdapter {
 
-  private JavaAdapter() { }
+  private JavaAdapter() {}
 
   public static OverallValue overallValue(Player p, Predictor predictor) {
     return OverallValue$.MODULE$.apply(p, predictor);
@@ -27,5 +27,4 @@ public final class JavaAdapter {
   public static Ability nowAbility(Player p, Predictor predictor) {
     return NowAbility$.MODULE$.apply(p, predictor);
   }
-
 }

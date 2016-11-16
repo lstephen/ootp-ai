@@ -49,13 +49,11 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
   def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 }
 
-
 class BattingPrediction(stats: SplitStats[BattingStats]) {
   val overall = Score(stats.getOverall.getWobaPlus)
   val vsLeft = stats.getVsLeft
   val vsRight = stats.getVsRight
 }
-
 
 class PitchingPrediction(stats: SplitStats[PitchingStats]) {
   val overall = Score(stats.getOverall.getBaseRunsPlus)

@@ -1,9 +1,6 @@
 package com.github.lstephen.ootp.ai.stats;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public class EraBaseRuns implements BaseRuns {
   private static final EraBaseRuns INSTANCE = new EraBaseRuns();
 
@@ -11,7 +8,7 @@ public class EraBaseRuns implements BaseRuns {
 
   private BattingStats context;
 
-  private EraBaseRuns() { }
+  private EraBaseRuns() {}
 
   public Double calculate(PitchingStats stats) {
     Double hits = (double) stats.getHits();
@@ -20,19 +17,20 @@ public class EraBaseRuns implements BaseRuns {
 
     Double a = hits + stats.getWalks() - stats.getHomeRuns();
 
-    Double b = factor * (
-        COEFFICIENT_SINGLE * stats.getSingles() +
-        COEFFICIENT_DOUBLE * doubles +
-        COEFFICIENT_TRIPLE * triples +
-        COEFFICIENT_HOME_RUN * stats.getHomeRuns() +
-        COEFFICIENT_WALK * stats.getWalks() +
-        COEFFICIENT_STRIKEOUT * stats.getStrikeouts() +
-        COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts()));
+    Double b =
+        factor
+            * (COEFFICIENT_SINGLE * stats.getSingles()
+                + COEFFICIENT_DOUBLE * doubles
+                + COEFFICIENT_TRIPLE * triples
+                + COEFFICIENT_HOME_RUN * stats.getHomeRuns()
+                + COEFFICIENT_WALK * stats.getWalks()
+                + COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
+                + COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts()));
 
     Double c = (double) stats.getOuts();
     Double d = (double) stats.getHomeRuns();
 
-    Double bsr = a * b/(b+c) + d;
+    Double bsr = a * b / (b + c) + d;
 
     return bsr / stats.getOuts() * 27;
   }
@@ -48,5 +46,4 @@ public class EraBaseRuns implements BaseRuns {
   public static void setLeagueContext(BattingStats stats) {
     get().context = stats;
   }
-
 }

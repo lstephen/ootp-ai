@@ -38,17 +38,6 @@ import com.github.lstephen.ootp.extract.html.PageFactory;
 import com.github.lstephen.ootp.extract.html.loader.DiskCachingLoader;
 import com.github.lstephen.ootp.extract.html.loader.PageLoader;
 import com.github.lstephen.ootp.extract.html.loader.PageLoaderBuilder;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import java.util.stream.Collectors;
-
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
@@ -56,15 +45,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
-
 import org.joda.time.LocalDate;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public final class SiteImpl implements Site, SalarySource {
 
   private final SiteDefinition definition;
@@ -131,20 +121,17 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public Page getPage(String url, Object... args) {
-    PageLoader loader = PageLoaderBuilder
-      .create()
-      .diskCache(getCacheDirectory())
-      .inMemoryCache()
-      .build();
+    PageLoader loader =
+        PageLoaderBuilder.create().diskCache(getCacheDirectory()).inMemoryCache().build();
 
-    return PageFactory
-      .create(loader)
-      .getPage(definition.getSiteRoot(), String.format(url, args));
+    return PageFactory.create(loader).getPage(definition.getSiteRoot(), String.format(url, args));
   }
 
   private String getCacheDirectory() {
     try {
-      return Config.createDefault().getValue("cache.dir").or(DiskCachingLoader.DEFAULT_CACHE_DIR) + "/" + getName();
+      return Config.createDefault().getValue("cache.dir").or(DiskCachingLoader.DEFAULT_CACHE_DIR)
+          + "/"
+          + getName();
     } catch (IOException e) {
       throw Throwables.propagate(e);
     }
@@ -211,31 +198,32 @@ public final class SiteImpl implements Site, SalarySource {
 
   public String getSalary(Player p) {
     return getTeamIds()
-      .stream()
-      .map(team -> getSalary(team).getSalary(p))
-      .filter(s -> s != null)
-      .findFirst()
-      .orElse("");
+        .stream()
+        .map(team -> getSalary(team).getSalary(p))
+        .filter(s -> s != null)
+        .findFirst()
+        .orElse("");
   }
 
   @Override
   public Integer getCurrentSalary(Player p) {
     return getTeamIds()
-      .stream()
-      .map(team -> getSalary(team).getCurrentSalary(p))
-      .filter(s -> s != 0)
-      .findFirst()
-      .orElse(0);
+        .stream()
+        .map(team -> getSalary(team).getCurrentSalary(p))
+        .filter(s -> s != 0)
+        .findFirst()
+        .orElse(0);
   }
 
   @Override
   public Optional<Integer> getTeamTopProspectPosition(PlayerId id) {
-    java.util.Optional<Integer> jopt = getTeamIds()
-      .stream()
-      .map(team -> getTopProspects(team).getPosition(id))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
-      .findFirst();
+    java.util.Optional<Integer> jopt =
+        getTeamIds()
+            .stream()
+            .map(team -> getTopProspects(team).getPosition(id))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
 
     return jopt.isPresent() ? Optional.of(jopt.get()) : Optional.absent();
   }
@@ -296,9 +284,7 @@ public final class SiteImpl implements Site, SalarySource {
   @Override
   public boolean isFutureFreeAgent(Player p) {
     if (futureFas == null) {
-      futureFas =
-        ImmutableSet.copyOf(
-            PlayerList.futureFreeAgents(this).extractIds());
+      futureFas = ImmutableSet.copyOf(PlayerList.futureFreeAgents(this).extractIds());
     }
 
     return futureFas.contains(p.getId());
@@ -362,10 +348,7 @@ public final class SiteImpl implements Site, SalarySource {
     return PowerRankingsReport.create(this, recordPredictor);
   }
 
-
-
   public static SiteImpl create(SiteDefinition definition, PlayerSource players) {
     return new SiteImpl(definition, players);
   }
-
 }

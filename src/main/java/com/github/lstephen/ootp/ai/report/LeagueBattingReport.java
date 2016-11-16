@@ -1,19 +1,16 @@
 package com.github.lstephen.ootp.ai.report;
 
-import com.google.common.collect.ImmutableMap;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.BaseRuns;
+import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.EraBaseRuns;
 import com.github.lstephen.ootp.ai.stats.FipBaseRuns;
 import com.github.lstephen.ootp.ai.stats.Woba;
+import com.google.common.collect.ImmutableMap;
 import java.io.PrintWriter;
 
-/**
- *
- * @author lstephen
- */
+/** @author lstephen */
 public class LeagueBattingReport implements Printable {
 
   private final BattingStats stats;
@@ -26,20 +23,20 @@ public class LeagueBattingReport implements Printable {
     Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
 
     Double b =
-      BaseRuns.COEFFICIENT_SINGLE * stats.getSingles() +
-      BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles() +
-      BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples() +
-      BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns() +
-      BaseRuns.COEFFICIENT_WALK * stats.getWalks() +
-      BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts() +
-      BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
+        BaseRuns.COEFFICIENT_SINGLE * stats.getSingles()
+            + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
+            + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
+            + BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns()
+            + BaseRuns.COEFFICIENT_WALK * stats.getWalks()
+            + BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
+            + BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
 
     Double c = (double) stats.getOuts();
 
     Double d = (double) stats.getHomeRuns();
 
     Double z = (stats.getRuns() - d) / a;
-    bsrFactor = (z * c/(1 - z)) / b;
+    bsrFactor = (z * c / (1 - z)) / b;
   }
 
   @Override
@@ -62,19 +59,21 @@ public class LeagueBattingReport implements Printable {
     w.format("run3B: %.2f%n", run3B);
     w.format("runHR: %.2f%n", runHR);
 
-    Double runsMinus = (runBB * stats.getWalks()
-        + run1B * stats.getSingles()
-        + run2B * stats.getDoubles()
-        + run3B * stats.getTriples()
-        + runHR * stats.getHomeRuns())
-      / stats.getOuts();
+    Double runsMinus =
+        (runBB * stats.getWalks()
+                + run1B * stats.getSingles()
+                + run2B * stats.getDoubles()
+                + run3B * stats.getTriples()
+                + runHR * stats.getHomeRuns())
+            / stats.getOuts();
 
-    Double runsPlus = (runBB * stats.getWalks()
-        + run1B * stats.getSingles()
-        + run2B * stats.getDoubles()
-        + run3B * stats.getTriples()
-        + runHR * stats.getHomeRuns())
-      / (stats.getWalks() + stats.getHits());
+    Double runsPlus =
+        (runBB * stats.getWalks()
+                + run1B * stats.getSingles()
+                + run2B * stats.getDoubles()
+                + run3B * stats.getTriples()
+                + runHR * stats.getHomeRuns())
+            / (stats.getWalks() + stats.getHits());
 
     Double wobaScale = 1 / (runsPlus + runsMinus);
 
@@ -86,7 +85,6 @@ public class LeagueBattingReport implements Printable {
     w.format("runs-: %.2f%n", runsMinus);
     w.format("runs+: %.2f%n", runsPlus);
     w.format("wobas: %.2f%n", wobaScale);
-
 
     Double wobaBB = (runBB + runsMinus) * wobaScale;
     Double woba1B = (run1B + runsMinus) * wobaScale;
@@ -101,14 +99,14 @@ public class LeagueBattingReport implements Printable {
     w.format("woba3B: %.2f%n", woba3B);
     w.format("wobaHR: %.2f%n", wobaHR);
 
-    Woba.setConstants(ImmutableMap
-        .<Woba.Event, Double>builder()
-        .put(Woba.Event.WALK, wobaBB)
-        .put(Woba.Event.SINGLE, woba1B)
-        .put(Woba.Event.DOUBLE, woba2B)
-        .put(Woba.Event.TRIPLE, woba3B)
-        .put(Woba.Event.HOME_RUN, wobaHR)
-        .build());
+    Woba.setConstants(
+        ImmutableMap.<Woba.Event, Double>builder()
+            .put(Woba.Event.WALK, wobaBB)
+            .put(Woba.Event.SINGLE, woba1B)
+            .put(Woba.Event.DOUBLE, woba2B)
+            .put(Woba.Event.TRIPLE, woba3B)
+            .put(Woba.Event.HOME_RUN, wobaHR)
+            .build());
 
     w.println();
 
@@ -160,19 +158,18 @@ public class LeagueBattingReport implements Printable {
     return baseRuns(stats.add(plusOne)) - stats.getRuns();
   }
 
-
   private Double baseRuns(BattingStats stats) {
 
     Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
 
     Double b =
-      BaseRuns.COEFFICIENT_SINGLE * stats.getSingles() +
-      BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles() +
-      BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples() +
-      BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns() +
-      BaseRuns.COEFFICIENT_WALK * stats.getWalks() +
-      BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts() +
-      BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
+        BaseRuns.COEFFICIENT_SINGLE * stats.getSingles()
+            + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
+            + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
+            + BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns()
+            + BaseRuns.COEFFICIENT_WALK * stats.getWalks()
+            + BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
+            + BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
 
     Double c = (double) stats.getOuts();
 
@@ -180,11 +177,10 @@ public class LeagueBattingReport implements Printable {
 
     b = bsrFactor * b;
 
-    return a * b/(b+c) + d;
+    return a * b / (b + c) + d;
   }
 
   public static LeagueBattingReport create(Site site) {
     return new LeagueBattingReport(site.getLeagueBatting());
   }
-
 }
