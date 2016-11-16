@@ -11,15 +11,13 @@ import Scalaz._
 
 import collection.JavaConversions._
 
-class InLineupScore
-  (player: Player, position: Position, vs: Option[VsHand] = None)
-  (implicit predictor: Predictor)
-  extends Scoreable {
+class InLineupScore(player: Player, position: Position, vs: Option[VsHand] = None)(implicit predictor: Predictor)
+    extends Scoreable {
 
   val name = player.getShortName
 
   val hitting: Score = vs match {
-    case None     => predictor.predictBatting(player).overall
+    case None => predictor.predictBatting(player).overall
     case Some(vs) => Score(vs.getStats(predictor, player).getWobaPlus)
   }
 

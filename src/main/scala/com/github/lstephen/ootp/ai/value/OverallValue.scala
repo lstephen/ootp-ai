@@ -5,11 +5,8 @@ import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.score._
 
-class OverallValue
-  (val player: Player, position: Option[Position] = None)
-  (implicit val predictor: Predictor)
-  extends Scoreable
-  {
+class OverallValue(val player: Player, position: Option[Position] = None)(implicit val predictor: Predictor)
+    extends Scoreable {
 
   val now = position match {
     case None => NowValue(player).score

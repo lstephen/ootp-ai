@@ -19,8 +19,7 @@ import scalaz.CaseInsensitive
   new Type(classOf[OneToTwenty]),
   new Type(value = classOf[Potential], name = "PotentialRating$RatingScale"),
   new Type(classOf[TwoToEight]),
-  new Type(classOf[ZeroToTen])
-))
+  new Type(classOf[ZeroToTen])))
 trait Scale[T] {
   def parse(s: String): Rating[T, _ <: Scale[T]]
   def normalize(v: T): Rating[Integer, OneToOneHundred]
@@ -52,11 +51,10 @@ case class AToE() extends StringScale(
 case class Potential() extends StringScale(
   Map(
     "Brilliant" -> 90,
-    "Good"      -> 70,
-    "Average"   -> 50,
-    "Fair"      -> 30,
-    "Poor"      -> 10
-  ))
+    "Good" -> 70,
+    "Average" -> 50,
+    "Fair" -> 30,
+    "Poor" -> 10))
 
 @JsonIgnoreProperties(Array("ratings"))
 class StringScale(rs: Map[String, Integer]) extends Scale[String] {

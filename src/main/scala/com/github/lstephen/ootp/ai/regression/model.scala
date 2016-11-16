@@ -10,7 +10,6 @@ trait Model {
   def train(ds: DataSet): Predict
 }
 
-
 class CompositeModel(ms: Seq[Model]) extends Model {
 
   def train(ds: DataSet) = {

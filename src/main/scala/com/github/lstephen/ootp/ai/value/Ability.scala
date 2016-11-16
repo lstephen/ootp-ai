@@ -10,10 +10,8 @@ trait ComponentScore extends Scoreable {
   def score: Score = components.total //map(_.getOrElse(Score.zero)).total
 }
 
-class Ability
-  (val player: Player, val position: Position)
-  (implicit val predictor: Predictor)
-  extends ComponentScore {
+class Ability(val player: Player, val position: Position)(implicit val predictor: Predictor)
+    extends ComponentScore {
 
   val batting: Option[Score] = None
   val pitching: Option[Score] = None

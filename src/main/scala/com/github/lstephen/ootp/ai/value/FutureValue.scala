@@ -23,7 +23,6 @@ trait PitcherFutureAbility { this: Ability =>
   override val pitching = Some(endurance *: predictor.predictFuturePitching(player).overall)
 }
 
-
 object FutureAbility {
   def apply(p: Player, pos: Position)(implicit ps: Predictor): Ability = {
     if (p.getAge < 27) {
@@ -37,20 +36,18 @@ object FutureAbility {
   }
 }
 
-class FutureValue
-  (val player: Player, val position: Position)
-  (implicit val predictor: Predictor)
-  extends ComponentScore {
+class FutureValue(val player: Player, val position: Position)(implicit val predictor: Predictor)
+    extends ComponentScore {
 
   val ability = FutureAbility(player, position)
 
   val vsReplacement =
-   if (player.getAge < 27) {
-     val vsCurrent = ReplacementLevels.getForIdeal.get(ability)
-     val vsAverage = ReplacementLevels.getForIdeal.getVsAverage(ability);
+    if (player.getAge < 27) {
+      val vsCurrent = ReplacementLevels.getForIdeal.get(ability)
+      val vsAverage = ReplacementLevels.getForIdeal.getVsAverage(ability);
 
-     Some(List(vsCurrent, vsAverage).average)
-   } else
+      Some(List(vsCurrent, vsAverage).average)
+    } else
       None
 
   def components = ability.components :+ vsReplacement

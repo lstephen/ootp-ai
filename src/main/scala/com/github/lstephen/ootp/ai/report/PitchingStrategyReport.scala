@@ -17,9 +17,9 @@ class PitchingStrategyReport(rotation: Rotation)(implicit predictor: Predictor) 
 
   val bullpenNowAbility =
     (chainValues, rotation.get(Role.CL, Role.SU, Role.MR))
-        .zipped
-        .map(_ *: predictor.predictPitching(_).overall)
-        .average
+      .zipped
+      .map(_ *: predictor.predictPitching(_).overall)
+      .average
 
   def print(w: PrintWriter): Unit = {
     w.println

@@ -13,7 +13,6 @@ import collection.JavaConversions._
 
 import java.io.PrintWriter
 
-
 class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) extends Printable {
   private def get(pos: Position): Score =
     levels.get(pos).getOrElse(throw new IllegalStateException())
@@ -34,10 +33,8 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor) ex
     else
       a.score - level
 
-
   def print(w: PrintWriter): Unit = {
-    def printLevel(p: Position): Unit
-      = w.println(f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d")
+    def printLevel(p: Position): Unit = w.println(f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d")
 
     w.println
     Position.hitting.foreach(printLevel(_))
@@ -60,8 +57,7 @@ object ReplacementLevels {
   def getFor(r: Roster)(implicit ps: Predictor): ReplacementLevels = {
     new ReplacementLevels(
       (Position.hitting ++ Position.pitching).foldLeft(Map.empty[Position, Score])(
-        (m, pos) => m + (pos -> top(r)(NowAbility(_, pos).score))
-      ))
+        (m, pos) => m + (pos -> top(r)(NowAbility(_, pos).score))))
   }
 
   def top[S](r: Roster)(f: Player => S)(implicit ps: Predictor, ord: Ordering[S]): S =

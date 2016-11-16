@@ -28,8 +28,6 @@ class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
       .take(1)
   }
 
-
-
   def release: List[Player] = {
     if (roster.isSmall) return List()
 

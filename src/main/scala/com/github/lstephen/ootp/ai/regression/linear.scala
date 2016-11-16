@@ -16,10 +16,10 @@ class LinearRegressionModel extends Model with StrictLogging {
 
     val regressions = (0 to (ds.features - 1))
       .map { idx =>
-        ds.toList.foldLeft(new SimpleRegression(true)) { (r,d) =>
+        ds.toList.foldLeft(new SimpleRegression(true)) { (r, d) =>
           d.input.get(idx) match {
             case Some(n) => r.addData(n, d.output)
-            case None    => ()
+            case None => ()
           }
           r
         }

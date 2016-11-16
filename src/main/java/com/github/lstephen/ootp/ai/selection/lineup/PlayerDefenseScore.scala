@@ -8,7 +8,7 @@ import com.github.lstephen.ootp.ai.score._
 import collection.JavaConversions._
 
 class PlayerDefenseScore(defensiveRatings: DefensiveRatings, position: Position, useBaseline: Boolean = true)
-  extends Scoreable {
+    extends Scoreable {
 
   def this(ply: Player, pos: Position) = this(ply.getDefensiveRatings, pos)
 
@@ -35,12 +35,12 @@ object PlayerDefenseScore {
         case Some(r) =>
           newRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
           newRosterBaseline.getOrElse(throw new IllegalStateException)
-        case None   => oldRosterBaseline.getOrElse {
+        case None => oldRosterBaseline.getOrElse {
           Context.oldRoster match {
             case Some(r) =>
               oldRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
               oldRosterBaseline.getOrElse(throw new IllegalStateException)
-            case None    => throw new RuntimeException("No rosters set")
+            case None => throw new RuntimeException("No rosters set")
           }
         }
       }
