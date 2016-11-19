@@ -139,7 +139,7 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public Iterable<Player> getAllPlayers() {
-    return PlayerList.allPlayers(this).extract();
+    return Sets.newHashSet(Iterables.concat(PlayerList.allPlayers(this).extract(), PlayerList.draft(this).extract(), PlayerList.freeAgents(this).extract()));
   }
 
   @Override
