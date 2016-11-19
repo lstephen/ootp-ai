@@ -58,7 +58,7 @@ public final class DraftReport implements Printable {
       }
     }
 
-    currentPlayersSorted = byOverall(predictor).immutableSortedCopy(current.getPlayers());
+    currentPlayersSorted = byOverall(new Predictor(current.getPlayers(), predictor)).immutableSortedCopy(current.getPlayers());
 
     historicalPlayersSorted =
         historical
