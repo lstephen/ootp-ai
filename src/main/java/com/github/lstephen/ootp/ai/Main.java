@@ -228,6 +228,9 @@ public class Main {
     final PitchingRegression pitchingRegression = PitchingRegression.run(site);
     Printables.print(pitchingRegression.correlationReport()).to(out);
 
+    LOG.info("Setting up Predictions...");
+    final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression);
+
     pcts.print(out);
 
     SplitStats.setPercentages(pcts);
@@ -239,9 +242,6 @@ public class Main {
     Changes changes = Changes.load(site);
 
     team.processManualChanges(changes);
-
-    LOG.info("Setting up Predictions...");
-    final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression);
 
     boolean isExpandedRosters = site.getDate().getMonthOfYear() == DateTimeConstants.SEPTEMBER;
 
@@ -443,10 +443,6 @@ public class Main {
       generic.setTitle("Waive");
       generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
-    }
-
-    if (battingRegression.isEmpty() || pitchingRegression.isEmpty()) {
-      return;
     }
 
     if (def.getName().equals("BTHUSTLE")) {
