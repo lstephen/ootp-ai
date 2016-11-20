@@ -143,7 +143,7 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
-  public Iterable<Player> getDraft() {
+  public Collection<Player> getDraft() {
     return PlayerList.draft(this).extract();
   }
 

@@ -4,6 +4,7 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.extract.html.Page;
+import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public final class PlayerList {
     this(site, site.getPage(url));
   }
 
-  public Iterable<Player> extract() {
+  public Collection<Player> extract() {
     return site.getPlayers(extractIds());
   }
 

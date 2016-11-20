@@ -32,7 +32,7 @@ public interface Site {
 
   Iterable<Player> getAllPlayers();
 
-  Iterable<Player> getDraft();
+  Collection<Player> getDraft();
 
   Iterable<Player> getFreeAgents();
 

@@ -44,7 +44,7 @@ public final class DraftReport implements Printable {
   }
 
   private void loadDraftClasses() {
-    current = DraftClass.load(getDraftClassFile(site.getDate().getYear()), site.getDefinition());
+    current = DraftClass.create(site.getDraft());
 
     site.getDraft().forEach(current::addIfNotPresent);
 
