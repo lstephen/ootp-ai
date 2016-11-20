@@ -221,6 +221,11 @@ public class Main {
 
     SplitPercentages pcts = SplitPercentages.create(site);
     SplitPercentagesHolder.set(pcts);
+    SplitStats.setPercentages(pcts);
+    PlayerRatings.setPercentages(pcts);
+    BestStartersSelection.setPercentages(pcts);
+    Bench.setPercentages(pcts);
+    pcts.print(out);
 
     final BattingRegression battingRegression = BattingRegression.run(site);
     Printables.print(battingRegression.correlationReport()).to(out);
@@ -230,13 +235,6 @@ public class Main {
 
     LOG.info("Setting up Predictions...");
     final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression);
-
-    pcts.print(out);
-
-    SplitStats.setPercentages(pcts);
-    PlayerRatings.setPercentages(pcts);
-    BestStartersSelection.setPercentages(pcts);
-    Bench.setPercentages(pcts);
 
     LOG.info("Loading manual changes...");
     Changes changes = Changes.load(site);

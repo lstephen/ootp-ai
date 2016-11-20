@@ -44,7 +44,7 @@ public final class DraftReport implements Printable {
   }
 
   private void loadDraftClasses() {
-    current = DraftClass.load(getDraftClassFile(site.getDate().getYear()), site.getDefinition());
+    current = DraftClass.create(site.getDraft());
 
     site.getDraft().forEach(current::addIfNotPresent);
 
@@ -58,7 +58,7 @@ public final class DraftReport implements Printable {
       }
     }
 
-    currentPlayersSorted = byOverall(new Predictor(current.getPlayers(), predictor)).immutableSortedCopy(current.getPlayers());
+    currentPlayersSorted = byOverall(predictor).immutableSortedCopy(current.getPlayers());
 
     historicalPlayersSorted =
         historical
