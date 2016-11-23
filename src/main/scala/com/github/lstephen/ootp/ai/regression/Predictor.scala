@@ -29,8 +29,8 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
     }
   }
 
-  val batting = time("batting", ps.map(p => (p, new BattingPrediction(br predict p))).toMap)
-  val battingFuture = time("battingFuture", ps.map(p => (p, new BattingPrediction(br predictFuture p))).toMap)
+  val batting = time("batting", br.predict(ps).mapValues(new BattingPrediction(_)))
+  val battingFuture = time("battingFuture", br.predictFuture(ps).mapValues(new BattingPrediction(_)))
 
   val pitching = time("pitching", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predict p))).toMap)
   val pitchingFuture = time("pitchingFuture", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predictFuture p))).toMap)
@@ -45,22 +45,20 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
   def predictFuturePitching(p: Player): PitchingPrediction = getPrediction(pitchingFuture, p)
 
   def correlationReport: Printable = new Printable { def print(w: PrintWriter) = {
-    br.correlationReport().print(w)
+    br.correlationReport.print(w)
     pr.correlationReport().print(w)
   }}
 
   def this(ps: Seq[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 
   // Java compatability
-  def this(ps: java.lang.Iterable[Player], br: BattingRegression, pr: PitchingRegression) =
-    this(ps.asScala.toSeq, br, pr)
+  def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps.asScala.toSeq, pr.br, pr.pr)
 
-  def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 }
 
 object Predictor {
   def train(site: Site): Predictor =
-    new Predictor(site.getAllPlayers(), BattingRegression.run(site), PitchingRegression.run(site))
+    new Predictor(site.getAllPlayers().asScala.toSeq, new BattingRegression(site), PitchingRegression.run(site))
 
 }
 

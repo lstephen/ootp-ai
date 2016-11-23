@@ -215,7 +215,7 @@ public class Main {
     Context$.MODULE$.oldRoster_$eq(oldRoster);
     Team team = site.extractTeam();
 
-    LOG.log(Level.INFO, "Running regressions...");
+    LOG.log(Level.INFO, "Calculating SplitPercentages...");
 
     SplitPercentages pcts = SplitPercentages.create(site);
     SplitPercentagesHolder.set(pcts);
@@ -225,7 +225,7 @@ public class Main {
     Bench.setPercentages(pcts);
     pcts.print(out);
 
-    LOG.info("Setting up Predictions...");
+    LOG.info("Training regressions and running predictions...");
     final Predictor predictor = Predictor$.MODULE$.train(site);
     Printables.print(predictor.correlationReport()).to(out);
 
