@@ -65,6 +65,8 @@ public final class SiteImpl implements Site, SalarySource {
 
   private ImmutableSet<PlayerId> injured;
 
+  private ImmutableSet<Player> allPlayers;
+
   private SiteImpl(SiteDefinition def, PlayerSource players) {
     this.definition = def;
     this.players = players;
@@ -138,8 +140,16 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
-  public Iterable<Player> getAllPlayers() {
-    return Sets.newHashSet(Iterables.concat(PlayerList.allPlayers(this).extract(), PlayerList.draft(this).extract(), PlayerList.freeAgents(this).extract()));
+  public synchronized Iterable<Player> getAllPlayers() {
+    if (allPlayers == null) {
+      allPlayers =
+          ImmutableSet.copyOf(
+              Iterables.concat(
+                  PlayerList.allPlayers(this).extract(),
+                  PlayerList.draft(this).extract(),
+                  PlayerList.freeAgents(this).extract()));
+    }
+    return allPlayers;
   }
 
   @Override

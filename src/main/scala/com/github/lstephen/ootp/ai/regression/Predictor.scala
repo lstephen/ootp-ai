@@ -1,12 +1,16 @@
 package com.github.lstephen.ootp.ai.regression
 
+import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.score._
+import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.stats.BattingStats
 import com.github.lstephen.ootp.ai.stats.PitchingStats
 import com.github.lstephen.ootp.ai.stats.SplitStats
 
 import com.typesafe.scalalogging.LazyLogging
+
+import java.io.PrintWriter
 
 import humanize.Humanize
 
@@ -40,6 +44,11 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
   def predictPitching(p: Player): PitchingPrediction = getPrediction(pitching, p)
   def predictFuturePitching(p: Player): PitchingPrediction = getPrediction(pitchingFuture, p)
 
+  def correlationReport: Printable = new Printable { def print(w: PrintWriter) = {
+    br.correlationReport().print(w)
+    pr.correlationReport().print(w)
+  }}
+
   def this(ps: Seq[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 
   // Java compatability
@@ -47,6 +56,12 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
     this(ps.asScala.toSeq, br, pr)
 
   def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
+}
+
+object Predictor {
+  def train(site: Site): Predictor =
+    new Predictor(site.getAllPlayers(), BattingRegression.run(site), PitchingRegression.run(site))
+
 }
 
 class BattingPrediction(stats: SplitStats[BattingStats]) {
