@@ -28,8 +28,8 @@ object Regressable {
   // Note that this is java.lang.Integer
   def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
-  implicit object RegressableBattingRatings extends Regressable[BattingRatings[_ <: Object]] {
-    def toInput(r: BattingRatings[_ <: Object]) = {
+  implicit object RegressableBattingRatings extends Regressable[BattingRatings[_]] {
+    def toInput(r: BattingRatings[_]) = {
       var extras = List(r.getK, r.getRunningSpeed)
         .map { o => if (o.isPresent) Some(o.get.doubleValue) else None }
 
@@ -37,10 +37,10 @@ object Regressable {
     }
   }
 
-  implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_ <: Object]] {
+  implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_]] {
     val version = SiteHolder.get.getType
 
-    def toInput(r: PitchingRatings[_ <: Object]) = {
+    def toInput(r: PitchingRatings[_]) = {
       var as: Input =
         Input(r.getMovement, r.getControl, r.getStuff)
 
@@ -82,6 +82,8 @@ class Regression(label: String, category: String) extends StrictLogging {
     data = data :+ new DataPoint(regressable.toInput(x), y)
     _regression = None
   }
+
+  def train: Unit = regression
 
   def getN: Long = data.length
 
