@@ -14,8 +14,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import java.io.PrintWriter;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
@@ -54,10 +57,6 @@ public final class BattingRegression {
     return regressions.get(p);
   }
 
-  public Boolean isEmpty() {
-    return getRegression(Predicting.HITS).getN() == 0;
-  }
-
   private void addData(TeamStats<BattingStats> teamStats) {
     for (Player p : teamStats.getPlayers()) {
       Splits<BattingStats> stats = teamStats.getSplits(p);
@@ -90,41 +89,30 @@ public final class BattingRegression {
     return Math.max(0, getRegression(predicting).predictBatting(rating));
   }
 
-  public TeamStats<BattingStats> predict(Iterable<Player> ps) {
-    Map<Player, SplitStats<BattingStats>> results = Maps.newHashMap();
-
-    for (Player p : ps) {
-      if (p.getBattingRatings() != null) {
-        results.put(p, predict(p));
-      }
-    }
-
-    return TeamStats.create(results);
+  public Map<Player, SplitStats<BattingStats>> predict(Collection<Player> players) {
+    return players.parallelStream()
+      .map(p -> new SimpleImmutableEntry<>(p, predict(p)))
+      .collect(Collectors.toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
   }
 
-  public SplitStats<BattingStats> predict(Player p) {
+  private SplitStats<BattingStats> predict(Player p) {
     return predict(p.getBattingRatings());
   }
 
-  public SplitStats<BattingStats> predictFuture(Player p) {
+  // Don't DRY with predict yet, since we want to rewrite to do predictions in batch anyway
+  public Map<Player, SplitStats<BattingStats>> predictFuture(Collection<Player> players) {
+    return players.parallelStream()
+      .map(p -> new SimpleImmutableEntry<>(p, predict(p)))
+      .collect(Collectors.toMap(SimpleImmutableEntry::getKey, SimpleImmutableEntry::getValue));
+  }
+
+  private SplitStats<BattingStats> predictFuture(Player p) {
     return SplitStats.create(
         predict(p.getBattingPotentialRatings().getVsLeft()),
         predict(p.getBattingPotentialRatings().getVsRight()));
   }
 
-  public TeamStats<BattingStats> predictFuture(Iterable<Player> ps) {
-    Map<Player, SplitStats<BattingStats>> results = Maps.newHashMap();
-
-    for (Player p : ps) {
-      if (p.getBattingRatings() != null) {
-        results.put(p, predictFuture(p));
-      }
-    }
-
-    return TeamStats.create(results);
-  }
-
-  public SplitStats<BattingStats> predict(Splits<? extends BattingRatings<?>> ratings) {
+  private SplitStats<BattingStats> predict(Splits<? extends BattingRatings<?>> ratings) {
     Long paToProject = DEFAULT_PLATE_APPEARANCES;
 
     Long vsRightPa = Math.round(paToProject * SplitPercentagesHolder.get().getVsRhpPercentage());
@@ -135,11 +123,11 @@ public final class BattingRegression {
         predict(ratings.getVsRight(), vsRightPa * 100));
   }
 
-  public BattingStats predict(BattingRatings<?> ratings) {
+  private BattingStats predict(BattingRatings<?> ratings) {
     return predict(ratings, DEFAULT_PLATE_APPEARANCES);
   }
 
-  public BattingStats predict(BattingRatings<?> ratings, Long plateAppearances) {
+  private BattingStats predict(BattingRatings<?> ratings, Long plateAppearances) {
 
     long predictedHits = Math.round(plateAppearances * predict(Predicting.HITS, ratings));
 

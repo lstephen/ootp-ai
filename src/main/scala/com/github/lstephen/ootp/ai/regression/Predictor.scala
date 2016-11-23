@@ -15,6 +15,7 @@ import java.io.PrintWriter
 import humanize.Humanize
 
 import scala.collection.JavaConverters._
+import collection.JavaConverters._
 
 class Predictor(ps: Seq[Player], private val br: BattingRegression, private val pr: PitchingRegression) extends LazyLogging {
 
@@ -29,8 +30,8 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
     }
   }
 
-  val batting = time("batting", ps.map(p => (p, new BattingPrediction(br predict p))).toMap)
-  val battingFuture = time("battingFuture", ps.map(p => (p, new BattingPrediction(br predictFuture p))).toMap)
+  val batting = time("batting", br.predict(ps.asJava).asScala.toMap.mapValues(new BattingPrediction(_)))
+  val battingFuture = time("battingFuture", br.predictFuture(ps.asJava).asScala.toMap.mapValues(new BattingPrediction(_)))
 
   val pitching = time("pitching", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predict p))).toMap)
   val pitchingFuture = time("pitchingFuture", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predictFuture p))).toMap)
