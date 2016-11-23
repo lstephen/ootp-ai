@@ -7,9 +7,8 @@ import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.ootp5.report.SpringTraining;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
-import com.github.lstephen.ootp.ai.regression.BattingRegression;
-import com.github.lstephen.ootp.ai.regression.PitchingRegression;
 import com.github.lstephen.ootp.ai.regression.Predictor;
+import com.github.lstephen.ootp.ai.regression.Predictor$;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
@@ -206,8 +205,7 @@ public class Main {
         .forEach(Page::load);
 
     LOG.log(Level.INFO, "Warming player cache...");
-    site.getPage("pagents.html").load();
-    Iterable<Player> allPlayers = site.getAllPlayers();
+    site.getAllPlayers();
 
     Printables.print(LeagueBattingReport.create(site)).to(out);
 
@@ -227,14 +225,9 @@ public class Main {
     Bench.setPercentages(pcts);
     pcts.print(out);
 
-    final BattingRegression battingRegression = BattingRegression.run(site);
-    Printables.print(battingRegression.correlationReport()).to(out);
-
-    final PitchingRegression pitchingRegression = PitchingRegression.run(site);
-    Printables.print(pitchingRegression.correlationReport()).to(out);
-
     LOG.info("Setting up Predictions...");
-    final Predictor predictor = new Predictor(allPlayers, battingRegression, pitchingRegression);
+    final Predictor predictor = Predictor$.MODULE$.train(site);
+    Printables.print(predictor.correlationReport()).to(out);
 
     LOG.info("Loading manual changes...");
     Changes changes = Changes.load(site);
