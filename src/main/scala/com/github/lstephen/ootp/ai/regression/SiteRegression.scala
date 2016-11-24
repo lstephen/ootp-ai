@@ -133,8 +133,9 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
         val ratings = getRatings(p)
 
         if (ratings == null) {
-          logger.warn(s"No ratings for ${p.getShortName} (${p.getId}) aged ${p.getAge}")
-        } else  {
+          logger.warn(
+            s"No ratings for ${p.getShortName} (${p.getId}) aged ${p.getAge}")
+        } else {
           addEntry(stats.getVsLeft(), ratings.getVsLeft())
           addEntry(stats.getVsRight(), ratings.getVsRight())
         }
@@ -163,7 +164,7 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
   def predict(ps: Seq[Player], f: (Player => Splits[_ <: R]) = getRatings(_))
     : Map[Player, SplitStats[S]] =
-      (ps, predict(ps map f)).zipped.toMap
+    (ps, predict(ps map f)).zipped.toMap
 
   def predictFuture(ps: Seq[Player]): Map[Player, SplitStats[S]] =
     predict(ps, getPotentialRatings(_))
