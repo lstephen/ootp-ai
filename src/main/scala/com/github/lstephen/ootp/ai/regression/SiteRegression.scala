@@ -2,17 +2,13 @@ package com.github.lstephen.ootp.ai.regression
 
 import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
-import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
-import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings
+import com.github.lstephen.ootp.ai.player.ratings.{
+  BattingRatings,
+  PitchingRatings
+}
 import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.splits.Splits
-import com.github.lstephen.ootp.ai.stats.BattingStats
-import com.github.lstephen.ootp.ai.stats.History
-import com.github.lstephen.ootp.ai.stats.PitchingStats
-import com.github.lstephen.ootp.ai.stats.SplitPercentagesHolder
-import com.github.lstephen.ootp.ai.stats.SplitStats
-import com.github.lstephen.ootp.ai.stats.Stats
-import com.github.lstephen.ootp.ai.stats.TeamStats
+import com.github.lstephen.ootp.ai.stats._
 
 import java.io.PrintWriter
 
@@ -20,21 +16,15 @@ import org.apache.commons.math3.stat.regression.SimpleRegression
 
 import scala.collection.JavaConverters._
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 import scala.math._
 
+import com.typesafe.scalalogging.LazyLogging
+
 import Regressable._
-
-/*trait RegressionDefinition {
-  type Stats
-  type Ratings
-
-  abstract def getTeamStats(s: Site): TeamStats[Stats]
-}*/
 
 case class RegressOn[S](val name: String,
                         val getStat: S => Double,
@@ -106,7 +96,7 @@ class PitchingRegression(site: Site) extends SiteRegression(site) {
     h.loadPitching(site, currentSeason, 5).asScala.toSeq
 }
 
-abstract class SiteRegression(site: Site) {
+abstract class SiteRegression(site: Site) extends LazyLogging {
   type R
   type S <: Stats[S]
 
@@ -133,18 +123,21 @@ abstract class SiteRegression(site: Site) {
       rs.get(r.name).getOrElse(throw new IllegalArgumentException(r.name))
 
     def addEntry(stats: S, ratings: R): Unit =
-      (1 to stats.getPlateAppearances).foreach { _ =>
+      (1 to stats.getPlateAppearances).foreach(_ =>
         regressOn.foreach(r =>
-          getRegression(r).addData(ratings, r.getStat(stats)))
-      }
+          getRegression(r).addData(ratings, r.getStat(stats))))
 
     def addData(teamStats: TeamStats[S]): Unit =
       teamStats.getPlayers().asScala.foreach { p =>
         val stats = teamStats.getSplits(p)
         val ratings = getRatings(p)
 
-        addEntry(stats.getVsLeft(), ratings.getVsLeft())
-        addEntry(stats.getVsRight(), ratings.getVsRight())
+        if (ratings == null) {
+          logger.warn(s"No ratings for ${p.getShortName} (${p.getId}) aged ${p.getAge}")
+        } else  {
+          addEntry(stats.getVsLeft(), ratings.getVsLeft())
+          addEntry(stats.getVsRight(), ratings.getVsRight())
+        }
       }
 
     addData(stats)
@@ -170,30 +163,32 @@ abstract class SiteRegression(site: Site) {
 
   def predict(ps: Seq[Player], f: (Player => Splits[_ <: R]) = getRatings(_))
     : Map[Player, SplitStats[S]] =
-    ps.par.map(p => p -> predict(f(p))).seq.toMap
+      (ps, predict(ps map f)).zipped.toMap
 
   def predictFuture(ps: Seq[Player]): Map[Player, SplitStats[S]] =
     predict(ps, getPotentialRatings(_))
 
-  def predict(ratings: Splits[_ <: R]): SplitStats[S] = {
+  def predict(ratings: Seq[Splits[_ <: R]]): Seq[SplitStats[S]] = {
     val vsRightPa = round(
       defaultPlateAppearances * SplitPercentagesHolder.get.getVsRhpPercentage)
     val vsLeftPa = defaultPlateAppearances - vsRightPa
 
-    SplitStats.create(predict(ratings.getVsLeft, vsLeftPa * 100),
-                      predict(ratings.getVsRight, vsRightPa * 100))
+    val vsLeft = predict(ratings.map(_.getVsLeft), vsLeftPa * 100)
+    val vsRight = predict(ratings.map(_.getVsRight), vsRightPa * 100)
+
+    (vsLeft, vsRight).zipped.map(SplitStats.create(_, _))
   }
 
-  def predict(ratings: R, pas: Long): S = {
-    def p(ro: RegressOn[_]) = round(pas * predict(ro, ratings))
+  def predict(ratings: Seq[R], pas: Long): Seq[S] = {
+    ratings.par.map { r =>
+      val s = newStats
 
-    val s = newStats
+      regressOn.foreach(ro => ro.setStat(s, round(pas * predict(ro, r))))
 
-    regressOn.foreach(ro => ro.setStat(s, p(ro)))
+      s.setPlateAppearances(pas.toInt)
 
-    s.setPlateAppearances(pas.toInt)
-
-    s
+      s
+    }.seq
   }
 
   def predict(ro: RegressOn[_], r: R): Double =
