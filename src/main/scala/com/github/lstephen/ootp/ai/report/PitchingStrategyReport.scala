@@ -12,12 +12,12 @@ import java.io.PrintWriter;
 
 import collection.JavaConversions._
 
-class PitchingStrategyReport(rotation: Rotation)(implicit predictor: Predictor) extends Printable {
+class PitchingStrategyReport(rotation: Rotation)(implicit predictor: Predictor)
+    extends Printable {
   val chainValues = List(1.8, 1.3, 1.0, 0.9, 0.8, 0.8, 0.6)
 
   val bullpenNowAbility =
-    (chainValues, rotation.get(Role.CL, Role.SU, Role.MR))
-      .zipped
+    (chainValues, rotation.get(Role.CL, Role.SU, Role.MR)).zipped
       .map(_ *: predictor.predictPitching(_).overall)
       .average
 
@@ -31,7 +31,8 @@ class PitchingStrategyReport(rotation: Rotation)(implicit predictor: Predictor) 
     w println "--- Slow Hook ---"
     rotation
       .get(Role.SP)
-      .filter(NowAbility(_, Position.STARTING_PITCHER).score > bullpenNowAbility)
+      .filter(
+        NowAbility(_, Position.STARTING_PITCHER).score > bullpenNowAbility)
       .foreach(w println _.getName)
   }
 }

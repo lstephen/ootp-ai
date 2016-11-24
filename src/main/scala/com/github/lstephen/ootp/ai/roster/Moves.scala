@@ -16,12 +16,12 @@ class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
     val fas = SiteHolder.get.getFreeAgents.toList
 
     val nows = fas.filter(NowValue(_).vsReplacement.orElseZero > Score.zero)
-    val alls = fas.filter(if (roster.isPitcherHeavy) _.isHitter else _.isPitcher)
+    val alls =
+      fas.filter(if (roster.isPitcherHeavy) _.isHitter else _.isPitcher)
 
     val dontAcquire = changes get Changes.ChangeType.DONT_ACQUIRE
 
-    (if (roster.isLarge) nows else nows ++ alls)
-      .distinct
+    (if (roster.isLarge) nows else nows ++ alls).distinct
       .filter(!dontAcquire.contains(_))
       .sortBy(OverallValue(_))
       .reverse
@@ -31,9 +31,7 @@ class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
   def release: List[Player] = {
     if (roster.isSmall) return List()
 
-    roster
-      .getAllPlayers
-      .toList
+    roster.getAllPlayers.toList
       .filter(if (roster.isPitcherHeavy) _.isPitcher else _.isHitter)
       .filter(roster.getStatus(_) != Roster.Status.ML)
       .sortBy(OverallValue(_))
@@ -44,4 +42,3 @@ class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
   def getRelease: java.util.List[Player] = release.asJava
 
 }
-

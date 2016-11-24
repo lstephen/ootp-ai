@@ -13,12 +13,14 @@ class Score(private val n: Double) extends AnyVal with Ordered[Score] {
   def +(that: Score) = Score(n + that.n)
   def -(that: Score) = Score(n - that.n)
 
-  def *:[N: Numeric](that: N): Score = Score(implicitly[Numeric[N]].toDouble(that) * n)
+  def *:[N: Numeric](that: N): Score =
+    Score(implicitly[Numeric[N]].toDouble(that) * n)
   def :/(that: Int) = Score(n / that)
 }
 
 object Score {
-  def apply[N: Numeric](n: N): Score = new Score(implicitly[Numeric[N]] toDouble n)
+  def apply[N: Numeric](n: N): Score =
+    new Score(implicitly[Numeric[N]] toDouble n)
   def apply(n: Number): Score = new Score(n.doubleValue)
 
   val zero: Score = Score(0)
@@ -34,8 +36,8 @@ object Score {
     def orElseZero = xs.getOrElse(Score.zero)
   }
 
-  implicit class TraversableOfOptionScore(xs: GenTraversableOnce[Option[Score]]) {
+  implicit class TraversableOfOptionScore(
+      xs: GenTraversableOnce[Option[Score]]) {
     def total = xs.foldLeft(zero)(_ + _.orElseZero)
   }
 }
-

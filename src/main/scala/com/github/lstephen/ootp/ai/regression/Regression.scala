@@ -15,7 +15,8 @@ import org.apache.spark.SparkContext
 import scala.math.ScalaNumericAnyConversions
 
 object Spark {
-  val context = new SparkContext(new SparkConf().setAppName("ootp-ai").setMaster("local"))
+  val context = new SparkContext(
+    new SparkConf().setAppName("ootp-ai").setMaster("local"))
 
   sys.ShutdownHookThread { context.stop }
 }
@@ -28,23 +29,28 @@ object Regressable {
   // Note that this is java.lang.Integer
   def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
-  implicit object RegressableBattingRatings extends Regressable[BattingRatings[_]] {
+  implicit object RegressableBattingRatings
+      extends Regressable[BattingRatings[_]] {
     def toInput(r: BattingRatings[_]) = {
-      var extras = List(r.getK, r.getRunningSpeed)
-        .map { o => if (o.isPresent) Some(o.get.doubleValue) else None }
+      var extras = List(r.getK, r.getRunningSpeed).map { o =>
+        if (o.isPresent) Some(o.get.doubleValue) else None
+      }
 
       Input(r.getContact, r.getGap, r.getPower, r.getEye) ++ new Input(extras)
     }
   }
 
-  implicit object RegressablePitchingRatings extends Regressable[PitchingRatings[_]] {
+  implicit object RegressablePitchingRatings
+      extends Regressable[PitchingRatings[_]] {
     val version = SiteHolder.get.getType
 
     def toInput(r: PitchingRatings[_]) = {
       var as: Input =
         Input(r.getMovement, r.getControl, r.getStuff)
 
-      as = as :+ (if (r.getGroundBallPct.isPresent) Some(r.getGroundBallPct.get.doubleValue) else None)
+      as = as :+ (if (r.getGroundBallPct.isPresent)
+                    Some(r.getGroundBallPct.get.doubleValue)
+                  else None)
 
       if (version == Version.OOTP5) {
         as = as ++ Input(r.getHits, r.getGap)
@@ -55,7 +61,7 @@ object Regressable {
   }
 }
 
-class Regression(label: String, category: String) extends StrictLogging {
+class Regression(label: String) extends StrictLogging {
 
   import Regressable._
 
@@ -69,7 +75,8 @@ class Regression(label: String, category: String) extends StrictLogging {
   def regression = _regression match {
     case Some(r) => r
     case None =>
-      logger.info(s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
+      logger.info(
+        s"Creating regression for $label, size: ${data.length}, averages: ${data.averages}")
 
       val p = model train data
 
@@ -93,7 +100,9 @@ class Regression(label: String, category: String) extends StrictLogging {
   def predict(xs: Input): Double = regression(xs)
 
   def mse =
-    (data.map { p => math.pow(p.output - predict(p.input), 2) }.sum) / data.length
+    (data.map { p =>
+      math.pow(p.output - predict(p.input), 2)
+    }.sum) / data.length
 
   def rsme = math.pow(mse, 0.5)
 
@@ -102,9 +111,9 @@ class Regression(label: String, category: String) extends StrictLogging {
   }
 
   // For Java interop
-  def addBattingData(x: BattingRatings[_ <: Object], y: Double): Unit = addData(x, y)(Regressable.RegressableBattingRatings)
-  def addPitchingData(x: PitchingRatings[_ <: Object], y: Double): Unit = addData(x, y)(Regressable.RegressablePitchingRatings)
+  def addPitchingData(x: PitchingRatings[_ <: Object], y: Double): Unit =
+    addData(x, y)(Regressable.RegressablePitchingRatings)
 
-  def predictBatting(x: BattingRatings[_ <: Object]): Double = predict(x)(Regressable.RegressableBattingRatings)
-  def predictPitching(x: PitchingRatings[_ <: Object]): Double = predict(x)(Regressable.RegressablePitchingRatings)
+  def predictPitching(x: PitchingRatings[_ <: Object]): Double =
+    predict(x)(Regressable.RegressablePitchingRatings)
 }

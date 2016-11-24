@@ -14,7 +14,9 @@ import java.io.PrintWriter
 
 import collection.JavaConversions._
 
-class HittingSelectionReport(roster: Roster)(implicit predictor: Predictor, stats: TeamStats[BattingStats]) extends Printable {
+class HittingSelectionReport(roster: Roster)(implicit predictor: Predictor,
+                                             stats: TeamStats[BattingStats])
+    extends Printable {
 
   def print(w: PrintWriter): Unit = {
     w.println()
@@ -33,9 +35,11 @@ class HittingSelectionReport(roster: Roster)(implicit predictor: Predictor, stat
     override def toString: String =
       s"$info| $hitting | $defense | $intangibles || $overall || $status |"
 
-    def info: String = f"${p.getPosition}%-2s ${p.getShortName}%-15s ${p.getAge}%2d"
+    def info: String =
+      f"${p.getPosition}%-2s ${p.getShortName}%-15s ${p.getAge}%2d"
 
-    def hitting: String = s"${hitting(VsHand.VS_LHP)} | ${hitting(VsHand.VS_RHP)}"
+    def hitting: String =
+      s"${hitting(VsHand.VS_LHP)} | ${hitting(VsHand.VS_RHP)}"
 
     def hitting(vs: VsHand): String = {
       val ps = vs.getStats(predictor, p)
@@ -60,4 +64,3 @@ class HittingSelectionReport(roster: Roster)(implicit predictor: Predictor, stat
     }
   }
 }
-

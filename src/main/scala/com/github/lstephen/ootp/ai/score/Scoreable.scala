@@ -16,4 +16,3 @@ object Scoreable {
     def total: Score = xs.map(_.score).total
   }
 }
-

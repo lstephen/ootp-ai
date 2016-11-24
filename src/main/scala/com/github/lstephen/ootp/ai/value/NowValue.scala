@@ -21,7 +21,8 @@ trait PitcherNowAbility { this: Ability =>
       (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
     }
   }
-  override val pitching = Some(endurance *: predictor.predictPitching(player).overall)
+  override val pitching = Some(
+    endurance *: predictor.predictPitching(player).overall)
 }
 
 object NowAbility {
@@ -35,12 +36,11 @@ object NowAbility {
   }
 
   def apply(p: Player)(implicit ps: Predictor): Ability =
-    (Position.hitting ++ Position.pitching)
-      .map(NowAbility(p, _))
-      .max
+    (Position.hitting ++ Position.pitching).map(NowAbility(p, _)).max
 }
 
-class NowValue(val player: Player, val position: Position)(implicit val predictor: Predictor)
+class NowValue(val player: Player, val position: Position)(
+    implicit val predictor: Predictor)
     extends ComponentScore {
 
   val ability = NowAbility(player, position)
@@ -53,7 +53,9 @@ class NowValue(val player: Player, val position: Position)(implicit val predicto
     components
       .map(_.map(s => f"${s.toLong}%3d"))
       .map(_.getOrElse("   "))
-      .mkString(f"${position.getAbbreviation}%2s : ", " ", f" : ${score.toLong}%3d")
+      .mkString(f"${position.getAbbreviation}%2s : ",
+                " ",
+                f" : ${score.toLong}%3d")
 }
 
 object NowValue {
@@ -61,8 +63,5 @@ object NowValue {
     new NowValue(p, pos)
 
   def apply(p: Player)(implicit ps: Predictor): NowValue =
-    (Position.hitting ++ Position.pitching)
-      .map(NowValue(p, _))
-      .max
+    (Position.hitting ++ Position.pitching).map(NowValue(p, _)).max
 }
-

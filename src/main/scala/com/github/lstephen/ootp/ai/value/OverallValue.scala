@@ -5,7 +5,8 @@ import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictor
 import com.github.lstephen.ootp.ai.score._
 
-class OverallValue(val player: Player, position: Option[Position] = None)(implicit val predictor: Predictor)
+class OverallValue(val player: Player, position: Option[Position] = None)(
+    implicit val predictor: Predictor)
     extends Scoreable {
 
   val now = position match {
@@ -21,7 +22,8 @@ class OverallValue(val player: Player, position: Option[Position] = None)(implic
   def age = {
     val base = 33 - Math.max(player.getAge, 27)
 
-    val oldAgePenalty = if (player.getAge <= 33) 0 else Math.pow(player.getAge - 33, 2)
+    val oldAgePenalty =
+      if (player.getAge <= 33) 0 else Math.pow(player.getAge - 33, 2)
 
     Score(base - oldAgePenalty)
   }
@@ -34,5 +36,6 @@ class OverallValue(val player: Player, position: Option[Position] = None)(implic
 
 object OverallValue {
   def apply(p: Player)(implicit predictor: Predictor) = new OverallValue(p)
-  def apply(p: Player, pos: Position)(implicit predictor: Predictor) = new OverallValue(p, Some(pos))
+  def apply(p: Player, pos: Position)(implicit predictor: Predictor) =
+    new OverallValue(p, Some(pos))
 }

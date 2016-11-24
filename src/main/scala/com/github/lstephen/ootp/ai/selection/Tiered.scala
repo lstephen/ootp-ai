@@ -8,11 +8,11 @@ import com.github.lstephen.ootp.ai.value.NowAbility
 import scala.collection.JavaConverters._
 import collection.JavaConversions._
 
-class Tiered(tiers: java.lang.Iterable[Position])(implicit predictor: Predictor) {
+class Tiered(tiers: java.lang.Iterable[Position])(
+    implicit predictor: Predictor) {
 
   def first(ps: List[Player]): List[Player] =
-    tiers
-      .toList
+    tiers.toList
       .map(pos => ps.maxBy(NowAbility(_, pos)))
       .distinct
       .sortBy(NowAbility(_))
@@ -30,6 +30,6 @@ class Tiered(tiers: java.lang.Iterable[Position])(implicit predictor: Predictor)
   def sort(ps: List[Player]): List[Player] = group(ps).flatten
   def take(ps: List[Player], n: Int): List[Player] = sort(ps).take(n)
 
-  def takeAsJava(ps: java.lang.Iterable[Player], n: Int) = take(ps.toList, n).asJava
+  def takeAsJava(ps: java.lang.Iterable[Player], n: Int) =
+    take(ps.toList, n).asJava
 }
-

@@ -16,7 +16,9 @@ import collection.JavaConversions._
 class BenchScorer(implicit predictor: Predictor) {
   val depthChartSelection = new DepthChartSelection
 
-  def score(bench: java.lang.Iterable[Player], lineup: Lineup, vs: VsHand): Double = {
+  def score(bench: java.lang.Iterable[Player],
+            lineup: Lineup,
+            vs: VsHand): Double = {
     score_(bench, lineup, vs).toDouble
   }
 
@@ -31,7 +33,9 @@ class BenchScorer(implicit predictor: Predictor) {
   }
 
   def score(bu: Backup, vs: VsHand): Score =
-    (Defense.getPositionFactor(bu.getPosition) * bu.getPercentage / 100.0) *: InLineupScore(bu.getPlayer, bu.getPosition, vs).score
+    (Defense.getPositionFactor(bu.getPosition) * bu.getPercentage / 100.0) *: InLineupScore(
+      bu.getPlayer,
+      bu.getPosition,
+      vs).score
 
 }
-

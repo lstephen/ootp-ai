@@ -11,7 +11,7 @@ import com.github.lstephen.ootp.ai.syntax._
 import scala.collection.GenTraversableOnce
 import scala.collection.JavaConversions._
 
-import java.lang.{ Iterable => JavaIterable }
+import java.lang.{Iterable => JavaIterable}
 
 class StarterSelection(implicit predictor: Predictor) {
 
@@ -21,11 +21,16 @@ class StarterSelection(implicit predictor: Predictor) {
     selectForPositions(Position.hitting.toSet, ps, vs)
 
   def select(ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] =
-    selectForPositions(Position.hitting.toSet - Position.DESIGNATED_HITTER, ps, vs)
+    selectForPositions(Position.hitting.toSet - Position.DESIGNATED_HITTER,
+                       ps,
+                       vs)
 
-  def selectForPositions(pos: Set[Position], ps: GenTraversableOnce[Player], vs: VsHand): Set[Player] = {
+  def selectForPositions(pos: Set[Position],
+                         ps: GenTraversableOnce[Player],
+                         vs: VsHand): Set[Player] = {
 
-    val initial = (pos.toList, ps.toList.sortBy(InLineupScore(_)).reverse).zipped.toMap
+    val initial =
+      (pos.toList, ps.toList.sortBy(InLineupScore(_)).reverse).zipped.toMap
 
     new HillClimbing(heuristic(vs), navigator(ps)).search(initial).values.toSet
   }
@@ -42,7 +47,8 @@ class StarterSelection(implicit predictor: Predictor) {
   def subs(ps: GenTraversableOnce[Player]): Starters => List[Starters] =
     s => ps.foldLeft(List[Starters]())((ls, p) => ls ++ subs(s, p))
 
-  def subsAndSwaps(ps: GenTraversableOnce[Player]): Starters => List[Starters] =
+  def subsAndSwaps(
+      ps: GenTraversableOnce[Player]): Starters => List[Starters] =
     subs(ps) flatMap swaps
 
   def subs(s: Starters, p: Player): List[Starters] = {
@@ -56,8 +62,8 @@ class StarterSelection(implicit predictor: Predictor) {
   def select(vs: VsHand, ps: JavaIterable[Player]): JavaIterable[Player] =
     select(List() ++ ps, vs)
 
-  def selectWithDh(vs: VsHand, ps: JavaIterable[Player]): JavaIterable[Player] =
+  def selectWithDh(vs: VsHand,
+                   ps: JavaIterable[Player]): JavaIterable[Player] =
     selectWithDh(List() ++ ps, vs)
 
 }
-
