@@ -20,7 +20,8 @@ trait PitcherFutureAbility { this: Ability =>
       (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
     }
   }
-  override val pitching = Some(endurance *: predictor.predictFuturePitching(player).overall)
+  override val pitching = Some(
+    endurance *: predictor.predictFuturePitching(player).overall)
 }
 
 object FutureAbility {
@@ -36,7 +37,8 @@ object FutureAbility {
   }
 }
 
-class FutureValue(val player: Player, val position: Position)(implicit val predictor: Predictor)
+class FutureValue(val player: Player, val position: Position)(
+    implicit val predictor: Predictor)
     extends ComponentScore {
 
   val ability = FutureAbility(player, position)
@@ -67,7 +69,5 @@ object FutureValue {
     new FutureValue(p, pos)
 
   def apply(p: Player)(implicit ps: Predictor): FutureValue =
-    (Position.hitting ++ Position.pitching)
-      .map(FutureValue(p, _))
-      .max
+    (Position.hitting ++ Position.pitching).map(FutureValue(p, _)).max
 }

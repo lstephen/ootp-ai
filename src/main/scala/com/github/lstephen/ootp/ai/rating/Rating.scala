@@ -10,4 +10,3 @@ case class Rating[T, S <: Scale[T]](value: T, scale: S) {
   def normalize: Rating[Integer, OneToOneHundred] = scale.normalize(value)
 
 }
-

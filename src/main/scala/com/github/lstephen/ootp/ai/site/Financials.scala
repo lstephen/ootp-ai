@@ -30,4 +30,3 @@ class FinancialsReport(site: Site, team: Id[Team]) extends Financials {
       .parse(doc.select("td:contains(Free Agents) + td").text.substring(1))
       .intValue
 }
-

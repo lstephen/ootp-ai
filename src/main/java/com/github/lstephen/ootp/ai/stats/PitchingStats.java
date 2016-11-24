@@ -29,6 +29,10 @@ public class PitchingStats implements Stats<PitchingStats> {
     this.atBats = atBats;
   }
 
+  public void setPlateAppearances(int pas) {
+    setAtBats(pas - walks);
+  }
+
   public Integer getHits() {
     return hits;
   }

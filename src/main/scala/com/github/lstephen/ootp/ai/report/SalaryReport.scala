@@ -23,11 +23,13 @@ import collection.JavaConversions._
 import scala.math._
 
 /**
- *
- * @author lstephen
- */
-class SalaryReport(team: Team, salary: Salary, financials: Financials)(implicit predictor: Predictor)
-    extends SalaryPredictor with Printable {
+  *
+  * @author lstephen
+  */
+class SalaryReport(team: Team, salary: Salary, financials: Financials)(
+    implicit predictor: Predictor)
+    extends SalaryPredictor
+    with Printable {
 
   private def vsReplacement(p: Player): Score =
     NowValue(p).vsReplacement.orElseZero
@@ -35,10 +37,8 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(implicit 
   val currentTotal: Long = team.map(salary.getCurrentSalary(_).toLong).sum
   val nextTotal: Long = team.map(salary.getNextSalary(_).toLong).sum
 
-  val replCurrentTotal: Score = team
-    .map(vsReplacement(_))
-    .filter(_.isPositive)
-    .total
+  val replCurrentTotal: Score =
+    team.map(vsReplacement(_)).filter(_.isPositive).total
 
   val replNextTotal: Score = team
     .filter(salary.getNextSalary(_) > 0)
@@ -57,13 +57,11 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(implicit 
   def print(w: PrintWriter): Unit = {
     w.println()
 
-    team
-      .toSeq
+    team.toSeq
       .filter(salary.getCurrentSalary(_) != 0)
       .sortBy(salary.getCurrentSalary(_))
       .reverse
       .foreach { p =>
-
         val s = salary getCurrentSalary p
 
         val nextS = salary getNextSalary p

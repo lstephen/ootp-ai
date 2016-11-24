@@ -15,8 +15,8 @@ class CompositeModel(ms: Seq[Model]) extends Model {
   def train(ds: DataSet) = {
     val trained = ms.map(_.train(ds))
 
-    i => trained.map(_(i)).sum / ms.length
+    i =>
+      trained.map(_(i)).sum / ms.length
   }
 
 }
-

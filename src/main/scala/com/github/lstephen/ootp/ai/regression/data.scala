@@ -18,12 +18,9 @@ class Input(private val is: List[Option[Double]]) {
   def get(idx: Integer): Option[Double] = is(idx)
 
   def toArray(f: Int => Double): Array[Double] =
-    is
-      .zipWithIndex
-      .map {
-        case (d, idx) => d getOrElse f(idx)
-      }
-      .toArray
+    is.zipWithIndex.map {
+      case (d, idx) => d getOrElse f(idx)
+    }.toArray
 
   def toVector(f: Int => Double): Vector = new DenseVector(toArray(f))
 }
@@ -52,13 +49,11 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
   lazy val averages: List[Double] = {
     logger.info("Calculating averages...")
 
-    (0 to (features - 1))
-      .map { idx =>
-        val vs = ds.map(_.input.get(idx)).flatten
+    (0 to (features - 1)).map { idx =>
+      val vs = ds.map(_.input.get(idx)).flatten
 
-        if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
-      }
-      .toList
+      if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
+    }.toList
   }
 
   def averageForColumn(i: Integer): Double = averages(i)
@@ -78,4 +73,3 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
 object DataSet {
   def apply(): DataSet = new DataSet(List())
 }
-

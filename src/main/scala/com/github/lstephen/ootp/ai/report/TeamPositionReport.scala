@@ -12,7 +12,8 @@ import java.io.PrintWriter
 
 import collection.JavaConversions._
 
-class TeamPositionReport(roster: Roster)(implicit predictor: Predictor) extends Printable {
+class TeamPositionReport(roster: Roster)(implicit predictor: Predictor)
+    extends Printable {
 
   override def print(pw: PrintWriter): Unit = {
     implicit val w = pw
@@ -27,15 +28,11 @@ class TeamPositionReport(roster: Roster)(implicit predictor: Predictor) extends 
     val vsL = top(pos, Some(VsHand.VS_LHP))
     val vsR = top(pos, Some(VsHand.VS_RHP))
 
-    (ovr, vsL, vsR)
-      .zipped
-      .toSeq
-      .take(10)
-      .zipWithIndex
-      .foreach {
-        case ((o, l, r), idx) =>
-          w.println(f"${idx + 1}%2d | ${format(o)} | ${format(l)} | ${format(r)}")
-      }
+    (ovr, vsL, vsR).zipped.toSeq.take(10).zipWithIndex.foreach {
+      case ((o, l, r), idx) =>
+        w.println(
+          f"${idx + 1}%2d | ${format(o)} | ${format(l)} | ${format(r)}")
+    }
   }
 
   def format(s: InLineupScore): String = {
@@ -49,4 +46,3 @@ class TeamPositionReport(roster: Roster)(implicit predictor: Predictor) extends 
       .reverse
 
 }
-

@@ -15,4 +15,3 @@ object Context {
   var idealRoster: Option[Roster] = None
   def idealRoster_=(r: Roster): Unit = { idealRoster = Some(r) }
 }
-

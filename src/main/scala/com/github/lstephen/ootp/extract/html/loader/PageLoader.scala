@@ -7,5 +7,4 @@ trait PageLoader {
 }
 
 class PageLoaderException(msg: String = null, cause: Throwable = null)
-  extends RuntimeException(msg, cause)
-
+    extends RuntimeException(msg, cause)

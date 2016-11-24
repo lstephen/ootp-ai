@@ -2,12 +2,14 @@ package com.github.lstephen.ootp.ai.selection.lineup
 
 import com.github.lstephen.ootp.ai.Context
 import com.github.lstephen.ootp.ai.player.Player
-import com.github.lstephen.ootp.ai.player.ratings.{ DefensiveRatings, Position }
+import com.github.lstephen.ootp.ai.player.ratings.{DefensiveRatings, Position}
 import com.github.lstephen.ootp.ai.score._
 
 import collection.JavaConversions._
 
-class PlayerDefenseScore(defensiveRatings: DefensiveRatings, position: Position, useBaseline: Boolean = true)
+class PlayerDefenseScore(defensiveRatings: DefensiveRatings,
+                         position: Position,
+                         useBaseline: Boolean = true)
     extends Scoreable {
 
   def this(ply: Player, pos: Position) = this(ply.getDefensiveRatings, pos)
@@ -21,7 +23,8 @@ class PlayerDefenseScore(defensiveRatings: DefensiveRatings, position: Position,
 }
 
 object PlayerDefenseScore {
-  def atBestPosition(p: Player, useBaseline: Boolean = true): PlayerDefenseScore =
+  def atBestPosition(p: Player,
+                     useBaseline: Boolean = true): PlayerDefenseScore =
     Position.hitting
       .map(new PlayerDefenseScore(p.getDefensiveRatings, _, useBaseline))
       .max
@@ -35,14 +38,15 @@ object PlayerDefenseScore {
         case Some(r) =>
           newRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
           newRosterBaseline.getOrElse(throw new IllegalStateException)
-        case None => oldRosterBaseline.getOrElse {
-          Context.oldRoster match {
-            case Some(r) =>
-              oldRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
-              oldRosterBaseline.getOrElse(throw new IllegalStateException)
-            case None => throw new RuntimeException("No rosters set")
+        case None =>
+          oldRosterBaseline.getOrElse {
+            Context.oldRoster match {
+              case Some(r) =>
+                oldRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
+                oldRosterBaseline.getOrElse(throw new IllegalStateException)
+              case None => throw new RuntimeException("No rosters set")
+            }
           }
-        }
       }
     }
   }
@@ -51,4 +55,3 @@ object PlayerDefenseScore {
     ps.filter(_.isHitter).map(atBestPosition(_, false).score).average
   }
 }
-

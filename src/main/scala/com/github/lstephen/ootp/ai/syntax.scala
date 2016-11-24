@@ -10,4 +10,3 @@ object syntax {
     def flatMap[C](g: B => List[C]): A => List[C] = x => f(x) flatMap (g(_))
   }
 }
-

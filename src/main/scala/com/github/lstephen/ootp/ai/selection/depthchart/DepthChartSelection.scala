@@ -22,17 +22,21 @@ import collection.JavaConversions._
 
 class DepthChartSelection(implicit predictor: Predictor) {
 
-  def select(lineups: AllLineups, available: java.lang.Iterable[Player]): AllDepthCharts =
+  def select(lineups: AllLineups,
+             available: java.lang.Iterable[Player]): AllDepthCharts =
     select(lineups, Set() ++ available)
 
   def select(lineups: AllLineups, available: Set[Player]): AllDepthCharts = {
-    AllDepthCharts.create(All
-      .builder()
-      .vsRhp(select(lineups.getVsRhp(), available, VsHand.VS_RHP))
-      .vsRhpPlusDh(select(lineups.getVsRhpPlusDh(), available, VsHand.VS_RHP))
-      .vsLhp(select(lineups.getVsLhp(), available, VsHand.VS_LHP))
-      .vsLhpPlusDh(select(lineups.getVsLhpPlusDh(), available, VsHand.VS_LHP))
-      .build());
+    AllDepthCharts.create(
+      All
+        .builder()
+        .vsRhp(select(lineups.getVsRhp(), available, VsHand.VS_RHP))
+        .vsRhpPlusDh(
+          select(lineups.getVsRhpPlusDh(), available, VsHand.VS_RHP))
+        .vsLhp(select(lineups.getVsLhp(), available, VsHand.VS_LHP))
+        .vsLhpPlusDh(
+          select(lineups.getVsLhpPlusDh(), available, VsHand.VS_LHP))
+        .build());
   }
 
   def select(lineup: Lineup, available: Set[Player], vs: VsHand): DepthChart = {
@@ -44,8 +48,10 @@ class DepthChartSelection(implicit predictor: Predictor) {
       dc.setStarter(entry.getPositionEnum, entry.getPlayer)
 
       if (entry.getPositionEnum != Position.DESIGNATED_HITTER) {
-        selectDefensiveReplacement(entry.getPositionEnum, entry.getPlayer, bench)
-          .foreach(dc.setDefensiveReplacement(entry.getPositionEnum, _))
+        selectDefensiveReplacement(
+          entry.getPositionEnum,
+          entry.getPlayer,
+          bench).foreach(dc.setDefensiveReplacement(entry.getPositionEnum, _))
       }
 
       addBackups(dc, entry.getPositionEnum(), bench, vs)
@@ -54,25 +60,29 @@ class DepthChartSelection(implicit predictor: Predictor) {
     dc
   }
 
-  def selectDefensiveReplacement(position: Position, starter: Player, bench: Set[Player]): Option[Player] = {
+  def selectDefensiveReplacement(position: Position,
+                                 starter: Player,
+                                 bench: Set[Player]): Option[Player] = {
     if (bench.isEmpty) return None
 
-    val candidate = bench
-      .toSeq
+    val candidate = bench.toSeq
       .sortBy(_.getDefensiveRatings.getPositionScore(position))
       .reverse
       .head
 
-    def defense(p: Player): Double = p.getDefensiveRatings.getPositionScore(position)
+    def defense(p: Player): Double =
+      p.getDefensiveRatings.getPositionScore(position)
 
     if (defense(candidate) > defense(starter) * 1.1) Some(candidate) else None
   }
 
-  def addBackups(dc: DepthChart, position: Position, bench: Set[Player], vs: VsHand): Unit = {
+  def addBackups(dc: DepthChart,
+                 position: Position,
+                 bench: Set[Player],
+                 vs: VsHand): Unit = {
     val starter = dc getStarter position
     val backup = InLineupScore.sort(bench, position, vs).head
 
     dc.addBackup(position, backup, 1)
   }
 }
-

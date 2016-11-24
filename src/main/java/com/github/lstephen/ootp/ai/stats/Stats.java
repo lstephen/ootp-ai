@@ -9,4 +9,8 @@ public interface Stats<Self extends Stats<Self>> {
   Self multiply(double factor);
 
   Self add(Self rhs);
+
+  int getPlateAppearances();
+
+  void setPlateAppearances(int pas);
 }

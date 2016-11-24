@@ -16,7 +16,10 @@ import humanize.Humanize
 
 import scala.collection.JavaConverters._
 
-class Predictor(ps: Seq[Player], private val br: BattingRegression, private val pr: PitchingRegression) extends LazyLogging {
+class Predictor(ps: Seq[Player],
+                private val br: BattingRegression,
+                private val pr: PitchingRegression)
+    extends LazyLogging {
 
   private def time[R](label: String, block: => R): R = {
     val t0 = System.nanoTime
@@ -29,36 +32,56 @@ class Predictor(ps: Seq[Player], private val br: BattingRegression, private val 
     }
   }
 
-  val batting = time("batting", br.predict(ps).mapValues(new BattingPrediction(_)))
-  val battingFuture = time("battingFuture", br.predictFuture(ps).mapValues(new BattingPrediction(_)))
+  val batting =
+    time("batting", br.predict(ps).mapValues(new BattingPrediction(_)))
 
-  val pitching = time("pitching", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predict p))).toMap)
-  val pitchingFuture = time("pitchingFuture", ps.filter(_.isPitcher).map(p => (p, new PitchingPrediction(pr predictFuture p))).toMap)
+  val battingFuture = time(
+    "battingFuture",
+    br.predictFuture(ps).mapValues(new BattingPrediction(_)))
+
+  val pitching = time(
+    "pitching",
+    pr.predict(ps.filter(_.isPitcher)).mapValues(new PitchingPrediction(_)))
+
+  val pitchingFuture = time(
+    "pitchingFuture",
+    pr.predict(ps.filter(_.isPitcher)).mapValues(new PitchingPrediction(_)))
 
   private def getPrediction[P](ps: Map[Player, P], p: Player): P =
-    ps.get(p).getOrElse(throw new IllegalArgumentException(s"Unable to predict for: ${p.getId}, ${p.getShortName}"))
+    ps.get(p)
+      .getOrElse(
+        throw new IllegalArgumentException(
+          s"Unable to predict for: ${p.getId}, ${p.getShortName}"))
 
   def predictBatting(p: Player): BattingPrediction = getPrediction(batting, p)
-  def predictFutureBatting(p: Player): BattingPrediction = getPrediction(battingFuture, p)
+  def predictFutureBatting(p: Player): BattingPrediction =
+    getPrediction(battingFuture, p)
 
-  def predictPitching(p: Player): PitchingPrediction = getPrediction(pitching, p)
-  def predictFuturePitching(p: Player): PitchingPrediction = getPrediction(pitchingFuture, p)
+  def predictPitching(p: Player): PitchingPrediction =
+    getPrediction(pitching, p)
+  def predictFuturePitching(p: Player): PitchingPrediction =
+    getPrediction(pitchingFuture, p)
 
-  def correlationReport: Printable = new Printable { def print(w: PrintWriter) = {
-    br.correlationReport.print(w)
-    pr.correlationReport().print(w)
-  }}
+  def correlationReport: Printable = new Printable {
+    def print(w: PrintWriter) = {
+      br.correlationReport.print(w)
+      pr.correlationReport.print(w)
+    }
+  }
 
   def this(ps: Seq[Player], pr: Predictor) = this(ps, pr.br, pr.pr)
 
   // Java compatability
-  def this(ps: java.lang.Iterable[Player], pr: Predictor) = this(ps.asScala.toSeq, pr.br, pr.pr)
+  def this(ps: java.lang.Iterable[Player], pr: Predictor) =
+    this(ps.asScala.toSeq, pr.br, pr.pr)
 
 }
 
 object Predictor {
   def train(site: Site): Predictor =
-    new Predictor(site.getAllPlayers().asScala.toSeq, new BattingRegression(site), PitchingRegression.run(site))
+    new Predictor(site.getAllPlayers().asScala.toSeq,
+                  new BattingRegression(site),
+                  new PitchingRegression(site))
 
 }
 
