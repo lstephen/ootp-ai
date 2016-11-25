@@ -1,6 +1,6 @@
 package com.github.lstephen.ootp.ai.regression
 
-import com.github.lstephen.ootp.ai.io.Printable
+import com.github.lstephen.ootp.ai.io.{ Printable, Printables }
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.{
   BattingRatings,
@@ -201,6 +201,9 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       w.println
 
       regressOn.foreach(r => w.println(getRegression(r).format))
+
+      w.println(s"Features: ${regressable.features.mkString(", ")}")
+      regressOn.foreach(r => Printables.print(getRegression(r).modelReport).to(w))
     }
   }
 }
