@@ -9,16 +9,17 @@ import com.github.lstephen.ootp.ai.site.Version
 
 import com.typesafe.scalalogging.StrictLogging
 
-import org.apache.spark.SparkConf
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SparkSession
 
 import scala.math.ScalaNumericAnyConversions
 
 object Spark {
-  val context = new SparkContext(
-    new SparkConf().setAppName("ootp-ai").setMaster("local"))
-
-  sys.ShutdownHookThread { context.stop }
+  lazy val session = {
+    val s = SparkSession.builder.master("local").appName("ootp-ai").getOrCreate
+    sys.ShutdownHookThread { s.stop }
+    s
+  }
 }
 
 trait Regressable[-T] {
@@ -69,7 +70,6 @@ class Regression(label: String) extends StrictLogging {
 
   var _regression: Option[Model.Predict] = None
 
-  //val model = new CompositeModel(List(new RandomForestModel, new LinearRegressionModel))
   val model = new RandomForestModel
 
   def regression = _regression match {
@@ -94,14 +94,14 @@ class Regression(label: String) extends StrictLogging {
 
   def getN: Long = data.length
 
-  def predict[T: Regressable](x: T): Double =
-    predict(implicitly[Regressable[T]].toInput(x))
+  def predict[T: Regressable](xs: Seq[T]): Seq[Double] =
+    predict(xs.map(implicitly[Regressable[T]].toInput(_)))
 
-  def predict(xs: Input): Double = regression(xs)
+  def predict(xs: Seq[Input]): Seq[Double] = regression(xs)
 
   def mse =
-    (data.map { p =>
-      math.pow(p.output - predict(p.input), 2)
+    ((predict(data.map(_.input)), data.map(_.output)).zipped.map {
+      case (p, o) => math.pow(o - p, 2)
     }.sum) / data.length
 
   def rsme = math.pow(mse, 0.5)
@@ -109,11 +109,4 @@ class Regression(label: String) extends StrictLogging {
   def format: String = {
     f"$label%15s | ${rsme}%.3f"
   }
-
-  // For Java interop
-  def addPitchingData(x: PitchingRatings[_ <: Object], y: Double): Unit =
-    addData(x, y)(Regressable.RegressablePitchingRatings)
-
-  def predictPitching(x: PitchingRatings[_ <: Object]): Double =
-    predict(x)(Regressable.RegressablePitchingRatings)
 }

@@ -32,7 +32,7 @@ class LinearRegressionModel extends Model with StrictLogging {
 
     val r = regressions.maxBy(_.getRSquare)
 
-    i =>
-      r.predict(i)
+    is =>
+      is.map(r.predict(_))
   }
 }

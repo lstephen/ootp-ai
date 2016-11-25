@@ -2,11 +2,11 @@ package com.github.lstephen.ootp.ai.regression
 
 import com.typesafe.scalalogging.StrictLogging
 
-import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.mllib.linalg.DenseVector
-import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.ml.linalg.{Vector, DenseVector}
+import org.apache.spark.ml.linalg.SQLDataTypes._
 
-import org.apache.spark.rdd.RDD
+import org.apache.spark.sql._
+import org.apache.spark.sql.types._
 
 class Input(private val is: List[Option[Double]]) {
   def :+(rhs: Double): Input = this :+ Some(rhs)
@@ -33,8 +33,7 @@ object Input {
 class DataPoint(val input: Input, val output: Double) {
   def features = input.length
 
-  def toLabeledPoint(f: Int => Double): LabeledPoint =
-    new LabeledPoint(output, input.toVector(f))
+  def toTuple(f: Int => Double): (Vector, Double) = (input.toVector(f), output)
 }
 
 class DataSet(ds: List[DataPoint]) extends StrictLogging {
@@ -66,8 +65,13 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
 
   def features = ds.head.input.length
 
-  def toRdd: RDD[LabeledPoint] =
-    Spark.context.parallelize(ds.map(_.toLabeledPoint(averageForColumn(_))))
+  def toDataFrame: DataFrame = {
+    import Spark.session.implicits._
+
+    ds.map { d =>
+      (d.input.toVector(averageForColumn(_)), d.output)
+    }.toDF("input", "output")
+  }
 }
 
 object DataSet {
