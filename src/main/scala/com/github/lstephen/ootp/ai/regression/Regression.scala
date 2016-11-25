@@ -64,10 +64,8 @@ object Regressable {
       as
     }
 
-    val features = Seq("Movement", "Control", "Stuff", "GB%") ++ (if (version == Version.OOTP5)
-                                                                    Seq("Hits",
-                                                                        "2B")
-                                                                  else Seq())
+    val features = Seq("Movement", "Control", "Stuff", "GB%") ++
+      (if (version == Version.OOTP5) Seq("Hits", "2B") else Seq())
   }
 }
 
