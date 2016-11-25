@@ -2,8 +2,11 @@ package com.github.lstephen.ootp.ai.regression
 
 import collection.JavaConversions._
 
-import com.github.lstephen.ootp.ai.player.ratings.{BattingRatings, PitchingRatings }
-import com.github.lstephen.ootp.ai.site.{ SiteHolder, Version }
+import com.github.lstephen.ootp.ai.player.ratings.{
+  BattingRatings,
+  PitchingRatings
+}
+import com.github.lstephen.ootp.ai.site.{SiteHolder, Version}
 
 import com.typesafe.scalalogging.StrictLogging
 
@@ -61,7 +64,8 @@ object Regressable {
       as
     }
 
-    val features = Seq("Movement", "Control", "Stuff", "GB%") ++ (if (version == Version.OOTP5) Seq("Hits", "2B") else Seq())
+    val features = Seq("Movement", "Control", "Stuff", "GB%") ++
+      (if (version == Version.OOTP5) Seq("Hits", "2B") else Seq())
   }
 }
 
