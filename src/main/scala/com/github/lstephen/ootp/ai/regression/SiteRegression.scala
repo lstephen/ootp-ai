@@ -1,6 +1,6 @@
 package com.github.lstephen.ootp.ai.regression
 
-import com.github.lstephen.ootp.ai.io.{ Printable, Printables }
+import com.github.lstephen.ootp.ai.io.{Printable, Printables}
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.{
   BattingRatings,
@@ -161,7 +161,9 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
   val defaultPlateAppearances = 700
 
   def getRegression(r: RegressOn[_]) =
-    regressions.get(r.name).getOrElse(throw new IllegalArgumentException(r.name))
+    regressions
+      .get(r.name)
+      .getOrElse(throw new IllegalArgumentException(r.name))
 
   def predict(ps: Seq[Player], f: (Player => Splits[_ <: R]) = getRatings(_))
     : Map[Player, SplitStats[S]] =
@@ -204,7 +206,8 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       regressOn.foreach(r => w.println(getRegression(r).format))
 
       w.println(s"Features: ${regressable.features.mkString(", ")}")
-      regressOn.foreach(r => Printables.print(getRegression(r).modelReport).to(w))
+      regressOn.foreach(r =>
+        Printables.print(getRegression(r).modelReport).to(w))
     }
   }
 }
