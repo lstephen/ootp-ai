@@ -1,6 +1,6 @@
 package com.github.lstephen.ootp.ai.regression
 
-import com.github.lstephen.ootp.ai.io.Printable
+import com.github.lstephen.ootp.ai.io.{ Printable, Printables }
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.{
   BattingRatings,
@@ -116,7 +116,8 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
   val currentSeason = site.getDate.getYear
 
-  val regressions: Future[Map[String, Regression]] = Future {
+  lazy val regressions: Map[String, Regression] = {
+    logger.info("Running regressions...")
     val rs = regressOn.map(r => r.name -> new Regression(r.name)).toMap
 
     def getRegression(r: RegressOn[_]) =
@@ -149,18 +150,17 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
     loadHistory(history).foreach(addData(_))
 
-    rs.values.par.foreach(_.train)
+    logger.info("Training...")
+    rs.values.foreach(_.train)
 
+    logger.info("Regressions done.")
     rs
   }
 
   val defaultPlateAppearances = 700
 
   def getRegression(r: RegressOn[_]) =
-    Await
-      .result(regressions, 10.minutes)
-      .get(r.name)
-      .getOrElse(throw new IllegalArgumentException(r.name))
+    regressions.get(r.name).getOrElse(throw new IllegalArgumentException(r.name))
 
   def predict(ps: Seq[Player], f: (Player => Splits[_ <: R]) = getRatings(_))
     : Map[Player, SplitStats[S]] =
@@ -201,6 +201,9 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       w.println
 
       regressOn.foreach(r => w.println(getRegression(r).format))
+
+      w.println(s"Features: ${regressable.features.mkString(", ")}")
+      regressOn.foreach(r => Printables.print(getRegression(r).modelReport).to(w))
     }
   }
 }

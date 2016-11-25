@@ -2,10 +2,8 @@ package com.github.lstephen.ootp.ai.regression
 
 import collection.JavaConversions._
 
-import com.github.lstephen.ootp.ai.player.ratings.BattingRatings
-import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings
-import com.github.lstephen.ootp.ai.site.SiteHolder
-import com.github.lstephen.ootp.ai.site.Version
+import com.github.lstephen.ootp.ai.player.ratings.{BattingRatings, PitchingRatings }
+import com.github.lstephen.ootp.ai.site.{ SiteHolder, Version }
 
 import com.typesafe.scalalogging.StrictLogging
 
@@ -24,6 +22,7 @@ object Spark {
 
 trait Regressable[-T] {
   def toInput(t: T): Input
+  def features: Seq[String]
 }
 
 object Regressable {
@@ -39,6 +38,8 @@ object Regressable {
 
       Input(r.getContact, r.getGap, r.getPower, r.getEye) ++ new Input(extras)
     }
+
+    val features = Seq("Contact", "Gap", "Power", "Eye", "K", "Speed")
   }
 
   implicit object RegressablePitchingRatings
@@ -59,6 +60,8 @@ object Regressable {
 
       as
     }
+
+    val features = Seq("Movement", "Control", "Stuff", "GB%")
   }
 }
 
@@ -109,4 +112,6 @@ class Regression(label: String) extends StrictLogging {
   def format: String = {
     f"$label%15s | ${rsme}%.3f"
   }
+
+  def modelReport = regression.report(label)
 }
