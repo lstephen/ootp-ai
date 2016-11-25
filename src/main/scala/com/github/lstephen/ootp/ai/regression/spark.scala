@@ -28,25 +28,25 @@ class RandomForestModel extends Model with StrictLogging {
       .setSeed(seed)
 
     val paramGrid = new ParamGridBuilder()
-      .addGrid(regressor.maxDepth, Array(8, 13, 21, 30))
-      .addGrid(regressor.maxBins, Array(16, 32, 64))
-      .addGrid(regressor.minInstancesPerNode, Array(50, 200))
+      .addGrid(regressor.maxDepth, Array(1, 2, 3, 5, 8))
+      .addGrid(regressor.maxBins, Array(20, 30))
+      .addGrid(regressor.numTrees, Array(10, 30, 100))
       .build()
 
-    /*al cv = new CrossValidator()
+    val cv = new CrossValidator()
       .setEstimator(regressor)
       .setEvaluator(new RegressionEvaluator().setLabelCol("output").setMetricName("mse"))
       .setEstimatorParamMaps(paramGrid)
       .setNumFolds(3)
-      .setSeed(42)*/
+      .setSeed(42)
 
-     val tvs = new TrainValidationSplit()
+     /*val tvs = new TrainValidationSplit()
       .setEstimator(regressor)
       .setEvaluator(new RegressionEvaluator().setLabelCol("output").setMetricName("mse"))
       .setEstimatorParamMaps(paramGrid)
-      .setTrainRatio(0.5)
+      .setTrainRatio(0.5)*/
 
-    val model = tvs.fit(ds.toDataFrame)
+    val model = cv.fit(ds.toDataFrame)
 
     logger.info(s"Model: $model")
 
