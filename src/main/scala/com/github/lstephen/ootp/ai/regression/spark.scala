@@ -6,8 +6,10 @@ import com.typesafe.scalalogging.StrictLogging
 
 import java.io.PrintWriter
 
+import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.linalg.Vector
-import org.apache.spark.ml.regression.RandomForestRegressor
+import org.apache.spark.ml.regression.{RandomForestRegressor, RandomForestRegressionModel}
+import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder, TrainValidationSplit}
 
 import org.apache.spark.ml.linalg.SQLDataTypes._
 
@@ -23,12 +25,28 @@ class RandomForestModel extends Model with StrictLogging {
       .setLabelCol("output")
       .setFeaturesCol("input")
       .setNumTrees(100)
-      .setMaxDepth(5)
-      .setMaxBins(32)
-      .setMinInstancesPerNode(ds.length / 100)
       .setSeed(seed)
 
-    val model = regressor.fit(ds.toDataFrame)
+    val paramGrid = new ParamGridBuilder()
+      .addGrid(regressor.maxDepth, Array(8, 13, 21, 30))
+      .addGrid(regressor.maxBins, Array(16, 32, 64))
+      .addGrid(regressor.minInstancesPerNode, Array(50, 200))
+      .build()
+
+    /*al cv = new CrossValidator()
+      .setEstimator(regressor)
+      .setEvaluator(new RegressionEvaluator().setLabelCol("output").setMetricName("mse"))
+      .setEstimatorParamMaps(paramGrid)
+      .setNumFolds(3)
+      .setSeed(42)*/
+
+     val tvs = new TrainValidationSplit()
+      .setEstimator(regressor)
+      .setEvaluator(new RegressionEvaluator().setLabelCol("output").setMetricName("mse"))
+      .setEstimatorParamMaps(paramGrid)
+      .setTrainRatio(0.5)
+
+    val model = tvs.fit(ds.toDataFrame)
 
     logger.info(s"Model: $model")
 
@@ -45,8 +63,9 @@ class RandomForestModel extends Model with StrictLogging {
       def report(l: String) = new Printable {
         def print(w: PrintWriter): Unit = {
           w.println(s"-- ${l}")
-          w.println(s"Feature Importances: ${model.featureImportances.toArray.map(n => f"$n%.3f").mkString(", ")}")
-          w.println(s"Parameters: ${model.extractParamMap}")
+          w.println(s"Feature Importances: ${model.bestModel.asInstanceOf[RandomForestRegressionModel].featureImportances.toArray.map(n => f"$n%.3f").mkString(", ")}")
+          w.println(s"Best Model: ${model.bestModel}")
+          w.println(s"Parameters: ${model.bestModel.extractParamMap}")
         }
       }
     }

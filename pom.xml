@@ -46,6 +46,8 @@
     <lib.humanize-slim.version>1.2.2</lib.humanize-slim.version>
     <lib.jackson.version>2.6.5</lib.jackson.version>
     <lib.joda-time.version>2.9.2</lib.joda-time.version>
+    <lib.jsr305.version>1.3.9</lib.jsr305.version>
+    <lib.netlib.version>1.1.2</lib.netlib.version>
     <lib.scalaz.version>7.1.3</lib.scalaz.version>
     <lib.scala-arm.version>1.4</lib.scala-arm.version>
     <lib.scala-library.version>2.11.7</lib.scala-library.version>
@@ -98,12 +100,6 @@
       <groupId>com.github.mfornos</groupId>
       <artifactId>humanize-slim</artifactId>
       <version>${lib.humanize-slim.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -122,12 +118,6 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${lib.jackson.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-annotations</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -144,8 +134,16 @@
 
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-      <version>${lib.findbugs.version}</version>
+      <artifactId>jsr305</artifactId>
+      <version>${lib.jsr305.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.fommil.netlib</groupId>
+      <artifactId>all</artifactId>
+      <version>${lib.netlib.version}</version>
+      <type>pom</type>
+      <scope>runtime</scope>
     </dependency>
 
     <dependency>
