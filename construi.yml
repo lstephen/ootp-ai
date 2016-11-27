@@ -10,15 +10,6 @@ volumes:
   - ./.local:/root/.local
 
 targets:
-  run-python:
-    before:
-      - install-python
-    run:
-      - python target/regression.py --help
-      - python target/regression.py train --help
-      - python target/regression.py predict --help
-
-
   build:
     run: mvn -B clean verify -Dgpg.skip=true -DaddScalacArgs=-feature
 
