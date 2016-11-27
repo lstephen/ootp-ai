@@ -72,7 +72,7 @@ class RandomForestModel extends Model with StrictLogging {
             throw new IllegalStateException("Could not find pipeline stage"))
       }
 
-      def report(l: String) = new Printable {
+      override def report(l: String) = new Printable {
         def print(w: PrintWriter): Unit = {
           w.println(s"-- ${l}")
           w.println(

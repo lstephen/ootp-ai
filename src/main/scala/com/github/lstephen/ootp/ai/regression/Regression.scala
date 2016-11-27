@@ -77,7 +77,7 @@ class Regression(label: String) extends StrictLogging {
 
   var _regression: Option[Model.Predict] = None
 
-  val model = new RandomForestModel
+  val model = new RegressionPyModel
 
   def regression = _regression match {
     case Some(r) => r
@@ -92,8 +92,8 @@ class Regression(label: String) extends StrictLogging {
       p
   }
 
-  def addData[T](x: T, y: Double)(implicit regressable: Regressable[T]): Unit = {
-    data = data :+ new DataPoint(regressable.toInput(x), y)
+  def addData[T](x: T, y: Double, w: Int)(implicit regressable: Regressable[T]): Unit = {
+    data = data :+ new DataPoint(regressable.toInput(x), y, w)
     _regression = None
   }
 
