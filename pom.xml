@@ -38,6 +38,7 @@
     <enforcer.skip>true</enforcer.skip>
 
     <lib.ai-search.version>1.2</lib.ai-search.version>
+    <lib.argonaut.version>6.1</lib.argonaut.version>
     <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.4.1</lib.commons-math3.version>
@@ -70,6 +71,12 @@
       <groupId>com.github.lstephen</groupId>
       <artifactId>ai-search</artifactId>
       <version>${lib.ai-search.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.argonaut</groupId>
+      <artifactId>argonaut_${scala.version}</artifactId>
+      <version>${lib.argonaut.version}</version>
     </dependency>
 
     <dependency>

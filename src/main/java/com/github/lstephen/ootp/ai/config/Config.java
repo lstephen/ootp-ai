@@ -20,9 +20,8 @@ public final class Config {
         .transform((v) -> StrSubstitutor.replace(v, System.getenv()));
   }
 
-  public static Config createDefault() throws IOException {
+  public static synchronized Config createDefault() throws IOException {
     try (InputStream in = Config.class.getResourceAsStream("/config.properties")) {
-
       return create(in);
     }
   }

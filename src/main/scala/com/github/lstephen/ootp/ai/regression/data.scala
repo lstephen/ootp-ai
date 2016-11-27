@@ -30,7 +30,7 @@ object Input {
   def apply(ds: List[Double]): Input = new Input(ds.map(Some(_)))
 }
 
-class DataPoint(val input: Input, val output: Double) {
+class DataPoint(val input: Input, val output: Double, val weight: Int) {
   def features = input.length
 
   def toTuple(f: Int => Double): (Vector, Double) = (input.toVector(f), output)
@@ -48,10 +48,14 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
   lazy val averages: List[Double] = {
     logger.info("Calculating averages...")
 
-    (0 to (features - 1)).map { idx =>
-      val vs = ds.map(_.input.get(idx)).flatten
+    (0 until features).map { idx =>
+      val entries = ds.map(d => d.input.get(idx).map(v => (v * d.weight, d.weight))).flatten
 
-      if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
+      val sum = entries.map(_._1).sum
+      val weights = entries.map(_._2).sum
+
+      sum / weights
+      //if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
     }.toList
   }
 

@@ -124,10 +124,8 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       rs.get(r.name).getOrElse(throw new IllegalArgumentException(r.name))
 
     def addEntry(stats: S, ratings: R): Unit =
-      if (stats.getPlateAppearances > 100) {
         regressOn.foreach(r =>
-          getRegression(r).addData(ratings, r.getStat(stats)))
-      }
+          getRegression(r).addData(ratings, r.getStat(stats), stats.getPlateAppearances))
 
     def addData(teamStats: TeamStats[S]): Unit =
       teamStats.getPlayers().asScala.foreach { p =>
