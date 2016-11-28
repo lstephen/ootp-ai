@@ -22,13 +22,15 @@ class RegressionPyModel extends Model with StrictLogging {
 
   val modelFile = File.createTempFile(UUID.randomUUID.toString, ".mdl").getAbsolutePath
 
-  def train(ds: DataSet) = {
+  def train(ds: DataSet): Model.Predict = {
     val json = ds.map(d => TrainInput(d.weight, d.input.toArray(ds.averageForColumn(_)), d.output)).asJson
 
     val regressionPyReport = RegressionPyCli.train(modelFile, json.toString)
 
     new Model.Predict {
       def apply(in: Seq[Input]): Seq[Double] = {
+        if (in.size == 0) return Seq()
+
         val json = in.map(i => PredictInput(i.toArray(ds.averageForColumn(_)))).asJson
 
         val results = RegressionPyCli.predict(modelFile, json.toString)
@@ -37,7 +39,10 @@ class RegressionPyModel extends Model with StrictLogging {
       }
 
       override def report(l: String) = new Printable {
-        def print(w: PrintWriter) { w.println(regressionPyReport) }
+        def print(w: PrintWriter) {
+          w.println(s"-- ${l}")
+          w.println(regressionPyReport)
+        }
       }
     }
   }
