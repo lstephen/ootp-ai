@@ -319,10 +319,6 @@ public class SinglePlayer implements PlayerSource {
 
     if (site.getType() == Version.OOTP5) {
       Elements overall = doc.select("tr.g2:has(td.s1_2:contains(Overall)");
-
-      System.out.println(overall.html());
-      System.out.println(overall.get(0).children().get(1).text());
-
       runs = Optional.of(Integer.parseInt(overall.get(0).children().get(1).text().trim()));
     }
 
