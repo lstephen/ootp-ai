@@ -33,6 +33,8 @@ public class PitchingRatings<T> {
 
   private final Rating<Integer, ? super OneToOneHundred> groundBallPct;
 
+  private final Rating<Integer, ? super OneToTen> runs;
+
   private PitchingRatings(Builder<T> builder) {
     Preconditions.checkNotNull(builder.scale);
     Preconditions.checkNotNull(builder.hits);
@@ -50,6 +52,7 @@ public class PitchingRatings<T> {
     this.movement = builder.movement;
     this.endurance = builder.endurance;
     this.groundBallPct = builder.groundBallPct;
+    this.runs = builder.runs;
   }
 
   public Integer getHits() {
@@ -80,6 +83,12 @@ public class PitchingRatings<T> {
     return groundBallPct == null
         ? Optional.<Integer>absent()
         : Optional.of(groundBallPct.normalize().get());
+  }
+
+  public Optional<Integer> getRuns() {
+    return runs == null
+        ? Optional.<Integer>absent()
+        : Optional.of(runs.normalize().get());
   }
 
   @Override
@@ -119,6 +128,8 @@ public class PitchingRatings<T> {
     private Rating<Integer, ? super OneToTen> endurance;
 
     private Rating<Integer, ? super OneToOneHundred> groundBallPct;
+
+    private Rating<Integer, ? super OneToTen> runs;
 
     private Builder(Scale<T> scale) {
       this.scale = scale;
@@ -226,6 +237,24 @@ public class PitchingRatings<T> {
 
     public Builder<T> groundBallPct(Integer value) {
       return groundBallPct(new Rating<>(value, new OneToOneHundred()));
+    }
+
+    public Builder<T> runs(Rating<Integer, ? super OneToTen> runs) {
+      this.runs = runs;
+      return this;
+    }
+
+    @JsonProperty("runs")
+    public Builder<T> runs(String s) {
+      return runs(new OneToTen().parse(s));
+    }
+
+    public Builder<T> runs(Integer value) {
+      return runs(new Rating<>(value, new OneToTen()));
+    }
+
+    public Builder<T> runs(Optional<Integer> value) {
+      return value.transform(this::runs).or(this);
     }
 
     public PitchingRatings<T> build() {
