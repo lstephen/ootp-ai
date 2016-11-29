@@ -90,6 +90,7 @@ RSpec.describe SinglePlayer do
 
         its("vs_right.endurance") { is_expected.to eq(6) }
         its("vs_right.ground_ball_pct.get") { is_expected.to eq(48) }
+        its("vs_right.runs.get") { is_expected.to eq(65) }
         end
       end
     end

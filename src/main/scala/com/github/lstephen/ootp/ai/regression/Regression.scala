@@ -59,13 +59,15 @@ object Regressable {
 
       if (version == Version.OOTP5) {
         as = as ++ Input(r.getHits, r.getGap)
+
+        as = as :+ (if (r.getRuns.isPresent) Some(r.getRuns.get.doubleValue) else None)
       }
 
       as
     }
 
     val features = Seq("Movement", "Control", "Stuff", "GB%") ++
-      (if (version == Version.OOTP5) Seq("Hits", "2B") else Seq())
+      (if (version == Version.OOTP5) Seq("Hits", "2B", "Runs") else Seq())
   }
 }
 

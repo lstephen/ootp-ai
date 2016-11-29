@@ -315,10 +315,17 @@ public class SinglePlayer implements PlayerSource {
         throw new IllegalStateException();
     }
 
+    Optional<Integer> runs = Optional.absent();
+
+    if (site.getType() == Version.OOTP5) {
+      Elements overall = doc.select("tr.g2:has(td.s1_2:contains(Overall)");
+      runs = Optional.of(Integer.parseInt(overall.get(0).children().get(1).text().trim()));
+    }
+
     PitchingRatings<?> l =
-        extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
+        extractPitchingRatings(vsLhb.get(0), site.getAbilityRatingScale(), endurance, gbp, runs);
     PitchingRatings<?> r =
-        extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance, gbp);
+        extractPitchingRatings(vsRhb.get(0), site.getAbilityRatingScale(), endurance, gbp, runs);
 
     return Splits.create(l, r);
   }
@@ -332,7 +339,8 @@ public class SinglePlayer implements PlayerSource {
         talent.get(0),
         site.getPotentialRatingScale(),
         current.getVsLeft().getEndurance(),
-        current.getVsLeft().getGroundBallPct().get());
+        current.getVsLeft().getGroundBallPct().get(),
+        Optional.<Integer>absent());
   }
 
   private Integer extractRange(String raw, String position) {
@@ -472,7 +480,7 @@ public class SinglePlayer implements PlayerSource {
   }
 
   private <T> PitchingRatings<T> extractPitchingRatings(
-      Element el, Scale<T> scale, int endurance, int gbp) {
+      Element el, Scale<T> scale, int endurance, int gbp, Optional<Integer> runs) {
     Elements line = el.children();
 
     ImmutableMap<PitchingRatingsType, Integer> idx;
@@ -496,6 +504,7 @@ public class SinglePlayer implements PlayerSource {
             .movement(line.get(idx.get(PitchingRatingsType.MOVEMENT)).text())
             .endurance(endurance)
             .groundBallPct(gbp)
+            .runs(runs)
             .build();
 
     return ratings;
