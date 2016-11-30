@@ -42,7 +42,6 @@ public class PitchingRatings<T> {
     Preconditions.checkNotNull(builder.stuff);
     Preconditions.checkNotNull(builder.control);
     Preconditions.checkNotNull(builder.movement);
-    Preconditions.checkNotNull(builder.endurance);
 
     this.scale = builder.scale;
     this.hits = builder.hits;
