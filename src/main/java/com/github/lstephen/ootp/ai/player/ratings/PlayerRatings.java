@@ -113,7 +113,7 @@ public final class PlayerRatings {
             .power(capBatting(age, curVsLeft.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsLeft.getEye(), capped.getEye(), ovr.getEye()))
             .k(capBatting(age, curVsLeft.getK().get(), capped.getK().get(), ovr.getK().get()))
-            .runningSpeed(curVsLeft.getRunningSpeed().get())
+            .runningSpeed(curVsLeft.getRunningSpeed())
             .build();
 
     BattingRatings<?> curVsRight = getBatting().getVsRight();
@@ -126,7 +126,7 @@ public final class PlayerRatings {
             .power(capBatting(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsRight.getEye(), capped.getEye(), ovr.getEye()))
             .k(capBatting(age, curVsRight.getK().get(), capped.getK().get(), ovr.getK().get()))
-            .runningSpeed(curVsRight.getRunningSpeed().get())
+            .runningSpeed(curVsRight.getRunningSpeed())
             .build();
 
     return Splits.create(potVsLeft, potVsRight);
