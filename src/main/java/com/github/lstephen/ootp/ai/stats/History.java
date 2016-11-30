@@ -28,41 +28,74 @@ public final class History {
     List<TeamStats<BattingStats>> result = Lists.newArrayList();
 
     for (int y = season - years; y < season; y++) {
+      TeamStats<BattingStats> s = loadBatting(site, y);
+
+      if (s != null) {
+        result.add(s);
+      }
+    }
+
+    return result;
+  }
+
+  public TeamStats<BattingStats> loadBatting(Site site, int season) {
+      int y = season;
+
+      if (season < 0) {
+        y = site.getDate().getYear() + season;
+      }
+
       LOG.log(Level.INFO, "Loading batting for season {0}...", y);
 
       File in = getBattingFile(site, y);
 
       if (in.exists()) {
         try {
-          result.add(Jackson.getMapper(site).readValue(in, TeamStats.Batting.class));
+          return Jackson.getMapper(site).readValue(in, TeamStats.Batting.class);
         } catch (IOException e) {
           throw Throwables.propagate(e);
         }
+      } else {
+        return null;
       }
-    }
-
-    return result;
   }
 
   public Iterable<TeamStats<PitchingStats>> loadPitching(Site site, int season, int years) {
     List<TeamStats<PitchingStats>> result = Lists.newArrayList();
 
     for (int y = season - years; y < season; y++) {
-      LOG.log(Level.INFO, "Loading pitching for season {0}...", y);
+      TeamStats<PitchingStats> s = loadPitching(site, y);
 
-      File in = getPitchingFile(site, y);
-
-      if (in.exists()) {
-        try {
-          result.add(Jackson.getMapper(site).readValue(in, TeamStats.class));
-        } catch (IOException e) {
-          throw Throwables.propagate(e);
-        }
+      if (s != null) {
+        result.add(s);
       }
     }
 
     return result;
   }
+
+  public TeamStats<PitchingStats> loadPitching(Site site, int season) {
+    int y = season;
+
+    if (season < 0) {
+      y = site.getDate().getYear() + season;
+    }
+
+    LOG.log(Level.INFO, "Loading pitching for season {0}...", y);
+
+    File in = getPitchingFile(site, y);
+
+    if (in.exists()) {
+      try {
+        return Jackson.getMapper(site).readValue(in, TeamStats.class);
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
+      }
+    } else {
+      return null;
+    }
+  }
+
 
   public void saveBatting(TeamStats<BattingStats> stats, Site site, int season) {
     save(getBattingFile(site, season), stats, site, season);

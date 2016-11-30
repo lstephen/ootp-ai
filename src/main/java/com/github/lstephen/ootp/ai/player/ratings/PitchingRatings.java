@@ -246,7 +246,7 @@ public class PitchingRatings<T> {
 
     @JsonProperty("runs")
     public Builder<T> runs(String s) {
-      return runs(new OneToTen().parse(s));
+      return s == null || s.equals("null") ? this : runs(new OneToTen().parse(s));
     }
 
     public Builder<T> runs(Integer value) {
