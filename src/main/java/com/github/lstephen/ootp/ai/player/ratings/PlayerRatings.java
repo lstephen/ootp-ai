@@ -26,9 +26,9 @@ public final class PlayerRatings {
   private final Splits<PitchingRatings<?>> pitching;
 
   @JsonSerialize(using = BattingPotentialSerializer.class)
-  private BattingRatings battingPotential;
+  private BattingRatings<?> battingPotential;
 
-  private PitchingRatings pitchingPotential;
+  private PitchingRatings<?> pitchingPotential;
 
   @JsonDeserialize(using = BuntForHitDeserializer.class)
   private Rating<?, ?> buntForHit;
@@ -93,7 +93,7 @@ public final class PlayerRatings {
 
   public Splits<BattingRatings<Integer>> getBattingPotential(int age) {
 
-    BattingRatings<?> ovr = getOverallBatting(getBatting());
+    BattingRatings<Integer> ovr = getOverallBatting(getBatting());
 
     BattingRatings<Integer> capped =
         BattingRatings.builder(new OneToOneHundred())
@@ -101,6 +101,7 @@ public final class PlayerRatings {
             .gap(capBattingPotential(age, ovr.getGap(), battingPotential.getGap()))
             .power(capBattingPotential(age, ovr.getPower(), battingPotential.getPower()))
             .eye(capBattingPotential(age, ovr.getEye(), battingPotential.getEye()))
+            .k(capBattingPotential(age, ovr.getK().get(), battingPotential.getK().get()))
             .build();
 
     BattingRatings<?> curVsLeft = getBatting().getVsLeft();
@@ -111,6 +112,8 @@ public final class PlayerRatings {
             .gap(capBatting(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
             .power(capBatting(age, curVsLeft.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsLeft.getEye(), capped.getEye(), ovr.getEye()))
+            .k(capBatting(age, curVsLeft.getK().get(), capped.getK().get(), ovr.getK().get()))
+            .runningSpeed(curVsLeft.getRunningSpeed().get())
             .build();
 
     BattingRatings<?> curVsRight = getBatting().getVsRight();
@@ -122,6 +125,8 @@ public final class PlayerRatings {
             .gap(capBatting(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
             .power(capBatting(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsRight.getEye(), capped.getEye(), ovr.getEye()))
+            .k(capBatting(age, curVsRight.getK().get(), capped.getK().get(), ovr.getK().get()))
+            .runningSpeed(curVsRight.getRunningSpeed().get())
             .build();
 
     return Splits.create(potVsLeft, potVsRight);
@@ -137,10 +142,9 @@ public final class PlayerRatings {
             .movement(capPitchingPotential(age, ovr.getMovement(), pitchingPotential.getMovement()))
             .hits(capPitchingPotential(age, ovr.getHits(), pitchingPotential.getHits()))
             .gap(capPitchingPotential(age, ovr.getGap(), pitchingPotential.getGap()))
-            .endurance(ovr.getEndurance())
             .build();
 
-    PitchingRatings curVsLeft = getPitching().getVsLeft();
+    PitchingRatings<?> curVsLeft = getPitching().getVsLeft();
 
     PitchingRatings<Integer> potVsLeft =
         PitchingRatings.builder(new OneToOneHundred())
@@ -151,10 +155,12 @@ public final class PlayerRatings {
                 capPitching(age, curVsLeft.getMovement(), capped.getMovement(), ovr.getMovement()))
             .hits(capPitching(age, curVsLeft.getHits(), capped.getHits(), ovr.getHits()))
             .gap(capPitching(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
+            .groundBallPct(curVsLeft.getGroundBallPct().get())
             .endurance(ovr.getEndurance())
+            .runs(curVsLeft.getRuns())
             .build();
 
-    PitchingRatings curVsRight = getPitching().getVsRight();
+    PitchingRatings<?> curVsRight = getPitching().getVsRight();
 
     PitchingRatings<Integer> potVsRight =
         PitchingRatings.builder(new OneToOneHundred())
@@ -165,7 +171,9 @@ public final class PlayerRatings {
                 capPitching(age, curVsRight.getMovement(), capped.getMovement(), ovr.getMovement()))
             .hits(capPitching(age, curVsRight.getHits(), capped.getHits(), ovr.getHits()))
             .gap(capPitching(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
+            .groundBallPct(curVsRight.getGroundBallPct().get())
             .endurance(ovr.getEndurance())
+            .runs(curVsRight.getRuns())
             .build();
 
     return Splits.create(potVsLeft, potVsRight);
@@ -237,11 +245,11 @@ public final class PlayerRatings {
         .toString();
   }
 
-  public static BattingRatings getOverallBatting(Splits<BattingRatings<?>> splits) {
+  public static BattingRatings<Integer> getOverallBatting(Splits<BattingRatings<?>> splits) {
     Integer vR = (int) Math.round(splitPercentages.getVsRhpPercentage() * 1000);
     Integer vL = 1000 - vR;
 
-    BattingRatings ovr =
+    BattingRatings<Integer> ovr =
         BattingRatings.builder(new OneToOneHundred())
             .contact(
                 OneToOneHundred.valueOf(
@@ -257,6 +265,10 @@ public final class PlayerRatings {
             .eye(
                 OneToOneHundred.valueOf(
                     (vR * splits.getVsRight().getEye() + vL * splits.getVsLeft().getEye()) / 1000))
+            .k(
+                OneToOneHundred.valueOf(
+                    (vR * splits.getVsRight().getK().get() + vL * splits.getVsLeft().getK().get()) / 1000))
+            .runningSpeed(splits.getVsRight().getRunningSpeed().get())
             .build();
 
     return ovr;
