@@ -6,6 +6,8 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 /** @author lstephen */
@@ -31,8 +33,28 @@ public class TeamStats<S extends Stats<S>> {
     this.players.putAll(players);
   }
 
+  public TeamStats<S> withRatingsOnly(Collection<Player> ps) {
+    TeamStats<S> updated = new TeamStats<S>(stats, players);
+
+    ps.stream().forEach(p -> updated.players.put(p.getId(), p));
+
+    return updated;
+  }
+
   public Iterable<Player> getPlayers() {
+    Collection<Player> ps = new ArrayList<>();
+    for (PlayerId id : stats.keySet()) {
+      ps.add(players.get(id));
+    }
+    return ps;
+  }
+
+  public Collection<Player> getAllRatings() {
     return players.values();
+  }
+
+  public Player getPlayer(PlayerId id) {
+    return players.get(id);
   }
 
   public boolean contains(Player p) {
@@ -70,6 +92,10 @@ public class TeamStats<S extends Stats<S>> {
       }
     }
 
+    private Batting(TeamStats<BattingStats> batting) {
+      super(batting.stats, batting.players);
+    }
+
     @JsonCreator
     private Batting(
         @JsonProperty("stats") Map<PlayerId, SplitStats<BattingStats>> stats,
@@ -86,6 +112,12 @@ public class TeamStats<S extends Stats<S>> {
     public static Batting create(
         TeamStats<BattingStats> batting, Map<Player, RunningStats> running) {
       return new Batting(batting, running);
+    }
+
+    public TeamStats.Batting withRatingsOnly(Collection<Player> ps) {
+      Batting b = new Batting(super.withRatingsOnly(ps));
+      b.running.putAll(running);
+      return b;
     }
   }
 }

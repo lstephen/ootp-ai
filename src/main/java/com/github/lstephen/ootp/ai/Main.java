@@ -9,6 +9,7 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.Predictor$;
+import com.github.lstephen.ootp.ai.report.DevelopmentReport;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
@@ -369,6 +370,9 @@ public class Main {
     }
 
     Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
+
+    LOG.info("Development Report...");
+    Printables.print(new DevelopmentReport(site, predictor)).to(out);
 
     LOG.info("Draft...");
     ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));

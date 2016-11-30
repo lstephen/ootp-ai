@@ -47,6 +47,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -260,12 +261,22 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public TeamStats.Batting getTeamBatting() {
-    return new TeamBattingImpl(this, definition.getTeam()).extract();
+    Collection<Player> players = new ArrayList<>();
+    for (Player p : extractTeam()) {
+      if (p.isHitter()) { players.add(p); }
+    }
+
+    return new TeamBattingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
   }
 
   @Override
   public TeamStats<PitchingStats> getTeamPitching() {
-    return new TeamPitchingImpl(this, definition.getTeam()).extract();
+    Collection<Player> players = new ArrayList<>();
+    for (Player p : extractTeam()) {
+      if (p.isPitcher()) { players.add(p); }
+    }
+
+    return new TeamPitchingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
   }
 
   public TopProspects getTopProspects(Integer teamId) {
