@@ -45,7 +45,7 @@ class Predictor(ps: Seq[Player],
 
   val pitchingFuture = time(
     "pitchingFuture",
-    pr.predict(ps.filter(_.isPitcher)).mapValues(new PitchingPrediction(_)))
+    pr.predictFuture(ps.filter(_.isPitcher)).mapValues(new PitchingPrediction(_)))
 
   private def getPrediction[P](ps: Map[Player, P], p: Player): P =
     ps.get(p)
