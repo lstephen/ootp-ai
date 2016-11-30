@@ -13,6 +13,7 @@ import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.splits.Splits;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 
 /** @author lstephen */
 public final class PlayerRatings {
@@ -157,7 +158,7 @@ public final class PlayerRatings {
             .gap(capPitching(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
             .groundBallPct(curVsLeft.getGroundBallPct())
             .endurance(ovr.getEndurance())
-            .runs(curVsLeft.getRuns())
+            .runs(Optional.absent())
             .build();
 
     PitchingRatings<?> curVsRight = getPitching().getVsRight();
@@ -173,7 +174,7 @@ public final class PlayerRatings {
             .gap(capPitching(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
             .groundBallPct(curVsRight.getGroundBallPct())
             .endurance(ovr.getEndurance())
-            .runs(curVsRight.getRuns())
+            .runs(Optional.absent())
             .build();
 
     return Splits.create(potVsLeft, potVsRight);
