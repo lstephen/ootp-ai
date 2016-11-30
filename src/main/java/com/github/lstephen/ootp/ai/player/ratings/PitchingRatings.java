@@ -238,6 +238,10 @@ public class PitchingRatings<T> {
       return groundBallPct(new Rating<>(value, new OneToOneHundred()));
     }
 
+    public Builder<T> groundBallPct(Optional<Integer> value) {
+      return value.transform(this::groundBallPct).or(this);
+    }
+
     public Builder<T> runs(Rating<Integer, ? super OneToTen> runs) {
       this.runs = runs;
       return this;

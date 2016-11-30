@@ -155,7 +155,7 @@ public final class PlayerRatings {
                 capPitching(age, curVsLeft.getMovement(), capped.getMovement(), ovr.getMovement()))
             .hits(capPitching(age, curVsLeft.getHits(), capped.getHits(), ovr.getHits()))
             .gap(capPitching(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
-            .groundBallPct(curVsLeft.getGroundBallPct().get())
+            .groundBallPct(curVsLeft.getGroundBallPct())
             .endurance(ovr.getEndurance())
             .runs(curVsLeft.getRuns())
             .build();
@@ -171,7 +171,7 @@ public final class PlayerRatings {
                 capPitching(age, curVsRight.getMovement(), capped.getMovement(), ovr.getMovement()))
             .hits(capPitching(age, curVsRight.getHits(), capped.getHits(), ovr.getHits()))
             .gap(capPitching(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
-            .groundBallPct(curVsRight.getGroundBallPct().get())
+            .groundBallPct(curVsRight.getGroundBallPct())
             .endurance(ovr.getEndurance())
             .runs(curVsRight.getRuns())
             .build();
