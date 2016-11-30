@@ -268,7 +268,7 @@ public final class PlayerRatings {
             .k(
                 OneToOneHundred.valueOf(
                     (vR * splits.getVsRight().getK().get() + vL * splits.getVsLeft().getK().get()) / 1000))
-            .runningSpeed(splits.getVsRight().getRunningSpeed().get())
+            .runningSpeed(splits.getVsRight().getRunningSpeed())
             .build();
 
     return ovr;

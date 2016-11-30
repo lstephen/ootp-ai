@@ -248,6 +248,11 @@ public final class BattingRatings<T> {
       return value == null ? this : runningSpeed(new Rating<>(value, new OneToOneHundred()));
     }
 
+    public Builder<T> runningSpeed(Optional<Integer> value) {
+      return value.transform(this::runningSpeed).or(this);
+    }
+
+
     public Builder<T> stealingAbility(Rating<Integer, ? super OneToOneHundred> sa) {
       this.stealingAbility = sa;
       return this;
