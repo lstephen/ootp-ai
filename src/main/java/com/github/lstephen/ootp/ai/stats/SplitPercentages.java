@@ -6,15 +6,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /** @author lstephen */
-public final class SplitPercentages {
+public class SplitPercentages {
 
-  private final Site site;
+  private Site site;
 
   private int vsLhp;
   private int vsRhp;
 
   private int vsLhb;
   private int vsRhb;
+
+  protected SplitPercentages() { }
 
   private SplitPercentages(Site site) {
     this.site = site;

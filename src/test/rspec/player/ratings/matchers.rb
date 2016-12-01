@@ -51,3 +51,30 @@ RSpec::Matchers.define :be_ootp6_pitching_ratings do |stuff, control, movement|
   end
 end
 
+RSpec::Matchers.define :be_ootp5_pitching_ratings do |hits, doubles, hrs, bbs, ks|
+  def normalize(value)
+    scale.normalize(value).get
+  end
+
+  def ratings_to_string(r)
+    "#{r.hits}/#{r.gap}/#{r.movement}/#{r.control}/#{r.stuff}"
+  end
+
+  match do |ratings|
+    ratings != nil &&
+      ratings.hits == normalize(hits) &&
+      ratings.gap == normalize(doubles) &&
+      ratings.movement == normalize(hrs) &&
+      ratings.control == normalize(bbs) &&
+      ratings.stuff == normalize(ks)
+  end
+
+  description do
+    "be ratings of #{hits}/#{doubles}/#{hrs}/#{bbs}/#{ks}"
+  end
+
+  failure_message do |actual|
+    "expected that #{ratings_to_string(actual)} would #{description}"
+  end
+end
+
