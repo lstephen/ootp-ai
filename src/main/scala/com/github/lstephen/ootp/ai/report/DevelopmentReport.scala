@@ -28,8 +28,8 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends P
 
   def print(w: PrintWriter): Unit = {
 
-    val dHitting = idsHitting.map(new PlayerDevelopment(_, pHitting, cHitting)).toList.sorted.reverse
-    val dPitching = idsPitching.map(new PlayerDevelopment(_, pPitching, cPitching)).toList.sorted.reverse
+    val dHitting = idsHitting.map(new PlayerDevelopment(_, pHitting, cHitting)).toList.sortBy(pd => (pd.score, - pd.toP.getAge())).reverse
+    val dPitching = idsPitching.map(new PlayerDevelopment(_, pPitching, cPitching)).toList.sortBy(pd => (pd.score, -pd.toP.getAge())).reverse
 
     w.println("Hitters")
     dHitting.filter(_.toP.isHitter).map(_.format).foreach(w.println(_))
