@@ -26,7 +26,8 @@ class Input(private val is: List[Option[Double]]) {
 }
 
 object Input {
-  def apply(ds: Integer*): Input = apply(ds.toList.map(_.doubleValue))
+  //def apply(ds: Integer*): Input = apply(ds.toList.map(_.doubleValue))
+  def apply[N <: Number](ds: Option[N]*): Input = new Input(ds.map(_.map(_.doubleValue)).toList)
   def apply(ds: List[Double]): Input = new Input(ds.map(Some(_)))
 }
 
@@ -54,8 +55,7 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
       val sum = entries.map(_._1).sum
       val weights = entries.map(_._2).sum
 
-      sum / weights
-      //if (vs.isEmpty) 50.0 else (vs.sum / vs.length)
+      if (weights == 0) 0 else sum / weights
     }.toList
   }
 

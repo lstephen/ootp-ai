@@ -51,6 +51,7 @@ class RandomForest:
     def report(self, out):
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
         out.write("Feature Scores: {}\n".format(np.round_(self.pipeline().named_steps['selection'].scores_), 3))
+        out.write("Feature Mask: {}\n".format(self.pipeline().named_steps['selection']._get_support_mask()))
         out.write("Feature Importances: {}\n".format(np.round_(self.pipeline().named_steps['regressor'].feature_importances_, 3)))
 
     def __repr__(self):
