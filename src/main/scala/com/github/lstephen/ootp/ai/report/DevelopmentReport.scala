@@ -26,10 +26,12 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends P
   val pPitching = History.create.loadPitching(site, -1)
   val idsPitching = playerIdSet(cPitching).intersect(playerIdSet(pPitching))
 
+  val pPredictor = new Predictor((cHitting.getAllRatings.asScala ++ cPitching.getAllRatings.asScala).toList.distinct, predictor) 
+
   def print(w: PrintWriter): Unit = {
 
-    val dHitting = idsHitting.map(new PlayerDevelopment(_, pHitting, cHitting)).toList.sortBy(pd => (pd.score, - pd.toP.getAge())).reverse
-    val dPitching = idsPitching.map(new PlayerDevelopment(_, pPitching, cPitching)).toList.sortBy(pd => (pd.score, -pd.toP.getAge())).reverse
+    val dHitting = idsHitting.map(new PlayerDevelopment(_, (pHitting, pPredictor), (cHitting, predictor))).toList.sortBy(pd => (pd.score, - pd.toP.getAge())).reverse
+    val dPitching = idsPitching.map(new PlayerDevelopment(_, (pPitching, pPredictor), (cPitching, predictor))).toList.sortBy(pd => (pd.score, -pd.toP.getAge())).reverse
 
     w.println("Hitters")
     dHitting.filter(_.toP.isHitter).map(_.format).foreach(w.println(_))
@@ -39,13 +41,13 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends P
   }
 }
 
-class PlayerDevelopment(pid: PlayerId, from: TeamStats[_], to: TeamStats[_])(implicit predictor: Predictor) extends Scoreable {
+class PlayerDevelopment(pid: PlayerId, from: (TeamStats[_], Predictor), to: (TeamStats[_], Predictor)) extends Scoreable {
 
-  val fromP = from.getPlayer(pid)
-  val toP = to.getPlayer(pid)
+  val fromP = from._1.getPlayer(pid)
+  val toP = to._1.getPlayer(pid)
 
-  val fromV = NowValue(fromP)
-  val toV = NowValue(toP)
+  val fromV = NowValue(fromP)(from._2)
+  val toV = NowValue(toP)(to._2)
 
   val score = toV.score - fromV.score
 

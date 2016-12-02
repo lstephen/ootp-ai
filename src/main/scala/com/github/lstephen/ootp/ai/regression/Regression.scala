@@ -7,12 +7,10 @@ import com.github.lstephen.ootp.ai.player.ratings.{
   PitchingRatings
 }
 import com.github.lstephen.ootp.ai.site.{SiteHolder, Version}
-
+import com.google.common.base.Optional
 import com.typesafe.scalalogging.StrictLogging
-
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SparkSession
-
 import scala.math.ScalaNumericAnyConversions
 
 object Spark {
@@ -32,42 +30,45 @@ object Regressable {
   // Note that this is java.lang.Integer
   def toSomeDouble(i: Integer): Some[Double] = Some(i.doubleValue)
 
+  val version = SiteHolder.get.getType
+
+  def s(n: Number): Option[Number] = Some(n)
+  def o[T](o: Optional[T]): Option[T] = if (o.isPresent) Some(o.get) else None
+
   implicit object RegressableBattingRatings
-      extends Regressable[BattingRatings[_]] {
-    def toInput(r: BattingRatings[_]) = {
-      var extras = List(r.getK, r.getRunningSpeed).map { o =>
-        if (o.isPresent) Some(o.get.doubleValue) else None
+    extends Regressable[BattingRatings[_]] {
+
+    def toInput(r: BattingRatings[_]): Input = version match {
+        case Version.OOTP5 =>
+          Input(s(r.getContact), s(r.getGap), o(r.getTriples), s(r.getPower), s(r.getEye), o(r.getK), o(r.getRunningSpeed))
+        case Version.OOTP6 =>
+          Input(s(r.getContact), s(r.getGap), s(r.getPower), s(r.getEye), o(r.getK), o(r.getRunningSpeed))
       }
 
-      Input(r.getContact, r.getGap, r.getPower, r.getEye) ++ new Input(extras)
+    val features = version match {
+      case Version.OOTP5 =>
+        Seq("Hits", "Doubles", "Triples", "Homeruns", "Walks", "Strikeouts", "Running Speed")
+      case Version.OOTP6 =>
+        Seq("Contact", "Gap", "Power", "Eye", "Avoid K's", "Running Speed")
     }
-
-    val features = Seq("Contact", "Gap", "Power", "Eye", "K", "Speed")
   }
 
   implicit object RegressablePitchingRatings
       extends Regressable[PitchingRatings[_]] {
-    val version = SiteHolder.get.getType
 
-    def toInput(r: PitchingRatings[_]) = {
-      var as: Input =
-        Input(r.getMovement, r.getControl, r.getStuff)
-
-      as = as :+ (if (r.getGroundBallPct.isPresent)
-                    Some(r.getGroundBallPct.get.doubleValue)
-                  else None)
-
-      if (version == Version.OOTP5) {
-        as = as ++ Input(r.getHits, r.getGap)
-
-        as = as :+ (if (r.getRuns.isPresent) Some(r.getRuns.get.doubleValue) else None)
-      }
-
-      as
+    def toInput(r: PitchingRatings[_]) = version match {
+      case Version.OOTP5 =>
+        Input(o(r.getRuns), s(r.getHits), s(r.getGap), s(r.getMovement), s(r.getControl), s(r.getStuff), o(r.getGroundBallPct))
+      case Version.OOTP6 =>
+        Input(s(r.getStuff), s(r.getControl), s(r.getMovement), o(r.getGroundBallPct))
     }
 
-    val features = Seq("Movement", "Control", "Stuff", "GB%") ++
-      (if (version == Version.OOTP5) Seq("Hits", "2B", "Runs") else Seq())
+    val features = version match {
+      case Version.OOTP5 =>
+        Seq("Runs", "Hits", "Doubles", "Homeruns", "Walks", "Strikeouts", "Groundball Pct.")
+      case Version.OOTP6 =>
+        Seq("Stuff", "Control", "Movement", "Groundball Pct.")
+    }
   }
 }
 
