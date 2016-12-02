@@ -3,21 +3,23 @@ package com.github.lstephen.ootp.ai.report
 import com.github.lstephen.ootp.ai.io.Printable
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.PlayerId
-import com.github.lstephen.ootp.ai.regression.Predictor
+import com.github.lstephen.ootp.ai.regression.{Predictor, Regressable}
 import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.score.Scoreable
-import com.github.lstephen.ootp.ai.stats.BattingStats
-import com.github.lstephen.ootp.ai.stats.History
-import com.github.lstephen.ootp.ai.stats.TeamStats
+import com.github.lstephen.ootp.ai.splits.Splits
+import com.github.lstephen.ootp.ai.stats.{History, TeamStats}
 import com.github.lstephen.ootp.ai.value.NowAbility
 import java.io.PrintWriter
 import org.apache.commons.lang3.StringUtils
 import scala.collection.JavaConverters._
 
 class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends Printable {
+  import Regressable._
 
-  def print(w: PrintWriter, pds: Seq[PlayerDevelopment], filter: PlayerDevelopment => Boolean) = {
-    pds.sortBy(pd => (pd.score, -pd.toP.getAge)).reverse.filter(filter).map(_.format).foreach(w.println(_))
+  def print[T: Regressable](w: PrintWriter, pds: Seq[PlayerDevelopment], filter: PlayerDevelopment => Boolean, regressedOn: Player => Splits[T]) = {
+    val r = implicitly[Regressable[T]]
+    w.println(r.features.mkString(", "))
+    pds.sortBy(pd => (pd.score, -pd.toP.getAge)).reverse.filter(filter).map(_.format(regressedOn)).foreach(w.println(_))
   }
 
   def print(w: PrintWriter): Unit = {
@@ -33,10 +35,10 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends P
     val dPitching = PlayerDevelopment.between((fromPitching, fromPredictions), (site.getTeamPitching, predictor))
 
     w.format("%nHitters%n")
-    print(w, dHitting, _.toP.isHitter)
+    print(w, dHitting, _.toP.isHitter, _.getBattingRatings)
 
     w.format("%nPitchers%n")
-    print(w, dPitching, _.toP.isPitcher)
+    print(w, dPitching, _.toP.isPitcher, _.getPitchingRatings)
   }
 }
 
@@ -50,8 +52,28 @@ class PlayerDevelopment(pid: PlayerId, from: (TeamStats[_], Predictor), to: (Tea
 
   val score = toV.score - fromV.score
 
-  val format =
-      f"${toP.getListedPosition.or("")}%2s ${StringUtils.abbreviate(toP.getName(), 25)}%-25s | ${fromP.getAge}%2s ${fromV.format}%s | ${toP.getAge}%2s ${toV.format}%s | ${score.toLong}%+3d"
+  def format[T: Regressable](regressedOn: Player => Splits[T]) = {
+    def ratingChange(f: Option[Double], t: Option[Double]): Option[Double] =
+      for { fr <- f; tr <- t } yield tr - fr
+
+    def formatRatingsChanges(from: T, to: T): String = {
+      val r = implicitly[Regressable[T]]
+
+      (r.toInput(from).toOptionList, r.toInput(to).toOptionList)
+        .zipped
+        .map { case (f, t) => ratingChange(f, t) }
+        .map(_.map(v => f"${v.round}%+3d").getOrElse("   "))
+        .mkString("")
+    }
+
+    val info = f"${toP.getListedPosition.or("")}%2s ${StringUtils.abbreviate(toP.getName(), 25)}%-25s ${toP.getAge}%2s"
+    val fromAndTo = f"${fromV.format}%s | ${toV.format}"
+
+    val vsL = formatRatingsChanges(regressedOn(fromP).getVsLeft, regressedOn(toP).getVsLeft)
+    val vsR = formatRatingsChanges(regressedOn(fromP).getVsRight, regressedOn(toP).getVsRight)
+
+    f"$info | $fromAndTo | ${score.toLong}%+3d | ${vsL} : ${vsR} |"
+  }
 }
 
 object PlayerDevelopment {
