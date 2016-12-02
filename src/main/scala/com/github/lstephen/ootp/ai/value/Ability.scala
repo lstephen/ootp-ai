@@ -19,4 +19,12 @@ class Ability(val player: Player, val position: Position)(
   val defense: Option[Score] = None
 
   def components = List(batting, pitching, defense)
+
+  def format: String =
+    components
+      .map(_.map(s => f"${s.toLong}%3d"))
+      .map(_.getOrElse("   "))
+      .mkString(f"${position.getAbbreviation}%2s : ",
+                " ",
+                f" : ${score.toLong}%3d")
 }
