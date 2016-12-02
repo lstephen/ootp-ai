@@ -5,6 +5,7 @@ require 'player/ratings/contexts'
 
 
 java_import com.github.lstephen.ootp.ai.player.PlayerId;
+java_import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
 java_import com.github.lstephen.ootp.ai.ootp5.site.SinglePlayer;
 java_import com.github.lstephen.ootp.ai.rating.AToE;
 java_import com.github.lstephen.ootp.ai.rating.OneToFive;
@@ -14,12 +15,21 @@ java_import com.github.lstephen.ootp.ai.rating.Rating;
 java_import com.github.lstephen.ootp.ai.rating.TwoToEight;
 java_import com.github.lstephen.ootp.ai.rating.ZeroToTen;
 java_import com.github.lstephen.ootp.ai.site.Version;
+java_import com.github.lstephen.ootp.ai.stats.SplitPercentages
 java_import com.github.lstephen.ootp.extract.html.loader.JsoupLoader;
-
 java_import com.google.common.base.Optional;
 java_import com.google.common.io.Resources;
-
 java_import org.jsoup.Jsoup;
+
+class MockSplitPercentages < SplitPercentages
+  def getVsLhbPercentage
+    0.3
+  end
+
+  def getVsRhbPercentage
+    0.7
+  end
+end
 
 RSpec.describe SinglePlayer do
 
@@ -46,15 +56,25 @@ RSpec.describe SinglePlayer do
         getTeamTopProspectPosition: Optional.absent)
     end
 
+    let(:ratings_definition) do
+      double('RatingsDefintion',
+         isFreezeOneRatings: false)
+    end
+
     before(:each) do
       allow(site).to receive_message_chain(:getPage, :load).and_return document
     end
 
     before(:each) { single_player.site = site }
+    before(:each) { PlayerRatings.percentages = MockSplitPercentages.new }
 
     before(:each) { single_player.salary_source = double('SalarySource', getSalary: '$SALARY') }
 
-    subject(:player) { single_player.get(id) }
+    subject(:player) do
+      p = single_player.get(id)
+      p.ratings_definition = ratings_definition
+      p
+    end
 
     context 'OOTP5' do
       let(:version) { Version::OOTP5 }
@@ -87,10 +107,57 @@ RSpec.describe SinglePlayer do
         it_behaves_like :pitcher, 'Calvin Rosati', 26
 
         context '#pitching_ratings', :property => :pitching_ratings do
+          its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 5, 7, 8, 6, 10 }
+          its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 7, 7, 9, 6, 10 }
 
-        its("vs_right.endurance") { is_expected.to eq(6) }
-        its("vs_right.ground_ball_pct.get") { is_expected.to eq(48) }
-        its("vs_right.runs.get") { is_expected.to eq(65) }
+          its("vs_right.endurance") { is_expected.to eq(6) }
+          its("vs_right.ground_ball_pct.get") { is_expected.to eq(48) }
+          its("vs_right.runs.get") { is_expected.to eq(65) }
+        end
+
+        context '#pitching_potential_ratings' do
+          let(:scale) { OneToOneHundred.new }
+          subject { player.pitching_potential_ratings }
+
+          its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 56, 70, 83, 60, 100 }
+          its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 76, 70, 93, 60, 100 }
+
+          [ 'vs_left', 'vs_right' ].each do |vs|
+            its("#{vs}.endurance") { is_expected.to eq(6) }
+            its("#{vs}.ground_ball_pct.get") { is_expected.to eq(48) }
+            its("#{vs}.runs") { is_expected.to_not be_present }
+          end
+        end
+      end
+
+      context 'Earl Putz' do
+        let(:file) { 'earl_putz' }
+
+        it_behaves_like :pitcher, 'Earl Putz', 20
+
+        context '#pitching_ratings', :property => :pitching_ratings do
+          its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 1, 4, 5, 5, 3 }
+          its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 2, 4, 5, 5, 4 }
+
+          [ 'vs_left', 'vs_right' ].each do |vs|
+            its("#{vs}.endurance") { is_expected.to eq(10) }
+            its("#{vs}.ground_ball_pct.get") { is_expected.to eq(68) }
+            its("#{vs}.runs.get") { is_expected.to eq(-5) }
+          end
+        end
+
+        context '#pitching_potential_ratings' do
+          let(:scale) { OneToOneHundred.new }
+          subject { player.pitching_potential_ratings }
+
+          its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 63, 50, 70, 70, 43 }
+          its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 73, 50, 70, 70, 53 }
+
+          [ 'vs_left', 'vs_right' ].each do |vs|
+            its("#{vs}.endurance") { is_expected.to eq(10) }
+            its("#{vs}.ground_ball_pct.get") { is_expected.to eq(68) }
+            its("#{vs}.runs") { is_expected.to_not be_present }
+          end
         end
       end
     end
