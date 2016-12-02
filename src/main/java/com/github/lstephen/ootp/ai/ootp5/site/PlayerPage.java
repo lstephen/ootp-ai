@@ -22,6 +22,7 @@ public final class PlayerPage {
   private static enum BattingRatingsType {
     CONTACT,
     GAP,
+    TRIPLES,
     POWER,
     EYE,
     K
@@ -36,12 +37,14 @@ public final class PlayerPage {
           BattingRatingsType.K, 5);
 
   private static final ImmutableMap<BattingRatingsType, Integer> OOTP5_HITTING =
-      ImmutableMap.of(
-          BattingRatingsType.CONTACT, 1,
-          BattingRatingsType.GAP, 2,
-          BattingRatingsType.POWER, 4,
-          BattingRatingsType.EYE, 5,
-          BattingRatingsType.K, 6);
+      ImmutableMap.<BattingRatingsType, Integer>builder()
+          .put(BattingRatingsType.CONTACT, 1)
+          .put(BattingRatingsType.GAP, 2)
+          .put(BattingRatingsType.TRIPLES, 3)
+          .put(BattingRatingsType.POWER, 4)
+          .put(BattingRatingsType.EYE, 5)
+          .put(BattingRatingsType.K, 6)
+          .build();
 
   private static final ImmutableMap<String, Integer> OOTP5_POTENTIAL =
       ImmutableMap.of(
@@ -107,6 +110,7 @@ public final class PlayerPage {
     return BattingRatings.builder(scale)
         .contact(line.get(idx.get(BattingRatingsType.CONTACT)).text())
         .gap(line.get(idx.get(BattingRatingsType.GAP)).text())
+        .triples(idx.containsKey(BattingRatingsType.TRIPLES) ? line.get(idx.get(BattingRatingsType.TRIPLES)).text() : null)
         .power(line.get(idx.get(BattingRatingsType.POWER)).text())
         .eye(line.get(idx.get(BattingRatingsType.EYE)).text())
         .k(line.get(idx.get(BattingRatingsType.K)).text())

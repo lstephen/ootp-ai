@@ -33,13 +33,6 @@ public class SinglePlayer implements PlayerSource {
 
   private static final Logger LOG = Logger.getLogger(SinglePlayer.class.getName());
 
-  private static enum BattingRatingsType {
-    CONTACT,
-    GAP,
-    POWER,
-    EYE
-  }
-
   private static enum PitchingRatingsType {
     HITS,
     GAP,

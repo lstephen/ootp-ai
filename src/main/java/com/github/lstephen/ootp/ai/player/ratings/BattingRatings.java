@@ -24,6 +24,8 @@ public final class BattingRatings<T> {
 
   private final Rating<T, ?> gap;
 
+  private final Rating<T, ?> triples;
+
   private final Rating<T, ?> power;
 
   private final Rating<T, ?> eye;
@@ -44,6 +46,7 @@ public final class BattingRatings<T> {
     this.scale = builder.scale;
     this.contact = builder.contact;
     this.gap = builder.gap;
+    this.triples = builder.triples;
     this.power = builder.power;
     this.eye = builder.eye;
     this.k = builder.k;
@@ -57,6 +60,10 @@ public final class BattingRatings<T> {
 
   public Integer getGap() {
     return gap.normalize().get();
+  }
+
+  public Optional<Integer> getTriples() {
+    return triples == null ? Optional.<Integer>absent() : Optional.of(triples.normalize().get());
   }
 
   public Integer getPower() {
@@ -144,6 +151,8 @@ public final class BattingRatings<T> {
 
     private Rating<T, ? extends Scale<T>> gap;
 
+    private Rating<T, ? extends Scale<T>> triples;
+
     private Rating<T, ? extends Scale<T>> power;
 
     private Rating<T, ? extends Scale<T>> eye;
@@ -190,6 +199,28 @@ public final class BattingRatings<T> {
 
     public Builder<T> gap(T value) {
       return gap(new Rating<>(value, scale));
+    }
+
+    public Builder<T> triples(Rating<T, ?> triples) {
+      this.triples = triples;
+      return this;
+    }
+
+    @JsonProperty("triples")
+    public Builder<T> triples(String s) {
+      return s == null || s.equals("null") ? this : triples(scale.parse(s));
+    }
+
+    public Builder<T> triples(T value) {
+      return triples(new Rating<>(value, scale));
+    }
+
+    public Builder<T> triples(Optional<T> value) {
+      return value.transform(this::triples).or(this);
+    }
+
+    public Builder<T> triplesOptionalRating(Optional<? extends Rating<T, ?>> value) {
+      return value.transform(this::triples).or(this);
     }
 
     public Builder<T> power(Rating<T, ?> power) {

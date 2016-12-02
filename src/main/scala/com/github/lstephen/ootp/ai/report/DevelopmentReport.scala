@@ -9,7 +9,7 @@ import com.github.lstephen.ootp.ai.score.Scoreable
 import com.github.lstephen.ootp.ai.stats.BattingStats
 import com.github.lstephen.ootp.ai.stats.History
 import com.github.lstephen.ootp.ai.stats.TeamStats
-import com.github.lstephen.ootp.ai.value.NowValue
+import com.github.lstephen.ootp.ai.value.NowAbility
 import java.io.PrintWriter
 import org.apache.commons.lang3.StringUtils
 import scala.collection.JavaConverters._
@@ -21,8 +21,16 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends P
   }
 
   def print(w: PrintWriter): Unit = {
-    val dHitting = PlayerDevelopment.between(site.getTeamBatting, History.create.loadBatting(site, -1))
-    val dPitching = PlayerDevelopment.between(site.getTeamPitching, History.create.loadPitching(site, -1))
+    val fromHitting = History.create.loadBatting(site, -1)
+    val fromPitching = History.create.loadPitching(site, -1)
+
+    fromHitting.getAllRatings.asScala.foreach(_.setRatingsDefinition(site.getDefinition))
+    fromPitching.getAllRatings.asScala.foreach(_.setRatingsDefinition(site.getDefinition))
+
+    val fromPredictions = new Predictor((fromHitting.getAllRatings.asScala ++ fromPitching.getAllRatings.asScala).toSeq.distinct, predictor)
+
+    val dHitting = PlayerDevelopment.between((fromHitting, fromPredictions), (site.getTeamBatting, predictor))
+    val dPitching = PlayerDevelopment.between((fromPitching, fromPredictions), (site.getTeamPitching, predictor))
 
     w.format("%nHitters%n")
     print(w, dHitting, _.toP.isHitter)
@@ -32,13 +40,13 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor) extends P
   }
 }
 
-class PlayerDevelopment(pid: PlayerId, from: TeamStats[_], to: TeamStats[_])(implicit predictor: Predictor) extends Scoreable {
+class PlayerDevelopment(pid: PlayerId, from: (TeamStats[_], Predictor), to: (TeamStats[_], Predictor)) extends Scoreable {
 
-  val fromP = from.getPlayer(pid)
-  val toP = to.getPlayer(pid)
+  val fromP = from._1.getPlayer(pid)
+  val toP = to._1.getPlayer(pid)
 
-  val fromV = NowValue(fromP)
-  val toV = NowValue(toP)
+  val fromV = NowAbility(fromP)(from._2)
+  val toV = NowAbility(toP)(to._2)
 
   val score = toV.score - fromV.score
 
@@ -50,8 +58,8 @@ object PlayerDevelopment {
 
   private def playerIdSet(s: TeamStats[_]) = s.getAllRatings.asScala.toSet.map((p: Player) => p.getId)
 
-  def between(from: TeamStats[_], to: TeamStats[_])(implicit predictor: Predictor): Seq[PlayerDevelopment] = {
-    val pids = playerIdSet(from).intersect(playerIdSet(to))
+  def between(from: (TeamStats[_], Predictor), to: (TeamStats[_], Predictor)): Seq[PlayerDevelopment] = {
+    val pids = playerIdSet(from._1).intersect(playerIdSet(to._1))
 
     pids.map(new PlayerDevelopment(_, from, to)).toList
   }
