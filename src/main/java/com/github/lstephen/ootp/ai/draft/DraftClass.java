@@ -2,6 +2,7 @@ package com.github.lstephen.ootp.ai.draft;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.lstephen.ootp.ai.config.Config;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.SiteDefinition;
@@ -29,14 +30,12 @@ public final class DraftClass {
     Iterables.addAll(this.players, players);
   }
 
-  public void addIfNotPresent(Player p) {
-    if (!this.players.contains(p)) {
-      this.players.add(p);
-    }
+  public void add(Player p) {
+    this.players.add(p);
   }
 
-  public void addIfNotPresent(Collection<Player> ps) {
-    ps.stream().forEach(this::addIfNotPresent);
+  public void add(Collection<Player> ps) {
+    ps.stream().forEach(this::add);
   }
 
   public Collection<Player> getPlayers() {
@@ -57,7 +56,7 @@ public final class DraftClass {
 
   public static DraftClass create(Collection<Player> ps) {
     DraftClass dc = new DraftClass();
-    dc.addIfNotPresent(ps);
+    dc.add(ps);
     return dc;
   }
 
@@ -74,6 +73,20 @@ public final class DraftClass {
       }
     } else {
       return create(ImmutableSet.<Player>of());
+    }
+  }
+
+  public static DraftClass load(Site site, int year) {
+    return load(getDraftClassFile(site, year), site.getDefinition());
+  }
+
+  public static File getDraftClassFile(Site site, int year) {
+    try {
+      String historyDirectory =
+          Config.createDefault().getValue("history.dir").or("c:/ootp/history");
+      return new File(historyDirectory + "/" + site.getName() + year + ".draft.json");
+    } catch (IOException e) {
+      throw Throwables.propagate(e);
     }
   }
 }

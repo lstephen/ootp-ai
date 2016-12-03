@@ -23,6 +23,8 @@ class Input(private val is: List[Option[Double]]) {
     }.toArray
 
   def toVector(f: Int => Double): Vector = new DenseVector(toArray(f))
+
+  def toOptionList: List[Option[Double]] = is
 }
 
 object Input {
