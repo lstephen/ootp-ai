@@ -157,20 +157,20 @@ public class PitchingStats implements Stats<PitchingStats> {
     }
   }
 
-  public Double getBaseRuns() {
+  public double getBaseRuns() {
     return getBaseRuns(EraBaseRuns.get());
   }
 
-  public Double getBaseRuns(BaseRuns brs) {
+  public double getBaseRuns(BaseRuns brs) {
     return brs.calculate(this);
   }
 
-  public Integer getBaseRunsPlus() {
+  public long getBaseRunsPlus() {
     return getBaseRunsPlus(EraBaseRuns.get());
   }
 
-  public Integer getBaseRunsPlus(BaseRuns brs) {
-    return (int) (leaguePitching.getBaseRuns(brs) * 100 / getBaseRuns(brs));
+  public long getBaseRunsPlus(BaseRuns brs) {
+    return Math.round(leaguePitching.getBaseRuns(brs) * 100.0 / getBaseRuns(brs));
   }
 
   public double getFip() {

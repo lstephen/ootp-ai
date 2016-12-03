@@ -190,8 +190,8 @@ public class BattingStats implements Stats<BattingStats> {
     + 2.0 * homeRuns);*/
   }
 
-  public int getWobaPlus() {
-    return (int) (getWoba() * 100 / leagueBatting.getWoba());
+  public long getWobaPlus() {
+    return Math.round(getWoba() * 100.0 / leagueBatting.getWoba());
   }
 
   public String getSlashLine() {

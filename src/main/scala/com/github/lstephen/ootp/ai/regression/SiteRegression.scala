@@ -61,6 +61,8 @@ class BattingRegression(site: Site) extends SiteRegression(site) {
     h.saveBatting(s, site, currentSeason)
   def loadHistory(h: History) =
     h.loadBatting(site, currentSeason, 5).asScala.toSeq
+
+  def getOverall(s: BattingStats) = s.getWobaPlus
 }
 
 class PitchingRegression(site: Site) extends SiteRegression(site) {
@@ -94,6 +96,9 @@ class PitchingRegression(site: Site) extends SiteRegression(site) {
     h.savePitching(s, site, currentSeason)
   def loadHistory(h: History) =
     h.loadPitching(site, currentSeason, 5).asScala.toSeq
+
+  def getOverall(s: PitchingStats) = s.getBaseRunsPlus
+
 }
 
 abstract class SiteRegression(site: Site) extends LazyLogging {
@@ -113,6 +118,8 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
   def saveHistory(h: History, s: TeamStats[S]): Unit
   def loadHistory(h: History): Seq[TeamStats[S]]
+
+  def getOverall(s: S): Double
 
   val currentSeason = site.getDate.getYear
 
@@ -206,6 +213,37 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       w.println(s"Features: ${regressable.features.mkString(", ")}")
       regressOn.foreach(r =>
         Printables.print(getRegression(r).modelReport).to(w))
+    }
+  }
+
+  def importanceReport: Printable = new Printable {
+    def print(w: PrintWriter): Unit = {
+      val avg = Input(getRegression(regressOn.head).data.averages)
+
+      val plusTens = (0 until avg.length).map(idx => avg.updated(idx, _ + 10))
+      val minusTens = (0 until avg.length).map(idx => avg.updated(idx, _ - 10))
+
+      val allInputs = avg +: (plusTens ++ minusTens)
+
+      val stats = Seq.fill(allInputs.size) { newStats }
+
+      regressOn.foreach(ro =>
+        (getRegression(ro).predict(allInputs), stats).zipped.foreach {
+          case (d, s) => ro.setStat(s, round(defaultPlateAppearances * d))
+      })
+
+      stats.foreach(_.setPlateAppearances(defaultPlateAppearances.toInt))
+
+      val ovrs = stats.map(getOverall(_))
+
+      val features = regressable.features
+      val n = features.size
+
+      w.println(f"${"Average"}%20s |  - ${getOverall(stats.head)}%3.0f +  |")
+
+      (features, ovrs.slice(1 + n, stats.size), ovrs.slice(1, 1 + n))
+        .zipped
+        .foreach { case (label, minus, plus) => w.println(f"${label}%20s | ${minus}%3.0f : ${plus}%3.0f |") }
     }
   }
 }

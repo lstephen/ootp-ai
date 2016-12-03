@@ -66,6 +66,12 @@ class Predictor(ps: Seq[Player],
     def print(w: PrintWriter) = {
       br.correlationReport.print(w)
       pr.correlationReport.print(w)
+
+      w.format("%nHitting Features%n")
+      br.importanceReport.print(w)
+
+      w.format("%nPitching Features%n")
+      pr.importanceReport.print(w)
     }
   }
 
