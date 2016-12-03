@@ -263,7 +263,9 @@ public final class SiteImpl implements Site, SalarySource {
   public TeamStats.Batting getTeamBatting() {
     Collection<Player> players = new ArrayList<>();
     for (Player p : extractTeam()) {
-      if (p.isHitter()) { players.add(p); }
+      if (p.isHitter()) {
+        players.add(p);
+      }
     }
 
     return new TeamBattingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
@@ -273,7 +275,9 @@ public final class SiteImpl implements Site, SalarySource {
   public TeamStats<PitchingStats> getTeamPitching() {
     Collection<Player> players = new ArrayList<>();
     for (Player p : extractTeam()) {
-      if (p.isPitcher()) { players.add(p); }
+      if (p.isPitcher()) {
+        players.add(p);
+      }
     }
 
     return new TeamPitchingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);

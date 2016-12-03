@@ -36,18 +36,35 @@ object Regressable {
   def o[T](o: Optional[T]): Option[T] = if (o.isPresent) Some(o.get) else None
 
   implicit object RegressableBattingRatings
-    extends Regressable[BattingRatings[_]] {
+      extends Regressable[BattingRatings[_]] {
 
     def toInput(r: BattingRatings[_]): Input = version match {
-        case Version.OOTP5 =>
-          Input(s(r.getContact), s(r.getGap), o(r.getTriples), s(r.getPower), s(r.getEye), o(r.getK), o(r.getRunningSpeed))
-        case Version.OOTP6 =>
-          Input(s(r.getContact), s(r.getGap), s(r.getPower), s(r.getEye), o(r.getK), o(r.getRunningSpeed))
-      }
+      case Version.OOTP5 =>
+        Input(s(r.getContact),
+              s(r.getGap),
+              o(r.getTriples),
+              s(r.getPower),
+              s(r.getEye),
+              o(r.getK),
+              o(r.getRunningSpeed))
+      case Version.OOTP6 =>
+        Input(s(r.getContact),
+              s(r.getGap),
+              s(r.getPower),
+              s(r.getEye),
+              o(r.getK),
+              o(r.getRunningSpeed))
+    }
 
     val features = version match {
       case Version.OOTP5 =>
-        Seq("Hits", "Doubles", "Triples", "Homeruns", "Walks", "Strikeouts", "Running Speed")
+        Seq("Hits",
+            "Doubles",
+            "Triples",
+            "Homeruns",
+            "Walks",
+            "Strikeouts",
+            "Running Speed")
       case Version.OOTP6 =>
         Seq("Contact", "Gap", "Power", "Eye", "Avoid K's", "Running Speed")
     }
@@ -58,14 +75,32 @@ object Regressable {
 
     def toInput(r: PitchingRatings[_]) = version match {
       case Version.OOTP5 =>
-        Input(o(r.getRuns), s(r.getHits), s(r.getGap), s(r.getMovement), s(r.getControl), s(r.getStuff), o(r.getGroundBallPct), s(r.getEndurance))
+        Input(o(r.getRuns),
+              s(r.getHits),
+              s(r.getGap),
+              s(r.getMovement),
+              s(r.getControl),
+              s(r.getStuff),
+              o(r.getGroundBallPct),
+              s(r.getEndurance))
       case Version.OOTP6 =>
-        Input(s(r.getStuff), s(r.getControl), s(r.getMovement), o(r.getGroundBallPct), s(r.getEndurance))
+        Input(s(r.getStuff),
+              s(r.getControl),
+              s(r.getMovement),
+              o(r.getGroundBallPct),
+              s(r.getEndurance))
     }
 
     val features = version match {
       case Version.OOTP5 =>
-        Seq("Runs", "Hits", "Doubles", "Homeruns", "Walks", "Strikeouts", "Groundball Pct.", "Endurance")
+        Seq("Runs",
+            "Hits",
+            "Doubles",
+            "Homeruns",
+            "Walks",
+            "Strikeouts",
+            "Groundball Pct.",
+            "Endurance")
       case Version.OOTP6 =>
         Seq("Stuff", "Control", "Movement", "Groundball Pct.", "Endurance")
     }
@@ -95,7 +130,8 @@ class Regression(label: String) extends StrictLogging {
       p
   }
 
-  def addData[T](x: T, y: Double, w: Int)(implicit regressable: Regressable[T]): Unit = {
+  def addData[T](x: T, y: Double, w: Int)(
+      implicit regressable: Regressable[T]): Unit = {
     data = data :+ new DataPoint(regressable.toInput(x), y, w)
     _regression = None
   }

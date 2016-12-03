@@ -110,7 +110,10 @@ public final class PlayerPage {
     return BattingRatings.builder(scale)
         .contact(line.get(idx.get(BattingRatingsType.CONTACT)).text())
         .gap(line.get(idx.get(BattingRatingsType.GAP)).text())
-        .triples(idx.containsKey(BattingRatingsType.TRIPLES) ? line.get(idx.get(BattingRatingsType.TRIPLES)).text() : null)
+        .triples(
+            idx.containsKey(BattingRatingsType.TRIPLES)
+                ? line.get(idx.get(BattingRatingsType.TRIPLES)).text()
+                : null)
         .power(line.get(idx.get(BattingRatingsType.POWER)).text())
         .eye(line.get(idx.get(BattingRatingsType.EYE)).text())
         .k(line.get(idx.get(BattingRatingsType.K)).text())

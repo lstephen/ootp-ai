@@ -131,8 +131,10 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       rs.get(r.name).getOrElse(throw new IllegalArgumentException(r.name))
 
     def addEntry(stats: S, ratings: R): Unit =
-        regressOn.foreach(r =>
-          getRegression(r).addData(ratings, r.getStat(stats), stats.getPlateAppearances))
+      regressOn.foreach(
+        r =>
+          getRegression(r)
+            .addData(ratings, r.getStat(stats), stats.getPlateAppearances))
 
     def addData(teamStats: TeamStats[S]): Unit =
       teamStats.getPlayers().asScala.foreach { p =>
@@ -241,9 +243,10 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
       w.println(f"${"Average"}%20s |  - ${getOverall(stats.head)}%3.0f +  |")
 
-      (features, ovrs.slice(1 + n, stats.size), ovrs.slice(1, 1 + n))
-        .zipped
-        .foreach { case (label, minus, plus) => w.println(f"${label}%20s | ${minus}%3.0f : ${plus}%3.0f |") }
+      (features, ovrs.slice(1 + n, stats.size), ovrs.slice(1, 1 + n)).zipped.foreach {
+        case (label, minus, plus) =>
+          w.println(f"${label}%20s | ${minus}%3.0f : ${plus}%3.0f |")
+      }
     }
   }
 }

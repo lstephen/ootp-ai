@@ -27,12 +27,19 @@ class RandomForest:
 
         feature_selection = SelectKBest(f_regression)
 
-        regressor = RandomForestRegressor(random_state=42, min_weight_fraction_leaf=0.01)
+        regressor = RandomForestRegressor(
+            random_state=42, min_weight_fraction_leaf=0.01)
 
-        pipeline = Pipeline(steps=[('selection', feature_selection), ('regressor', regressor)])
+        pipeline = Pipeline(
+            steps=[('selection', feature_selection), ('regressor', regressor)])
 
         self._cv = RandomizedSearchCV(
-                pipeline, param_grid, n_iter=100, cv=3, random_state=42, fit_params={'regressor__sample_weight': weights})
+            pipeline,
+            param_grid,
+            n_iter=100,
+            cv=3,
+            random_state=42,
+            fit_params={'regressor__sample_weight': weights})
 
         self._cv.fit(xs, ys)
 
@@ -43,19 +50,29 @@ class RandomForest:
         return self.pipeline()
 
     def cross_val_score(self, xs, ys, weights):
-        return np.mean(cross_val_score(self.pipeline(), xs, ys, fit_params={'regressor__sample_weight': weights}))
+        return np.mean(
+            cross_val_score(
+                self.pipeline(),
+                xs,
+                ys,
+                fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
         self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
 
     def report(self, out):
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
-        out.write("Feature Scores: {}\n".format(np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Feature Mask: {}\n".format(self.pipeline().named_steps['selection']._get_support_mask()))
-        out.write("Feature Importances: {}\n".format(np.round_(self.pipeline().named_steps['regressor'].feature_importances_, 3)))
+        out.write("Feature Scores: {}\n".format(
+            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
+        out.write("Feature Mask: {}\n".format(self.pipeline().named_steps[
+            'selection']._get_support_mask()))
+        out.write("Feature Importances: {}\n".format(
+            np.round_(self.pipeline().named_steps['regressor']
+                      .feature_importances_, 3)))
 
     def __repr__(self):
         return "RandomForest(...)"
+
 
 class RidgeEstimator:
     def __init__(self, xs, ys, weights):
@@ -68,9 +85,13 @@ class RidgeEstimator:
 
         regressor = Ridge(random_state=42)
 
-        pipeline = Pipeline(steps=[('selection', feature_selection), ('regressor', regressor)])
+        pipeline = Pipeline(
+            steps=[('selection', feature_selection), ('regressor', regressor)])
 
-        self._cv = GridSearchCV(pipeline, param_grid, fit_params={'regressor__sample_weight': weights})
+        self._cv = GridSearchCV(
+            pipeline,
+            param_grid,
+            fit_params={'regressor__sample_weight': weights})
 
         self._cv.fit(xs, ys)
 
@@ -81,18 +102,26 @@ class RidgeEstimator:
         return self.pipeline()
 
     def cross_val_score(self, xs, ys, weights):
-        return np.mean(cross_val_score(self.pipeline(), xs, ys, fit_params={'regressor__sample_weight': weights}))
+        return np.mean(
+            cross_val_score(
+                self.pipeline(),
+                xs,
+                ys,
+                fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
         self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
 
     def report(self, out):
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
-        out.write("Feature Scores: {}\n".format(np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Coefficients: {}\n".format(np.round_(self.pipeline().named_steps['regressor'].coef_, 3)))
+        out.write("Feature Scores: {}\n".format(
+            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
+        out.write("Coefficients: {}\n".format(
+            np.round_(self.pipeline().named_steps['regressor'].coef_, 3)))
 
     def __repr__(self):
         return "Ridge(...)"
+
 
 class KernelRidgeEstimator:
     def __init__(self, xs, ys, weights):
@@ -105,9 +134,13 @@ class KernelRidgeEstimator:
 
         regressor = KernelRidge()
 
-        pipeline = Pipeline(steps=[('selection', feature_selection), ('regressor', regressor)])
+        pipeline = Pipeline(
+            steps=[('selection', feature_selection), ('regressor', regressor)])
 
-        self._cv = GridSearchCV(pipeline, param_grid, fit_params={'regressor__sample_weight': weights})
+        self._cv = GridSearchCV(
+            pipeline,
+            param_grid,
+            fit_params={'regressor__sample_weight': weights})
 
         self._cv.fit(xs, ys)
 
@@ -118,31 +151,40 @@ class KernelRidgeEstimator:
         return self.pipeline()
 
     def cross_val_score(self, xs, ys, weights):
-        return np.mean(cross_val_score(self.pipeline(), xs, ys, fit_params={'regressor__sample_weight': weights}))
+        return np.mean(
+            cross_val_score(
+                self.pipeline(),
+                xs,
+                ys,
+                fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
         self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
 
     def report(self, out):
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
-        out.write("Feature Scores: {}\n".format(np.round_(self.pipeline().named_steps['selection'].scores_), 3))
+        out.write("Feature Scores: {}\n".format(
+            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
 
     def __repr__(self):
         return "KernelRidge(...)"
 
+
 class LinearRegressionEstimator:
     def __init__(self, xs, ys, weights):
-        param_grid = {
-            'selection__k': list(range(1, xs.shape[1] + 1))
-        }
+        param_grid = {'selection__k': list(range(1, xs.shape[1] + 1))}
 
         feature_selection = SelectKBest(f_regression)
 
         regressor = LinearRegression()
 
-        pipeline = Pipeline(steps=[('selection', feature_selection), ('regressor', regressor)])
+        pipeline = Pipeline(
+            steps=[('selection', feature_selection), ('regressor', regressor)])
 
-        self._cv = GridSearchCV(pipeline, param_grid, fit_params={'regressor__sample_weight': weights})
+        self._cv = GridSearchCV(
+            pipeline,
+            param_grid,
+            fit_params={'regressor__sample_weight': weights})
 
         self._cv.fit(xs, ys)
 
@@ -153,15 +195,22 @@ class LinearRegressionEstimator:
         return self.pipeline()
 
     def cross_val_score(self, xs, ys, weights):
-        return np.mean(cross_val_score(self.pipeline(), xs, ys, fit_params={'regressor__sample_weight': weights}))
+        return np.mean(
+            cross_val_score(
+                self.pipeline(),
+                xs,
+                ys,
+                fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
         self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
 
     def report(self, out):
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
-        out.write("Feature Scores: {}\n".format(np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Coefficients: {}\n".format(np.round_(self.pipeline().named_steps['regressor'].coef_, 3)))
+        out.write("Feature Scores: {}\n".format(
+            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
+        out.write("Coefficients: {}\n".format(
+            np.round_(self.pipeline().named_steps['regressor'].coef_, 3)))
 
     def __repr__(self):
         return "LinearRegressionEstimator(...)"
@@ -170,6 +219,7 @@ class LinearRegressionEstimator:
 @click.group()
 def cli():
     pass
+
 
 @cli.command()
 @click.argument('model', type=click.File('wb'))
@@ -183,7 +233,8 @@ def train(model):
     ys = np.array([d['label'] for d in data])
 
     #estimators = [ (e.cross_val_score(xs, ys, weights), e) for e in [ RandomForest(xs, ys, weights), RidgeEstimator(xs, ys, weights), KernelRidgeEstimator(xs, ys, weights), LinearRegressionEstimator(xs, ys, weights) ] ]
-    estimators = [ (e.cross_val_score(xs, ys, weights), e) for e in [ RandomForest(xs, ys, weights) ] ]
+    estimators = [(e.cross_val_score(xs, ys, weights), e)
+                  for e in [RandomForest(xs, ys, weights)]]
 
     best = sorted(estimators)[-1][1]
 
@@ -191,7 +242,8 @@ def train(model):
 
     joblib.dump(best.estimator(), model)
 
-    logging.info("Trained on {} inputs in {:.3f} seconds.".format(len(data), time.perf_counter() - start))
+    logging.info("Trained on {} inputs in {:.3f} seconds.".format(
+        len(data), time.perf_counter() - start))
 
     sys.stdout.write("Selected: {}\n".format(best.__class__.__name__))
     sys.stdout.write("Scores: {}\n".format(estimators))
@@ -217,9 +269,9 @@ def predict(model):
 
     sys.stdout.write(json.dumps(predictions))
 
-    logging.info("Predicted {} inputs in {:.3f} seconds.".format(len(data), time.perf_counter() - start))
+    logging.info("Predicted {} inputs in {:.3f} seconds.".format(
+        len(data), time.perf_counter() - start))
 
 
 if __name__ == '__main__':
     cli()
-

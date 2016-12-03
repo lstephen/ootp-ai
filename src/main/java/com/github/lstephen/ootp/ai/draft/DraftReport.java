@@ -1,20 +1,16 @@
 package com.github.lstephen.ootp.ai.draft;
 
-import com.github.lstephen.ootp.ai.config.Config;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.value.JavaAdapter;
-import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Collection;

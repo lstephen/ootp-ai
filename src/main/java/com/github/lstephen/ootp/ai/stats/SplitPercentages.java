@@ -16,7 +16,7 @@ public class SplitPercentages {
   private int vsLhb;
   private int vsRhb;
 
-  protected SplitPercentages() { }
+  protected SplitPercentages() {}
 
   private SplitPercentages(Site site) {
     this.site = site;
