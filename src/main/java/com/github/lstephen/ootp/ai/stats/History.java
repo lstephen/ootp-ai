@@ -39,25 +39,25 @@ public final class History {
   }
 
   public TeamStats<BattingStats> loadBatting(Site site, int season) {
-      int y = season;
+    int y = season;
 
-      if (season < 0) {
-        y = site.getDate().getYear() + season;
+    if (season < 0) {
+      y = site.getDate().getYear() + season;
+    }
+
+    LOG.log(Level.INFO, "Loading batting for season {0}...", y);
+
+    File in = getBattingFile(site, y);
+
+    if (in.exists()) {
+      try {
+        return Jackson.getMapper(site).readValue(in, TeamStats.Batting.class);
+      } catch (IOException e) {
+        throw Throwables.propagate(e);
       }
-
-      LOG.log(Level.INFO, "Loading batting for season {0}...", y);
-
-      File in = getBattingFile(site, y);
-
-      if (in.exists()) {
-        try {
-          return Jackson.getMapper(site).readValue(in, TeamStats.Batting.class);
-        } catch (IOException e) {
-          throw Throwables.propagate(e);
-        }
-      } else {
-        return null;
-      }
+    } else {
+      return null;
+    }
   }
 
   public Iterable<TeamStats<PitchingStats>> loadPitching(Site site, int season, int years) {
@@ -95,7 +95,6 @@ public final class History {
       return null;
     }
   }
-
 
   public void saveBatting(TeamStats<BattingStats> stats, Site site, int season) {
     save(getBattingFile(site, season), stats, site, season);

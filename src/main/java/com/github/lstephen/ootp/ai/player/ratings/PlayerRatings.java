@@ -101,7 +101,8 @@ public final class PlayerRatings {
         BattingRatings.builder(new OneToOneHundred())
             .contact(capBattingPotential(age, ovr.getContact(), battingPotential.getContact()))
             .gap(capBattingPotential(age, ovr.getGap(), battingPotential.getGap()))
-            .triplesOptionalRating(capBattingPotential(age, ovr.getTriples(), battingPotential.getTriples()))
+            .triplesOptionalRating(
+                capBattingPotential(age, ovr.getTriples(), battingPotential.getTriples()))
             .power(capBattingPotential(age, ovr.getPower(), battingPotential.getPower()))
             .eye(capBattingPotential(age, ovr.getEye(), battingPotential.getEye()))
             .k(capBattingPotential(age, ovr.getK().get(), battingPotential.getK().get()))
@@ -127,7 +128,8 @@ public final class PlayerRatings {
             .contact(
                 capBatting(age, curVsRight.getContact(), capped.getContact(), ovr.getContact()))
             .gap(capBatting(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
-            .triples(capBatting(age, curVsRight.getTriples(), capped.getTriples(), ovr.getTriples()))
+            .triples(
+                capBatting(age, curVsRight.getTriples(), capped.getTriples(), ovr.getTriples()))
             .power(capBatting(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsRight.getEye(), capped.getEye(), ovr.getEye()))
             .k(capBatting(age, curVsRight.getK().get(), capped.getK().get(), ovr.getK().get()))
@@ -184,7 +186,6 @@ public final class PlayerRatings {
     return Splits.create(potVsLeft, potVsRight);
   }
 
-
   private Rating<Integer, OneToOneHundred> capBatting(
       int age, Optional<Integer> current, Optional<Integer> capped, Optional<Integer> overall) {
 
@@ -193,15 +194,15 @@ public final class PlayerRatings {
     }
 
     return capBatting(age, current.get(), capped.get(), overall.get());
-      }
-
+  }
 
   private Rating<Integer, OneToOneHundred> capBatting(
       int age, int current, int capped, int overall) {
     return capBattingPotential(age, current, capped + (current - overall));
   }
 
-  private Optional<Rating<Integer, OneToOneHundred>> capBattingPotential(int age, Optional<Integer> current, Optional<Integer> potential) {
+  private Optional<Rating<Integer, OneToOneHundred>> capBattingPotential(
+      int age, Optional<Integer> current, Optional<Integer> potential) {
     if (!current.isPresent() || !potential.isPresent()) {
       return Optional.absent();
     }
@@ -292,7 +293,8 @@ public final class PlayerRatings {
                     (vR * splits.getVsRight().getEye() + vL * splits.getVsLeft().getEye()) / 1000))
             .k(
                 OneToOneHundred.valueOf(
-                    (vR * splits.getVsRight().getK().get() + vL * splits.getVsLeft().getK().get()) / 1000))
+                    (vR * splits.getVsRight().getK().get() + vL * splits.getVsLeft().getK().get())
+                        / 1000))
             .runningSpeed(splits.getVsRight().getRunningSpeed())
             .build();
 

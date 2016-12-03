@@ -85,9 +85,7 @@ public class PitchingRatings<T> {
   }
 
   public Optional<Integer> getRuns() {
-    return runs == null
-        ? Optional.<Integer>absent()
-        : Optional.of(runs.normalize().get());
+    return runs == null ? Optional.<Integer>absent() : Optional.of(runs.normalize().get());
   }
 
   @Override

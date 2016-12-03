@@ -8,7 +8,7 @@ object Model {
   trait Predict {
     def apply(in: Seq[Input]): Seq[Double]
     def report(label: String): Printable = new Printable {
-      def print(w: PrintWriter) = { }
+      def print(w: PrintWriter) = {}
     }
   }
 }
