@@ -58,16 +58,16 @@ object Regressable {
 
     def toInput(r: PitchingRatings[_]) = version match {
       case Version.OOTP5 =>
-        Input(o(r.getRuns), s(r.getHits), s(r.getGap), s(r.getMovement), s(r.getControl), s(r.getStuff), o(r.getGroundBallPct))
+        Input(o(r.getRuns), s(r.getHits), s(r.getGap), s(r.getMovement), s(r.getControl), s(r.getStuff), o(r.getGroundBallPct), s(r.getEndurance))
       case Version.OOTP6 =>
-        Input(s(r.getStuff), s(r.getControl), s(r.getMovement), o(r.getGroundBallPct))
+        Input(s(r.getStuff), s(r.getControl), s(r.getMovement), o(r.getGroundBallPct), s(r.getEndurance))
     }
 
     val features = version match {
       case Version.OOTP5 =>
-        Seq("Runs", "Hits", "Doubles", "Homeruns", "Walks", "Strikeouts", "Groundball Pct.")
+        Seq("Runs", "Hits", "Doubles", "Homeruns", "Walks", "Strikeouts", "Groundball Pct.", "Endurance")
       case Version.OOTP6 =>
-        Seq("Stuff", "Control", "Movement", "Groundball Pct.")
+        Seq("Stuff", "Control", "Movement", "Groundball Pct.", "Endurance")
     }
   }
 }
