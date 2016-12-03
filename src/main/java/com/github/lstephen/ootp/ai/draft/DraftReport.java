@@ -44,18 +44,14 @@ public final class DraftReport implements Printable {
   }
 
   private void loadDraftClasses() {
-    current = DraftClass.create(site.getDraft());
+    current = DraftClass.load(site, site.getDate().getYear());
 
-    site.getDraft().forEach(current::addIfNotPresent);
+    site.getDraft().forEach(current::add);
 
-    current.save(site, getDraftClassFile(site.getDate().getYear()));
+    current.save(site, DraftClass.getDraftClassFile(site, site.getDate().getYear()));
 
     for (int i = 1; i < 5; i++) {
-      File dcFile = getDraftClassFile(site.getDate().getYear() - i);
-
-      if (dcFile.exists()) {
-        historical.add(DraftClass.load(dcFile, site.getDefinition()));
-      }
+      historical.add(DraftClass.load(site, site.getDate().getYear() - i));
     }
 
     currentPlayersSorted = byOverall(predictor).immutableSortedCopy(current.getPlayers());
@@ -76,16 +72,6 @@ public final class DraftReport implements Printable {
             .collect(Collectors.toList());
 
     predictor = new Predictor(allPlayers, predictor);
-  }
-
-  private File getDraftClassFile(int year) {
-    try {
-      String historyDirectory =
-          Config.createDefault().getValue("history.dir").or("c:/ootp/history");
-      return new File(historyDirectory + "/" + site.getName() + year + ".draft.json");
-    } catch (IOException e) {
-      throw Throwables.propagate(e);
-    }
   }
 
   private RoundValue getRoundValue(int round) {
