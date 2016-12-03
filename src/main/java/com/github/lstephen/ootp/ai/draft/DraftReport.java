@@ -44,6 +44,8 @@ public final class DraftReport implements Printable {
 
     site.getDraft().forEach(current::add);
 
+    current.onlyKeep(site.getAllPlayers());
+
     current.save(site, DraftClass.getDraftClassFile(site, site.getDate().getYear()));
 
     for (int i = 1; i < 5; i++) {
