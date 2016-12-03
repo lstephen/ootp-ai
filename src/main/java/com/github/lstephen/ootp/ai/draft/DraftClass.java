@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 /** @author lstephen */
 public final class DraftClass {
 
-  private final Set<Player> players = Sets.newHashSet();
+  private Set<Player> players = Sets.newHashSet();
 
   private DraftClass() {}
 
@@ -36,6 +36,10 @@ public final class DraftClass {
 
   public void add(Collection<Player> ps) {
     ps.stream().forEach(this::add);
+  }
+
+  public void onlyKeep(Iterable<Player> ps) {
+    players = Sets.intersection(players, ImmutableSet.copyOf(ps));
   }
 
   public Collection<Player> getPlayers() {
