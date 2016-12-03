@@ -208,18 +208,14 @@ public class BestStartersSelection implements Selection {
 
   private Double getValueProvided(
       Player p, Lineup l, Iterable<Player> selected, Double pct, Lineup.VsHand vs) {
-    Double score = 0.0;
-    Integer wobaPlus = vs.getStats(predictor, p).getWobaPlus();
+    double score = 0.0;
+    long wobaPlus = vs.getStats(predictor, p).getWobaPlus();
 
     if (l.contains(p)) {
       score += wobaPlus;
 
       Position pos = l.getPosition(p);
       score += (Defense.getPositionFactor(pos) * p.getDefensiveRatings().getPositionScore(pos));
-
-      /*if (p.canPlay(l.getPosition(p))) {
-      score += wobaPlus;
-      }*/
     }
 
     return pct * score;

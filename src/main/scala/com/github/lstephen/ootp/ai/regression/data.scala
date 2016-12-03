@@ -13,6 +13,9 @@ class Input(private val is: List[Option[Double]]) {
   def :+(rhs: Option[Double]): Input = new Input(is :+ rhs)
   def ++(rhs: Input): Input = new Input(is ++ rhs.is)
 
+  def updated(idx: Integer, f: Double => Double) =
+    new Input(is.updated(idx, get(idx).map(f)))
+
   val length = is.length
 
   def get(idx: Integer): Option[Double] = is(idx)
