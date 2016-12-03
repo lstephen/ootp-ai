@@ -90,7 +90,9 @@ class PlayerDevelopment(from: (Player, Predictor), to: (Player, Predictor)) exte
     val vsL = formatRatingsChanges(regressedOn(fromP).getVsLeft, regressedOn(toP).getVsLeft)
     val vsR = formatRatingsChanges(regressedOn(fromP).getVsRight, regressedOn(toP).getVsRight)
 
-    f"$info | $fromAndTo | ${score.toLong}%+3d | ${vsL} : ${vsR} |"
+    val stars = toP.getStars.get.getFormattedText
+
+    f"$info | $fromAndTo | ${score.toLong}%+3d | ${vsL} : ${vsR} | ${stars}"
   }
 }
 
