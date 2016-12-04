@@ -104,7 +104,7 @@ class PlayerDevelopment(from: (Player, Predictor), to: (Player, Predictor))
 
       (r.toInput(from).toOptionList, r.toInput(to).toOptionList).zipped.map {
         case (f, t) => ratingChange(f, t)
-      }.map(_.map(v => f"${v.round}%+3d").getOrElse("   ")).mkString("")
+      }.map(_.map(v => if (v.round == 0) "   " else f"${v.round}%+3d").getOrElse("   ")).mkString("")
     }
 
     val info = f"${toP.getListedPosition.or("")}%2s ${StringUtils
