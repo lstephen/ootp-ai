@@ -241,7 +241,7 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       val features = regressable.features
       val n = features.size
 
-      w.println(f"${"Average"}%20s |  -    ${getOverall(stats.head)}%3.0f    +  |")
+      w.println(f"${"Average"}%20s |  -   ${getOverall(stats.head)}%3.0f   +  |")
 
       (features, ovrs.slice(1 + n, stats.size), ovrs.slice(1, 1 + n)).zipped.foreach {
         case (label, minus, plus) =>
