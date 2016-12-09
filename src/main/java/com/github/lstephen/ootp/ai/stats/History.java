@@ -51,7 +51,9 @@ public final class History {
 
     if (in.exists()) {
       try {
-        return Jackson.getMapper(site).readValue(in, TeamStats.Batting.class);
+        TeamStats<BattingStats> ps = Jackson.getMapper(site).readValue(in, TeamStats.Batting.class);
+        ps.getAllRatings().stream().forEach(p -> p.setRatingsDefinition(site.getDefinition()));
+        return ps;
       } catch (IOException e) {
         throw Throwables.propagate(e);
       }
@@ -87,7 +89,9 @@ public final class History {
 
     if (in.exists()) {
       try {
-        return Jackson.getMapper(site).readValue(in, TeamStats.class);
+        TeamStats<PitchingStats> ps = Jackson.getMapper(site).readValue(in, TeamStats.class);
+        ps.getAllRatings().stream().forEach(p -> p.setRatingsDefinition(site.getDefinition()));
+        return ps;
       } catch (IOException e) {
         throw Throwables.propagate(e);
       }
