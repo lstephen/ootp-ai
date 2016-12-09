@@ -193,10 +193,12 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
   }
 
   def predict(ratings: Seq[R], pas: Long): Seq[S] = {
+    val predictions: Map[String, Seq[Double]] = Regression.predict(regressions, ratings)
+
     val stats = Seq.fill(ratings.size) { newStats }
 
     regressOn.foreach(ro =>
-      (predict(ro, ratings), stats).zipped.foreach {
+      (predictions(ro.name), stats).zipped.foreach {
         case (d, s) => ro.setStat(s, round(pas * d))
     })
 
@@ -204,9 +206,6 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
     stats
   }
-
-  def predict(ro: RegressOn[_], r: Seq[R]): Seq[Double] =
-    getRegression(ro).predict(r).map(max(0, _))
 
   def correlationReport: Printable = new Printable {
     def print(w: PrintWriter): Unit = {
@@ -231,10 +230,12 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
 
       val allInputs = avg +: (plusTens ++ minusTens ++ ranges)
 
+      val predictions: Map[String, Seq[Double]] = Regression.predict(regressions, allInputs)
+
       val stats = Seq.fill(allInputs.size) { newStats }
 
       regressOn.foreach(ro =>
-        (getRegression(ro).predict(allInputs), stats).zipped.foreach {
+        (predictions(ro), stats).zipped.foreach {
           case (d, s) => ro.setStat(s, round(defaultPlateAppearances * d))
       })
 
