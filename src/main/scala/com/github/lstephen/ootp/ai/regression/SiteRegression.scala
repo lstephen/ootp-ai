@@ -235,7 +235,7 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       val stats = Seq.fill(allInputs.size) { newStats }
 
       regressOn.foreach(ro =>
-        (predictions(ro), stats).zipped.foreach {
+        (predictions(ro.name), stats).zipped.foreach {
           case (d, s) => ro.setStat(s, round(defaultPlateAppearances * d))
       })
 

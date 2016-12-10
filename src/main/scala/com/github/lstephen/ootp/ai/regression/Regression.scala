@@ -166,6 +166,6 @@ object Regression {
   def predict(rs: Map[String, Regression], xs: Seq[Input]): Map[String, Seq[Double]] = {
     val models = rs.mapValues(_.regression)
 
-    RegressionPyModel.predict(models, inputs)
+    RegressionPyModel.predict(models, xs)
   }
 }
