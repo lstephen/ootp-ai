@@ -113,11 +113,11 @@ class Regression(label: String) extends StrictLogging {
 
   var data: DataSet = DataSet()
 
-  var _regression: Option[Model.Predict] = None
+  var _regression: Option[RegressionPyModel.Predict] = None
 
-  val model = new RegressionPyModel
+  val model: RegressionPyModel = new RegressionPyModel
 
-  def regression = _regression match {
+  def regression: RegressionPyModel.Predict = _regression match {
     case Some(r) => r
     case None =>
       logger.info(
@@ -157,4 +157,15 @@ class Regression(label: String) extends StrictLogging {
   }
 
   def modelReport = regression.report(label)
+}
+
+object Regression {
+  def predict[T: Regressable](rs: Map[String, Regression], xs: Seq[T]): Map[String, Seq[Double]] =
+    predict(rs, xs.map(implicitly[Regressable[T]].toInput(_)))
+
+  def predict(rs: Map[String, Regression], xs: Seq[Input]): Map[String, Seq[Double]] = {
+    val models = rs.mapValues(_.regression)
+
+    RegressionPyModel.predict(models, xs)
+  }
 }

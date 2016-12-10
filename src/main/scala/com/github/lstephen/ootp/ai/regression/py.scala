@@ -10,21 +10,34 @@ import java.io.PrintWriter
 import java.util.UUID
 
 case class TrainInput(weight: Integer, features: Array[Double], label: Double)
-case class PredictInput(features: Array[Double])
+
+object TrainInput {
+    implicit def TrainInputCodecJson =
+      casecodec3(TrainInput.apply, TrainInput.unapply)("weight",
+                                                       "features",
+                                                       "label")
+}
+
+case class PredictFeatures(features: Array[Double])
+
+object PredictFeatures {
+    implicit def PredictFeaturesCodecJson =
+      casecodec1(PredictFeatures.apply, PredictFeatures.unapply)("features")
+}
+
+case class PredictInput(models: Map[String, String], data: Array[PredictFeatures])
+
+object PredictInput {
+    implicit def PredictInputCodecJson =
+      casecodec2(PredictInput.apply, PredictInput.unapply)("models", "data")
+}
+
 
 class RegressionPyModel extends Model with StrictLogging {
-  implicit def TrainInputCodecJson =
-    casecodec3(TrainInput.apply, TrainInput.unapply)("weight",
-                                                     "features",
-                                                     "label")
-
-  implicit def PredictInputCodecJson =
-    casecodec1(PredictInput.apply, PredictInput.unapply)("features")
-
   val modelFile =
     File.createTempFile(UUID.randomUUID.toString, ".mdl").getAbsolutePath
 
-  def train(ds: DataSet): Model.Predict = {
+  def train(ds: DataSet): RegressionPyModel.Predict = {
     val json = ds
       .map(
         d =>
@@ -35,17 +48,21 @@ class RegressionPyModel extends Model with StrictLogging {
 
     val regressionPyReport = RegressionPyCli.train(modelFile, json.toString)
 
-    new Model.Predict {
+    new RegressionPyModel.Predict {
+      val modelFile = RegressionPyModel.this.modelFile
+      val dataSet = ds
+
       def apply(in: Seq[Input]): Seq[Double] = {
         if (in.size == 0) return Seq()
 
         val json =
-          in.map(i => PredictInput(i.toArray(ds.averageForColumn(_)))).asJson
+          PredictInput(Map("model" -> modelFile), in.map(i => PredictFeatures(i.toArray(ds.averageForColumn(_)))).toArray).asJson
 
-        val results = RegressionPyCli.predict(modelFile, json.toString)
+        val results = RegressionPyCli.predict(json.toString)
 
         Parse
-          .decodeOption[Array[Double]](results)
+          .decodeOption[Map[String, Array[Double]]](results)
+          .flatMap(_.get("model"))
           .getOrElse(throw new IllegalStateException)
       }
 
@@ -59,15 +76,41 @@ class RegressionPyModel extends Model with StrictLogging {
   }
 }
 
+object RegressionPyModel {
+
+  trait Predict extends Model.Predict {
+    def modelFile: String
+    def dataSet: DataSet
+  }
+
+  def predict(models: Map[String, Predict], in: Seq[Input]): Map[String, Seq[Double]] = {
+    if (in.size == 0) return models.mapValues(_ => Seq())
+
+    val json =
+      PredictInput(models.mapValues(_.modelFile), in.map(i => PredictFeatures(i.toArray(models.head._2.dataSet.averageForColumn(_)))).toArray).asJson
+
+    val results = RegressionPyCli.predict(json.toString)
+
+    Parse
+      .decodeOption[Map[String, Array[Double]]](results)
+      .getOrElse(throw new IllegalStateException)
+      .mapValues(_.toSeq)
+  }
+}
+
 object RegressionPyCli extends StrictLogging {
 
-  def train(f: String, in: String): String = run("train", f, in)
-  def predict(f: String, in: String): String = run("predict", f, in)
-
-  def run(cmd: String, modelFile: String, in: String): String = {
+  def train(modelFile: String, in: String): String = {
     import scala.sys.process._
 
-    s"python target/regression.py ${cmd} ${modelFile}" #< new ByteArrayInputStream(
+    s"python target/regression.py train ${modelFile}" #< new ByteArrayInputStream(
+      in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
+  }
+
+  def predict(in: String): String = {
+    import scala.sys.process._
+
+    s"python target/regression.py predict" #< new ByteArrayInputStream(
       in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
   }
 
