@@ -252,11 +252,20 @@ def train(model):
 
 
 @cli.command()
-@click.argument('model', type=click.File('rb'))
-def predict(model):
+def predict():
     start = time.perf_counter()
 
     data = json.load(sys.stdin)
+
+    predictions = { k: predict(data['data'], m) for k, m in data['models'].items() }
+
+    sys.stdout.write(json.dumps(predictions))
+
+    logging.info("Predicted {} inputs for {} models in {:.3f} seconds.".format(
+        len(data['data']), len(data['models']), time.perf_counter() - start))
+
+def predict(data, model):
+    start = time.perf_counter()
 
     if (len(data) == 0):
         predictions = []
@@ -267,10 +276,7 @@ def predict(model):
 
         predictions = list(m.predict(xs))
 
-    sys.stdout.write(json.dumps(predictions))
-
-    logging.info("Predicted {} inputs in {:.3f} seconds.".format(
-        len(data), time.perf_counter() - start))
+    return predictions
 
 
 if __name__ == '__main__':
