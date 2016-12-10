@@ -187,7 +187,7 @@ public final class Roster implements Printable {
 
     w.println();
     for (Status s : levels) {
-      w.print(String.format("(%d) %-10s ", assignments.get(s).size(), s));
+      w.print(String.format(" (%2d) %-16s |", assignments.get(s).size(), s));
     }
     w.println();
 
@@ -206,7 +206,13 @@ public final class Roster implements Printable {
       for (Status s : levels) {
         List<Player> ps = Player.byShortName().sortedCopy(assignments.get(s));
 
-        w.print(String.format("%-15s ", i < ps.size() ? ps.get(i).getShortName() : ""));
+        if (i < ps.size()) {
+          Player p = ps.get(i);
+
+          w.print(String.format(" %2s %-15s %2d |", p.getListedPosition().or(""), p.getShortName(), p.getAge()));
+        } else {
+          w.print(String.format(" %21s |", ""));
+        }
       }
       w.println();
     }
