@@ -275,7 +275,7 @@ public final class PlayerRatings {
     Integer vR = (int) Math.round(splitPercentages.getVsRhpPercentage() * 1000);
     Integer vL = 1000 - vR;
 
-    BattingRatings<Integer> ovr =
+    BattingRatings.Builder<Integer> builder = 
         BattingRatings.builder(new OneToOneHundred())
             .contact(
                 OneToOneHundred.valueOf(
@@ -291,14 +291,16 @@ public final class PlayerRatings {
             .eye(
                 OneToOneHundred.valueOf(
                     (vR * splits.getVsRight().getEye() + vL * splits.getVsLeft().getEye()) / 1000))
-            .k(
+            .runningSpeed(splits.getVsRight().getRunningSpeed());
+
+    if (splits.getVsRight().getK().isPresent() && splits.getVsLeft().getK().isPresent()) {
+      builder = builder.k(
                 OneToOneHundred.valueOf(
                     (vR * splits.getVsRight().getK().get() + vL * splits.getVsLeft().getK().get())
-                        / 1000))
-            .runningSpeed(splits.getVsRight().getRunningSpeed())
-            .build();
+                        / 1000));
+    }
 
-    return ovr;
+    return builder.build();
   }
 
   public static PitchingRatings getOverallPitching(Splits<PitchingRatings<?>> splits) {
