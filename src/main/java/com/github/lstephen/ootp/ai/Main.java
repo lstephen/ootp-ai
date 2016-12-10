@@ -12,6 +12,7 @@ import com.github.lstephen.ootp.ai.regression.Predictor$;
 import com.github.lstephen.ootp.ai.report.DevelopmentReport;
 import com.github.lstephen.ootp.ai.report.FreeAgents;
 import com.github.lstephen.ootp.ai.report.GenericValueReport;
+import com.github.lstephen.ootp.ai.report.HistorialDevelopmentReport;
 import com.github.lstephen.ootp.ai.report.HittingSelectionReport;
 import com.github.lstephen.ootp.ai.report.LeagueBattingReport;
 import com.github.lstephen.ootp.ai.report.PitchingStrategyReport;
@@ -373,6 +374,9 @@ public class Main {
 
     LOG.info("Development Report...");
     Printables.print(new DevelopmentReport(site, predictor)).to(out);
+
+    LOG.info("Historial Development Report...");
+    Printables.print(new HistorialDevelopmentReport(site, predictor)).to(out);
 
     LOG.info("Draft...");
     ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));

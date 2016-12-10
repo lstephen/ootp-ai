@@ -3,7 +3,7 @@
 set -e
 set -x
 
-if [[ -z "$SKIP_GIT_SYNC" ]];
+if [[ -z "$SKIP_GIT_SYNC" ]]
 then
   mkdir -p /root/.ssh
 
@@ -29,16 +29,19 @@ fi
 echo "Running..."
 MAVEN_OPTS="-Xmx1G" mvn -B exec:java -Dgpg.skip=true
 
-echo "Updating data..."
-cd ootp-ai-data
+if [[ -z "$SKIP_GIT_SYNC" ]]
+then
+  echo "Updating data..."
+  cd ootp-ai-data
 
-[[ -n "$GIT_AUTHOR_NAME" ]] && git config user.name $GIT_AUTHOR_NAME
-[[ -n "$GIT_AUTHOR_EMAIL" ]] && git config user.email $GIT_AUTHOR_EMAIL
+  [[ -n "$GIT_AUTHOR_NAME" ]] && git config user.name $GIT_AUTHOR_NAME
+  [[ -n "$GIT_AUTHOR_EMAIL" ]] && git config user.email $GIT_AUTHOR_EMAIL
 
-git add --all
-git commit -m "$(date)"
-git pull --rebase
-git push origin master
+  git add --all
+  git commit -m "$(date)"
+  git pull --rebase
+  git push origin master
+fi
 
 echo "Done."
 
