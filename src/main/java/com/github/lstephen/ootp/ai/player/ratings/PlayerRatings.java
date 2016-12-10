@@ -105,7 +105,7 @@ public final class PlayerRatings {
                 capBattingPotential(age, ovr.getTriples(), battingPotential.getTriples()))
             .power(capBattingPotential(age, ovr.getPower(), battingPotential.getPower()))
             .eye(capBattingPotential(age, ovr.getEye(), battingPotential.getEye()))
-            .k(capBattingPotential(age, ovr.getK().get(), battingPotential.getK().get()))
+            .k(capBattingPotential(age, ovr.getK(), battingPotential.getK()))
             .build();
 
     BattingRatings<?> curVsLeft = getBatting().getVsLeft();
@@ -117,7 +117,7 @@ public final class PlayerRatings {
             .triples(capBatting(age, curVsLeft.getTriples(), capped.getTriples(), ovr.getTriples()))
             .power(capBatting(age, curVsLeft.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsLeft.getEye(), capped.getEye(), ovr.getEye()))
-            .k(capBatting(age, curVsLeft.getK().get(), capped.getK().get(), ovr.getK().get()))
+            .k(capBatting(age, curVsLeft.getK(), capped.getK(), ovr.getK()))
             .runningSpeed(curVsLeft.getRunningSpeed())
             .build();
 
@@ -132,7 +132,7 @@ public final class PlayerRatings {
                 capBatting(age, curVsRight.getTriples(), capped.getTriples(), ovr.getTriples()))
             .power(capBatting(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
             .eye(capBatting(age, curVsRight.getEye(), capped.getEye(), ovr.getEye()))
-            .k(capBatting(age, curVsRight.getK().get(), capped.getK().get(), ovr.getK().get()))
+            .k(capBatting(age, curVsRight.getK(), capped.getK(), ovr.getK()))
             .runningSpeed(curVsRight.getRunningSpeed())
             .build();
 
