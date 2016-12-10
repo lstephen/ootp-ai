@@ -256,6 +256,10 @@ public final class BattingRatings<T> {
       return this;
     }
 
+    public Builder<T> k(Optional<? extends Rating<T, ?>> k) {
+      return k.transform(this::k).or(this);
+    }
+
     @JsonProperty("k")
     public Builder<T> k(String s) {
       return s == null || s.equals("null") ? this : k(scale.parse(s));
