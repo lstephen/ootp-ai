@@ -12,6 +12,7 @@ import com.github.lstephen.ootp.ai.stats.{BattingStats, History, TeamStats}
 import com.github.lstephen.ootp.ai.value.NowAbility
 import java.io.PrintWriter
 import org.apache.commons.lang3.StringUtils
+import com.typesafe.scalalogging.StrictLogging
 import scala.collection.JavaConverters._
 
 class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) extends Printable {
@@ -43,25 +44,26 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
       val cells = cellsFor(ply)
       val p = cells.last._1
 
-      val formattedCells = (15 to 45).map(a => cellFor(p, a).map((d: (Player, Score)) => f"${d._2.toLong}%3d").getOrElse("   ")).mkString(" ")
+      val formattedCells = (15 to 45).map(a => cellFor(p, a).map((d: (Player, Score)) => f"${d._2.toLong}%+3d").getOrElse("   ")).mkString(" ")
 
       w.println(f"${StringUtils.abbreviate(p.getName(), 25)}%-25s | $formattedCells |")
     }
   }
 
   def print(w: PrintWriter): Unit = {
-    w.println(f"${"Hitters"}%-25s | ${(15 to 45).map(a => f"${a}%+3d").mkString(" ")} |")
+    w.println()
+    w.println(f"${"Hitters"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
     printOvrGrid(battingDevelopment.filter(_.toP.isHitter))(w)
 
     w.println()
-    w.println(f"${"Pitchers"}%-25s | ${(15 to 45).map(a => f"${a}%+3d").mkString(" ")} |")
+    w.println(f"${"Pitchers"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
     printOvrGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
   }
 }
 
 
 class DevelopmentReport(site: Site, implicit val predictor: Predictor)
-    extends Printable {
+    extends Printable with StrictLogging {
   import Regressable._
 
   def print[T: Regressable](
@@ -103,6 +105,7 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor)
       predictor)
     val draftPredictions = new Predictor(draft.getPlayers, predictor)
 
+    logger.info("Setting up current year development...")
     val dHitting = PlayerDevelopment.betweenTeamStats(
       (fromHitting, fromPredictions),
       (site.getTeamBatting, predictor))
@@ -110,6 +113,7 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor)
       (fromPitching, fromPredictions),
       (site.getTeamPitching, predictor))
 
+    logger.info("Setting up draft development...")
     val draftHitting = PlayerDevelopment.betweenPlayers(
       (draft.getPlayers.asScala.toSeq, draftPredictions),
       (site.getTeamBatting.getAllRatings.asScala.toSeq, predictor))
@@ -117,9 +121,11 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor)
       (draft.getPlayers.asScala.toSeq, draftPredictions),
       (site.getTeamPitching.getAllRatings.asScala.toSeq, predictor))
 
+    logger.info("Active Players report...")
     w.format("%nActive Players%n")
     print(dHitting, dPitching)(w)
 
+    logger.info("Draft Players report...")
     w.format("%nDrafted Players%n")
     print(draftHitting, draftPitching)(w)
   }
