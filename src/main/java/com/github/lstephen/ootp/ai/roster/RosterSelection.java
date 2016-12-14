@@ -23,6 +23,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -223,9 +224,8 @@ public final class RosterSelection {
     List<Status> remainingLevels = Lists.newArrayList(this.remainingLevels);
 
     while (!remainingLevels.isEmpty()) {
-      ImmutableSet<Player> availableHitters = Selections.onlyHitters(roster.getUnassigned());
-
-      ImmutableSet<Player> availablePitchers = Selections.onlyPitchers(roster.getUnassigned());
+      Collection<Player> availableHitters = Selections.onlyHitters(roster.getUnassigned());
+      Collection<Player> availablePitchers = Selections.onlyPitchers(roster.getUnassigned());
 
       int hittersSize =
           ((availableHitters.size() + remainingLevels.size()) - 1) / remainingLevels.size();
@@ -234,16 +234,34 @@ public final class RosterSelection {
 
       Status level = remainingLevels.get(0);
 
-      roster.assign(
-          level,
-          new Tiered(Position.hitting(), predictor).takeAsJava(availableHitters, hittersSize));
-
-      roster.assign(
-          level,
-          new Tiered(Position.pitching(), predictor).takeAsJava(availablePitchers, pitchersSize));
+      switch (level) {
+        case AAA:
+          roster.assign(level, selectTiered(roster.getUnassigned(), hittersSize, pitchersSize));
+          break;
+        default:
+          roster.assign(level, selectOldest(roster.getUnassigned(), hittersSize, pitchersSize));
+          break;
+      }
 
       remainingLevels.remove(level);
     }
+  }
+
+  private Collection<Player> selectTiered(Iterable<Player> ps, int hitterSize, int pitcherSize) {
+    Collection<Player> selected = new HashSet<>();
+    selected.addAll(new Tiered(Position.hitting(), predictor).takeAsJava(Selections.onlyHitters(ps), hitterSize));
+    selected.addAll(new Tiered(Position.pitching(), predictor).takeAsJava(Selections.onlyPitchers(ps), pitcherSize));
+    return selected;
+  }
+
+  private Collection<Player> selectOldest(Iterable<Player> ps, int hitterSize, int pitcherSize) {
+    Ordering<Player> byBatting = Ordering.natural().reverse().onResultOf(p -> predictor.predictBatting(p).overall());
+    Ordering<Player> byPitching = Ordering.natural().reverse().onResultOf(p -> predictor.predictPitching(p).overall());
+
+    Collection<Player> selected = new HashSet<>();
+    selected.addAll(Player.byAge().reverse().compound(byBatting).immutableSortedCopy(Selections.onlyHitters(ps)).subList(0, hitterSize));
+    selected.addAll(Player.byAge().reverse().compound(byPitching).immutableSortedCopy(Selections.onlyPitchers(ps)).subList(0, pitcherSize));
+    return selected;
   }
 
   private ImmutableSet<Player> getForced(Changes changes) {
