@@ -363,61 +363,6 @@ public class Main {
             .collect(Collectors.toSet()));
     generic.print(out);
 
-    //Break Even Rate = 0.590 + 3.33 x (HR/PA)
-
-    if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
-      LOG.log(Level.INFO, "Spring training...");
-      Printables.print(SpringTraining.create(site.getType(), newRoster.getAllPlayers())).to(out);
-    }
-
-    Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
-
-    LOG.info("Development Report...");
-    Printables.print(new DevelopmentReport(site, predictor)).to(out);
-
-    LOG.info("Historial Development Report...");
-    Printables.print(new HistorialDevelopmentReport(site, predictor)).to(out);
-
-    LOG.info("Draft...");
-    ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
-    Iterable<Player> remaining =
-        Sets.difference(
-            ImmutableSet.copyOf(FluentIterable.from(site.getDraft()).filter(Predicates.notNull())),
-            drafted);
-
-    if (!Iterables.isEmpty(remaining)) {
-      generic.setTitle("Drafted");
-      generic.setPlayers(drafted);
-      generic.print(out);
-
-      generic.setTitle("Remaining");
-      generic.setPlayers(remaining);
-      generic.print(out);
-    }
-
-    DraftReport.create(site, predictor).print(out);
-
-    Printables.print(salary).to(out);
-
-    LOG.info("Extensions report...");
-    generic.setTitle("Extensions");
-    generic.setPlayers(
-        Iterables.concat(
-            Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()), futureFas));
-    generic.print(out);
-
-    LOG.info("Arbitration report...");
-    generic.setTitle("Arbitration");
-    generic.setPlayers(
-        Iterables.filter(
-            newRoster.getAllPlayers(),
-            new Predicate<Player>() {
-              public boolean apply(Player p) {
-                return p.getSalary().endsWith("a");
-              }
-            }));
-    generic.print(out);
-
     if (def.getName().equals("BTHUSTLE")) {
       LOG.info("40 man roster reports...");
 
@@ -473,6 +418,60 @@ public class Main {
 
     generic.setTitle("Sign");
     generic.setPlayers(moves.getSign());
+    generic.print(out);
+
+
+    if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
+      LOG.log(Level.INFO, "Spring training...");
+      Printables.print(SpringTraining.create(site.getType(), newRoster.getAllPlayers())).to(out);
+    }
+
+    Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
+
+    LOG.info("Development Report...");
+    Printables.print(new DevelopmentReport(site, predictor)).to(out);
+
+    LOG.info("Historial Development Report...");
+    Printables.print(new HistorialDevelopmentReport(site, predictor)).to(out);
+
+    LOG.info("Draft...");
+    ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));
+    Iterable<Player> remaining =
+        Sets.difference(
+            ImmutableSet.copyOf(FluentIterable.from(site.getDraft()).filter(Predicates.notNull())),
+            drafted);
+
+    if (!Iterables.isEmpty(remaining)) {
+      generic.setTitle("Drafted");
+      generic.setPlayers(drafted);
+      generic.print(out);
+
+      generic.setTitle("Remaining");
+      generic.setPlayers(remaining);
+      generic.print(out);
+    }
+
+    DraftReport.create(site, predictor).print(out);
+
+    Printables.print(salary).to(out);
+
+    LOG.info("Extensions report...");
+    generic.setTitle("Extensions");
+    generic.setPlayers(
+        Iterables.concat(
+            Iterables.filter(newRoster.getAllPlayers(), site.isFutureFreeAgent()), futureFas));
+    generic.print(out);
+
+    LOG.info("Arbitration report...");
+    generic.setTitle("Arbitration");
+    generic.setPlayers(
+        Iterables.filter(
+            newRoster.getAllPlayers(),
+            new Predicate<Player>() {
+              public boolean apply(Player p) {
+                return p.getSalary().endsWith("a");
+              }
+            }));
     generic.print(out);
 
     LOG.info("FA report...");
