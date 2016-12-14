@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils
 import com.typesafe.scalalogging.StrictLogging
 import scala.collection.JavaConverters._
 
+
 class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) extends Printable {
 
   val history = History.create
@@ -62,35 +63,20 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     r.features.zipWithIndex.foreach { case (l, i) => printPitchingFeatureGrid(pds, l, i) }
   }
 
-  def printBattingFeatureGrid(pds: Seq[PlayerDevelopment], label: String, idx: Int)(implicit w: PrintWriter) = {
-    val cells = pds.map(pd => (pd.toP, pd.featureScore(_.getBattingRatings.getVsLeft, idx), pd.featureScore(_.getBattingRatings.getVsRight, idx)))
+  def printBattingFeatureGrid(pds: Seq[PlayerDevelopment], label: String, idx: Int)(implicit w: PrintWriter) =
+    printFeatureGrid(pds, label, idx, _.getBattingRatings)
+
+  def printPitchingFeatureGrid(pds: Seq[PlayerDevelopment], label: String, idx: Int)(implicit w: PrintWriter) =
+    printFeatureGrid(pds, label, idx, _.getPitchingRatings)
+
+
+  def printFeatureGrid[R: Regressable](pds: Seq[PlayerDevelopment], label: String, idx: Int, r: Player => Splits[R])(implicit w: PrintWriter) = {
+    val cells = pds.map(pd => (pd.toP, pd.featureScore(r(_).getVsLeft, idx), pd.featureScore(r(_).getVsRight, idx)))
 
     val players: Set[Player] = pds.map(_.toP).toSet
 
     def cellsFor(p: Player) = cells.filter(_._1 == p).sortBy(_._1.getAge)
-    def cellFor(p: Player, age: Int): Option[(Player, Option[Score], Option[Score])] = cellsFor(p).find(_._1.getAge == age)
-
-    w.println
-    w.println(f"${label}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
-
-    players.toList.sortBy(p => cellsFor(p).last._1.getAge).foreach { ply =>
-      val cells = cellsFor(ply)
-      val p = cells.last._1
-
-      val formattedCellsVsL = (15 to 45).map(a => cellFor(p, a).flatMap((d: (Player, Option[Score], Option[Score])) => d._2.map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
-      val formattedCellsVsR = (15 to 45).map(a => cellFor(p, a).flatMap((d: (Player, Option[Score], Option[Score])) => d._3.map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
-
-      w.println(f"${StringUtils.abbreviate(p.getName(), 25)}%-25s | $formattedCellsVsL |")
-      w.println(f"${""}%-25s | $formattedCellsVsR |")
-    }
-  }
-
-  def printPitchingFeatureGrid(pds: Seq[PlayerDevelopment], label: String, idx: Int)(implicit w: PrintWriter) = {
-    val cells = pds.map(pd => (pd.toP, pd.featureScore(_.getPitchingRatings.getVsLeft, idx), pd.featureScore(_.getPitchingRatings.getVsRight, idx)))
-
-    val players: Set[Player] = pds.map(_.toP).toSet
-
-    def cellsFor(p: Player) = cells.filter(_._1 == p).sortBy(_._1.getAge)
+    def cellsFor(age: Int) = cells.filter(_._1.getAge == a)
     def cellFor(p: Player, age: Int): Option[(Player, Option[Score], Option[Score])] = cellsFor(p).find(_._1.getAge == age)
 
     w.println
