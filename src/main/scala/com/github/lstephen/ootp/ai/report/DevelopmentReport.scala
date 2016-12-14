@@ -2,8 +2,8 @@ package com.github.lstephen.ootp.ai.report
 
 import com.github.lstephen.ootp.ai.draft.DraftClass
 import com.github.lstephen.ootp.ai.io.Printable
-import com.github.lstephen.ootp.ai.player.Player
-import com.github.lstephen.ootp.ai.player.PlayerId
+import com.github.lstephen.ootp.ai.player.{Player, PlayerId}
+import com.github.lstephen.ootp.ai.player.ratings.{BattingRatings, PitchingRatings}
 import com.github.lstephen.ootp.ai.regression.{Predictor, Regressable}
 import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.score.{Score, Scoreable}
@@ -14,6 +14,7 @@ import java.io.PrintWriter
 import org.apache.commons.lang3.StringUtils
 import com.typesafe.scalalogging.StrictLogging
 import scala.collection.JavaConverters._
+
 
 class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) extends Printable {
 
@@ -50,6 +51,48 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     }
   }
 
+  def printBattingFeatureGrid(pds: Seq[PlayerDevelopment])(implicit w: PrintWriter): Unit = {
+    val r = implicitly[Regressable[BattingRatings[_]]]
+
+    r.features.zipWithIndex.foreach { case (l, i) => printBattingFeatureGrid(pds, l, i) }
+  }
+
+  def printPitchingFeatureGrid(pds: Seq[PlayerDevelopment])(implicit w: PrintWriter): Unit = {
+    val r = implicitly[Regressable[PitchingRatings[_]]]
+
+    r.features.zipWithIndex.foreach { case (l, i) => printPitchingFeatureGrid(pds, l, i) }
+  }
+
+  def printBattingFeatureGrid(pds: Seq[PlayerDevelopment], label: String, idx: Int)(implicit w: PrintWriter) =
+    printFeatureGrid(pds, label, idx, _.getBattingRatings)
+
+  def printPitchingFeatureGrid(pds: Seq[PlayerDevelopment], label: String, idx: Int)(implicit w: PrintWriter) =
+    printFeatureGrid(pds, label, idx, _.getPitchingRatings)
+
+
+  def printFeatureGrid[R: Regressable](pds: Seq[PlayerDevelopment], label: String, idx: Int, r: Player => Splits[R])(implicit w: PrintWriter) = {
+    val cells = pds.map(pd => (pd.toP, pd.featureScore(r(_).getVsLeft, idx), pd.featureScore(r(_).getVsRight, idx)))
+
+    val players: Set[Player] = pds.map(_.toP).toSet
+
+    def cellsFor(p: Player) = cells.filter(_._1 == p).sortBy(_._1.getAge)
+    def cellFor(p: Player, age: Int): Option[(Player, Option[Score], Option[Score])] = cellsFor(p).find(_._1.getAge == age)
+
+    w.println
+    w.println(f"${"--- " + label + " ---"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
+
+    players.toList.sortBy(p => cellsFor(p).last._1.getAge).foreach { ply =>
+      val cells = cellsFor(ply)
+      val p = cells.last._1
+
+      val formattedCellsVsL = (15 to 45).map(a => cellFor(p, a).flatMap((d: (Player, Option[Score], Option[Score])) => d._2.map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
+      val formattedCellsVsR = (15 to 45).map(a => cellFor(p, a).flatMap((d: (Player, Option[Score], Option[Score])) => d._3.map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
+
+      w.println(f"${StringUtils.abbreviate(p.getName(), 25)}%-25s | $formattedCellsVsL |")
+      w.println(f"${""}%-25s | $formattedCellsVsR |")
+    }
+  }
+
   def print(w: PrintWriter): Unit = {
     w.println()
     w.println(f"${"Hitters"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
@@ -58,6 +101,9 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     w.println()
     w.println(f"${"Pitchers"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
     printOvrGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
+
+    printBattingFeatureGrid(battingDevelopment.filter(_.toP.isHitter))(w)
+    printPitchingFeatureGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
   }
 }
 
@@ -147,9 +193,16 @@ class PlayerDevelopment(from: (Player, Predictor), to: (Player, Predictor))
 
   val score = toV.score - fromV.score
 
+  def ratingChange(f: Option[Double], t: Option[Double]): Option[Double] =
+    for { fr <- f; tr <- t } yield tr - fr
+
+  def featureScore[R: Regressable](f: Player => R, idx: Integer): Option[Score] = {
+    val r = implicitly[Regressable[R]]
+
+    ratingChange(r.toInput(f(fromP)).get(idx), r.toInput(f(toP)).get(idx)).map(Score(_))
+  }
+
   def format[T: Regressable](regressedOn: Player => Splits[T]) = {
-    def ratingChange(f: Option[Double], t: Option[Double]): Option[Double] =
-      for { fr <- f; tr <- t } yield tr - fr
 
     def formatRatingsChanges(from: T, to: T): String = {
       val r = implicitly[Regressable[T]]
@@ -176,7 +229,7 @@ class PlayerDevelopment(from: (Player, Predictor), to: (Player, Predictor))
 
 object PlayerDevelopment {
 
-  private def playerIdSet(s: Seq[Player]) = s.toSet.map((p: Player) => p.getId)
+  private def playerIdSet(s: Seq[Player]) = s.map((p: Player) => p.getId).toSet
 
   def betweenTeamStats(from: (TeamStats[_], Predictor),
                        to: (TeamStats[_], Predictor)): Seq[PlayerDevelopment] =
