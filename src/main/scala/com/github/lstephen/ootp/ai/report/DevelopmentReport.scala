@@ -76,7 +76,6 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     val players: Set[Player] = pds.map(_.toP).toSet
 
     def cellsFor(p: Player) = cells.filter(_._1 == p).sortBy(_._1.getAge)
-    def cellsFor(age: Int) = cells.filter(_._1.getAge == a)
     def cellFor(p: Player, age: Int): Option[(Player, Option[Score], Option[Score])] = cellsFor(p).find(_._1.getAge == age)
 
     w.println
