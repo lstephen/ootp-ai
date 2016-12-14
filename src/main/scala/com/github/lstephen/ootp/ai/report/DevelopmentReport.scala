@@ -94,7 +94,7 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     def cellFor(p: Player, age: Int): Option[(Player, Option[Score], Option[Score])] = cellsFor(p).find(_._1.getAge == age)
 
     w.println
-    w.println(f"${label}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
+    w.println(f"${"--- " + label + " ---"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
 
     players.toList.sortBy(p => cellsFor(p).last._1.getAge).foreach { ply =>
       val cells = cellsFor(ply)
@@ -112,11 +112,12 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     w.println()
     w.println(f"${"Hitters"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
     printOvrGrid(battingDevelopment.filter(_.toP.isHitter))(w)
-    printBattingFeatureGrid(battingDevelopment.filter(_.toP.isHitter))(w)
 
     w.println()
     w.println(f"${"Pitchers"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
     printOvrGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
+
+    printBattingFeatureGrid(battingDevelopment.filter(_.toP.isHitter))(w)
     printPitchingFeatureGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
   }
 }
