@@ -204,7 +204,7 @@ public final class Roster implements Printable {
 
     for (int i = 0; i < maxSize; i++) {
       for (Status s : levels) {
-        List<Player> ps = Player.byShortName().sortedCopy(assignments.get(s));
+        List<Player> ps = Player.byListedPosition().compound(Player.byShortName()).sortedCopy(assignments.get(s));
 
         if (i < ps.size()) {
           Player p = ps.get(i);

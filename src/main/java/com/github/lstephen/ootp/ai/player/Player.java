@@ -397,6 +397,10 @@ public final class Player {
     return Ordering.natural().onResultOf(Player::getAge);
   }
 
+  public static Ordering<Player> byListedPosition() {
+    return Ordering.explicit("SP", "MR", "CL", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "DH").onResultOf(p -> p.getListedPosition().or(""));
+  }
+
   public static Ordering<Player> byShortName() {
     return Ordering.natural().onResultOf(Player::getShortName);
   }
