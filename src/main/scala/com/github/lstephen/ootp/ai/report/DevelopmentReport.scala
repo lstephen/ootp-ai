@@ -91,6 +91,7 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
     w.println(f"${"--- " + label + " ---"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
 
     w.println(f"${"Average"}%25s | ${(15 to 45).map(averageForAge(_)).map(s => f"${s.toLong}%+3d").mkString(" ")} |")
+    w.println(f"${"Players"}%25s | ${(15 to 45).map(cellsForAge(_).size).map(n => f"${n}%3d").mkString(" ")} |")
 
     players.toList.sortBy(p => cellsFor(p).last._1.getAge).foreach { ply =>
       val cells = cellsFor(ply)
