@@ -7,6 +7,7 @@ import com.github.lstephen.ootp.ai.player.ratings.{BattingRatings, PitchingRatin
 import com.github.lstephen.ootp.ai.regression.{Predictor, Regressable}
 import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.score.{Score, Scoreable}
+import com.github.lstephen.ootp.ai.score.Score._
 import com.github.lstephen.ootp.ai.splits.Splits
 import com.github.lstephen.ootp.ai.stats.{BattingStats, History, TeamStats}
 import com.github.lstephen.ootp.ai.value.NowAbility
@@ -71,22 +72,32 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor) 
 
 
   def printFeatureGrid[R: Regressable](pds: Seq[PlayerDevelopment], label: String, idx: Int, r: Player => Splits[R])(implicit w: PrintWriter) = {
+    type Cell = (Player, Option[Score], Option[Score])
+
     val cells = pds.map(pd => (pd.toP, pd.featureScore(r(_).getVsLeft, idx), pd.featureScore(r(_).getVsRight, idx)))
 
     val players: Set[Player] = pds.map(_.toP).toSet
 
     def cellsFor(p: Player) = cells.filter(_._1 == p).sortBy(_._1.getAge)
-    def cellFor(p: Player, age: Int): Option[(Player, Option[Score], Option[Score])] = cellsFor(p).find(_._1.getAge == age)
+    def cellsForAge(age: Int) = cells.filter(_._1.getAge == age)
+    def cellFor(p: Player, age: Int): Option[Cell] = cellsFor(p).find(_._1.getAge == age)
+
+    def averageForAge(age: Int): Score = cellsForAge(age).flatMap(c => List(c._2, c._3)).flatten.average
+
+    def formatCellsByAge(p: Player, f: Cell => Option[Score]) =
+      (15 to 45).map(a => cellFor(p, a).flatMap(d => f(d).map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
 
     w.println
     w.println(f"${"--- " + label + " ---"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
+
+    w.println(f"${"Average"}%25s | ${(15 to 45).map(averageForAge(_)).map(s => f"${s.toLong}%+3d").mkString(" ")} |")
 
     players.toList.sortBy(p => cellsFor(p).last._1.getAge).foreach { ply =>
       val cells = cellsFor(ply)
       val p = cells.last._1
 
-      val formattedCellsVsL = (15 to 45).map(a => cellFor(p, a).flatMap((d: (Player, Option[Score], Option[Score])) => d._2.map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
-      val formattedCellsVsR = (15 to 45).map(a => cellFor(p, a).flatMap((d: (Player, Option[Score], Option[Score])) => d._3.map(s => f"${s.toLong}%+3d")).getOrElse("   ")).mkString(" ")
+      val formattedCellsVsL = formatCellsByAge(p, _._2)
+      val formattedCellsVsR = formatCellsByAge(p, _._3)
 
       w.println(f"${StringUtils.abbreviate(p.getName(), 25)}%-25s | $formattedCellsVsL |")
       w.println(f"${""}%-25s | $formattedCellsVsR |")
