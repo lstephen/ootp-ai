@@ -48,11 +48,11 @@ public final class Player {
 
   @JsonIgnore private ImmutableList<Slot> slots;
 
-  @JsonIgnore private Optional<StarRating> stars = Optional.absent();
+  private Optional<StarRating> stars = Optional.absent();
 
-  @JsonIgnore private Optional<Clutch> clutch = Optional.absent();
+  private Optional<Clutch> clutch = Optional.absent();
 
-  @JsonIgnore private Optional<Consistency> consistency = Optional.absent();
+  private Optional<Consistency> consistency = Optional.absent();
 
   private Player(PlayerId id, String name, PlayerRatings ratings) {
     this.id = id;
