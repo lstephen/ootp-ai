@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.github.lstephen.ootp.ai.player.ratings.json.BattingPotentialSerializer;
 import com.github.lstephen.ootp.ai.site.Site;
 
@@ -14,6 +15,8 @@ public final class Jackson {
 
   public static ObjectMapper getMapper(Site site) {
     ObjectMapper mapper = new ObjectMapper();
+
+    mapper.registerModule(new GuavaModule());
 
     mapper.setVisibilityChecker(
         mapper

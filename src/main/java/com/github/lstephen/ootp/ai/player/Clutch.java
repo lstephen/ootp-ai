@@ -10,9 +10,7 @@ public enum Clutch {
 
   public static Clutch extractFrom(Document doc) {
     String starsText = doc.select("td.s4:containsOwn(Stars)").html();
-    //System.out.println(starsText);
     String[] split = StringUtils.splitByWholeSeparator(starsText, "<br />");
-    //System.out.println(Strings.join(split).with(","));
     String clutchText = split[split.length - 4];
 
     if (clutchText.equalsIgnoreCase("Suffers")) {
