@@ -54,6 +54,10 @@ public final class Player {
 
   private Optional<Consistency> consistency = Optional.absent();
 
+  private Optional<InjuryRating> injury = Optional.absent();
+
+  private Optional<TeamLeaderSkills> leader = Optional.absent();
+
   private Player(PlayerId id, String name, PlayerRatings ratings) {
     this.id = id;
     this.name = name;
@@ -146,6 +150,22 @@ public final class Player {
 
   public void setConsistency(Consistency consistency) {
     this.consistency = Optional.of(consistency);
+  }
+
+  public Optional<InjuryRating> getInjuryRating() {
+    return injury;
+  }
+
+  public void setInjuryRating(InjuryRating injury) {
+    this.injury = Optional.of(injury);
+  }
+
+  public Optional<TeamLeaderSkills> getLeader() {
+    return leader;
+  }
+
+  public void setLeader(TeamLeaderSkills leader) {
+    this.leader = Optional.of(leader);
   }
 
   public String getIntangibles() {

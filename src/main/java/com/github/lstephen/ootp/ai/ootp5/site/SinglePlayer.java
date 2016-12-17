@@ -3,9 +3,11 @@ package com.github.lstephen.ootp.ai.ootp5.site;
 import com.github.lstephen.ootp.ai.player.BattingHand;
 import com.github.lstephen.ootp.ai.player.Clutch;
 import com.github.lstephen.ootp.ai.player.Consistency;
+import com.github.lstephen.ootp.ai.player.InjuryRating;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.github.lstephen.ootp.ai.player.PlayerSource;
+import com.github.lstephen.ootp.ai.player.TeamLeaderSkills;
 import com.github.lstephen.ootp.ai.player.ratings.DefensiveRatings;
 import com.github.lstephen.ootp.ai.player.ratings.FieldingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.PitchingRatings;
@@ -150,6 +152,8 @@ public class SinglePlayer implements PlayerSource {
     player.setStars(StarRating.extractFrom(doc));
     player.setClutch(Clutch.extractFrom(doc));
     player.setConsistency(Consistency.extractFrom(doc));
+    player.setInjuryRating(InjuryRating.extractFrom(doc));
+    player.setLeader(TeamLeaderSkills.extractFrom(site.getType(), doc));
 
     if (site.isInjured(player)) {
       player.setInjured(Boolean.TRUE);
