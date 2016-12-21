@@ -62,7 +62,7 @@ class BattingRegression(site: Site) extends SiteRegression(site) {
   def saveHistory(h: History, s: TeamStats[BattingStats]) =
     h.saveBatting(s, site, currentSeason)
   def loadHistory(h: History) =
-    h.loadBatting(site, currentSeason, 5).asScala.toSeq
+    h.loadBatting(site, currentSeason, 10).asScala.toSeq
 
   def getOverall(s: BattingStats) = s.getWobaPlus
 }
@@ -97,7 +97,7 @@ class PitchingRegression(site: Site) extends SiteRegression(site) {
   def saveHistory(h: History, s: TeamStats[PitchingStats]) =
     h.savePitching(s, site, currentSeason)
   def loadHistory(h: History) =
-    h.loadPitching(site, currentSeason, 5).asScala.toSeq
+    h.loadPitching(site, currentSeason, 10).asScala.toSeq
 
   def getOverall(s: PitchingStats) = s.getBaseRunsPlus
 
@@ -138,7 +138,7 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
           getRegression(r)
             .addData(ratings, r.getStat(stats), stats.getPlateAppearances))
 
-    def addData(teamStats: TeamStats[S]): Unit =
+    def addData(teamStats: TeamStats[S], weight: Int): Unit =
       teamStats.getPlayers().asScala.foreach { p =>
         val stats = teamStats.getSplits(p)
         val ratings = getRatings(p)
@@ -147,18 +147,21 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
           logger.warn(
             s"No ratings for ${p.getShortName} (${p.getId}) aged ${p.getAge}")
         } else {
-          addEntry(stats.getVsLeft(), ratings.getVsLeft())
-          addEntry(stats.getVsRight(), ratings.getVsRight())
+          addEntry(stats.getVsLeft().multiply(weight), ratings.getVsLeft())
+          addEntry(stats.getVsRight().multiply(weight), ratings.getVsRight())
         }
       }
 
-    addData(stats)
 
     val history = History.create
 
     saveHistory(history, stats)
 
-    loadHistory(history).foreach(addData(_))
+    val loadedHistory = loadHistory(history)
+
+    loadedHistory.zipWithIndex.foreach { case (h, idx) => addData(h, idx + 1) }
+
+    addData(stats, loadedHistory.length + 3)
 
     logger.info("Training...")
     rs.values.foreach(_.train)

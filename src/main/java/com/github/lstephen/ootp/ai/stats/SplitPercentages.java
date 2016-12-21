@@ -60,11 +60,11 @@ public class SplitPercentages {
 
     int currentSeason = site.getDate().getYear();
 
-    for (TeamStats<BattingStats> h : history.loadBatting(site, currentSeason, 5)) {
+    for (TeamStats<BattingStats> h : history.loadBatting(site, currentSeason, 3)) {
       loadBatting(h);
     }
 
-    for (TeamStats<PitchingStats> p : history.loadPitching(site, currentSeason, 5)) {
+    for (TeamStats<PitchingStats> p : history.loadPitching(site, currentSeason, 3)) {
       loadPitching(p);
     }
   }
