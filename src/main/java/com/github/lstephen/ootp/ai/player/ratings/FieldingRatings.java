@@ -111,18 +111,30 @@ public class FieldingRatings {
 
     @JsonCreator
     public static Builder fromJson(ObjectNode node) {
-      JsonNode range = node.get("range").get("reference");
-      JsonNode errors = node.get("errors").get("reference");
-      JsonNode arm = node.get("arm").get("reference");
-      JsonNode dp = node.get("dp").get("reference");
-      JsonNode ability = node.get("ability").get("reference");
-
       return create()
-          .range(range == null ? 0 : range.asInt())
-          .errors(errors == null ? 0 : errors.asInt())
-          .arm(arm == null ? 0 : arm.asInt())
-          .dp(dp == null ? 0 : dp.asInt())
-          .ability(ability == null ? 0 : ability.asInt());
+          .range(fromJson(node, "range"))
+          .errors(fromJson(node, "errors"))
+          .arm(fromJson(node, "arm"))
+          .dp(fromJson(node, "dp"))
+          .ability(fromJson(node, "ability"));
+    }
+
+    private static int fromJson(ObjectNode node, String field) {
+      JsonNode present = node.get(field).get("present");
+
+      if (present == null) {
+        if (node.get(field) == null) {
+          return 0;
+        } else {
+          return node.get(field).asInt();
+        }
+      }
+
+      if (present.asBoolean()) {
+        return node.get(field).get("reference").asInt();
+      }
+
+      return 0;
     }
   }
 

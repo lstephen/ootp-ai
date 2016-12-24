@@ -77,6 +77,10 @@ RSpec.describe Player do
       let(:running_scale) { OneToTen.new }
 
       it { expect { deserialize(serialize player) }.not_to raise_error }
+
+      context '#defensive_ratings', :property => :defensive_ratings do
+        its(:position_scores) { is_expected.to eq('-2---245') }
+      end
     end
   end
 end
