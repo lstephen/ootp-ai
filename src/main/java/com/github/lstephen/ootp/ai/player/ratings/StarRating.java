@@ -1,5 +1,8 @@
 package com.github.lstephen.ootp.ai.player.ratings;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 
@@ -17,7 +20,8 @@ public final class StarRating {
 
   private final Boolean half;
 
-  private StarRating(Type type, Integer number, Boolean half) {
+  @JsonCreator
+  private StarRating(@JsonProperty("type") Type type, @JsonProperty("number") Integer number, @JsonProperty("half") Boolean half) {
     this.type = type;
     this.number = number;
     this.half = half;
@@ -50,12 +54,8 @@ public final class StarRating {
 
   public static StarRating extractFrom(Document doc) {
     String starsText = doc.select("td.s4:containsOwn(Stars)").html();
-    //System.out.println(starsText);
     String[] split = StringUtils.splitByWholeSeparator(starsText, "<br />");
-    //System.out.println(Strings.join(split).with(","));
     starsText = split[split.length - 2];
-
-    //System.out.println(starsText);
 
     if (doc.text().contains("Prospect rating :")) {
       return blueValueOf(starsText);

@@ -70,6 +70,14 @@ RSpec.describe Player do
 
       it { expect { deserialize(serialize player) }.not_to raise_error }
     end
+
+    context 'Craig Parkhill' do
+      let(:json) { CRAIG_PARKHILL_JSON }
+      let(:bunt_scale) { OneToFive.new }
+      let(:running_scale) { OneToTen.new }
+
+      it { expect { deserialize(serialize player) }.not_to raise_error }
+    end
   end
 end
 
@@ -314,6 +322,104 @@ ELIJAH_CHAUSEE_JSON = <<-JSON
   "battingHand" : "LEFT",
   "injured" : false,
   "upcomingFreeAgent" : true
+}
+JSON
+
+CRAIG_PARKHILL_JSON = <<-JSON
+{
+  "id" : "p215",
+  "name" : "Craig Parkhill",
+  "ratings" : {
+    "batting" : {
+      "vsLeft" : {
+        "@type" : "BattingRatings",
+        "scale" : {
+          "@type" : "OneToOneHundred"
+        },
+        "contact" : 80,
+        "gap" : 61,
+        "triples" : null,
+        "power" : 100,
+        "eye" : 100,
+        "k" : 71,
+        "runningSpeed" : 55,
+        "stealingAbility" : 55
+      },
+      "vsRight" : {
+        "@type" : "BattingRatings",
+        "scale" : {
+          "@type" : "OneToOneHundred"
+        },
+        "contact" : 72,
+        "gap" : 57,
+        "triples" : null,
+        "power" : 100,
+        "eye" : 100,
+        "k" : 68,
+        "runningSpeed" : 55,
+        "stealingAbility" : 55
+      }
+    },
+    "defensive" : {
+      "positionRating" : {
+        "CENTER_FIELD" : 4.0,
+        "RIGHT_FIELD" : 6.0
+      },
+      "catcher" : {
+        "range" : null,
+        "errors" : null,
+        "arm" : 10,
+        "dp" : null,
+        "ability" : 0
+      },
+      "infield" : {
+        "range" : 0,
+        "errors" : 0,
+        "arm" : 50,
+        "dp" : 50,
+        "ability" : null
+      },
+      "outfield" : {
+        "range" : 42,
+        "errors" : 46,
+        "arm" : 50,
+        "dp" : null,
+        "ability" : null
+      }
+    },
+    "pitching" : null,
+    "battingPotential" : {
+      "scale" : {
+        "@type" : "OneToTen"
+      },
+      "contact" : 8,
+      "gap" : 7,
+      "triples" : null,
+      "power" : 10,
+      "eye" : 10,
+      "k" : 8,
+      "runningSpeed" : 55,
+      "stealingAbility" : 55
+    },
+    "pitchingPotential" : null,
+    "buntForHit" : 1,
+    "stealing" : 6
+  },
+  "age" : 32,
+  "team" : "Houston Astros",
+  "salary" : "$20M e",
+  "battingHand" : "SWITCH",
+  "stars" : {
+    "type" : "GOLD",
+    "number" : 3,
+    "half" : true
+  },
+  "clutch" : "NORMAL",
+  "consistency" : "VERY_INCONSISTENT",
+  "injury" : "NORMAL",
+  "leader" : "NONE",
+  "injured" : false,
+  "upcomingFreeAgent" : false
 }
 JSON
 
