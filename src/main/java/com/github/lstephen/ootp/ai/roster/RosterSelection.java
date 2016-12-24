@@ -188,15 +188,20 @@ public final class RosterSelection {
     }
 
     while (ml.size() < Math.min(MINIMUM_ML_ROSTER_SIZE, mode.getMajorLeagueRosterLimit())) {
+      Iterable<Player> available = Iterables.filter(
+            Iterables.concat(
+                getAvailableHitters(roster, mode), getAvailablePitchers(roster, mode)),
+            pl -> !ml.contains(pl) && pl.getAge() > 25);
+
+      if (Iterables.isEmpty(available)) {
+        break;
+      }
+
       Player p =
           Ordering.natural()
               .reverse()
               .onResultOf((Player ply) -> JavaAdapter.nowAbility(ply, predictor).score())
-              .min(
-                  Iterables.filter(
-                      Iterables.concat(
-                          getAvailableHitters(roster, mode), getAvailablePitchers(roster, mode)),
-                      pl -> !ml.contains(pl) && pl.getAge() > 25));
+              .min(available);
 
       ml.add(p);
     }
