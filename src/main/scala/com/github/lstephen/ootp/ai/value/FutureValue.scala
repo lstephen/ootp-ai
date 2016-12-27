@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.value
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.Position
 import com.github.lstephen.ootp.ai.regression.Predictor
+import com.github.lstephen.ootp.ai.score._
 import com.github.lstephen.ootp.ai.selection.lineup.PlayerDefenseScore
 
 import collection.JavaConversions._
@@ -46,13 +47,24 @@ class FutureValue(val player: Player, val position: Position)(
   val vsReplacement =
     if (player.getAge < 27) {
       val vsCurrent = ReplacementLevels.getForIdeal.get(ability)
-      val vsAverage = ReplacementLevels.getForIdeal.getVsAverage(ability);
+      val vsAverage = ReplacementLevels.getForIdeal.getVsAverage(ability)
 
       Some(List(vsCurrent, vsAverage).average)
     } else
       None
 
-  def components = ability.components :+ vsReplacement
+  val vsMax =
+    if (player.getAge < 27) {
+      val vsCurrent = MaxLevels.getVsIdeal(ability)
+      val vsAverage = MaxLevels.getVsAverage(ability)
+
+      val v = List(vsCurrent, vsAverage).average
+
+      if (v > Score.zero) Some(v) else None
+    } else
+      None
+
+  def components = ability.components :+ vsReplacement :+ vsMax
 
   def format: String = {
     val p = if (score.isPositive) position.getAbbreviation else ""
