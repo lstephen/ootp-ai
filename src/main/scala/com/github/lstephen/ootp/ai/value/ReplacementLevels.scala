@@ -73,14 +73,36 @@ object MaxLevels {
     else
       a.score - getForIdeal(a)
 
+  def getVsFuture(a: Ability): Score =
+    if (a.position == Position.MIDDLE_RELIEVER)
+      0.865 *: (a.score - getForFuture(a))
+    else
+      a.score - getForFuture(a)
+
+  def getVsAverage(a: Ability): Score =
+    if (a.position == Position.MIDDLE_RELIEVER)
+      0.865 *: (a.score - average)
+    else
+      a.score - average
+
   def getForIdeal(a: Ability): Score = getForIdeal(a.position, Some(a.player))
+
 
   def getForIdeal(pos: Position, ply: Option[Player] = None): Score =
     getFor(Context.idealRoster.getOrElse(throw new IllegalStateException), pos, ply)(Context.currentPredictor.getOrElse(throw new IllegalStateException))
 
-  def getFor(r: Roster, pos: Position, ply: Option[Player] = None)(implicit ps: Predictor): Score =
-    r.getAllPlayers.toList.filter(p => ply.map(_ != p).getOrElse(true)).map(NowAbility(_, pos).score).max
+  val average = (Position.hitting() ++ Position.pitching()).map(getForIdeal(_)).average
 
-  // we can do this for future abilities by considering the max of NowAbility and FutureAbility of all players
+  def getFor(r: Roster, pos: Position, ply: Option[Player] = None)(implicit ps: Predictor): Score =
+    getFor(r, pos, ply, NowAbility(_, pos).score)
+
+  def getForFuture(a: Ability): Score =
+    getForFuture(Context.idealRoster.getOrElse(throw new IllegalStateException), a.position, Some(a.player))(Context.currentPredictor.getOrElse(throw new IllegalStateException))
+
+  def getForFuture(r: Roster, pos: Position, ply: Option[Player] = None)(implicit ps: Predictor): Score =
+    getFor(r, pos, ply, FutureAbility(_, pos).score)
+
+  def getFor(r: Roster, pos: Position, ply: Option[Player], a: Player => Score)(implicit ps: Predictor): Score =
+    r.getAllPlayers.toList.filter(p => ply.map(_ != p).getOrElse(true)).map(a(_)).max
 }
 
