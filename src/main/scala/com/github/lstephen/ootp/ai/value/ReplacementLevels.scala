@@ -34,7 +34,7 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor)
 
   def print(w: PrintWriter): Unit = {
     def printLevel(p: Position): Unit =
-      w.println(f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d")
+      w.println(f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d ${MaxLevels.getForIdeal(p).toLong}%3d")
 
     w.println
     Position.hitting.foreach(printLevel(_))
@@ -65,3 +65,22 @@ object ReplacementLevels {
                                         ord: Ordering[S]): S =
     r.getMinorLeaguers.toList.map(f).sorted.reverse.head
 }
+
+object MaxLevels {
+  def getVsIdeal(a: Ability): Score =
+    if (a.position == Position.MIDDLE_RELIEVER)
+      0.865 *: (a.score - getForIdeal(a))
+    else
+      a.score - getForIdeal(a)
+
+  def getForIdeal(a: Ability): Score = getForIdeal(a.position, Some(a.player))
+
+  def getForIdeal(pos: Position, ply: Option[Player] = None): Score =
+    getFor(Context.idealRoster.getOrElse(throw new IllegalStateException), pos, ply)(Context.currentPredictor.getOrElse(throw new IllegalStateException))
+
+  def getFor(r: Roster, pos: Position, ply: Option[Player] = None)(implicit ps: Predictor): Score =
+    r.getAllPlayers.toList.filter(p => ply.map(_ != p).getOrElse(true)).map(NowAbility(_, pos).score).max
+
+  // we can do this for future abilities by considering the max of NowAbility and FutureAbility of all players
+}
+
