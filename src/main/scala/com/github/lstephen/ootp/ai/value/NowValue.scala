@@ -48,7 +48,13 @@ class NowValue(val player: Player, val position: Position)(
 
   val vsReplacement = Some(ReplacementLevels.getForIdeal.get(ability))
 
-  def components = ability.components :+ vsReplacement
+  val vsMax = {
+    val m = MaxLevels.getVsIdeal(ability)
+
+    if (m > Score.zero) Some(m) else None
+  }
+
+  def components = ability.components :+ vsReplacement :+ vsMax
 
   def format: String =
     components

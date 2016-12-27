@@ -31,18 +31,21 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
     extends SalaryPredictor
     with Printable {
 
-  private def vsReplacement(p: Player): Score =
-    NowValue(p).vsReplacement.orElseZero
+  private def value(p: Player): Score = {
+    val v = NowValue(p)
+
+    v.vsReplacement.orElseZero + v.vsMax.orElseZero
+  }
 
   val currentTotal: Long = team.map(salary.getCurrentSalary(_).toLong).sum
   val nextTotal: Long = team.map(salary.getNextSalary(_).toLong).sum
 
   val replCurrentTotal: Score =
-    team.map(vsReplacement(_)).filter(_.isPositive).total
+    team.map(value(_)).filter(_.isPositive).total
 
   val replNextTotal: Score = team
     .filter(salary.getNextSalary(_) > 0)
-    .map(vsReplacement(_))
+    .map(value(_))
     .filter(_.isPositive)
     .total
 
@@ -81,7 +84,7 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
     val totalNext = format(nextTotal)
     val buffer = " " * 21
 
-    val perReplLabel = "$/Repl"
+    val perReplLabel = "$/Value"
     val perReplCurrent = format(currentTotal / replCurrentTotal.toLong)
     val perReplNext = format(nextTotal / replNextTotal.toLong)
 
@@ -89,7 +92,7 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
     val forFreeAgents = format(financials.getAvailableForFreeAgents)
     val forExtensions = format(financials.getAvailableForExtensions)
 
-    val maxLabel = "Max $/Repl"
+    val maxLabel = "Max $/Value"
 
     w println line
     w println f"$buffer| $totalCurrent%11s $totalNext%11s"
@@ -100,9 +103,9 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
   }
 
   def predictNow(p: Player): Integer =
-    max(vsReplacement(p).toLong * maxReplCurrent, 0).toInt
+    max(value(p).toLong * maxReplCurrent, 0).toInt
 
   def predictNext(p: Player): Integer =
-    max(vsReplacement(p).toLong * maxReplNext, 0).toInt
+    max(value(p).toLong * maxReplNext, 0).toInt
 
 }

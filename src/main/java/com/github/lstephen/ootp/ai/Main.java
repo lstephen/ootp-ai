@@ -231,6 +231,8 @@ public class Main {
     final Predictor predictor = Predictor$.MODULE$.train(site);
     Printables.print(predictor.correlationReport()).to(out);
 
+    Context$.MODULE$.currentPredictor_$eq(predictor);
+
     LOG.info("Loading manual changes...");
     Changes changes = Changes.load(site);
 
