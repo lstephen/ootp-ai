@@ -333,7 +333,7 @@ public class Main {
 
     AllDepthCharts depthCharts =
         new DepthChartSelection(predictor)
-            .select(lineups, Selections.onlyHitters(newRoster.getPlayers(Status.ML)));
+            .select(lineups, newRoster.getPlayers(Status.ML));
 
     Printables.print(depthCharts).to(out);
 
