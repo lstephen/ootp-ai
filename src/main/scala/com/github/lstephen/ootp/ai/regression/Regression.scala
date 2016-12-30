@@ -9,17 +9,7 @@ import com.github.lstephen.ootp.ai.player.ratings.{
 import com.github.lstephen.ootp.ai.site.{SiteHolder, Version}
 import com.google.common.base.Optional
 import com.typesafe.scalalogging.StrictLogging
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.SparkSession
 import scala.math.ScalaNumericAnyConversions
-
-object Spark {
-  lazy val session = {
-    val s = SparkSession.builder.master("local").appName("ootp-ai").getOrCreate
-    sys.ShutdownHookThread { s.stop }
-    s
-  }
-}
 
 trait Regressable[-T] {
   def toInput(t: T): Input
