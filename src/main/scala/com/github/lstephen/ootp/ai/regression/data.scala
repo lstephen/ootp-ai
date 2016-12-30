@@ -2,12 +2,6 @@ package com.github.lstephen.ootp.ai.regression
 
 import com.typesafe.scalalogging.StrictLogging
 
-import org.apache.spark.ml.linalg.{Vector, DenseVector}
-import org.apache.spark.ml.linalg.SQLDataTypes._
-
-import org.apache.spark.sql._
-import org.apache.spark.sql.types._
-
 class Input(private val is: List[Option[Double]]) {
   def :+(rhs: Double): Input = this :+ Some(rhs)
   def :+(rhs: Option[Double]): Input = new Input(is :+ rhs)
@@ -25,8 +19,6 @@ class Input(private val is: List[Option[Double]]) {
       case (d, idx) => d getOrElse f(idx)
     }.toArray
 
-  def toVector(f: Int => Double): Vector = new DenseVector(toArray(f))
-
   def toOptionList: List[Option[Double]] = is
 }
 
@@ -39,8 +31,6 @@ object Input {
 
 class DataPoint(val input: Input, val output: Double, val weight: Int) {
   def features = input.length
-
-  def toTuple(f: Int => Double): (Vector, Double) = (input.toVector(f), output)
 }
 
 class DataSet(ds: List[DataPoint]) extends StrictLogging {
@@ -76,14 +66,6 @@ class DataSet(ds: List[DataPoint]) extends StrictLogging {
   val length = ds.length
 
   def features = ds.head.input.length
-
-  def toDataFrame: DataFrame = {
-    import Spark.session.implicits._
-
-    ds.map { d =>
-      (d.input.toVector(averageForColumn(_)), d.output)
-    }.toDF("input", "output")
-  }
 }
 
 object DataSet {

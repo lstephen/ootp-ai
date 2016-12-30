@@ -54,9 +54,7 @@
     <lib.scala-arm.version>1.4</lib.scala-arm.version>
     <lib.scala-library.version>2.11.7</lib.scala-library.version>
     <lib.scala-logging.version>3.1.0</lib.scala-logging.version>
-    <lib.scala-reflect.version>2.11.1</lib.scala-reflect.version>
     <lib.slf4j.version>1.7.21</lib.slf4j.version>
-    <lib.spark.version>2.0.2</lib.spark.version>
 
     <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
     <lib.jsoup.version>1.7.3</lib.jsoup.version>
@@ -179,12 +177,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-reflect</artifactId>
-      <version>${lib.scala-reflect.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${lib.slf4j.version}</version>
@@ -195,36 +187,6 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>${lib.slf4j.version}</version>
       <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-catalyst_${scala.version}</artifactId>
-      <version>${lib.spark.version}</version>
-    </dependency>
-
-    <!--<dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_${scala.version}</artifactId>
-      <version>${lib.spark.version}</version>
-    </dependency>-->
-
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib_${scala.version}</artifactId>
-      <version>${lib.spark.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib-local_${scala.version}</artifactId>
-      <version>${lib.spark.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.spark</groupId>
-      <artifactId>spark-sql_${scala.version}</artifactId>
-      <version>${lib.spark.version}</version>
     </dependency>
 
     <dependency>
