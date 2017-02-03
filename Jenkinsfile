@@ -54,7 +54,9 @@ if (env.BRANCH_NAME == 'master' && OOTPAI_SITE != 'NONE') {
         , "OOTPAI_PLAYOFFS=${OOTPAI_PLAYOFFS}"
         , "OOTPAI_CLEAR_CACHE=${OOTPAI_CLEAR_CACHE}"
         ]) {
-        construi 'run'
+        timeout(time: 180, unit: 'MINUTES') {
+          construi 'run'
+        }
       }
     }
   }
