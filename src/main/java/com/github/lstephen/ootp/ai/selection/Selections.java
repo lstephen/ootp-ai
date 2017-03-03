@@ -14,7 +14,11 @@ public final class Selections {
   private Selections() {}
 
   public static ImmutableMultimap<Slot, Player> select(Selection selection, Iterable available) {
-    return selection.select(ImmutableSet.<Player>of(), available);
+    return select(selection, available, ImmutableSet.<Player>of());
+  }
+
+  public static ImmutableMultimap<Slot, Player> select(Selection selection, Iterable available, Iterable forced) {
+    return selection.select(forced, available);
   }
 
   public static ImmutableSet<Player> onlyHitters(Iterable<Player> ps) {
