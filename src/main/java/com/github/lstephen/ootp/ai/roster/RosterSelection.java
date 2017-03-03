@@ -188,10 +188,11 @@ public final class RosterSelection {
     }
 
     while (ml.size() < Math.min(MINIMUM_ML_ROSTER_SIZE, mode.getMajorLeagueRosterLimit())) {
-      Iterable<Player> available = Iterables.filter(
-            Iterables.concat(
-                getAvailableHitters(roster, mode), getAvailablePitchers(roster, mode)),
-            pl -> !ml.contains(pl) && pl.getAge() > 25);
+      Iterable<Player> available =
+          Iterables.filter(
+              Iterables.concat(
+                  getAvailableHitters(roster, mode), getAvailablePitchers(roster, mode)),
+              pl -> !ml.contains(pl) && pl.getAge() > 25);
 
       if (Iterables.isEmpty(available)) {
         break;
@@ -254,18 +255,34 @@ public final class RosterSelection {
 
   private Collection<Player> selectTiered(Iterable<Player> ps, int hitterSize, int pitcherSize) {
     Collection<Player> selected = new HashSet<>();
-    selected.addAll(new Tiered(Position.hitting(), predictor).takeAsJava(Selections.onlyHitters(ps), hitterSize));
-    selected.addAll(new Tiered(Position.pitching(), predictor).takeAsJava(Selections.onlyPitchers(ps), pitcherSize));
+    selected.addAll(
+        new Tiered(Position.hitting(), predictor)
+            .takeAsJava(Selections.onlyHitters(ps), hitterSize));
+    selected.addAll(
+        new Tiered(Position.pitching(), predictor)
+            .takeAsJava(Selections.onlyPitchers(ps), pitcherSize));
     return selected;
   }
 
   private Collection<Player> selectOldest(Iterable<Player> ps, int hitterSize, int pitcherSize) {
-    Ordering<Player> byBatting = Ordering.natural().reverse().onResultOf(p -> predictor.predictBatting(p).overall());
-    Ordering<Player> byPitching = Ordering.natural().reverse().onResultOf(p -> predictor.predictPitching(p).overall());
+    Ordering<Player> byBatting =
+        Ordering.natural().reverse().onResultOf(p -> predictor.predictBatting(p).overall());
+    Ordering<Player> byPitching =
+        Ordering.natural().reverse().onResultOf(p -> predictor.predictPitching(p).overall());
 
     Collection<Player> selected = new HashSet<>();
-    selected.addAll(Player.byAge().reverse().compound(byBatting).immutableSortedCopy(Selections.onlyHitters(ps)).subList(0, hitterSize));
-    selected.addAll(Player.byAge().reverse().compound(byPitching).immutableSortedCopy(Selections.onlyPitchers(ps)).subList(0, pitcherSize));
+    selected.addAll(
+        Player.byAge()
+            .reverse()
+            .compound(byBatting)
+            .immutableSortedCopy(Selections.onlyHitters(ps))
+            .subList(0, hitterSize));
+    selected.addAll(
+        Player.byAge()
+            .reverse()
+            .compound(byPitching)
+            .immutableSortedCopy(Selections.onlyPitchers(ps))
+            .subList(0, pitcherSize));
     return selected;
   }
 

@@ -23,6 +23,4 @@ public enum InjuryRating {
 
     throw new IllegalArgumentException("Unknown Injury Rating: " + injuryRatingText);
   }
-
-
 }

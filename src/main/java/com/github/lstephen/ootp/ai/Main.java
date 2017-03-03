@@ -332,8 +332,7 @@ public class Main {
     LOG.log(Level.INFO, "Choosing Depth Charts...");
 
     AllDepthCharts depthCharts =
-        new DepthChartSelection(predictor)
-            .select(lineups, newRoster.getPlayers(Status.ML));
+        new DepthChartSelection(predictor).select(lineups, newRoster.getPlayers(Status.ML));
 
     Printables.print(depthCharts).to(out);
 
@@ -421,7 +420,6 @@ public class Main {
     generic.setTitle("Sign");
     generic.setPlayers(moves.getSign());
     generic.print(out);
-
 
     if (site.getDate().getMonthOfYear() == DateTimeConstants.MARCH) {
       LOG.log(Level.INFO, "Spring training...");

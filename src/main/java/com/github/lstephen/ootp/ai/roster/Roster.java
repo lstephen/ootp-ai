@@ -204,12 +204,15 @@ public final class Roster implements Printable {
 
     for (int i = 0; i < maxSize; i++) {
       for (Status s : levels) {
-        List<Player> ps = Player.byListedPosition().compound(Player.byShortName()).sortedCopy(assignments.get(s));
+        List<Player> ps =
+            Player.byListedPosition().compound(Player.byShortName()).sortedCopy(assignments.get(s));
 
         if (i < ps.size()) {
           Player p = ps.get(i);
 
-          w.print(String.format(" %2s %-15s %2d |", p.getListedPosition().or(""), p.getShortName(), p.getAge()));
+          w.print(
+              String.format(
+                  " %2s %-15s %2d |", p.getListedPosition().or(""), p.getShortName(), p.getAge()));
         } else {
           w.print(String.format(" %21s |", ""));
         }

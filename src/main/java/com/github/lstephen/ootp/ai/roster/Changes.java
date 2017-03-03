@@ -13,6 +13,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 
 /** @author lstephen */
@@ -48,8 +50,9 @@ public final class Changes {
 
   private Changes() {}
 
-  public ImmutableSet<Player> get(ChangeType type) {
-    return ImmutableSet.copyOf(changes.get(type));
+  public ImmutableSet<Player> get(ChangeType... type) {
+    return ImmutableSet.copyOf(
+        Stream.of(type).flatMap(t -> changes.get(t).stream()).collect(Collectors.toSet()));
   }
 
   private void add(ChangeType type, Player p) {

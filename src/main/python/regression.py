@@ -257,12 +257,16 @@ def predict():
 
     data = json.load(sys.stdin)
 
-    predictions = { k: predict(data['data'], m) for k, m in data['models'].items() }
+    predictions = {
+        k: predict(data['data'], m)
+        for k, m in data['models'].items()
+    }
 
     sys.stdout.write(json.dumps(predictions))
 
     logging.info("Predicted {} inputs for {} models in {:.3f} seconds.".format(
         len(data['data']), len(data['models']), time.perf_counter() - start))
+
 
 def predict(data, model):
     start = time.perf_counter()

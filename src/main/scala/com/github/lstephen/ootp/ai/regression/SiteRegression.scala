@@ -152,7 +152,6 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
         }
       }
 
-
     val history = History.create
 
     saveHistory(history, stats)
@@ -196,7 +195,8 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
   }
 
   def predict(ratings: Seq[R], pas: Long): Seq[S] = {
-    val predictions: Map[String, Seq[Double]] = Regression.predict(regressions, ratings)
+    val predictions: Map[String, Seq[Double]] =
+      Regression.predict(regressions, ratings)
 
     val stats = Seq.fill(ratings.size) { newStats }
 
@@ -229,11 +229,13 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       val plusTens = (0 until avg.length).map(idx => avg.updated(idx, _ + 10))
       val minusTens = (0 until avg.length).map(idx => avg.updated(idx, _ - 10))
 
-      val ranges = (0 until avg.length).flatMap(idx => (5 to 95 by 10).map(n => avg.updated(idx, _ => n)))
+      val ranges = (0 until avg.length).flatMap(idx =>
+        (5 to 95 by 10).map(n => avg.updated(idx, _ => n)))
 
       val allInputs = avg +: (plusTens ++ minusTens ++ ranges)
 
-      val predictions: Map[String, Seq[Double]] = Regression.predict(regressions, allInputs)
+      val predictions: Map[String, Seq[Double]] =
+        Regression.predict(regressions, allInputs)
 
       val stats = Seq.fill(allInputs.size) { newStats }
 
@@ -249,12 +251,22 @@ abstract class SiteRegression(site: Site) extends LazyLogging {
       val features = regressable.features
       val n = features.size
 
-      w.println(f"${"Average"}%20s |  -   ${getOverall(stats.head)}%3.0f   +  | ${(5 to 95 by 10).map(n => f"${n}%3s").mkString(" ")}")
+      w.println(
+        f"${"Average"}%20s |  -   ${getOverall(stats.head)}%3.0f   +  | ${(5 to 95 by 10)
+          .map(n => f"${n}%3s")
+          .mkString(" ")}")
 
-      Zip[List].ap.tuple4(features.toList, ovrs.slice(1 + n, 1 + 2*n).toList, ovrs.slice(1, 1 + n).toList, ovrs.slice(1 + 2*n, stats.size).grouped(10).toList).map {
+      Zip[List].ap
+        .tuple4(features.toList,
+                ovrs.slice(1 + n, 1 + 2 * n).toList,
+                ovrs.slice(1, 1 + n).toList,
+                ovrs.slice(1 + 2 * n, stats.size).grouped(10).toList)
+        .map {
           case (label, minus, plus, rs) =>
-            w.println(f"${label}%20s | ${minus}%3.0f (${plus - minus}%3.0f) ${plus}%3.0f | ${if (label == "Endurance") "" else rs.map(n => f"${n}%3.0f").mkString(" ")}")
-      }
+            w.println(
+              f"${label}%20s | ${minus}%3.0f (${plus - minus}%3.0f) ${plus}%3.0f | ${if (label == "Endurance") ""
+              else rs.map(n => f"${n}%3.0f").mkString(" ")}")
+        }
     }
   }
 }
