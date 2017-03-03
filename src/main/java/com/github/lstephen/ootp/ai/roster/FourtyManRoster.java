@@ -90,14 +90,14 @@ public class FourtyManRoster implements Printable {
         Selections.select(
                 new HitterSelectionFactory(predictor).create(Mode.EXPANDED),
                 Selections.onlyHitters(available),
-                forced)
+                Selections.onlyHitters(forced))
             .values());
 
     fourtyMan.addAll(
         Selections.select(
                 new PitcherSelectionFactory(predictor).create(Mode.EXPANDED),
                 Selections.onlyPitchers(available),
-                forced)
+                Selections.onlyPitchers(forced))
             .values());
 
     Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
