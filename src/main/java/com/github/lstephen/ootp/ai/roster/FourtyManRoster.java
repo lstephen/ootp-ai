@@ -9,6 +9,7 @@ import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.value.JavaAdapter;
+import com.github.lstephen.ootp.ai.value.FutureValue;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
@@ -74,18 +75,29 @@ public class FourtyManRoster implements Printable {
 
     Set<Player> fourtyMan = Sets.newHashSet();
 
+    Set<Player> forced = Sets.newHashSet();
+
+    for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
+      FutureValue fv = JavaAdapter.futureValue(p, predictor);
+      if (!fv.vsReplacement().isEmpty() && fv.vsReplacement().get().toLong() > 0) {
+        forced.add(p);
+      }
+    }
+
     Iterable<Player> available = roster.getAllPlayers();
 
     fourtyMan.addAll(
         Selections.select(
                 new HitterSelectionFactory(predictor).create(Mode.EXPANDED),
-                Selections.onlyHitters(available))
+                Selections.onlyHitters(available),
+                forced)
             .values());
 
     fourtyMan.addAll(
         Selections.select(
                 new PitcherSelectionFactory(predictor).create(Mode.EXPANDED),
-                Selections.onlyPitchers(available))
+                Selections.onlyPitchers(available),
+                forced)
             .values());
 
     Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
@@ -145,7 +157,7 @@ public class FourtyManRoster implements Printable {
               ? 0
               : JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
 
-      boolean belowReplacement = Math.min(current, future) < 0 && Math.max(current, future) <= 0;
+      boolean belowReplacement = Math.min(current, future) <= 0 && Math.max(current, future) <= 0;
 
       if (p.getAge() > 25
           && belowReplacement
