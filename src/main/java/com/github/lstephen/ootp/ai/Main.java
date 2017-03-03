@@ -368,6 +368,7 @@ public class Main {
       LOG.info("40 man roster reports...");
 
       FourtyManRoster fourtyMan = new FourtyManRoster(team, newRoster, predictor);
+      fourtyMan.setChanges(changes);
 
       Printables.print(fourtyMan).to(out);
 
