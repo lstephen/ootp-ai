@@ -12,26 +12,26 @@ import java.util.UUID
 case class TrainInput(weight: Integer, features: Array[Double], label: Double)
 
 object TrainInput {
-    implicit def TrainInputCodecJson =
-      casecodec3(TrainInput.apply, TrainInput.unapply)("weight",
-                                                       "features",
-                                                       "label")
+  implicit def TrainInputCodecJson =
+    casecodec3(TrainInput.apply, TrainInput.unapply)("weight",
+                                                     "features",
+                                                     "label")
 }
 
 case class PredictFeatures(features: Array[Double])
 
 object PredictFeatures {
-    implicit def PredictFeaturesCodecJson =
-      casecodec1(PredictFeatures.apply, PredictFeatures.unapply)("features")
+  implicit def PredictFeaturesCodecJson =
+    casecodec1(PredictFeatures.apply, PredictFeatures.unapply)("features")
 }
 
-case class PredictInput(models: Map[String, String], data: Array[PredictFeatures])
+case class PredictInput(models: Map[String, String],
+                        data: Array[PredictFeatures])
 
 object PredictInput {
-    implicit def PredictInputCodecJson =
-      casecodec2(PredictInput.apply, PredictInput.unapply)("models", "data")
+  implicit def PredictInputCodecJson =
+    casecodec2(PredictInput.apply, PredictInput.unapply)("models", "data")
 }
-
 
 class RegressionPyModel extends Model with StrictLogging {
   val modelFile =
@@ -56,7 +56,10 @@ class RegressionPyModel extends Model with StrictLogging {
         if (in.size == 0) return Seq()
 
         val json =
-          PredictInput(Map("model" -> modelFile), in.map(i => PredictFeatures(i.toArray(ds.averageForColumn(_)))).toArray).asJson
+          PredictInput(
+            Map("model" -> modelFile),
+            in.map(i => PredictFeatures(i.toArray(ds.averageForColumn(_))))
+              .toArray).asJson
 
         val results = RegressionPyCli.predict(json.toString)
 
@@ -83,11 +86,18 @@ object RegressionPyModel {
     def dataSet: DataSet
   }
 
-  def predict(models: Map[String, Predict], in: Seq[Input]): Map[String, Seq[Double]] = {
+  def predict(models: Map[String, Predict],
+              in: Seq[Input]): Map[String, Seq[Double]] = {
     if (in.size == 0) return models.mapValues(_ => Seq())
 
     val json =
-      PredictInput(models.mapValues(_.modelFile), in.map(i => PredictFeatures(i.toArray(models.head._2.dataSet.averageForColumn(_)))).toArray).asJson
+      PredictInput(
+        models.mapValues(_.modelFile),
+        in.map(
+            i =>
+              PredictFeatures(
+                i.toArray(models.head._2.dataSet.averageForColumn(_))))
+          .toArray).asJson
 
     val results = RegressionPyCli.predict(json.toString)
 

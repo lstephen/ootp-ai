@@ -3,20 +3,21 @@ package com.github.lstephen.ootp.ai.roster;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.Predictor;
+import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
 import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Selections;
-import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.github.lstephen.ootp.ai.value.FutureValue;
-import com.google.common.base.Optional;
+import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import java.io.PrintWriter;
+import java.util.Optional;
 import java.util.Set;
 
 /** @author lstephen */
@@ -28,7 +29,7 @@ public class FourtyManRoster implements Printable {
 
   private final Predictor predictor;
 
-  private Optional<Changes> changes = Optional.absent();
+  private Optional<Changes> changes = Optional.empty();
 
   private ImmutableSet<Player> desired25Man;
 
@@ -83,6 +84,9 @@ public class FourtyManRoster implements Printable {
         forced.add(p);
       }
     }
+
+    changes.ifPresent(
+        c -> c.get(ChangeType.FORCE_ML, ChangeType.FORCE_FORCE_ML).forEach(forced::add));
 
     Iterable<Player> available = roster.getAllPlayers();
 

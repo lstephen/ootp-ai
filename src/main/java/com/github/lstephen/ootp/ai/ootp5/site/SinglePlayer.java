@@ -286,7 +286,8 @@ public class SinglePlayer implements PlayerSource {
     int gbp;
     switch (site.getType()) {
       case OOTP6:
-        endurance = StringUtils.isNumeric(ratings[0].trim()) ? Integer.parseInt(ratings[0].trim()) : 0;
+        endurance =
+            StringUtils.isNumeric(ratings[0].trim()) ? Integer.parseInt(ratings[0].trim()) : 0;
         gbp = Integer.parseInt(ratings[1].trim());
         break;
       case OOTP5:

@@ -150,10 +150,12 @@ class Regression(label: String) extends StrictLogging {
 }
 
 object Regression {
-  def predict[T: Regressable](rs: Map[String, Regression], xs: Seq[T]): Map[String, Seq[Double]] =
+  def predict[T: Regressable](rs: Map[String, Regression],
+                              xs: Seq[T]): Map[String, Seq[Double]] =
     predict(rs, xs.map(implicitly[Regressable[T]].toInput(_)))
 
-  def predict(rs: Map[String, Regression], xs: Seq[Input]): Map[String, Seq[Double]] = {
+  def predict(rs: Map[String, Regression],
+              xs: Seq[Input]): Map[String, Seq[Double]] = {
     val models = rs.mapValues(_.regression)
 
     RegressionPyModel.predict(models, xs)

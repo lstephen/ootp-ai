@@ -2,7 +2,6 @@ package com.github.lstephen.ootp.ai.player.ratings;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 
@@ -21,7 +20,10 @@ public final class StarRating {
   private final Boolean half;
 
   @JsonCreator
-  private StarRating(@JsonProperty("type") Type type, @JsonProperty("number") Integer number, @JsonProperty("half") Boolean half) {
+  private StarRating(
+      @JsonProperty("type") Type type,
+      @JsonProperty("number") Integer number,
+      @JsonProperty("half") Boolean half) {
     this.type = type;
     this.number = number;
     this.half = half;

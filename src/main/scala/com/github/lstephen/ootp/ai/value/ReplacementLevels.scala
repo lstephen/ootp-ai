@@ -34,7 +34,8 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor)
 
   def print(w: PrintWriter): Unit = {
     def printLevel(p: Position): Unit =
-      w.println(f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d ${MaxLevels.getForIdeal(p).toLong}%3d")
+      w.println(
+        f"${p.getAbbreviation}%2s: ${get(p).toLong}%3d ${MaxLevels.getForIdeal(p).toLong}%3d")
 
     w.println
     Position.hitting.foreach(printLevel(_))
@@ -87,22 +88,36 @@ object MaxLevels {
 
   def getForIdeal(a: Ability): Score = getForIdeal(a.position, Some(a.player))
 
-
   def getForIdeal(pos: Position, ply: Option[Player] = None): Score =
-    getFor(Context.idealRoster.getOrElse(throw new IllegalStateException), pos, ply)(Context.currentPredictor.getOrElse(throw new IllegalStateException))
+    getFor(
+      Context.idealRoster.getOrElse(throw new IllegalStateException),
+      pos,
+      ply)(Context.currentPredictor.getOrElse(throw new IllegalStateException))
 
-  val average = (Position.hitting() ++ Position.pitching()).map(getForIdeal(_)).average
+  val average =
+    (Position.hitting() ++ Position.pitching()).map(getForIdeal(_)).average
 
-  def getFor(r: Roster, pos: Position, ply: Option[Player] = None)(implicit ps: Predictor): Score =
+  def getFor(r: Roster, pos: Position, ply: Option[Player] = None)(
+      implicit ps: Predictor): Score =
     getFor(r, pos, ply, NowAbility(_, pos).score)
 
   def getForFuture(a: Ability): Score =
-    getForFuture(Context.idealRoster.getOrElse(throw new IllegalStateException), a.position, Some(a.player))(Context.currentPredictor.getOrElse(throw new IllegalStateException))
+    getForFuture(
+      Context.idealRoster.getOrElse(throw new IllegalStateException),
+      a.position,
+      Some(a.player))(
+      Context.currentPredictor.getOrElse(throw new IllegalStateException))
 
-  def getForFuture(r: Roster, pos: Position, ply: Option[Player] = None)(implicit ps: Predictor): Score =
+  def getForFuture(r: Roster, pos: Position, ply: Option[Player] = None)(
+      implicit ps: Predictor): Score =
     getFor(r, pos, ply, FutureAbility(_, pos).score)
 
-  def getFor(r: Roster, pos: Position, ply: Option[Player], a: Player => Score)(implicit ps: Predictor): Score =
-    r.getAllPlayers.toList.filter(p => ply.map(_ != p).getOrElse(true)).map(a(_)).max
+  def getFor(r: Roster,
+             pos: Position,
+             ply: Option[Player],
+             a: Player => Score)(implicit ps: Predictor): Score =
+    r.getAllPlayers.toList
+      .filter(p => ply.map(_ != p).getOrElse(true))
+      .map(a(_))
+      .max
 }
-
