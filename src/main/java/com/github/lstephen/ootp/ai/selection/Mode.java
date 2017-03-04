@@ -49,7 +49,7 @@ public enum Mode {
     public ImmutableMultiset<Slot> getHittingSlots() {
       Multiset<Slot> expanded = HashMultiset.create(REGULAR_SEASON.getHittingSlots());
 
-      expanded.addAll(ImmutableMultiset.of(Slot.C, Slot.SS, Slot.IF, Slot.CF, Slot.OF, Slot.H));
+      expanded.addAll(ImmutableMultiset.of(Slot.C, Slot.IF, Slot.OF, Slot.H));
 
       return ImmutableMultiset.copyOf(expanded);
     }
@@ -58,7 +58,7 @@ public enum Mode {
     public ImmutableMultiset<Slot> getPitchingSlots() {
       Multiset<Slot> expanded = HashMultiset.create(REGULAR_SEASON.getPitchingSlots());
 
-      expanded.addAll(ImmutableMultiset.of(Slot.SP, Slot.MR, Slot.P));
+      expanded.addAll(ImmutableMultiset.of(Slot.SP, Slot.MR));
 
       return ImmutableMultiset.copyOf(expanded);
     }
