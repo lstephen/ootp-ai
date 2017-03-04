@@ -76,35 +76,31 @@ public class FourtyManRoster implements Printable {
 
     Set<Player> fourtyMan = Sets.newHashSet();
 
-    Set<Player> forced = Sets.newHashSet();
-
     for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
       FutureValue fv = JavaAdapter.futureValue(p, predictor);
       if (!fv.vsReplacement().isEmpty() && fv.vsReplacement().get().toLong() > 0) {
-        forced.add(p);
+        fourtyMan.add(p);
       }
     }
 
     changes.ifPresent(
-        c -> c.get(ChangeType.FORCE_ML, ChangeType.FORCE_FORCE_ML).forEach(forced::add));
+        c -> c.get(ChangeType.FORCE_ML, ChangeType.FORCE_FORCE_ML).forEach(fourtyMan::add));
 
     Iterable<Player> available = roster.getAllPlayers();
 
     fourtyMan.addAll(
         Selections.select(
                 new HitterSelectionFactory(predictor).create(Mode.EXPANDED),
-                Selections.onlyHitters(available),
-                Selections.onlyHitters(forced))
+                Selections.onlyHitters(available))
             .values());
 
     fourtyMan.addAll(
         Selections.select(
                 new PitcherSelectionFactory(predictor).create(Mode.EXPANDED),
-                Selections.onlyPitchers(available),
-                Selections.onlyPitchers(forced))
+                Selections.onlyPitchers(available))
             .values());
 
-    Integer sizeWillBe = fourtyMan.size() + (40 - fourtyMan.size()) / 3;
+    Integer sizeWillBe = Math.max(40, fourtyMan.size() + (40 - fourtyMan.size()) / 3);
 
     Ordering<Player> ordering =
         Ordering.natural()
@@ -121,6 +117,10 @@ public class FourtyManRoster implements Printable {
       if (fourtyMan.size() >= sizeWillBe) {
         break;
       }
+    }
+
+    while (fourtyMan.size() > 40) {
+      fourtyMan.remove(ordering.min(roster.getAllPlayers()));
     }
 
     desired40Man = ImmutableSet.copyOf(fourtyMan);
