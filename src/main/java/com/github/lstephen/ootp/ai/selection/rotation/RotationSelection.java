@@ -82,6 +82,7 @@ public final class RotationSelection implements Selection {
                 (Rotation r) ->
                     r.getAll()
                         .stream()
+                        .limit(14)
                         .mapToDouble(p -> predictor.predictPitching(p).overall())
                         .sum());
 
