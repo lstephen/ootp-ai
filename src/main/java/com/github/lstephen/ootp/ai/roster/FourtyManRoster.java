@@ -80,7 +80,7 @@ public class FourtyManRoster implements Printable {
 
     for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
       FutureValue fv = JavaAdapter.futureValue(p, predictor);
-      if (!fv.vsReplacement().isEmpty() && fv.vsReplacement().get().toLong() > 0) {
+      if (!fv.vsReplacement().isEmpty() && fv.vsReplacement().get().toLong() >= 0) {
         forced.add(p);
       }
     }
