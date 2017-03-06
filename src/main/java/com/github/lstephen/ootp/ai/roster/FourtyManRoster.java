@@ -1,5 +1,6 @@
 package com.github.lstephen.ootp.ai.roster;
 
+import com.github.lstephen.ootp.ai.Context$;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.Predictor;
@@ -77,6 +78,8 @@ public class FourtyManRoster implements Printable {
     Set<Player> fourtyMan = Sets.newHashSet();
 
     Set<Player> forced = Sets.newHashSet();
+
+    forced.addAll(Context$.MODULE$.idealRoster().get().getAllPlayers());
 
     for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
       FutureValue fv = JavaAdapter.futureValue(p, predictor);
