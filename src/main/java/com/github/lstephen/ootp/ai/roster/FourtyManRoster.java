@@ -79,7 +79,7 @@ public class FourtyManRoster implements Printable {
 
     Set<Player> forced = Sets.newHashSet();
 
-    forced.addAll(Context$.MODULE$.idealRoster().get().getAllPlayers());
+    forced.addAll(Context$.MODULE$.idealRoster().get().getPlayers(Roster.Status.ML));
 
     for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
       FutureValue fv = JavaAdapter.futureValue(p, predictor);
