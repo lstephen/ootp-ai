@@ -23,6 +23,7 @@ public final class Rotation implements Printable {
 
   public static enum Role {
     SP,
+    LR,
     MR,
     SU,
     CL,
@@ -43,7 +44,7 @@ public final class Rotation implements Printable {
     double score = 0.0;
     int spFactor = 10;
 
-    for (Player p : get(Role.SP)) {
+    for (Player p : get(Role.SP, Role.LR)) {
       int end = p.getPitchingRatings().getVsRight().getEndurance();
 
       double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
@@ -65,6 +66,10 @@ public final class Rotation implements Printable {
     Double sus = score(get(Role.SU), predictor, EnumSet.noneOf(BullpenOption.class));
     Double cls = score(get(Role.CL), predictor, EnumSet.of(BullpenOption.CLUTCH));
 
+    // The numbers here are based on the factors
+    // We have one CL spot, so sum(factors) = 5
+    // We have two setup spots, so sum(factors) = 5 + 4 = 9
+    // Four MR spots, sum(factors) = 5 + 4 + 3 + 2 = 14
     return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
   }
 
@@ -129,6 +134,9 @@ public final class Rotation implements Printable {
       return false;
     }
 
+    if (rotation.containsKey(Role.LR) && rotation.get(Role.LR).size() > 2) {
+      return false;
+    }
     if (rotation.containsKey(Role.MR) && rotation.get(Role.MR).size() > 4) {
       return false;
     }
