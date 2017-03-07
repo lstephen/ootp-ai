@@ -44,7 +44,7 @@ public final class Rotation implements Printable {
     double score = 0.0;
     int spFactor = 10;
 
-    for (Player p : get(Role.SP, Role.LR)) {
+    for (Player p : get(Role.SP)) {
       int end = p.getPitchingRatings().getVsRight().getEndurance();
 
       double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
@@ -58,19 +58,16 @@ public final class Rotation implements Printable {
   }
 
   private static enum BullpenOption {
-    CLUTCH
+    CLUTCH, ENDURANCE
   }
 
   private Double scoreBullpen(Predictor predictor) {
+    Double lrs = score(get(Role.LR), predictor, EnumSet.of(BullpenOption.ENDURANCE));
     Double mrs = score(get(Role.MR), predictor, EnumSet.noneOf(BullpenOption.class));
     Double sus = score(get(Role.SU), predictor, EnumSet.noneOf(BullpenOption.class));
     Double cls = score(get(Role.CL), predictor, EnumSet.of(BullpenOption.CLUTCH));
 
-    // The numbers here are based on the factors
-    // We have one CL spot, so sum(factors) = 5
-    // We have two setup spots, so sum(factors) = 5 + 4 = 9
-    // Four MR spots, sum(factors) = 5 + 4 + 3 + 2 = 14
-    return (mrs + (14.0 / 9.0) * sus + (14.0 / 5.0) * cls) / 3.0;
+    return (0.7 * lrs + mrs + 1.5 * sus + 3.0 * cls) / 4.0;
   }
 
   private double score(
@@ -103,7 +100,13 @@ public final class Rotation implements Printable {
         }
       }
 
-      double f = factor + clutchFactor;
+      double enduranceFactor = 0.865;
+
+      if (options.contains(BullpenOption.ENDURANCE)) {
+        enduranceFactor = (1000.0 - Math.pow(10 - p.getPitchingRatings().getVsRight().getEndurance, 3)) / 1000.0;
+      }
+
+      double f = factor + clutchFactor + (enduranceFactor - 0.865);
 
       score += f * stats.overall();
       vsL += f * stats.vsLeft().getBaseRunsPlus();
@@ -271,13 +274,13 @@ public final class Rotation implements Printable {
   }
 
   public ImmutableList<Player> getNonStarters() {
-    return get(Role.MR, Role.SU, Role.CL, Role.NONE);
+    return get(Role.LR, Role.MR, Role.SU, Role.CL, Role.NONE);
   }
 
   public void print(PrintWriter w) {
     w.println();
 
-    Stream.of(Role.SP, Role.MR, Role.SU, Role.CL, Role.NONE)
+    Stream.of(Role.values())
         .forEach(
             r -> {
               w.println(r);
