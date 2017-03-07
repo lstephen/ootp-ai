@@ -78,7 +78,7 @@ public final class RotationSelection implements Selection {
 
   private Ordering<Rotation> heuristic() {
     Ordering<Rotation> bySize =
-      Ordering.natural().onResultOf((Rotation r) -> r.getAll().size());
+      Ordering.natural().onResultOf((Rotation r) -> r.getAll().size()).reverse();
 
     return Ordering.natural().onResultOf((Rotation r) -> r.score(predictor)).compound(bySize);
   }
