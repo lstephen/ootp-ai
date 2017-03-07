@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class RotationSelection implements Selection {
@@ -76,17 +77,10 @@ public final class RotationSelection implements Selection {
   }
 
   private Ordering<Rotation> heuristic() {
-    Ordering<Rotation> byOverall =
-        Ordering.natural()
-            .onResultOf(
-                (Rotation r) ->
-                    r.getAll()
-                        .stream()
-                        .limit(14)
-                        .mapToDouble(p -> predictor.predictPitching(p).overall())
-                        .sum());
+    Ordering<Rotation> bySize =
+      Ordering.natural().onResultOf((Rotation r) -> r.getAll().size());
 
-    return Ordering.natural().onResultOf((Rotation r) -> r.score(predictor)).compound(byOverall);
+    return Ordering.natural().onResultOf((Rotation r) -> r.score(predictor)).compound(bySize);
   }
 
   private Supplier<Rotation> initialStateGenerator(
@@ -154,11 +148,8 @@ public final class RotationSelection implements Selection {
     return new ActionGenerator<Rotation>() {
       @Override
       public Stream<Action<Rotation>> apply(Rotation r) {
-        Iterable<Action<Rotation>> actions =
-            Iterables.<Action<Rotation>>concat(swaps(r), substitutions(r), moves(r));
-
         return Stream.concat(
-            swaps(r).stream(), Stream.concat(substitutions(r).stream(), moves(r).stream()));
+            Stream.concat(swaps(r).stream(), removes(r).stream()), Stream.concat(substitutions(r).stream(), moves(r).stream()));
       }
 
       private Set<Move> moves(Rotation rot) {
@@ -206,6 +197,11 @@ public final class RotationSelection implements Selection {
 
         return ss;
       }
+
+      private Set<Remove> removes(Rotation r) {
+        return r.getAll().stream().map(Remove::new).collect(Collectors.toSet());
+      }
+
     };
   }
 
@@ -305,6 +301,18 @@ public final class RotationSelection implements Selection {
 
     public Rotation apply(Rotation r) {
       return r.move(p, role, idx);
+    }
+  }
+
+  private static class Remove implements Action<Rotation> {
+    private Player p;
+
+    public Remove(Player p) {
+      this.p = p;
+    }
+
+    public Rotation apply(Rotation r) {
+      return r.remove(p);
     }
   }
 }
