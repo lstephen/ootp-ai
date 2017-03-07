@@ -192,7 +192,7 @@ public final class Rotation implements Printable {
     return next;
   }
 
-  private Rotation remove(Player p) {
+  public Rotation remove(Player p) {
     Map<Role, ImmutableList<Player>> newRotation = Maps.newHashMap(rotation);
 
     for (Map.Entry<Role, ImmutableList<Player>> r : newRotation.entrySet()) {
