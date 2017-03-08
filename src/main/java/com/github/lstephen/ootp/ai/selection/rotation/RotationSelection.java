@@ -200,7 +200,7 @@ public final class RotationSelection implements Selection {
       }
 
       private Set<Remove> removes(Rotation r) {
-        return r.getAll().stream().map(Remove::new).collect(Collectors.toSet());
+        return r.getAll().stream().filter(p -> !Iterables.contains(forced, p)).map(Remove::new).collect(Collectors.toSet());
       }
 
     };
