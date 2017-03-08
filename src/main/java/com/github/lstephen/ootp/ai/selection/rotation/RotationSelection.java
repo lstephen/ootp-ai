@@ -61,7 +61,7 @@ public final class RotationSelection implements Selection {
 
     HillClimbing<Rotation> hc =
         HillClimbing.<Rotation>builder()
-            .validator(r -> r.isValid() && r.get(Role.SP).size() == definition.getRotationSize())
+            .validator(r -> r.isValid() && r.get(Role.SP).size() == definition.getRotationSize() && r.getAll().size() <= slots.size())
             .heuristic(heuristic())
             .actionGenerator(actionGenerator(forced, available))
             .build();
@@ -152,10 +152,11 @@ public final class RotationSelection implements Selection {
             Stream.concat(swaps(r).stream(), removes(r).stream()), Stream.concat(substitutions(r).stream(), moves(r).stream()));
       }
 
+      /* Also includes adds */
       private Set<Move> moves(Rotation rot) {
         Set<Move> moves = Sets.newHashSet();
 
-        for (Player p : rot.getAll()) {
+        for (Player p : Sets.newHashSet(Iterables.concat(forced, available))) {
           for (Role r : Rotation.Role.values()) {
             for (int i = 0; i < 5; i++) {
               moves.add(new Move(p, r, i));
