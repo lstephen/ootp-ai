@@ -186,7 +186,6 @@ public class Main {
     }
 
     Boolean isLookToNextSeason = Boolean.FALSE;
-    Boolean isPlayoffs = "true".equals(System.getenv("OOTPAI_PLAYOFFS"));
 
     if (LOOK_TO_NEXT_SEASON.contains(def)) {
       isLookToNextSeason = Boolean.TRUE;
@@ -238,16 +237,21 @@ public class Main {
 
     team.processManualChanges(changes);
 
+    boolean isPreseason = site.getDate().getMonthOfYear() < DateTimeConstants.APRIL;
     boolean isExpandedRosters = site.getDate().getMonthOfYear() == DateTimeConstants.SEPTEMBER;
+    boolean isPlayoffs = site.getDate().getMonthOfYear() >= DateTimeConstants.OCTOBER
+      || "true".equals(System.getenv("OOTPAI_PLAYOFFS"));
 
     int month = site.getDate().getMonthOfYear();
 
     Mode mode = Mode.REGULAR_SEASON;
 
-    if (month < DateTimeConstants.APRIL) {
+    if (isPreseason) {
       mode = Mode.PRESEASON;
     } else if (isExpandedRosters) {
       mode = Mode.EXPANDED;
+    } else if (isPlayoffs) {
+      mode = Mode.PLAYOFFS;
     }
 
     LOG.info("Loading FAS...");
