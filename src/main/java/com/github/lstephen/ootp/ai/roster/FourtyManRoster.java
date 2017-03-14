@@ -107,7 +107,7 @@ public class FourtyManRoster implements Printable {
                 Selections.onlyPitchers(forced))
             .values());
 
-    Integer sizeWillBe = Math.max(40, fourtyMan.size() + (40 - fourtyMan.size()) / 3);
+    Integer sizeWillBe = Math.min(40, fourtyMan.size() + (40 - fourtyMan.size()) / 3);
 
     Ordering<Player> ordering =
         Ordering.natural()
