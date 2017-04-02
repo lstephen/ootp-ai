@@ -6,6 +6,7 @@ import com.github.lstephen.ootp.ai.player.ratings.Position;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.Roster.Status;
+import com.github.lstephen.ootp.ai.score.Score;
 import com.github.lstephen.ootp.ai.selection.HitterSelectionFactory;
 import com.github.lstephen.ootp.ai.selection.Mode;
 import com.github.lstephen.ootp.ai.selection.PitcherSelectionFactory;
@@ -27,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import scala.Option;
 
 public final class RosterSelection {
 
@@ -155,6 +157,18 @@ public final class RosterSelection {
 
     if (mode != Mode.IDEAL) {
       assignToDisabledList(roster, team.getInjuries());
+    }
+
+    // Force our best players. We'd rather release someone than leave
+    // these players off
+    if (mode != Mode.IDEAL) {
+      for (Player p : roster.getUnassigned()) {
+        Option<Score> vsMax = JavaAdapter.nowValue(p, predictor).vsMax();
+        if (!vsMax.isEmpty() && vsMax.get().isPositive()) {
+          System.out.println("Forcing best: " + p.getShortName());
+          forced.add(p);
+        }
+      }
     }
 
     forced.removeAll(roster.getPlayers(Status.DL));
