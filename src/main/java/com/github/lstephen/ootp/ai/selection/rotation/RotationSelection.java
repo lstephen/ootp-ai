@@ -28,11 +28,18 @@ public final class RotationSelection implements Selection {
 
   private final Multiset<Slot> slots;
 
+  private boolean useAllAvailable = false;
+
   private RotationSelection(
       Predictor predictor, RotationDefinition definition, Multiset<Slot> slots) {
     this.predictor = predictor;
     this.definition = definition;
     this.slots = slots;
+  }
+
+  public RotationSelection useAllAvailable() {
+    useAllAvailable = true;
+    return this;
   }
 
   public ImmutableMultimap<Slot, Player> select(
@@ -61,7 +68,7 @@ public final class RotationSelection implements Selection {
 
     HillClimbing<Rotation> hc =
         HillClimbing.<Rotation>builder()
-            .validator(r -> r.isValid() && r.get(Role.SP).size() == definition.getRotationSize() && r.getAll().size() <= slots.size())
+            .validator(r -> r.isValid() && r.get(Role.SP).size() == definition.getRotationSize() && (useAllAvailable || r.getAll().size() <= slots.size()))
             .heuristic(heuristic())
             .actionGenerator(actionGenerator(forced, available))
             .build();

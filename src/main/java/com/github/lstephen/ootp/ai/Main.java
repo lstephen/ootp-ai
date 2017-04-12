@@ -320,6 +320,7 @@ public class Main {
 
     Rotation rotation =
         RotationSelection.forMode(selectionMode, predictor)
+            .useAllAvailable()
             .selectRotation(
                 ImmutableSet.<Player>of(),
                 Selections.onlyPitchers(newRoster.getPlayers(Status.ML)));
