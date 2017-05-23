@@ -14,7 +14,7 @@ from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer, Imputer, MinMaxScaler
+from sklearn.preprocessing import FunctionTransformer
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 
