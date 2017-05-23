@@ -58,7 +58,8 @@ public final class Rotation implements Printable {
   }
 
   private static enum BullpenOption {
-    CLUTCH, ENDURANCE
+    CLUTCH,
+    ENDURANCE
   }
 
   private Double scoreBullpen(Predictor predictor) {
@@ -103,7 +104,9 @@ public final class Rotation implements Printable {
       double enduranceFactor = 0.865;
 
       if (options.contains(BullpenOption.ENDURANCE)) {
-        enduranceFactor = (1000.0 - Math.pow(10 - p.getPitchingRatings().getVsRight().getEndurance(), 3)) / 1000.0;
+        enduranceFactor =
+            (1000.0 - Math.pow(10 - p.getPitchingRatings().getVsRight().getEndurance(), 3))
+                / 1000.0;
       }
 
       double f = factor + clutchFactor + (enduranceFactor - 0.865);

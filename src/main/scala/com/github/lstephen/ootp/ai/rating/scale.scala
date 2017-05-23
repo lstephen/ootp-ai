@@ -20,7 +20,8 @@ import scalaz.CaseInsensitive
     new Type(classOf[OneToTwenty]),
     new Type(value = classOf[Potential], name = "PotentialRating$RatingScale"),
     new Type(classOf[TwoToEight]),
-    new Type(classOf[ZeroToTen])))
+    new Type(classOf[ZeroToTen])
+  ))
 trait Scale[T] {
   def parse(s: String): Rating[T, _ <: Scale[T]]
   def normalize(v: T): Rating[Integer, OneToOneHundred]

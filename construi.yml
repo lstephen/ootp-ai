@@ -53,5 +53,5 @@ targets:
       - /bin/bash -c "pip install --user yapf==0.13.1 && ~/.local/bin/yapf --recursive --in-place src/main/python"
       - /bin/bash -c '[[ -e "$GOOGLE_JAVA_FORMAT_JAR" ]] || curl -sSL https://github.com/google/google-java-format/releases/download/google-java-format-1.1/google-java-format-1.1-all-deps.jar -o $GOOGLE_JAVA_FORMAT_JAR'
       - /bin/bash -c 'find src -name *.java | xargs java -jar $GOOGLE_JAVA_FORMAT_JAR --replace'
-      - /bin/bash -c '[[ -e "$SCALAFMT_JAR" ]] || (curl -sSL https://github.com/olafurpg/scalafmt/releases/download/v0.4.10/scalafmt.tar.gz | tar zxv -C target/scalafmt)'
+      - /bin/bash -c '[[ -e "$SCALAFMT_JAR" ]] || (curl -sSL https://github.com/olafurpg/scalafmt/releases/download/v0.6.3/scalafmt.tar.gz | tar zxv -C target/scalafmt)'
       - /bin/bash -c 'java -jar $SCALAFMT_JAR --in-place'
