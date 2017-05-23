@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 class RandomForest:
     def __init__(self, xs, ys, weights):
         param_grid = {
-            'selection__k': scipy.stats.randint(1, xs.shape[1] + 1),
+            'selection__k': scipy.stats.randint(2, xs.shape[1] + 1),
             'regressor__n_estimators': scipy.stats.randint(1, 100),
             'regressor__max_depth': scipy.stats.randint(1, 50)
         }
