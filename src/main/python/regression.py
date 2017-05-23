@@ -6,7 +6,7 @@ import scipy
 import sys
 import time
 
-from sklearn.decomposition import PCA
+from sklearn.decomposition import FastICA, PCA
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.externals import joblib
 from sklearn.feature_selection import SelectKBest, f_regression
@@ -14,8 +14,8 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
+from sklearn.pipeline import FeatureUnion, Pipeline
+from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 
@@ -84,11 +84,12 @@ def flatten_matrix(m):
 class Isotonic:
     def __init__(self, xs, ys, weights):
         param_grid = {
-            'pca__n_components': [None] + list(range(1, xs.shape[1])),
+            'features__ica__n_components': [None] + list(range(1, xs.shape[1])),
+            'features__pca__n_components': [None] + list(range(1, xs.shape[1])),
             'regressor__increasing': [True, False]
         }
 
-        pca = PCA()
+        features = FeatureUnion([('best', SelectKBest(f_regression, k=1)), ('pca', PCA()), ('ica', FastICA())])
 
         feature_selection = SelectKBest(f_regression, k=1)
 
@@ -98,7 +99,7 @@ class Isotonic:
         regressor = IsotonicRegression(out_of_bounds='clip')
 
         pipeline = Pipeline(
-            steps=[('pca', pca), ('selection', feature_selection),
+            steps=[('scaler', MinMaxScaler()), ('features', features), ('selection', feature_selection),
                    ('flatten', flatten), ('regressor', regressor)])
 
         self._cv = GridSearchCV(
