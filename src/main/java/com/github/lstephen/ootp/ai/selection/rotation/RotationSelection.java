@@ -68,7 +68,11 @@ public final class RotationSelection implements Selection {
 
     HillClimbing<Rotation> hc =
         HillClimbing.<Rotation>builder()
-            .validator(r -> r.isValid() && r.get(Role.SP).size() == definition.getRotationSize() && (useAllAvailable || r.getAll().size() <= slots.size()))
+            .validator(
+                r ->
+                    r.isValid()
+                        && r.get(Role.SP).size() == definition.getRotationSize()
+                        && (useAllAvailable || r.getAll().size() <= slots.size()))
             .heuristic(heuristic())
             .actionGenerator(actionGenerator(forced, available))
             .build();
@@ -85,7 +89,7 @@ public final class RotationSelection implements Selection {
 
   private Ordering<Rotation> heuristic() {
     Ordering<Rotation> bySize =
-      Ordering.natural().onResultOf((Rotation r) -> r.getAll().size()).reverse();
+        Ordering.natural().onResultOf((Rotation r) -> r.getAll().size()).reverse();
 
     return Ordering.natural().onResultOf((Rotation r) -> r.score(predictor)).compound(bySize);
   }
@@ -156,7 +160,8 @@ public final class RotationSelection implements Selection {
       @Override
       public Stream<Action<Rotation>> apply(Rotation r) {
         return Stream.concat(
-            Stream.concat(swaps(r).stream(), removes(r).stream()), Stream.concat(substitutions(r).stream(), moves(r).stream()));
+            Stream.concat(swaps(r).stream(), removes(r).stream()),
+            Stream.concat(substitutions(r).stream(), moves(r).stream()));
       }
 
       /* Also includes adds */
@@ -207,9 +212,12 @@ public final class RotationSelection implements Selection {
       }
 
       private Set<Remove> removes(Rotation r) {
-        return r.getAll().stream().filter(p -> !Iterables.contains(forced, p)).map(Remove::new).collect(Collectors.toSet());
+        return r.getAll()
+            .stream()
+            .filter(p -> !Iterables.contains(forced, p))
+            .map(Remove::new)
+            .collect(Collectors.toSet());
       }
-
     };
   }
 

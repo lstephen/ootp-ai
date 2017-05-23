@@ -54,7 +54,8 @@ class BattingRegression(site: Site) extends SiteRegression(site) {
     RegressOn("Triples", _.getTriplesPerPlateAppearance, _.setTriples(_)),
     RegressOn("HomeRuns", _.getHomeRunsPerPlateAppearance, _.setHomeRuns(_)),
     RegressOn("Walks", _.getWalksPerPlateAppearance, _.setWalks(_)),
-    RegressOn("Ks", _.getKsPerPlateAppearance, _.setKs(_)))
+    RegressOn("Ks", _.getKsPerPlateAppearance, _.setKs(_))
+  )
 
   def getRatings(p: Player) = p.getBattingRatings
   def getPotentialRatings(p: Player) = p.getBattingPotentialRatings
@@ -86,10 +87,12 @@ class PitchingRegression(site: Site) extends SiteRegression(site) {
   lazy val regressOn: Seq[RegressOn[PitchingStats]] = Seq(
     RegressOn("Hits", _.getHitsPerPlateAppearance, _.setHits(_)),
     RegressOn("Doubles", _.getDoublesPerPlateAppearance, _.setDoubles(_)),
-    RegressOn("Triples", _.getTriplesPerPlateAppearance, _.setTriples(_)),
+    // TODO: Work out why getTriplesPerPlateAppearence is always zero
+    //RegressOn("Triples", _.getTriplesPerPlateAppearance, _.setTriples(_)),
     RegressOn("HomeRuns", _.getHomeRunsPerPlateAppearance, _.setHomeRuns(_)),
     RegressOn("Walks", _.getWalksPerPlateAppearance, _.setWalks(_)),
-    RegressOn("Ks", _.getStrikeoutsPerPlateAppearance, _.setStrikeouts(_)))
+    RegressOn("Ks", _.getStrikeoutsPerPlateAppearance, _.setStrikeouts(_))
+  )
 
   def getRatings(p: Player) = p.getPitchingRatings
   def getPotentialRatings(p: Player) = p.getPitchingPotentialRatings

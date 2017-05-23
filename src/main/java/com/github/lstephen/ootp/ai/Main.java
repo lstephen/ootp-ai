@@ -239,8 +239,9 @@ public class Main {
 
     boolean isPreseason = site.getDate().getMonthOfYear() < DateTimeConstants.APRIL;
     boolean isExpandedRosters = site.getDate().getMonthOfYear() == DateTimeConstants.SEPTEMBER;
-    boolean isPlayoffs = site.getDate().getMonthOfYear() >= DateTimeConstants.OCTOBER
-      || "true".equals(System.getenv("OOTPAI_PLAYOFFS"));
+    boolean isPlayoffs =
+        site.getDate().getMonthOfYear() >= DateTimeConstants.OCTOBER
+            || "true".equals(System.getenv("OOTPAI_PLAYOFFS"));
 
     int month = site.getDate().getMonthOfYear();
 

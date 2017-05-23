@@ -9,10 +9,12 @@ import time
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.externals import joblib
 from sklearn.feature_selection import SelectKBest, f_regression
+from sklearn.isotonic import IsotonicRegression
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import FunctionTransformer
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 
@@ -74,19 +76,24 @@ class RandomForest:
         return "RandomForest(...)"
 
 
-class RidgeEstimator:
+def flatten_matrix(m):
+    return m.flatten()
+
+
+class Isotonic:
     def __init__(self, xs, ys, weights):
-        param_grid = {
-            'selection__k': list(range(1, xs.shape[1] + 1)),
-            'regressor__alpha': [0.1, 1.0, 10.0]
-        }
+        param_grid = {'regressor__increasing': [True, False]}
 
-        feature_selection = SelectKBest(f_regression)
+        feature_selection = SelectKBest(f_regression, k=1)
 
-        regressor = Ridge(random_state=42)
+        # We can't use a lambda as it can't be pickled
+        flatten = FunctionTransformer(flatten_matrix)
 
-        pipeline = Pipeline(
-            steps=[('selection', feature_selection), ('regressor', regressor)])
+        regressor = IsotonicRegression(out_of_bounds='clip')
+
+        pipeline = Pipeline(steps=[('selection', feature_selection),
+                                   ('flatten', flatten),
+                                   ('regressor', regressor)])
 
         self._cv = GridSearchCV(
             pipeline,
@@ -116,104 +123,11 @@ class RidgeEstimator:
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
         out.write("Feature Scores: {}\n".format(
             np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Coefficients: {}\n".format(
-            np.round_(self.pipeline().named_steps['regressor'].coef_, 3)))
+        out.write("Feature Mask: {}\n".format(self.pipeline().named_steps[
+            'selection']._get_support_mask()))
 
     def __repr__(self):
-        return "Ridge(...)"
-
-
-class KernelRidgeEstimator:
-    def __init__(self, xs, ys, weights):
-        param_grid = {
-            'selection__k': list(range(1, xs.shape[1] + 1)),
-            'regressor__alpha': [0.1, 1.0, 10.0]
-        }
-
-        feature_selection = SelectKBest(f_regression)
-
-        regressor = KernelRidge()
-
-        pipeline = Pipeline(
-            steps=[('selection', feature_selection), ('regressor', regressor)])
-
-        self._cv = GridSearchCV(
-            pipeline,
-            param_grid,
-            fit_params={'regressor__sample_weight': weights})
-
-        self._cv.fit(xs, ys)
-
-    def pipeline(self):
-        return self._cv.best_estimator_
-
-    def estimator(self):
-        return self.pipeline()
-
-    def cross_val_score(self, xs, ys, weights):
-        return np.mean(
-            cross_val_score(
-                self.pipeline(),
-                xs,
-                ys,
-                fit_params={'regressor__sample_weight': weights}))
-
-    def fit(self, xs, ys, weights):
-        self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
-
-    def report(self, out):
-        out.write("Best Parameters: {}\n".format(self._cv.best_params_))
-        out.write("Feature Scores: {}\n".format(
-            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-
-    def __repr__(self):
-        return "KernelRidge(...)"
-
-
-class LinearRegressionEstimator:
-    def __init__(self, xs, ys, weights):
-        param_grid = {'selection__k': list(range(1, xs.shape[1] + 1))}
-
-        feature_selection = SelectKBest(f_regression)
-
-        regressor = LinearRegression()
-
-        pipeline = Pipeline(
-            steps=[('selection', feature_selection), ('regressor', regressor)])
-
-        self._cv = GridSearchCV(
-            pipeline,
-            param_grid,
-            fit_params={'regressor__sample_weight': weights})
-
-        self._cv.fit(xs, ys)
-
-    def pipeline(self):
-        return self._cv.best_estimator_
-
-    def estimator(self):
-        return self.pipeline()
-
-    def cross_val_score(self, xs, ys, weights):
-        return np.mean(
-            cross_val_score(
-                self.pipeline(),
-                xs,
-                ys,
-                fit_params={'regressor__sample_weight': weights}))
-
-    def fit(self, xs, ys, weights):
-        self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
-
-    def report(self, out):
-        out.write("Best Parameters: {}\n".format(self._cv.best_params_))
-        out.write("Feature Scores: {}\n".format(
-            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Coefficients: {}\n".format(
-            np.round_(self.pipeline().named_steps['regressor'].coef_, 3)))
-
-    def __repr__(self):
-        return "LinearRegressionEstimator(...)"
+        return "Isotonic(...)"
 
 
 @click.group()
@@ -232,9 +146,10 @@ def train(model):
     xs = np.matrix([d['features'] for d in data])
     ys = np.array([d['label'] for d in data])
 
-    #estimators = [ (e.cross_val_score(xs, ys, weights), e) for e in [ RandomForest(xs, ys, weights), RidgeEstimator(xs, ys, weights), KernelRidgeEstimator(xs, ys, weights), LinearRegressionEstimator(xs, ys, weights) ] ]
-    estimators = [(e.cross_val_score(xs, ys, weights), e)
-                  for e in [RandomForest(xs, ys, weights)]]
+    estimators = [
+        (e.cross_val_score(xs, ys, weights), e)
+        for e in [RandomForest(xs, ys, weights), Isotonic(xs, ys, weights)]
+    ]
 
     best = sorted(estimators)[-1][1]
 
