@@ -6,6 +6,7 @@ import scipy
 import sys
 import time
 
+from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.externals import joblib
 from sklearn.feature_selection import SelectKBest, f_regression
@@ -82,7 +83,12 @@ def flatten_matrix(m):
 
 class Isotonic:
     def __init__(self, xs, ys, weights):
-        param_grid = {'regressor__increasing': [True, False]}
+        param_grid = {
+            'pca__n_components': [None] + list(range(1, xs.shape[1])),
+            'regressor__increasing': [True, False]
+        }
+
+        pca = PCA()
 
         feature_selection = SelectKBest(f_regression, k=1)
 
@@ -91,9 +97,9 @@ class Isotonic:
 
         regressor = IsotonicRegression(out_of_bounds='clip')
 
-        pipeline = Pipeline(steps=[('selection', feature_selection),
-                                   ('flatten', flatten),
-                                   ('regressor', regressor)])
+        pipeline = Pipeline(
+            steps=[('pca', pca), ('selection', feature_selection),
+                   ('flatten', flatten), ('regressor', regressor)])
 
         self._cv = GridSearchCV(
             pipeline,
