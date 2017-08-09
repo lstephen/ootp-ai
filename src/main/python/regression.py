@@ -11,10 +11,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.externals import joblib
 from sklearn.feature_selection import SelectKBest, f_regression
 from sklearn.isotonic import IsotonicRegression
-from sklearn.kernel_ridge import KernelRidge
-from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV
-from sklearn.pipeline import FeatureUnion, Pipeline
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
@@ -77,6 +75,7 @@ class RandomForest:
         return "RandomForest(...)"
 
 
+<<<<<<< HEAD
 def flatten_matrix(m):
     return m.flatten()
 
@@ -133,6 +132,8 @@ class Isotonic:
         return "Isotonic(...)"
 
 
+=======
+>>>>>>> 28b77c5d75b719bab341f4374ce2a39c6d700c8a
 @click.group()
 def cli():
     pass
@@ -149,10 +150,8 @@ def train(model):
     xs = np.matrix([d['features'] for d in data])
     ys = np.array([d['label'] for d in data])
 
-    estimators = [
-        (e.cross_val_score(xs, ys, weights), e)
-        for e in [RandomForest(xs, ys, weights), Isotonic(xs, ys, weights)]
-    ]
+    estimators = [(e.cross_val_score(xs, ys, weights), e)
+                  for e in [RandomForest(xs, ys, weights)]]
 
     best = sorted(estimators)[-1][1]
 
