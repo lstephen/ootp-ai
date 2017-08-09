@@ -6,11 +6,14 @@ import scipy
 import sys
 import time
 
+from sklearn.decomposition import FastICA, PCA
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.externals import joblib
 from sklearn.feature_selection import SelectKBest, f_regression
-from sklearn.model_selection import cross_val_score, RandomizedSearchCV
+from sklearn.isotonic import IsotonicRegression
+from sklearn.model_selection import cross_val_score, GridSearchCV, RandomizedSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler, FunctionTransformer
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 
@@ -18,7 +21,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 class RandomForest:
     def __init__(self, xs, ys, weights):
         param_grid = {
-            'selection__k': scipy.stats.randint(1, xs.shape[1] + 1),
+            'selection__k': scipy.stats.randint(2, xs.shape[1] + 1),
             'regressor__n_estimators': scipy.stats.randint(1, 100),
             'regressor__max_depth': scipy.stats.randint(1, 50)
         }
@@ -70,6 +73,61 @@ class RandomForest:
 
     def __repr__(self):
         return "RandomForest(...)"
+
+
+def flatten_matrix(m):
+    return m.flatten()
+
+
+class Isotonic:
+    def __init__(self, xs, ys, weights):
+        param_grid = {'regressor__increasing': [True, False]}
+
+        feature_selection = SelectKBest(f_regression, k=1)
+
+        # We can't use a lambda as it can't be pickled
+        flatten = FunctionTransformer(flatten_matrix)
+
+        regressor = IsotonicRegression(out_of_bounds='clip')
+
+        pipeline = Pipeline(
+            steps=[('scaler', MinMaxScaler()),
+                   ('selection', feature_selection), ('flatten', flatten),
+                   ('regressor', regressor)])
+
+        self._cv = GridSearchCV(
+            pipeline,
+            param_grid,
+            fit_params={'regressor__sample_weight': weights})
+
+        self._cv.fit(xs, ys)
+
+    def pipeline(self):
+        return self._cv.best_estimator_
+
+    def estimator(self):
+        return self.pipeline()
+
+    def cross_val_score(self, xs, ys, weights):
+        return np.mean(
+            cross_val_score(
+                self.pipeline(),
+                xs,
+                ys,
+                fit_params={'regressor__sample_weight': weights}))
+
+    def fit(self, xs, ys, weights):
+        self.pipeline().fit(xs, ys, regressor__sample_weight=weights)
+
+    def report(self, out):
+        out.write("Best Parameters: {}\n".format(self._cv.best_params_))
+        out.write("Feature Scores: {}\n".format(
+            np.round_(self.pipeline().named_steps['selection'].scores_), 3))
+        out.write("Feature Mask: {}\n".format(self.pipeline().named_steps[
+            'selection']._get_support_mask()))
+
+    def __repr__(self):
+        return "Isotonic(...)"
 
 
 @click.group()
