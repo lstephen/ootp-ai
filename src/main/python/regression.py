@@ -147,7 +147,7 @@ def train(model):
     ys = np.array([d['label'] for d in data])
 
     estimators = [(e.cross_val_score(xs, ys, weights), e)
-                  for e in [RandomForest(xs, ys, weights)]]
+                  for e in [RandomForest(xs, ys, weights), IsotonicRegression(xs, ys, weights)]]
 
     best = sorted(estimators)[-1][1]
 
