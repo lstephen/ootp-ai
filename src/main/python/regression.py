@@ -23,7 +23,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 class RandomForest:
     def __init__(self, xs, ys, weights):
         param_grid = {
-            'selection__k': scipy.stats.randint(1, xs.shape[1] + 1),
+            'selection__k': scipy.stats.randint(2, xs.shape[1] + 1),
             'regressor__n_estimators': scipy.stats.randint(1, 100),
             'regressor__max_depth': scipy.stats.randint(1, 50)
         }
@@ -84,12 +84,8 @@ def flatten_matrix(m):
 class Isotonic:
     def __init__(self, xs, ys, weights):
         param_grid = {
-            'features__ica__n_components': [None] + list(range(1, xs.shape[1])),
-            'features__pca__n_components': [None] + list(range(1, xs.shape[1])),
             'regressor__increasing': [True, False]
         }
-
-        features = FeatureUnion([('best', SelectKBest(f_regression, k=1)), ('pca', PCA()), ('ica', FastICA())])
 
         feature_selection = SelectKBest(f_regression, k=1)
 
@@ -99,7 +95,7 @@ class Isotonic:
         regressor = IsotonicRegression(out_of_bounds='clip')
 
         pipeline = Pipeline(
-            steps=[('scaler', MinMaxScaler()), ('features', features), ('selection', feature_selection),
+            steps=[('scaler', MinMaxScaler()), ('selection', feature_selection),
                    ('flatten', flatten), ('regressor', regressor)])
 
         self._cv = GridSearchCV(
