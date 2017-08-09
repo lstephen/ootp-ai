@@ -75,16 +75,13 @@ class RandomForest:
         return "RandomForest(...)"
 
 
-<<<<<<< HEAD
 def flatten_matrix(m):
     return m.flatten()
 
 
 class Isotonic:
     def __init__(self, xs, ys, weights):
-        param_grid = {
-            'regressor__increasing': [True, False]
-        }
+        param_grid = {'regressor__increasing': [True, False]}
 
         feature_selection = SelectKBest(f_regression, k=1)
 
@@ -94,8 +91,9 @@ class Isotonic:
         regressor = IsotonicRegression(out_of_bounds='clip')
 
         pipeline = Pipeline(
-            steps=[('scaler', MinMaxScaler()), ('selection', feature_selection),
-                   ('flatten', flatten), ('regressor', regressor)])
+            steps=[('scaler', MinMaxScaler()),
+                   ('selection', feature_selection), ('flatten', flatten),
+                   ('regressor', regressor)])
 
         self._cv = GridSearchCV(
             pipeline,
@@ -132,8 +130,6 @@ class Isotonic:
         return "Isotonic(...)"
 
 
-=======
->>>>>>> 28b77c5d75b719bab341f4374ce2a39c6d700c8a
 @click.group()
 def cli():
     pass
