@@ -161,8 +161,8 @@ class HistorialDevelopmentReport(site: Site, implicit val predictor: Predictor)
       f"${"Pitchers"}%-25s | ${(15 to 45).map(a => f"${a}%3d").mkString(" ")} |")
     printOvrGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
 
-    printBattingFeatureGrid(battingDevelopment.filter(_.toP.isHitter))(w)
-    printPitchingFeatureGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
+    //printBattingFeatureGrid(battingDevelopment.filter(_.toP.isHitter))(w)
+    //printPitchingFeatureGrid(pitchingDevelopment.filter(_.toP.isPitcher))(w)
   }
 }
 

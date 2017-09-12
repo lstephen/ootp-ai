@@ -93,6 +93,14 @@ public final class PlayerRatings {
     return pitching != null;
   }
 
+  public BattingRatings<?> getRawBattingPotential() {
+    return battingPotential;
+  }
+
+  public PitchingRatings<?> getRawPitchingPotential() {
+    return pitchingPotential;
+  }
+
   public Splits<BattingRatings<Integer>> getBattingPotential(int age) {
 
     BattingRatings<Integer> ovr = getOverallBatting(getBatting());
