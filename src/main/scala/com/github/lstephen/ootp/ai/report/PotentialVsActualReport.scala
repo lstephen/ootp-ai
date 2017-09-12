@@ -6,7 +6,7 @@ import com.github.lstephen.ootp.ai.player.ratings.{BattingRatings, PitchingRatin
 import com.github.lstephen.ootp.ai.regression.Regressable
 import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.splits.Splits
-import com.github.lstephen.ootp.ai.stats.History
+import com.github.lstephen.ootp.ai.stats.{History, TeamStats}
 
 import scala.collection.mutable.HashMap
 import scala.collection.mutable.{ Set => MutableSet }
@@ -29,7 +29,7 @@ class PotentialVsActualReport(site: Site) extends Printable {
   def mkBucket(f: String, a: Integer, p: Option[Double]): Option[Bucket] =
     for { pr <- p } yield Bucket(f, a, pr.round)
 
-  def data[R : Regressable](getPotential: Player => R, getActual: Player => Splits[R]): Map[Bucket, DescriptiveStatistics] = {
+      def data[R : Regressable](loadHistory: Int => TeamStats[_], getPotential: Player => R, getActual: Player => Splits[R]): Map[Bucket, DescriptiveStatistics] = {
     val m = new HashMap[Bucket, DescriptiveStatistics]()
 
     def add(b: Option[Bucket], a: Option[Double]): Unit = {
@@ -45,7 +45,7 @@ class PotentialVsActualReport(site: Site) extends Printable {
     val r = implicitly[Regressable[R]]
 
     (-10 to -1)
-      .map(history.loadBatting(site, _))
+      .map(loadHistory(_))
       .toList
       .filter(_ != null)
       .flatMap(_.getAllRatings.asScala)
@@ -64,10 +64,10 @@ class PotentialVsActualReport(site: Site) extends Printable {
   }
 
   val hittingData: Map[Bucket, DescriptiveStatistics] =
-    data(_.getRawBattingPotential, _.getBattingRatings)
+    data(history.loadBatting(site, _), _.getRawBattingPotential, _.getBattingRatings)
 
   val pitchingData: Map[Bucket, DescriptiveStatistics] =
-    data(_.getRawPitchingPotential, _.getPitchingRatings)
+    data(history.loadPitching(site, _), _.getRawPitchingPotential, _.getPitchingRatings)
 
   val allPotentials: List[Long] =
     (hittingData.keys ++ pitchingData.keys).map { case Bucket(f, a, p) => p }.toList.sorted
