@@ -352,6 +352,10 @@ public final class Player {
     return ratings.getBattingPotential(age);
   }
 
+  public BattingRatings<?> getRawBattingPotential() {
+    return ratings.getRawBattingPotential();
+  }
+
   public Rating<?, ?> getBuntForHitRating() {
     return ratings.getBuntForHit();
   }
@@ -370,6 +374,10 @@ public final class Player {
 
   public Splits<PitchingRatings<Integer>> getPitchingPotentialRatings() {
     return ratings.getPitchingPotential(age);
+  }
+
+  public PitchingRatings<?> getRawPitchingPotential() {
+    return ratings.getRawPitchingPotential();
   }
 
   @Override
