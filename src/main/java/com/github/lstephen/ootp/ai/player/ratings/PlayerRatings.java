@@ -14,6 +14,7 @@ import com.github.lstephen.ootp.ai.splits.Splits;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /** @author lstephen */
@@ -268,6 +269,34 @@ public final class PlayerRatings {
 
   public void setPitchingPotential(PitchingRatings ratings) {
     this.pitchingPotential = ratings;
+  }
+
+  private static <R> boolean isTO(R l, R r, R p, Function<R, Integer> get) {
+    return 0.75 * get.apply(l) + 0.25 * get.apply(r) >= get.apply(p) + 5;
+  }
+
+  @JsonIgnore
+  public boolean isTOEligible() {
+    if (hasPitching()) {
+      PitchingRatings l = getPitching().getVsLeft();
+      PitchingRatings r = getPitching().getVsRight();
+      PitchingRatings p = getRawPitchingPotential();
+
+      return isTO(l, r, p, PitchingRatings::getStuff)
+        || isTO(l, r, p, PitchingRatings::getControl)
+        || isTO(l, r, p, PitchingRatings::getMovement);
+    } else {
+      BattingRatings l = getBatting().getVsLeft();
+      BattingRatings r = getBatting().getVsRight();
+      BattingRatings p = getRawBattingPotential();
+
+      return isTO(l, r, p, BattingRatings::getContact)
+        || isTO(l, r, p, BattingRatings::getGap)
+        || isTO(l, r, p, BattingRatings::getPower)
+        || isTO(l, r, p, BattingRatings::getEye)
+        || isTO(l, r, p, rat -> (Integer) rat.getK().or(0));
+    }
+
   }
 
   @Override

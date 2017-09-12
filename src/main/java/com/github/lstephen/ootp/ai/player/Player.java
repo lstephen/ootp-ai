@@ -380,6 +380,11 @@ public final class Player {
     return ratings.getRawPitchingPotential();
   }
 
+  @JsonIgnore
+  public boolean isTOEligible() {
+    return getAge() <= 30 && ratings.isTOEligible();
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
