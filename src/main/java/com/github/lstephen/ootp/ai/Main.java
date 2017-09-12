@@ -419,6 +419,7 @@ public class Main {
       }
 
       LOG.info("T=O...");
+      generic.setTitle("T=O");
       generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isTOEligible));
       generic.print(out);
     }

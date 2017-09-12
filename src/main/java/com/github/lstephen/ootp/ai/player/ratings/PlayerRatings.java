@@ -272,7 +272,8 @@ public final class PlayerRatings {
   }
 
   private static <R> boolean isTO(R l, R r, R p, Function<R, Integer> get) {
-    return 0.75 * get.apply(l) + 0.25 * get.apply(r) >= get.apply(p) + 5;
+    return get.apply(p) < 90
+      && (0.75 * get.apply(r) + 0.25 * get.apply(l) >= get.apply(p) + 5);
   }
 
   @JsonIgnore
