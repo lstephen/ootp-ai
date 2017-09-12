@@ -20,7 +20,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 class PotentialVsActualReport(site: Site) extends Printable {
 
   def ignore(feature: String): Boolean =
-    Array("Running Speed", "Groundball Pct.", "Endurance").contains(feature)
+    Array("Running Speed", "Runs", "Groundball Pct.", "Endurance").contains(feature)
 
   val history = History.create
 
