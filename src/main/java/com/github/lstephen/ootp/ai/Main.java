@@ -417,6 +417,10 @@ public class Main {
                 }));
         generic.print(out);
       }
+
+      LOG.info("T=O...");
+      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isTOEligible));
+      generic.print(out);
     }
 
     Moves moves = new Moves(newRoster, changes, predictor);
