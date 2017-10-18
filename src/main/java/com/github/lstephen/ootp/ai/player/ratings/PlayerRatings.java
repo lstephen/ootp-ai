@@ -272,8 +272,7 @@ public final class PlayerRatings {
   }
 
   private static <R> boolean isTO(R l, R r, R p, Function<R, Integer> get) {
-    return get.apply(p) < 90
-      && (0.75 * get.apply(r) + 0.25 * get.apply(l) >= get.apply(p) + 5);
+    return get.apply(p) < 90 && (0.75 * get.apply(r) + 0.25 * get.apply(l) >= get.apply(p) + 5);
   }
 
   @JsonIgnore
@@ -284,20 +283,19 @@ public final class PlayerRatings {
       PitchingRatings p = getRawPitchingPotential();
 
       return isTO(l, r, p, PitchingRatings::getStuff)
-        || isTO(l, r, p, PitchingRatings::getControl)
-        || isTO(l, r, p, PitchingRatings::getMovement);
+          || isTO(l, r, p, PitchingRatings::getControl)
+          || isTO(l, r, p, PitchingRatings::getMovement);
     } else {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
       BattingRatings p = getRawBattingPotential();
 
       return isTO(l, r, p, BattingRatings::getContact)
-        || isTO(l, r, p, BattingRatings::getGap)
-        || isTO(l, r, p, BattingRatings::getPower)
-        || isTO(l, r, p, BattingRatings::getEye)
-        || isTO(l, r, p, rat -> (Integer) rat.getK().or(0));
+          || isTO(l, r, p, BattingRatings::getGap)
+          || isTO(l, r, p, BattingRatings::getPower)
+          || isTO(l, r, p, BattingRatings::getEye)
+          || isTO(l, r, p, rat -> (Integer) rat.getK().or(0));
     }
-
   }
 
   @Override
