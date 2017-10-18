@@ -66,10 +66,13 @@ class RandomForest:
         out.write("Feature Scores: {}\n".format(
             np.round_(self.pipeline().named_steps['selection'].scores_), 3))
         out.write("Feature Mask: {}\n".format(self.pipeline().named_steps[
-            'selection']._get_support_mask()))
-        out.write("Feature Importances: {}\n".format(
-            np.round_(self.pipeline().named_steps['regressor']
-                      .feature_importances_, 3)))
+            'selection'].get_support()))
+        out.write("Feature Importances: {}\n".format(self.feature_importances(
+        )))
+
+    def feature_importances(self):
+        return np.round_(
+            self.pipeline().named_steps['regressor'].feature_importances_, 3)
 
     def __repr__(self):
         return "RandomForest(...)"
@@ -146,10 +149,14 @@ def train(model):
     xs = np.matrix([d['features'] for d in data])
     ys = np.array([d['label'] for d in data])
 
-    estimators = [(e.cross_val_score(xs, ys, weights), e)
-                  for e in [RandomForest(xs, ys, weights), Isotonic(xs, ys, weights)]]
+    rf = RandomForest(xs, ys, weights)
+    iso = Isotonic(xs, ys, weights)
 
-    best = sorted(estimators)[-1][1]
+    best = iso
+
+    if sorted(rf.feature_importances())[1] > 0.1 and rf.cross_val_score(
+            xs, ys, weights) > iso.cross_val_score(xs, ys, weights):
+        best = rf
 
     best.fit(xs, ys, weights)
 
@@ -159,6 +166,9 @@ def train(model):
         len(data), time.perf_counter() - start))
 
     sys.stdout.write("Selected: {}\n".format(best.__class__.__name__))
+
+    estimators = [(e.cross_val_score(xs, ys, weights), e) for e in [rf, iso]]
+
     sys.stdout.write("Scores: {}\n".format(estimators))
 
     best.report(sys.stdout)
