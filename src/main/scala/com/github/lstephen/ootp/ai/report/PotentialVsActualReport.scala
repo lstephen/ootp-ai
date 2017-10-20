@@ -59,7 +59,7 @@ class PotentialVsActualReport(site: Site) extends Printable {
       .filter(getPotential(_) != null)
       .filter(getActual(_) != null)
       .foreach { p =>
-        r.features.filter(!ignore(_)).zipWithIndex.foreach {
+        r.features.zipWithIndex.filter { case (l, i) => !ignore(l) }.foreach {
           case (l, i) => {
             add(mkBucket(l, p.getAge, r.toInput(getPotential(p)).get(i)),
                 r.toInput(getActual(p).getVsLeft).get(i))
