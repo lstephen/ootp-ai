@@ -20,6 +20,8 @@ class Input(private val is: List[Option[Double]]) {
     }.toArray
 
   def toOptionList: List[Option[Double]] = is
+
+  override def toString: String = s"(${is.map(_.toString).mkString(",")})"
 }
 
 object Input {
