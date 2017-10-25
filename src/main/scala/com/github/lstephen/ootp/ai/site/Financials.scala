@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document
 trait Financials {
   def getAvailableForExtensions: Int
   def getAvailableForFreeAgents: Int
+  def getLastYearRevenue: Int
 }
 
 class FinancialsReport(site: Site, team: Id[Team]) extends Financials {
@@ -28,5 +29,11 @@ class FinancialsReport(site: Site, team: Id[Team]) extends Financials {
     NumberFormat
       .getNumberInstance()
       .parse(doc.select("td:contains(Free Agents) + td").text.substring(1))
+      .intValue
+
+  val getLastYearRevenue =
+    NumberFormat
+      .getNumberInstance()
+      .parse(doc.select("td:contains(Total Revenue) + td + td").text.substring(1))
       .intValue
 }
