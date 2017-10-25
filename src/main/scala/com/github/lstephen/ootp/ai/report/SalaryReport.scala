@@ -9,7 +9,6 @@ import com.github.lstephen.ootp.ai.roster.Team
 import com.github.lstephen.ootp.ai.score.Score
 import com.github.lstephen.ootp.ai.site.Financials
 import com.github.lstephen.ootp.ai.site.Salary
-import com.github.lstephen.ootp.ai.site.Site
 import com.github.lstephen.ootp.ai.value.NowValue
 import com.github.lstephen.ootp.ai.value.SalaryPredictor
 
@@ -49,8 +48,10 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
     .filter(_.isPositive)
     .total
 
+  val availableForExtensions = min(financials.getAvailableForExtensions, max(financials.getLastYearRevenue - nextTotal, 0))
+
   val maxCurrent = currentTotal + financials.getAvailableForFreeAgents
-  val maxNext = nextTotal + financials.getAvailableForExtensions
+  val maxNext = nextTotal + availableForExtensions
   val maxReplCurrent = maxCurrent / replCurrentTotal.toLong
   val maxReplNext = maxNext / replNextTotal.toLong
 
@@ -73,7 +74,7 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
         val name = StringUtils.abbreviate(p.getShortName, 15)
         val age = p.getAge
         val current = format(s)
-        val next = if (nextS == 0) "" else format(s)
+        val next = if (nextS == 0) "" else format(nextS)
 
         w println f"$position%2s $name%-15s $age%2d| $current%11s $next%11s"
       }
@@ -90,7 +91,7 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
 
     val forLabel = "$ Available"
     val forFreeAgents = format(financials.getAvailableForFreeAgents)
-    val forExtensions = format(financials.getAvailableForExtensions)
+    val forExtensions = format(availableForExtensions)
 
     val maxLabel = "Max $/Value"
 

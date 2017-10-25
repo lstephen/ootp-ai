@@ -14,12 +14,16 @@ import com.google.common.collect.Maps;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 /** @author lstephen */
 public class SalaryImpl implements Salary {
+
+  private static final Logger LOG = Logger.getLogger(SalaryImpl.class.getName());
 
   private final Id<Team> team;
 
@@ -44,11 +48,15 @@ public class SalaryImpl implements Salary {
   }
 
   public String getSalary(Player p) {
+    return getSalary(p.getId());
+  }
+
+  public String getSalary(PlayerId id) {
     Document doc = loadPage();
 
     for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
       Element a = el.children().select("a").get(0);
-      if (p.getId().equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
+      if (id.equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
         String salary = el.children().get(2).text().trim();
 
         if (salary.startsWith("$")) {
@@ -86,7 +94,11 @@ public class SalaryImpl implements Salary {
   }
 
   public Integer getCurrentSalary(final Player p) {
-    String key = site.getName() + p.getId();
+    return getCurrentSalary(p.getId());
+  }
+
+  public Integer getCurrentSalary(final PlayerId id) {
+    String key = site.getName() + id;
 
     if (CURRENT_SALARY_CACHE.containsKey(key)) {
       return CURRENT_SALARY_CACHE.get(key);
@@ -96,7 +108,7 @@ public class SalaryImpl implements Salary {
 
     for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
       Element a = el.children().select("a").get(0);
-      if (p.getId().equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
+      if (id.equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
         String salary = el.children().get(2).text().trim();
 
         if (salary.startsWith("$")) {
@@ -118,11 +130,17 @@ public class SalaryImpl implements Salary {
   }
 
   public Integer getNextSalary(Player p) {
+    return getNextSalary(p.getId());
+  }
+
+  public Integer getNextSalary(PlayerId id) {
     Document doc = loadPage();
+
+    LOG.log(Level.INFO, "getNextSalary");
 
     for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
       Element a = el.children().select("a").get(0);
-      if (p.getId().equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
+      if (id.equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
         String salary = el.children().get(2).text().trim();
 
         if (salary.startsWith("$")) {
@@ -136,16 +154,19 @@ public class SalaryImpl implements Salary {
           } else {
             String comment = el.children().get(5).text().trim();
 
+            LOG.log(Level.INFO, "Comment: " + comment);
+
             if (comment.contains("Automatic") || comment.contains("Possible Arbitration")) {
-              return getCurrentSalary(p);
+              return getCurrentSalary(id);
             } else if (comment.contains("Arbitration (Estimate:")) {
+              LOG.log(Level.INFO, "Arbirtation: " + comment);
               try {
                 int estimate =
                     NumberFormat.getIntegerInstance()
                         .parse(StringUtils.substringBetween(comment, "$", ")"))
                         .intValue();
 
-                return Math.max(getCurrentSalary(p), estimate);
+                return Math.max(getCurrentSalary(id), estimate);
               } catch (ParseException e) {
                 throw Throwables.propagate(e);
               }
