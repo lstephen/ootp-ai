@@ -40,6 +40,7 @@ import com.github.lstephen.ootp.extract.html.loader.PageLoader;
 import com.github.lstephen.ootp.extract.html.loader.PageLoaderBuilder;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -145,10 +146,10 @@ public final class SiteImpl implements Site, SalarySource {
     if (allPlayers == null) {
       allPlayers =
           ImmutableSet.copyOf(
-              Iterables.concat(
+              Iterables.filter(Iterables.concat(
                   PlayerList.allPlayers(this).extract(),
                   PlayerList.draft(this).extract(),
-                  PlayerList.freeAgents(this).extract()));
+                  PlayerList.freeAgents(this).extract()), Predicates.notNull()));
     }
     return allPlayers;
   }
