@@ -9,7 +9,7 @@ import com.github.lstephen.ootp.ai.rating.OneToTen;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
@@ -90,7 +90,7 @@ public class PitchingRatings<T> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
+    return MoreObjects.toStringHelper(this)
         .add("stuff", stuff)
         .add("control", control)
         .add("movement", movement)

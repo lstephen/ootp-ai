@@ -2,7 +2,7 @@ package com.github.lstephen.ootp.ai.elo;
 
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.roster.Team;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 /** @author lstephen */
@@ -46,7 +46,7 @@ public final class GameResult {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
+    return MoreObjects.toStringHelper(this)
         .add("visitor", visitor)
         .add("visitorScore", visitorScore)
         .add("home", home)

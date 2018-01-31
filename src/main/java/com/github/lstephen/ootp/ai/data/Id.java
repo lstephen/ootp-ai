@@ -1,6 +1,8 @@
 package com.github.lstephen.ootp.ai.data;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 /** @author lstephen */
@@ -32,17 +34,17 @@ public final class Id<T> {
 
     Id rhs = Id.class.cast(obj);
 
-    return Objects.equal(id, rhs.id);
+    return Objects.equals(id, rhs.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(id);
+    return Objects.hash(id);
   }
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("id", id).toString();
+    return MoreObjects.toStringHelper(this).add("id", id).toString();
   }
 
   public static <T> Id<T> valueOf(String id) {
