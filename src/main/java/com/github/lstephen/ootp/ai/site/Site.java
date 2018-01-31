@@ -53,7 +53,7 @@ public interface Site {
 
   Player getPlayer(PlayerId id);
 
-  List<Player> getPlayers(Collection<PlayerId> ids);
+  ImmutableList<Player> getPlayers(Collection<PlayerId> ids);
 
   Iterable<Player> getRuleFiveDraft();
 
