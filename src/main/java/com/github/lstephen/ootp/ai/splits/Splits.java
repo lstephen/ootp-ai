@@ -3,7 +3,7 @@ package com.github.lstephen.ootp.ai.splits;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 /** @author lstephen */
 public class Splits<T> {
@@ -31,7 +31,7 @@ public class Splits<T> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("left", vsLeft).add("right", vsRight).toString();
+    return MoreObjects.toStringHelper(this).add("left", vsLeft).add("right", vsRight).toString();
   }
 
   public static <T> Splits<T> create(T vsLeft, T vsRight) {

@@ -8,7 +8,7 @@ import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -96,7 +96,7 @@ public final class BattingRatings<T> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
+    return MoreObjects.toStringHelper(this)
         .add("scale", scale)
         .add("contact", contact)
         .add("gap", gap)
