@@ -302,8 +302,8 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
-  public ImmutableList<Player> getPlayers(Collection<PlayerId> ids) {
-    return ids.parallelStream().map(id -> getPlayer(id)).collect(ImmutableList.toImmutableList());
+  public List<Player> getPlayers(Collection<PlayerId> ids) {
+    return ids.parallelStream().map(id -> getPlayer(id)).collect(Collectors.toList());
   }
 
   @Override

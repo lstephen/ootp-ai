@@ -7,6 +7,7 @@ import com.github.lstephen.ootp.extract.html.Page;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -37,8 +38,10 @@ public final class PlayerList {
     return this;
   }
 
-  public ImmutableCollection<Player> extract() {
-    return ImmutableList.copyOf(Iterables.filter(site.getPlayers(extractIds()), c -> filterNulls ? c != null : true));
+  public Collection<Player> extract() {
+    ArrayList<Player> toReturn = new ArrayList<>();
+    Iterables.addAll(toReturn, Iterables.filter(site.getPlayers(extractIds()), c -> filterNulls ? c != null : true));
+    return toReturn;
   }
 
   public Set<PlayerId> extractIds() {
