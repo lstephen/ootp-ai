@@ -12,7 +12,7 @@ import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.splits.Splits;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -300,7 +300,7 @@ public final class PlayerRatings {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
+    return Objects.toStringHelper(this)
         .add("batting", batting)
         .add("pitching", pitching)
         .add("defensive", defensive)

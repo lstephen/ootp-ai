@@ -13,7 +13,6 @@ import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import org.joda.time.LocalDate;
@@ -53,7 +52,7 @@ public interface Site {
 
   Player getPlayer(PlayerId id);
 
-  ImmutableList<Player> getPlayers(Collection<PlayerId> ids);
+  List<Player> getPlayers(Collection<PlayerId> ids);
 
   Iterable<Player> getRuleFiveDraft();
 

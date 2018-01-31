@@ -4,9 +4,6 @@ import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.PlayerId;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.extract.html.Page;
-import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -21,8 +18,6 @@ public final class PlayerList {
 
   private final Page page;
 
-  private boolean filterNulls = false;
-
   private PlayerList(Site site, Page page) {
     this.site = site;
     this.page = page;
@@ -32,13 +27,8 @@ public final class PlayerList {
     this(site, site.getPage(url));
   }
 
-  public PlayerList filterNulls() {
-    this.filterNulls = true;
-    return this;
-  }
-
-  public ImmutableCollection<Player> extract() {
-    return ImmutableList.copyOf(Iterables.filter(site.getPlayers(extractIds()), c -> filterNulls ? c != null : true));
+  public Collection<Player> extract() {
+    return site.getPlayers(extractIds());
   }
 
   public Set<PlayerId> extractIds() {
@@ -58,7 +48,7 @@ public final class PlayerList {
   }
 
   public static PlayerList freeAgents(Site site) {
-    return new PlayerList(site, "agents.html").filterNulls();
+    return new PlayerList(site, "agents.html");
   }
 
   public static PlayerList futureFreeAgents(Site site) {

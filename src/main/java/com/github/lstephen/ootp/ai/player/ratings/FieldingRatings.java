@@ -3,7 +3,7 @@ package com.github.lstephen.ootp.ai.player.ratings;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 /** @author lstephen */
@@ -40,7 +40,7 @@ public class FieldingRatings {
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this)
+    return Objects.toStringHelper(this)
         .add("range", range)
         .add("errors", errors)
         .add("arm", arm)
@@ -183,7 +183,7 @@ public class FieldingRatings {
 
     @Override
     public String toString() {
-      return MoreObjects.toStringHelper(this)
+      return Objects.toStringHelper(this)
           .add("range", range)
           .add("errors", errors)
           .add("arm", arm)

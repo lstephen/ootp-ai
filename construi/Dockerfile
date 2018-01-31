@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:yakkety
 
 RUN apt-get update && apt-get install -y curl git maven openjdk-8-jdk python3 python3-pip
 
