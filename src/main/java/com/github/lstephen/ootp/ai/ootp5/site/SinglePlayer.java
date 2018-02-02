@@ -223,7 +223,8 @@ public class SinglePlayer implements PlayerSource {
             .build();
 
     if (!ps.containsKey(p)) {
-      throw new IllegalStateException("Unknown Position:" + p);
+      LOG.log(Level.WARNING, "Unknown Position: {0}", p);
+      return "";
     }
 
     return ps.get(p);
