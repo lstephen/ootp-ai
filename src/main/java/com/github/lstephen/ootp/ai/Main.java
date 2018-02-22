@@ -418,6 +418,17 @@ public class Main {
         generic.print(out);
       }
 
+      // TODO: Move AFL and Winter clinic to preseason only
+      LOG.info("AFL...");
+      generic.setTitle("AFL");
+      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isAflEligible));
+      generic.print(out);
+
+      LOG.info("Winter ball...");
+      generic.setTitle("Winter ball");
+      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isWinterEligible));
+      generic.print(out);
+
       LOG.info("T=O...");
       generic.setTitle("T=O");
       generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isTOEligible));

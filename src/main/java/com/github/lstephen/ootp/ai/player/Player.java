@@ -385,6 +385,16 @@ public final class Player {
     return getAge() <= 30 && ratings.isTOEligible();
   }
 
+  @JsonIgnore
+  public boolean isAflEligible() {
+    return getAge() <= 25 && ratings.isAflEligible();
+  }
+
+  @JsonIgnore
+  public boolean isWinterEligible() {
+    return getAge() <= 30 && ratings.isWinterEligible();
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
