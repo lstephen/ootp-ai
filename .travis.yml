@@ -5,6 +5,7 @@ language: generic
 cache:
   directories:
     - .m2
+    - ootp-ai-data
 
 env:
   global:
