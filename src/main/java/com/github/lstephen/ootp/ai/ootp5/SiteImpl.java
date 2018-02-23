@@ -146,10 +146,12 @@ public final class SiteImpl implements Site, SalarySource {
     if (allPlayers == null) {
       allPlayers =
           ImmutableSet.copyOf(
-              Iterables.filter(Iterables.concat(
-                  PlayerList.allPlayers(this).extract(),
-                  PlayerList.draft(this).extract(),
-                  PlayerList.freeAgents(this).extract()), Predicates.notNull()));
+              Iterables.filter(
+                  Iterables.concat(
+                      PlayerList.allPlayers(this).extract(),
+                      PlayerList.draft(this).extract(),
+                      PlayerList.freeAgents(this).extract()),
+                  Predicates.notNull()));
     }
     return allPlayers;
   }

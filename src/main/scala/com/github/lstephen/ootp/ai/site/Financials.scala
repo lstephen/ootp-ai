@@ -34,6 +34,7 @@ class FinancialsReport(site: Site, team: Id[Team]) extends Financials {
   val getLastYearRevenue =
     NumberFormat
       .getNumberInstance()
-      .parse(doc.select("td:contains(Total Revenue) + td + td").text.substring(1))
+      .parse(
+        doc.select("td:contains(Total Revenue) + td + td").text.substring(1))
       .intValue
 }

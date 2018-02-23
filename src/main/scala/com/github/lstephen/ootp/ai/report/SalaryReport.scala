@@ -48,7 +48,9 @@ class SalaryReport(team: Team, salary: Salary, financials: Financials)(
     .filter(_.isPositive)
     .total
 
-  val availableForExtensions = min(financials.getAvailableForExtensions, max(financials.getLastYearRevenue - nextTotal, 0))
+  val availableForExtensions = min(
+    financials.getAvailableForExtensions,
+    max(financials.getLastYearRevenue - nextTotal, 0))
 
   val maxCurrent = currentTotal + financials.getAvailableForFreeAgents
   val maxNext = nextTotal + availableForExtensions
