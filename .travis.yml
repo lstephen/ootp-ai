@@ -22,9 +22,9 @@ jobs:
   include:
     - stage: build
       script: construi build
-    - stage: run bth
+    - stage: run
       env:
-        - OOTPAI_SITE=BTH
+        - OOTPAI_SITE=BTHUSTLE
       script: construi run
 
 
