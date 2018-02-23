@@ -191,6 +191,10 @@ public class SinglePlayer implements PlayerSource {
       player.setYearsOfProService(getYearsOfProService(page));
     }
 
+    if (doc.html().contains("Years of MLB Service")) {
+      player.setYearsOfMlbService(getYearsOfMlbService(page));
+    }
+
     Optional<Integer> teamTopProspectPosition = site.getTeamTopProspectPosition(id);
 
     if (teamTopProspectPosition.isPresent()) {
@@ -232,6 +236,12 @@ public class SinglePlayer implements PlayerSource {
 
   private Boolean isRuleFiveEligible(PlayerPage page) {
     return extractContractText(page, "Rule 5 Draft Eligibility :").contains("Eligible");
+  }
+
+  private Integer getYearsOfMlbService(PlayerPage page) {
+    String raw = extractContractText(page, "Years of MLB Service :");
+
+    return Integer.parseInt(StringUtils.substringBefore(raw, " "));
   }
 
   private Integer getYearsOfProService(PlayerPage page) {
