@@ -271,8 +271,19 @@ public final class PlayerRatings {
     this.pitchingPotential = ratings;
   }
 
-  private static final Stream<Function<PitchingRatings, Integer>> PITCHING_CHECKS = Stream.of(PitchingRatings::getStuff, PitchingRatings::getControl, PitchingRatings::getMovement);
-  private static final Stream<Function<BattingRatings, Integer>> BATTING_CHECKS = Stream.of(BattingRatings::getContact, BattingRatings::getGap, BattingRatings::getPower, BattingRatings::getEye, rat -> (Integer) rat.getK().or(0));
+  private static final Stream<Function<PitchingRatings, Integer>> pitchingChecks() {
+    return Stream.of(
+        PitchingRatings::getStuff, PitchingRatings::getControl, PitchingRatings::getMovement);
+  }
+
+  private static final Stream<Function<BattingRatings, Integer>> battingChecks() {
+    return Stream.of(
+        BattingRatings::getContact,
+        BattingRatings::getGap,
+        BattingRatings::getPower,
+        BattingRatings::getEye,
+        rat -> (Integer) rat.getK().or(0));
+  }
 
   // TODO: This code duplication between the eligibility checks can probably be
   // refactored.
@@ -294,7 +305,7 @@ public final class PlayerRatings {
       BattingRatings r = getBatting().getVsRight();
       BattingRatings p = getRawBattingPotential();
 
-      return BATTING_CHECKS.anyMatch(f -> isTO(l, r, p, f));
+      return battingChecks().anyMatch(f -> isTO(l, r, p, f));
     }
   }
 
@@ -313,12 +324,13 @@ public final class PlayerRatings {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
 
-      return BATTING_CHECKS.anyMatch(f -> isAfl(l, r, f));
+      return battingChecks().anyMatch(f -> isAfl(l, r, f));
     }
   }
 
   private static <R> boolean isWinter(R l, R r, Function<R, Integer> get) {
-    return Math.abs(get.apply(l) - get.apply(r)) >= 10 && Math.min(get.apply(l), get.apply(r)) <= 65;
+    return Math.abs(get.apply(l) - get.apply(r)) >= 10
+        && Math.min(get.apply(l), get.apply(r)) <= 65;
   }
 
   @JsonIgnore
@@ -332,7 +344,7 @@ public final class PlayerRatings {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
 
-      return BATTING_CHECKS.anyMatch(f -> isWinter(l, r, f));
+      return battingChecks().anyMatch(f -> isWinter(l, r, f));
     }
   }
 
