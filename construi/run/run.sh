@@ -16,7 +16,7 @@ then
     popd
   else
     echo "Cloning latest data..."
-    rm -rf $OOTPAI_DATA/{*,.*}
+    find $OOTPAI_DATA -mindepth 1 -delete
     git clone --depth 1 "https://${GITHUB_TOKEN}@github.com/lstephen/ootp-ai-data.git" $OOTPAI_DATA
   fi
 fi
