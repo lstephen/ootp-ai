@@ -271,6 +271,12 @@ public final class PlayerRatings {
     this.pitchingPotential = ratings;
   }
 
+  private static final Stream<Function<PitchingRatings, Integer>> PITCHING_CHECKS = Stream.of(PitchingRatings::getStuff, PitchingRatings::getControl, PitchingRatings::getMovement);
+  private static final Stream<Function<BattingRatings, Integer>> BATTING_CHECKS = Stream.of(BattingRatings::getContact, BattingRatings::getGap, BattingRatings::getPower, BattingRatings::getEye, rat -> (Integer) rat.getK().or(0));
+
+  // TODO: This code duplication between the eligibility checks can probably be
+  // refactored.
+
   private static <R> boolean isTO(R l, R r, R p, Function<R, Integer> get) {
     return get.apply(p) < 90 && (0.75 * get.apply(r) + 0.25 * get.apply(l) >= get.apply(p) + 5);
   }
@@ -282,19 +288,51 @@ public final class PlayerRatings {
       PitchingRatings r = getPitching().getVsRight();
       PitchingRatings p = getRawPitchingPotential();
 
-      return isTO(l, r, p, PitchingRatings::getStuff)
-          || isTO(l, r, p, PitchingRatings::getControl)
-          || isTO(l, r, p, PitchingRatings::getMovement);
+      return PITCHING_CHECKS.anyMatch(f -> isTO(l, r, p, f));
     } else {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
       BattingRatings p = getRawBattingPotential();
 
-      return isTO(l, r, p, BattingRatings::getContact)
-          || isTO(l, r, p, BattingRatings::getGap)
-          || isTO(l, r, p, BattingRatings::getPower)
-          || isTO(l, r, p, BattingRatings::getEye)
-          || isTO(l, r, p, rat -> (Integer) rat.getK().or(0));
+      return BATTING_CHECKS.anyMatch(f -> isTO(l, r, p, f));
+    }
+  }
+
+  private static <R> boolean isAfl(R l, R r, Function<R, Integer> get) {
+    return 0.75 * get.apply(l) + 0.25 * get.apply(l) <= 65;
+  }
+
+  @JsonIgnore
+  public boolean isAflEligible() {
+    if (hasPitching()) {
+      PitchingRatings l = getPitching().getVsLeft();
+      PitchingRatings r = getPitching().getVsRight();
+
+      return PITCHING_CHECKS.anyMatch(f -> isAfl(l, r, f));
+    } else {
+      BattingRatings l = getBatting().getVsLeft();
+      BattingRatings r = getBatting().getVsRight();
+
+      return BATTING_CHECKS.anyMatch(f -> isAfl(l, r, f));
+    }
+  }
+
+  private static <R> boolean isWinter(R l, R r, Function<R, Integer> get) {
+    return Math.abs(get.apply(l) - get.apply(r)) >= 10 && Math.min(get.apply(l), get.apply(r)) <= 65;
+  }
+
+  @JsonIgnore
+  public boolean isWinterEligible() {
+    if (hasPitching()) {
+      PitchingRatings l = getPitching().getVsLeft();
+      PitchingRatings r = getPitching().getVsRight();
+
+      return PITCHING_CHECKS.anyMatch(f -> isWinter(l, r, f));
+    } else {
+      BattingRatings l = getBatting().getVsLeft();
+      BattingRatings r = getBatting().getVsRight();
+
+      return BATTING_CHECKS.anyMatch(f -> isWinter(l, r, f));
     }
   }
 
