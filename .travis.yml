@@ -19,6 +19,11 @@ before_install:
 - pip install --user construi
 
 
+stages:
+- build
+- name: run
+  if: branch = master
+
 jobs:
   include:
     - stage: build
