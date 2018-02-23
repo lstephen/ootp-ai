@@ -5,13 +5,6 @@ set -x
 
 if [[ -z "$SKIP_GIT_SYNC" ]]
 then
-  mkdir -p /root/.ssh
-
-  printf "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-  cp /ssh/id_rsa /root/.ssh/id_rsa
-  chmod 600 /root/.ssh/id_rsa
-
   if [ -d "ootp-ai-data/.git" ]; then
     echo "Pulling latest data..."
     cd ootp-ai-data
@@ -22,7 +15,7 @@ then
   else
     echo "Cloning latest data..."
     rm -rf ootp-ai-data
-    git clone --depth 1 git@github.com:lstephen/ootp-ai-data.git
+    git clone --depth 1 "https://${GITHUB_TOKEN}@github.com/lstephen/ootp-ai-data.git"
   fi
 fi
 
