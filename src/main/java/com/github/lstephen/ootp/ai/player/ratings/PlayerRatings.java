@@ -299,7 +299,7 @@ public final class PlayerRatings {
       PitchingRatings r = getPitching().getVsRight();
       PitchingRatings p = getRawPitchingPotential();
 
-      return PITCHING_CHECKS.anyMatch(f -> isTO(l, r, p, f));
+      return pitchingChecks().anyMatch(f -> isTO(l, r, p, f));
     } else {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
@@ -319,7 +319,7 @@ public final class PlayerRatings {
       PitchingRatings l = getPitching().getVsLeft();
       PitchingRatings r = getPitching().getVsRight();
 
-      return PITCHING_CHECKS.anyMatch(f -> isAfl(l, r, f));
+      return pitchingChecks().anyMatch(f -> isAfl(l, r, f));
     } else {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
@@ -339,7 +339,7 @@ public final class PlayerRatings {
       PitchingRatings l = getPitching().getVsLeft();
       PitchingRatings r = getPitching().getVsRight();
 
-      return PITCHING_CHECKS.anyMatch(f -> isWinter(l, r, f));
+      return pitchingChecks().anyMatch(f -> isWinter(l, r, f));
     } else {
       BattingRatings l = getBatting().getVsLeft();
       BattingRatings r = getBatting().getVsRight();
