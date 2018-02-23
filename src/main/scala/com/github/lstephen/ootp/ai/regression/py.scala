@@ -9,6 +9,9 @@ import java.io.File
 import java.io.PrintWriter
 import java.util.UUID
 
+import scala.concurrent._
+import scala.concurrent.duration._
+
 case class TrainInput(weight: Integer, features: Array[Double], label: Double)
 
 object TrainInput {
@@ -109,19 +112,28 @@ object RegressionPyModel {
 }
 
 object RegressionPyCli extends StrictLogging {
+  import ExecutionContext.Implicits.global
 
   def train(modelFile: String, in: String): String = {
     import scala.sys.process._
 
-    s"python target/regression.py train ${modelFile}" #< new ByteArrayInputStream(
-      in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
+    val f = Future(blocking {
+      s"python target/regression.py train ${modelFile}" #< new ByteArrayInputStream(
+        in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
+    })
+
+    Await.result(f, 60 second)
   }
 
   def predict(in: String): String = {
     import scala.sys.process._
 
-    s"python target/regression.py predict" #< new ByteArrayInputStream(
-      in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
+    val f = Future(blocking {
+      s"python target/regression.py predict" #< new ByteArrayInputStream(
+        in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
+    })
+
+    Await.result(f, 60 second)
   }
 
 }
