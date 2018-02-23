@@ -22,7 +22,7 @@ before_install:
 stages:
 - build
 - name: run
-  if: branch = master
+  if: branch = master AND NOT type = pull_request
 
 jobs:
   include:
