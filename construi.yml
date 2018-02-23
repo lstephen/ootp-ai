@@ -41,7 +41,7 @@ targets:
       - SKIP_GIT_SYNC
     volumes:
       - $GIT_SSH_KEY:/ssh/id_rsa:ro
-      - ./ootp-ai-data:/var/ootp-ai-data
+      - $PWD/ootp-ai-data:/var/ootp-ai-data
     run: /bin/bash construi/run/run.sh
 
   fmt:
