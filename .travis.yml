@@ -36,4 +36,7 @@ jobs:
     - env:
         - OOTPAI_SITE=SAVOY
       script: construi run
+    - env:
+        - OOTPAI_SITE=HFTC
+      script: construi run
 
