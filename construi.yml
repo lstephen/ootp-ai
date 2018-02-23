@@ -39,8 +39,8 @@ targets:
       - OOTPAI_CLEAR_CACHE
       - OOTPAI_PLAYOFFS
       - SKIP_GIT_SYNC
+      - GITHUB_TOKEN
     volumes:
-      - $GIT_SSH_KEY:/ssh/id_rsa:ro
       - ./ootp-ai-data:/var/ootp-ai-data
     run: /bin/bash construi/run/run.sh
 
