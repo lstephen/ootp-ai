@@ -6,12 +6,24 @@ cache:
   directories:
     - .m2
 
+env:
+- OOTPAI_CLEAR_CACHE=true
+
 services:
 - docker
 
 before_install:
 - pip install --user construi
 
-script:
-- construi build
+
+jobs:
+  include:
+    - stage: build
+      script: construi build
+    - stage: run bth
+      env:
+        - OOTPAI_SITE=BTH
+      script: construi run
+
+
 
