@@ -127,18 +127,25 @@ object RegressionPyCli extends StrictLogging {
   def run(cmd: String, in: String, retries: Int = 3): String = {
     import scala.sys.process._
 
+    var out = ""
+    val p = (cmd #< new ByteArrayInputStream(in.getBytes("UTF-8"))).run(ProcessLogger(s => out += s, logger.info(_)))
+
     try {
-      val f = Future(blocking {
-        cmd #< new ByteArrayInputStream(in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
-      })
+
+      val f = Future(blocking { p.exitValue })
 
       Await.result(f, 60 second)
     } catch {
       case e: TimeoutException =>
-        if (retries <= 0) throw e;
+        if (retries <= 0) {
+          p.destroy
+          throw e;
+        }
 
         logger.info("Retrying...");
         run(cmd, in, retries - 1);
     }
+
+    out
   }
 }
