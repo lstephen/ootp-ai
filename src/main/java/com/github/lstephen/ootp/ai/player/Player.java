@@ -239,6 +239,14 @@ public final class Player {
     rosterStatus.setYearsOfProService(years);
   }
 
+  public Optional<Integer> getYearsOfMlbService() {
+    return rosterStatus.getYearsOfMlbService();
+  }
+
+  public void setYearsOfMlbService(Integer years) {
+    rosterStatus.setYearsOfMlbService(years);
+  }
+
   public Optional<Integer> getTeamTopProspectPosition() {
     return rosterStatus.getTeamTopProspectPosition();
   }
@@ -392,7 +400,9 @@ public final class Player {
 
   @JsonIgnore
   public boolean isWinterEligible() {
-    return getAge() <= 30 && ratings.isWinterEligible();
+    return getAge() <= 30
+        && ratings.isWinterEligible()
+        && getYearsOfMlbService().transform(y -> y >= 1).or(true);
   }
 
   @Override

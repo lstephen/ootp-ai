@@ -19,6 +19,8 @@ public final class RosterStatus {
 
   private Optional<Integer> yearsOfProService = Optional.absent();
 
+  private Optional<Integer> yearsOfMlbService = Optional.absent();
+
   private Optional<Integer> teamTopProspectPosition = Optional.absent();
 
   private RosterStatus() {}
@@ -77,6 +79,14 @@ public final class RosterStatus {
 
   public void setYearsOfProService(Integer years) {
     this.yearsOfProService = Optional.of(years);
+  }
+
+  public Optional<Integer> getYearsOfMlbService() {
+    return yearsOfMlbService;
+  }
+
+  public void setYearsOfMlbService(Integer years) {
+    this.yearsOfMlbService = Optional.of(years);
   }
 
   public Optional<Integer> getTeamTopProspectPosition() {
