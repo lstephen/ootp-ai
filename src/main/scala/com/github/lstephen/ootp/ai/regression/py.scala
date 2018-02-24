@@ -12,6 +12,8 @@ import java.util.UUID
 import scala.concurrent._
 import scala.concurrent.duration._
 
+import scala.language.postfixOps
+
 case class TrainInput(weight: Integer, features: Array[Double], label: Double)
 
 object TrainInput {
@@ -114,26 +116,29 @@ object RegressionPyModel {
 object RegressionPyCli extends StrictLogging {
   import ExecutionContext.Implicits.global
 
-  def train(modelFile: String, in: String): String = {
-    import scala.sys.process._
-
-    val f = Future(blocking {
-      s"python target/regression.py train ${modelFile}" #< new ByteArrayInputStream(
-        in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
-    })
-
-    Await.result(f, 60 second)
+  def train(modelFile: String, in: String, retries: Int = 3): String = {
+    run(s"python target/regression.py train ${modelFile}", in)
   }
 
   def predict(in: String): String = {
-    import scala.sys.process._
-
-    val f = Future(blocking {
-      s"python target/regression.py predict" #< new ByteArrayInputStream(
-        in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
-    })
-
-    Await.result(f, 60 second)
+    run(s"python target/regression.py predict", in)
   }
 
+  def run(cmd: String, in: String, retries: Int = 3): String = {
+    import scala.sys.process._
+
+    try {
+      val f = Future(blocking {
+        cmd #< new ByteArrayInputStream(in.getBytes("UTF-8")) !! ProcessLogger(logger.info(_))
+      })
+
+      Await.result(f, 60 second)
+    } catch {
+      case e: TimeoutException =>
+        if (retries <= 0) throw e;
+
+        logger.info("Retrying...");
+        run(cmd, in, retries - 1);
+    }
+  }
 }
