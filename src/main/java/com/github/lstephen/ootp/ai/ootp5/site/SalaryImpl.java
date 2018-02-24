@@ -136,8 +136,6 @@ public class SalaryImpl implements Salary {
   public Integer getNextSalary(PlayerId id) {
     Document doc = loadPage();
 
-    LOG.log(Level.INFO, "getNextSalary");
-
     for (Element el : doc.select("tr.g:has(a), tr.g2:has(a)")) {
       Element a = el.children().select("a").get(0);
       if (id.equals(new PlayerId(a.attr("href").replaceAll(".html", "")))) {
