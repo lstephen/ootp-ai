@@ -372,12 +372,21 @@ public class Main {
     generic.print(out);
 
     if (def.getName().equals("BTHUSTLE")) {
+      LOG.info("40 man roster reports...");
+
+      FourtyManRoster fourtyMan = new FourtyManRoster(team, newRoster, predictor);
+      fourtyMan.setChanges(changes);
+
+      Printables.print(fourtyMan).to(out);
+
+      generic.setTitle("-40");
+      generic.setPlayers(fourtyMan.getPlayersToRemove());
+      generic.print(out);
+
       generic.setTitle("Waive");
       generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
-    }
 
-    if (def.getName().equals("BTHUSTLE")) {
       LOG.info("Waviers report...");
       generic.setTitle("Waivers");
       generic.setPlayers(site.getWaiverWire());
