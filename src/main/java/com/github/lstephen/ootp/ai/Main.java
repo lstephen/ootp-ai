@@ -372,10 +372,6 @@ public class Main {
     generic.print(out);
 
     if (def.getName().equals("BTHUSTLE")) {
-      generic.setTitle("-40");
-      generic.setPlayers(fourtyMan.getPlayersToRemove());
-      generic.print(out);
-
       generic.setTitle("Waive");
       generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
