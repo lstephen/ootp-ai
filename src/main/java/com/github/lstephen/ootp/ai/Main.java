@@ -379,16 +379,6 @@ public class Main {
 
       Printables.print(fourtyMan).to(out);
 
-      generic.setTitle("+40");
-      generic.setPlayers(
-          ImmutableSet.<Player>builder()
-              .addAll(fourtyMan.getPlayersToAdd())
-              .addAll(
-                  FluentIterable.from(changes.get(ChangeType.FOURTY_MAN))
-                      .filter(Predicates.in(newRoster.getAllPlayers())))
-              .build());
-      generic.print(out);
-
       generic.setTitle("-40");
       generic.setPlayers(fourtyMan.getPlayersToRemove());
       generic.print(out);
@@ -396,38 +386,23 @@ public class Main {
       generic.setTitle("Waive");
       generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
-    }
 
-    if (def.getName().equals("BTHUSTLE")) {
       LOG.info("Waviers report...");
       generic.setTitle("Waivers");
       generic.setPlayers(site.getWaiverWire());
       generic.print(out);
 
       if (site.getDate().getMonthOfYear() < DateTimeConstants.APRIL) {
-        LOG.info("Rule 5...");
-        generic.setTitle("Rule 5");
-        generic.setPlayers(
-            Iterables.filter(
-                site.getRuleFiveDraft(),
-                new Predicate<Player>() {
-                  public boolean apply(Player p) {
-                    return JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong() >= 0;
-                  }
-                }));
+        LOG.info("AFL...");
+        generic.setTitle("AFL");
+        generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isAflEligible));
+        generic.print(out);
+
+        LOG.info("Winter ball...");
+        generic.setTitle("Winter ball");
+        generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isWinterEligible));
         generic.print(out);
       }
-
-      // TODO: Move AFL and Winter clinic to preseason only
-      LOG.info("AFL...");
-      generic.setTitle("AFL");
-      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isAflEligible));
-      generic.print(out);
-
-      LOG.info("Winter ball...");
-      generic.setTitle("Winter ball");
-      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isWinterEligible));
-      generic.print(out);
 
       LOG.info("T=O...");
       generic.setTitle("T=O");
