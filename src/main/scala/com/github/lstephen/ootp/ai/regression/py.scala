@@ -139,8 +139,9 @@ object RegressionPyCli extends StrictLogging {
       out
     } catch {
       case e: TimeoutException =>
+        p.destroy
+
         if (retries <= 0) {
-          p.destroy
           throw e;
         }
 
