@@ -135,6 +135,8 @@ object RegressionPyCli extends StrictLogging {
       val f = Future(blocking { p.exitValue })
 
       Await.result(f, 60 second)
+
+      out
     } catch {
       case e: TimeoutException =>
         if (retries <= 0) {
@@ -145,7 +147,5 @@ object RegressionPyCli extends StrictLogging {
         logger.info("Retrying...");
         run(cmd, in, retries - 1);
     }
-
-    out
   }
 }
