@@ -379,10 +379,6 @@ public class Main {
 
       Printables.print(fourtyMan).to(out);
 
-      generic.setTitle("-40");
-      generic.setPlayers(fourtyMan.getPlayersToRemove());
-      generic.print(out);
-
       generic.setTitle("Waive");
       generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
