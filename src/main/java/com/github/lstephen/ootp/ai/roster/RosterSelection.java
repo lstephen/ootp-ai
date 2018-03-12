@@ -364,8 +364,8 @@ public final class RosterSelection {
                   ? Math.max(0, Math.min(stats.getSplits(p).getVsRight().getBaseRunsPlus(), 999))
                   : "",
               p.getIntangibles(),
-              value.getNowValue(Position.STARTING_PITCHER),
-              value.getNowValue(Position.MIDDLE_RELIEVER),
+              value.getNowValue(p, Position.STARTING_PITCHER),
+              value.getNowValue(p, Position.MIDDLE_RELIEVER),
               value.getNowValue(p)));
     }
 
