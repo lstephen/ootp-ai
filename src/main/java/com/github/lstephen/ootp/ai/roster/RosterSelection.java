@@ -345,7 +345,7 @@ public final class RosterSelection {
 
       w.println(
           String.format(
-              "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s | %2s || %3d |",
+              "%-2s %-15s%s %3s %2d | %4.1f %4.1f %4.1f %4.1f | %3d %3s | %3d %3s | %2s | %3d/%3d || %3d ||",
               p.getPosition(),
               p.getShortName(),
               p.getRosterStatus(),
@@ -364,6 +364,8 @@ public final class RosterSelection {
                   ? Math.max(0, Math.min(stats.getSplits(p).getVsRight().getBaseRunsPlus(), 999))
                   : "",
               p.getIntangibles(),
+              value.getNowValue(Position.STARTING_PITCHER),
+              value.getNowValue(Position.MIDDLE_RELIEVER),
               value.getNowValue(p)));
     }
 
