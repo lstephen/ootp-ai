@@ -229,7 +229,7 @@ public final class RosterSelection {
 
   private void assignToDisabledList(Roster r, Iterable<Player> ps) {
     for (Player p : ps) {
-      boolean isOn40Man = p.getOn40Man().or(Boolean.TRUE);
+      boolean isOn40Man = getFourtyManRoster().getDesired40ManRoster().contains(p);
       boolean isOnDl = previous != null && previous.getStatus(p) == Status.DL;
 
       if (isOn40Man || isOnDl) {
