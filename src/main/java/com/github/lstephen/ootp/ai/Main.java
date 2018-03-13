@@ -567,6 +567,13 @@ public class Main {
     generic.setPlayers(mlNonProspects);
     generic.print(out);
 
+    if (def.getName().equals("BTHUSTLE")) {
+      LOG.info("SP to MR...");
+      generic.setTitle("SP to MR");
+      generic.setPlayers(Iterables.filter(all, Player::isSpToMrEligible));
+      generic.print(out);
+    }
+
     LOG.log(Level.INFO, "Done.");
   }
 }
