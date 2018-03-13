@@ -404,6 +404,11 @@ public class Main {
       generic.setTitle("T=O");
       generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isTOEligible));
       generic.print(out);
+
+      LOG.info("SP to MR...");
+      generic.setTitle("SP to MR");
+      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isSpToMrEligible));
+      generic.print(out);
     }
 
     Moves moves = new Moves(newRoster, changes, predictor);
