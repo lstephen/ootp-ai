@@ -419,7 +419,7 @@ public final class Player {
     int vLSum = vsL.getStuff() + vsL.getControl() + vsL.getMovement();
     int vRSum = vsR.getStuff() + vsR.getControl() + vsR.getMovement();
 
-    int ovrSum = (int) (0.75 * vLSum + 0.25 * vRSum);
+    int ovrSum = (int) (0.75 * vRSum + 0.25 * vLSum);
 
     if (getAge() >= 26 && 4 <= endurance && endurance <= 5 && ovrSum <= 195) {
       return true;
