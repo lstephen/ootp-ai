@@ -405,6 +405,37 @@ public final class Player {
         && getYearsOfMlbService().transform(y -> y >= 1).or(true);
   }
 
+  @JsonIgnore
+  public boolean isSpToMrEligible() {
+    if (!isPitcher()) {
+      return false;
+    }
+
+    int endurance = getPitchingRatings().getVsLeft().getEndurance();
+
+    PitchingRatings vsL = getPitchingRatings().getVsLeft();
+    PitchingRatings vsR = getPitchingRatings().getVsRight();
+
+    int vLSum = vsL.getStuff() + vsL.getControl() + vsL.getMovement();
+    int vRSum = vsR.getStuff() + vsR.getControl() + vsR.getMovement();
+
+    int ovrSum = (int) (0.75 * vLSum + 0.25 * vRSum);
+
+    if (getAge() >= 26 && 4 <= endurance && endurance <= 5 && ovrSum <= 195) {
+      return true;
+    }
+
+    if (getAge() >= 29 && endurance > 5 && ovrSum <= 195) {
+      return true;
+    }
+
+    if (getAge() >= 34 && ovrSum <= 210) {
+      return true;
+    }
+
+    return false;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
