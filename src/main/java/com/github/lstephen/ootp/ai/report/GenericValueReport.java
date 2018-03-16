@@ -17,8 +17,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
+import io.reactivex.Observable;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 /** @author lstephen */
@@ -32,7 +34,7 @@ public class GenericValueReport implements Printable {
 
   private final PlayerValue playerValue;
 
-  private Function<Player, Integer> custom;
+  private Function<Player, Long> custom;
 
   private boolean reverse;
 
@@ -68,7 +70,7 @@ public class GenericValueReport implements Printable {
     return Math.round(OverallValue$.MODULE$.apply(p, predictor).score());
   }
 
-  public void setCustomValueFunction(Function<Player, Integer> custom) {
+  public void setCustomValueFunction(Function<Player, Long> custom) {
     this.custom = custom;
   }
 
@@ -84,27 +86,23 @@ public class GenericValueReport implements Printable {
     w.println();
     w.format("--- %s ---%n", title);
 
-    Iterable<Player> ps =
+    Ordering<Player> order =
         Ordering.natural()
             .reverse()
-            .onResultOf(
-                new Function<Player, Long>() {
-                  public Long apply(Player p) {
-                    return custom == null ? getValue(p) : custom.apply(p).longValue();
-                  }
-                })
-            .compound(Player.byTieBreak())
-            .sortedCopy(players);
+            .onResultOf(Optional.ofNullable(custom).orElse(this::getValue))
+            .compound(Player.byTieBreak());
 
     if (reverse) {
-      ps = ImmutableList.copyOf(ps).reverse();
+      order = order.reverse();
     }
+
+    Observable<Player> ps = Observable.fromIterable(players).sorted(order);
 
     if (limit != null) {
-      ps = Iterables.limit(ps, limit);
+      ps = ps.take(limit);
     }
 
-    for (Player p : ps) {
+    ps.forEach(p -> {
       Long value = custom == null ? getValue(p) : custom.apply(p).longValue();
 
       Integer current = playerValue.getNowValue(p);
@@ -128,7 +126,7 @@ public class GenericValueReport implements Printable {
               p.getId().unwrap(),
               StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),
               p.getStars().isPresent() ? p.getStars().get().getFormattedText() : ""));
-    }
+    });
 
     w.flush();
   }
