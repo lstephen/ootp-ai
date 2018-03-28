@@ -402,7 +402,27 @@ public class Main {
 
       LOG.info("T=O...");
       generic.setTitle("T=O");
-      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isTOEligible));
+      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), p -> {
+        if (!p.isTOEligible()) {
+          return false;
+        }
+
+        Long current = JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong();
+        Long future =
+            JavaAdapter.futureValue(p, predictor).vsReplacement().isEmpty()
+                ? 0
+                : JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
+
+        if (current > 0) {
+          return true;
+        }
+
+        if (p.getAge() <= 25 && future > 0) {
+          return true;
+        }
+
+        return false;
+      }));
       generic.print(out);
 
       LOG.info("SP to MR...");
