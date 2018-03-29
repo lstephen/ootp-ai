@@ -10,9 +10,9 @@ public enum Consistency {
 
   public static Consistency extractFrom(Document doc) {
     String starsText = doc.select("td.s4:containsOwn(Stars)").html();
-    //System.out.println(starsText);
+    // System.out.println(starsText);
     String[] split = StringUtils.splitByWholeSeparator(starsText, "<br />");
-    //System.out.println(Strings.join(split).with(","));
+    // System.out.println(Strings.join(split).with(","));
     String clutchText = split[split.length - 5];
 
     if (clutchText.equalsIgnoreCase("Very inconsistent")) {

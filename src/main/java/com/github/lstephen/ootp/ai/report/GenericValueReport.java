@@ -13,7 +13,6 @@ import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.SalaryPredictor;
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
@@ -102,31 +101,32 @@ public class GenericValueReport implements Printable {
       ps = ps.take(limit);
     }
 
-    ps.forEach(p -> {
-      Long value = custom == null ? getValue(p) : custom.apply(p).longValue();
+    ps.forEach(
+        p -> {
+          Long value = custom == null ? getValue(p) : custom.apply(p).longValue();
 
-      Integer current = playerValue.getNowValue(p);
-      Integer ceiling = playerValue.getCeilingValue(p);
-      Integer future = playerValue.getFutureValue(p);
+          Integer current = playerValue.getNowValue(p);
+          Integer ceiling = playerValue.getCeilingValue(p);
+          Integer future = playerValue.getFutureValue(p);
 
-      w.println(
-          String.format(
-              "%2s %-25s %2d| %s | %s | %s | %-8s | %s %9s | %7s:%7s | %5s | %-20s | %s",
-              p.getListedPosition().or(""),
-              StringUtils.abbreviate(p.getName(), 25),
-              p.getAge(),
-              NowValue$.MODULE$.apply(p, predictor).format(),
-              FutureValue$.MODULE$.apply(p, predictor).format(),
-              OverallValue$.MODULE$.apply(p, predictor).format(),
-              Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
-              p.getRosterStatus(),
-              StringUtils.abbreviate(p.getSalary(), 9),
-              salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNow(p)),
-              salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNext(p)),
-              p.getId().unwrap(),
-              StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),
-              p.getStars().isPresent() ? p.getStars().get().getFormattedText() : ""));
-    });
+          w.println(
+              String.format(
+                  "%2s %-25s %2d| %s | %s | %s | %-8s | %s %9s | %7s:%7s | %5s | %-20s | %s",
+                  p.getListedPosition().or(""),
+                  StringUtils.abbreviate(p.getName(), 25),
+                  p.getAge(),
+                  NowValue$.MODULE$.apply(p, predictor).format(),
+                  FutureValue$.MODULE$.apply(p, predictor).format(),
+                  OverallValue$.MODULE$.apply(p, predictor).format(),
+                  Selections.isHitter(p) ? p.getDefensiveRatings().getPositionScores() : "",
+                  p.getRosterStatus(),
+                  StringUtils.abbreviate(p.getSalary(), 9),
+                  salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNow(p)),
+                  salary == null ? "" : SalaryFormat.prettyPrint(salary.predictNext(p)),
+                  p.getId().unwrap(),
+                  StringUtils.abbreviate(p.getTeam() == null ? "" : p.getTeam(), 20),
+                  p.getStars().isPresent() ? p.getStars().get().getFormattedText() : ""));
+        });
 
     w.flush();
   }

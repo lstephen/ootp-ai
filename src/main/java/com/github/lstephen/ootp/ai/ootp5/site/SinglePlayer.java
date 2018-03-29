@@ -98,7 +98,7 @@ public class SinglePlayer implements PlayerSource {
       LOG.log(Level.WARNING, "Player not found. ID: " + id);
       LOG.log(Level.FINE, "Reason for not finding " + id, e);
       throw e;
-      //return null;
+      // return null;
     }
   }
 

@@ -230,7 +230,7 @@ public final class PlayerRatings {
       return OneToOneHundred.valueOf(current);
     }
 
-    //Double factor = definition.getYearlyRatingsIncrease();
+    // Double factor = definition.getYearlyRatingsIncrease();
     Integer factor = 8;
 
     Integer value =

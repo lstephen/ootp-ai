@@ -21,7 +21,6 @@ import com.github.lstephen.ootp.ai.report.SalaryReport;
 import com.github.lstephen.ootp.ai.report.TeamPositionReport;
 import com.github.lstephen.ootp.ai.report.TeamReport;
 import com.github.lstephen.ootp.ai.roster.Changes;
-import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.FourtyManRoster;
 import com.github.lstephen.ootp.ai.roster.Moves;
 import com.github.lstephen.ootp.ai.roster.Roster;
@@ -402,27 +401,30 @@ public class Main {
 
       LOG.info("T=O...");
       generic.setTitle("T=O");
-      generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), p -> {
-        if (!p.isTOEligible()) {
-          return false;
-        }
+      generic.setPlayers(
+          Iterables.filter(
+              newRoster.getAllPlayers(),
+              p -> {
+                if (!p.isTOEligible()) {
+                  return false;
+                }
 
-        Long current = JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong();
-        Long future =
-            JavaAdapter.futureValue(p, predictor).vsReplacement().isEmpty()
-                ? 0
-                : JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
+                Long current = JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong();
+                Long future =
+                    JavaAdapter.futureValue(p, predictor).vsReplacement().isEmpty()
+                        ? 0
+                        : JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
 
-        if (current > 0) {
-          return true;
-        }
+                if (current > 0) {
+                  return true;
+                }
 
-        if (p.getAge() <= 25 && future > 0) {
-          return true;
-        }
+                if (p.getAge() <= 25 && future > 0) {
+                  return true;
+                }
 
-        return false;
-      }));
+                return false;
+              }));
       generic.print(out);
 
       LOG.info("SP to MR...");

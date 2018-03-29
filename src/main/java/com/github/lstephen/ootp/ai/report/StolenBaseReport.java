@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 
 public class StolenBaseReport implements Printable {
 
-  //http://www.fangraphs.com/blogs/the-changing-caught-stealing-calculus-2/
+  // http://www.fangraphs.com/blogs/the-changing-caught-stealing-calculus-2/
   public Double getBreakEvenPoint() {
     // calculate expected home runs per pa of our lineups
-    //0.590 + 3.33 * (hr/pa);
+    // 0.590 + 3.33 * (hr/pa);
     return 0.0;
   }
 

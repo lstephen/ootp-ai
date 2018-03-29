@@ -114,7 +114,8 @@ public class PitchingStats implements Stats<PitchingStats> {
   }
 
   public double getTriplesPerPlateAppearance() {
-    //System.out.println(triples + "/" + getPlateAppearances() + "=" + perPlateAppearance(triples));
+    // System.out.println(triples + "/" + getPlateAppearances() + "=" +
+    // perPlateAppearance(triples));
     return perPlateAppearance(triples);
   }
 

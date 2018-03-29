@@ -128,7 +128,8 @@ object RegressionPyCli extends StrictLogging {
     import scala.sys.process._
 
     var out = ""
-    val p = (cmd #< new ByteArrayInputStream(in.getBytes("UTF-8"))).run(ProcessLogger(s => out += s, logger.info(_)))
+    val p = (cmd #< new ByteArrayInputStream(in.getBytes("UTF-8")))
+      .run(ProcessLogger(s => out += s, logger.info(_)))
 
     try {
 

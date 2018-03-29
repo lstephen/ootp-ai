@@ -200,6 +200,10 @@ class DevelopmentReport(site: Site, implicit val predictor: Predictor)
     val fromHitting = History.create.loadBatting(site, -1)
     val fromPitching = History.create.loadPitching(site, -1)
 
+    if (fromHitting == null || fromPitching == null) {
+      return
+    }
+
     fromHitting.getAllRatings.asScala
       .foreach(_.setRatingsDefinition(site.getDefinition))
     fromPitching.getAllRatings.asScala

@@ -1,15 +1,14 @@
 package com.github.lstephen.ootp.extract.html.loader;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+import io.reactivex.Single;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import java.io.InputStream;
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,30 +17,19 @@ public class JsoupLoader implements PageLoader {
 
   @Override
   public Document load(String url) {
-    try {
-      return load(new URL(url));
-    } catch (IOException e) {
-      throw new PageLoaderException("Unable to load " + url, e);
-    }
+    return Single.just(url).map(URL::new).flatMap(this::load).blockingGet();
   }
 
-  public Document load(URL url) throws IOException {
-    LOG.info("Loading page {}...", url);
-
-    try(InputStream is = url.openStream()) {
-      Document d = load(is);
-
-      if (d == null) {
-        throw new PageLoaderException("Unable to load " + url);
-      }
-
-      return d;
-    }
+  public Single<Document> load(URL url) throws IOException {
+    return Single.just(url)
+        .doOnSuccess(u -> LOG.info("Loading {}...", u))
+        .map(
+            u -> {
+              try (InputStream in = u.openStream()) {
+                return CharStreams.toString(new InputStreamReader(in, Charsets.ISO_8859_1));
+              }
+            })
+        .doOnError(t -> LOG.warn("Unable to load page.", t))
+        .map(Jsoup::parse);
   }
-
-  public Document load(InputStream is) throws IOException {
-    return Jsoup.parse(is, Charsets.ISO_8859_1.name(), "");
-  }
-
-
 }
