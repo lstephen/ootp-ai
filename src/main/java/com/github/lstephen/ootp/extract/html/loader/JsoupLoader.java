@@ -3,7 +3,6 @@ package com.github.lstephen.ootp.extract.html.loader;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import io.reactivex.Single;
-import io.reactivex.SingleTransformer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,23 +17,19 @@ public class JsoupLoader implements PageLoader {
 
   @Override
   public Document load(String url) {
-    return Single.just(url).map(URL::new).compose(load()).blockingGet();
+    return Single.just(url).map(URL::new).flatMap(this::load).blockingGet();
   }
 
-  public Document load(URL url) throws IOException {
-    return Single.just(url).compose(load()).blockingGet();
-  }
-
-  public SingleTransformer<URL, Document> load() {
-    return s ->
-        s.doOnSuccess(url -> LOG.info("Loading {}...", url))
-            .map(
-                url -> {
-                  try (InputStream in = url.openStream()) {
-                    return CharStreams.toString(new InputStreamReader(in, Charsets.ISO_8859_1));
-                  }
-                })
-            .doOnError(t -> LOG.warn("Unable to load page.", t))
-            .map(Jsoup::parse);
+  public Single<Document> load(URL url) throws IOException {
+    return Single.just(url)
+        .doOnSuccess(u -> LOG.info("Loading {}...", u))
+        .map(
+            u -> {
+              try (InputStream in = u.openStream()) {
+                return CharStreams.toString(new InputStreamReader(in, Charsets.ISO_8859_1));
+              }
+            })
+        .doOnError(t -> LOG.warn("Unable to load page.", t))
+        .map(Jsoup::parse);
   }
 }

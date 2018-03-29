@@ -12,7 +12,7 @@ RSpec.describe LeagueBatting do
 
   let(:html) { "com/github/lstephen/ootp/ai/ootp6/site/leagueb.html" }
   let(:resource) { Resources.getResource(html) }
-  let(:document) { JsoupLoader.new.load resource }
+  let(:document) { JsoupLoader.new.load(resource).blockingGet }
 
   let(:page) do
     double('Page')

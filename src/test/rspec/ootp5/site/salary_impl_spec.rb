@@ -12,7 +12,7 @@ RSpec.describe SalaryImpl do
 
   let(:html) { "com/github/lstephen/ootp/ai/#{version.to_s.downcase}/site/team#{team_id}sa.html" }
   let(:resource) { Resources.getResource(html) }
-  let(:document) { JsoupLoader.new.load resource }
+  let(:document) { JsoupLoader.new.load(resource).blockingGet }
 
   let(:site) do
     double('Site',
