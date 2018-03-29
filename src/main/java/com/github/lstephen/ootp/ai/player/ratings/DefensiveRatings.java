@@ -20,7 +20,7 @@ public class DefensiveRatings {
           .put(Position.THIRD_BASE, 3.0) // C
           .put(Position.CENTER_FIELD, 3.0) // D
           .put(Position.LEFT_FIELD, 2.0) // D
-          .put(Position.RIGHT_FIELD, 2.0) //D
+          .put(Position.RIGHT_FIELD, 2.0) // D
           .put(Position.CATCHER, 1.0)
           .put(Position.FIRST_BASE, 1.0)
           .build();
