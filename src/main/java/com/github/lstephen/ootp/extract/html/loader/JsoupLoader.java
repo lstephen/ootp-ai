@@ -16,8 +16,8 @@ public class JsoupLoader implements PageLoader {
   private static final Logger LOG = LoggerFactory.getLogger(JsoupLoader.class);
 
   @Override
-  public Document load(String url) {
-    return Single.just(url).map(URL::new).flatMap(this::load).blockingGet();
+  public Single<Document> load(String url) {
+    return Single.just(url).map(URL::new).flatMap(this::load);
   }
 
   public Single<Document> load(URL url) throws IOException {

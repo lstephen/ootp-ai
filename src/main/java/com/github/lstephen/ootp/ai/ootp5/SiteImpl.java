@@ -46,6 +46,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import io.reactivex.Single;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,6 +69,12 @@ public final class SiteImpl implements Site, SalarySource {
   private ImmutableSet<PlayerId> injured;
 
   private ImmutableSet<Player> allPlayers;
+
+  private Single<PageLoader> loader =
+      Single.fromCallable(
+              () ->
+                  PageLoaderBuilder.create().diskCache(getCacheDirectory()).inMemoryCache().build())
+          .cache();
 
   private SiteImpl(SiteDefinition def, PlayerSource players) {
     this.definition = def;
@@ -125,10 +132,8 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public Page getPage(String url, Object... args) {
-    PageLoader loader =
-        PageLoaderBuilder.create().diskCache(getCacheDirectory()).inMemoryCache().build();
-
-    return PageFactory.create(loader).getPage(definition.getSiteRoot(), String.format(url, args));
+    return PageFactory.create(loader.blockingGet())
+        .getPage(definition.getSiteRoot(), String.format(url, args));
   }
 
   private String getCacheDirectory() {

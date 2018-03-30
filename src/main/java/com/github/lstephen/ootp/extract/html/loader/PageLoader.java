@@ -1,7 +1,8 @@
 package com.github.lstephen.ootp.extract.html.loader;
 
+import io.reactivex.Single;
 import org.jsoup.nodes.Document;
 
 public interface PageLoader {
-  Document load(String url);
+  Single<Document> load(String url);
 }

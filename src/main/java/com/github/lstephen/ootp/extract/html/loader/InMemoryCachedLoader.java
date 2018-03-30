@@ -1,10 +1,9 @@
 package com.github.lstephen.ootp.extract.html.loader;
 
-import com.google.common.base.Throwables;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import java.util.concurrent.ExecutionException;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import org.jsoup.nodes.Document;
 
 /** @author lstephen */
@@ -12,29 +11,25 @@ public final class InMemoryCachedLoader implements PageLoader {
 
   private static final Integer MAXIMUM_CACHE_SIZE = 200;
 
-  private final LoadingCache<String, Document> cache;
+  private final Cache<String, Document> cache =
+      Caffeine.newBuilder()
+          .initialCapacity(MAXIMUM_CACHE_SIZE)
+          .maximumSize(MAXIMUM_CACHE_SIZE)
+          .build();
+
+  private final PageLoader wrapped;
 
   private InMemoryCachedLoader(final PageLoader wrapped) {
-    cache =
-        CacheBuilder.newBuilder()
-            .maximumSize(MAXIMUM_CACHE_SIZE)
-            .initialCapacity(MAXIMUM_CACHE_SIZE)
-            .build(
-                new CacheLoader<String, Document>() {
-                  @Override
-                  public Document load(String key) {
-                    return wrapped.load(key);
-                  }
-                });
+    this.wrapped = wrapped;
   }
 
   @Override
-  public Document load(String url) {
-    try {
-      return cache.get(url);
-    } catch (ExecutionException e) {
-      throw Throwables.propagate(e);
-    }
+  public Single<Document> load(String url) {
+    Maybe<Document> getCached = Maybe.fromCallable(() -> cache.getIfPresent(url));
+
+    Single<Document> getWrapped = wrapped.load(url).doOnSuccess(d -> cache.put(url, d));
+
+    return getCached.switchIfEmpty(getWrapped);
   }
 
   public static InMemoryCachedLoader wrap(PageLoader wrapped) {
