@@ -34,7 +34,6 @@ import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.PitchingStats;
 import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
-import com.github.lstephen.ootp.extract.html.PageFactory;
 import com.github.lstephen.ootp.extract.html.loader.DiskCachingLoader;
 import com.github.lstephen.ootp.extract.html.loader.PageLoader;
 import com.github.lstephen.ootp.extract.html.loader.PageLoaderBuilder;
@@ -132,8 +131,7 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public Page getPage(String url, Object... args) {
-    return PageFactory.create(loader.blockingGet())
-        .getPage(definition.getSiteRoot(), String.format(url, args));
+    return () -> loader.flatMap(l -> l.load(definition.getSiteRoot() + String.format(url, args))).blockingGet();
   }
 
   private String getCacheDirectory() {
