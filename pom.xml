@@ -38,6 +38,7 @@
 
     <lib.ai-search.version>1.2</lib.ai-search.version>
     <lib.argonaut.version>6.1</lib.argonaut.version>
+    <lib.caffeine.version>2.6.2</lib.caffeine.version>
     <lib.commons-io.version>2.4</lib.commons-io.version>
     <lib.commons-lang3.version>3.3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.4.1</lib.commons-math3.version>
@@ -92,6 +93,12 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>${lib.commons-io.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+      <version>${lib.caffeine.version}</version>
     </dependency>
 
     <dependency>

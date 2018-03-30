@@ -4,6 +4,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.cache.AbstractCache;
 import com.google.common.io.Files;
+import io.reactivex.Maybe;
+import io.reactivex.Single;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -28,8 +30,12 @@ public final class DiskCachingLoader implements PageLoader {
   }
 
   @Override
-  public Document load(String url) {
-    return cache.get(url, PageLoaders.asCallable(wrapped, url));
+  public Single<Document> load(String url) {
+    Maybe<Document> getCached = Maybe.fromCallable(() -> cache.getIfPresent(url));
+
+    Single<Document> getWrapped = wrapped.load(url).doOnSuccess(d -> cache.put(url, d));
+
+    return getCached.switchIfEmpty(getWrapped);
   }
 
   private static final class DiskCache extends AbstractCache<String, Document> {
