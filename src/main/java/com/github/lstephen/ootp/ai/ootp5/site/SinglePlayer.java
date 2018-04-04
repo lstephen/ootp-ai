@@ -366,7 +366,7 @@ public class SinglePlayer implements PlayerSource {
 
     String rawPosStr = StringUtils.substringBetween(raw, position + " :", "(Fielding Pct.)");
 
-    return Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim());
+    return Math.min(1.0, Double.valueOf(StringUtils.substringAfter(rawPosStr, "(Range),").trim()));
   }
 
   private Integer extractPositionRating(String raw, String position) {
