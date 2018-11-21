@@ -131,7 +131,10 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public Page getPage(String url, Object... args) {
-    return () -> loader.flatMap(l -> l.load(definition.getSiteRoot() + String.format(url, args))).blockingGet();
+    return () ->
+        loader
+            .flatMap(l -> l.load(definition.getSiteRoot() + String.format(url, args)))
+            .blockingGet();
   }
 
   private String getCacheDirectory() {

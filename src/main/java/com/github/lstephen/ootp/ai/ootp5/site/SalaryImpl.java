@@ -152,7 +152,7 @@ public class SalaryImpl implements Salary {
           } else {
             String comment = el.children().get(5).text().trim();
 
-            LOG.log(Level.INFO, "Comment: " + comment);
+            LOG.log(Level.FINE, "Comment: " + comment);
 
             if (comment.contains("Automatic") || comment.contains("Possible Arbitration")) {
               return getCurrentSalary(id);

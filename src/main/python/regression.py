@@ -36,14 +36,9 @@ class RandomForest:
             steps=[('selection', feature_selection), ('regressor', regressor)])
 
         self._cv = RandomizedSearchCV(
-            pipeline,
-            param_grid,
-            n_iter=100,
-            cv=3,
-            random_state=42,
-            fit_params={'regressor__sample_weight': weights})
+            pipeline, param_grid, n_iter=100, cv=3, random_state=42)
 
-        self._cv.fit(xs, ys)
+        self._cv.fit(xs, ys, regressor__sample_weight=weights)
 
     def pipeline(self):
         return self._cv.best_estimator_
@@ -57,6 +52,7 @@ class RandomForest:
                 self.pipeline(),
                 xs,
                 ys,
+                cv=3,
                 fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
@@ -99,13 +95,9 @@ class Isotonic:
                    ('selection', feature_selection), ('flatten', flatten),
                    ('regressor', regressor)])
 
-        self._cv = GridSearchCV(
-            pipeline,
-            param_grid,
-            cv=3,
-            fit_params={'regressor__sample_weight': weights})
+        self._cv = GridSearchCV(pipeline, param_grid, cv=3)
 
-        self._cv.fit(xs, ys)
+        self._cv.fit(xs, ys, regressor__sample_weight=weights)
 
     def pipeline(self):
         return self._cv.best_estimator_
@@ -119,6 +111,7 @@ class Isotonic:
                 self.pipeline(),
                 xs,
                 ys,
+                cv=3,
                 fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
@@ -137,24 +130,19 @@ class Isotonic:
 
 class Huber:
     def __init__(self, xs, ys, weights):
-        param_grid = {
-            'selection__k': range(1, xs.shape[1] + 1),
-        }
+        param_grid = {'selection__k': range(1, xs.shape[1] + 1), }
 
         feature_selection = SelectKBest(f_regression)
 
         regressor = HuberRegressor(fit_intercept=True)
 
-        pipeline = Pipeline(
-            steps=[('scaler', MinMaxScaler()), ('selection', feature_selection), ('regressor', regressor)])
+        pipeline = Pipeline(steps=[('scaler', MinMaxScaler()),
+                                   ('selection', feature_selection),
+                                   ('regressor', regressor)])
 
-        self._cv = GridSearchCV(
-            pipeline,
-            param_grid,
-            cv=3,
-            fit_params={'regressor__sample_weight': weights})
+        self._cv = GridSearchCV(pipeline, param_grid, cv=3)
 
-        self._cv.fit(xs, ys)
+        self._cv.fit(xs, ys, regressor__sample_weight=weights)
 
     def pipeline(self):
         return self._cv.best_estimator_
@@ -168,6 +156,7 @@ class Huber:
                 self.pipeline(),
                 xs,
                 ys,
+                cv=3,
                 fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
@@ -177,19 +166,20 @@ class Huber:
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
         out.write("Feature Scores: {}\n".format(
             np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Coefficients: {}\n".format(self.pipeline().named_steps['regressor'].coef_))
-        out.write("Intercept: {}\n".format(self.pipeline().named_steps['regressor'].intercept_))
+        out.write("Coefficients: {}\n".format(self.pipeline().named_steps[
+            'regressor'].coef_))
+        out.write("Intercept: {}\n".format(self.pipeline().named_steps[
+            'regressor'].intercept_))
         out.write("Feature Mask: {}\n".format(self.pipeline().named_steps[
             'selection']._get_support_mask()))
 
     def __repr__(self):
         return "Huber(...)"
 
+
 class Linear:
     def __init__(self, xs, ys, weights):
-        param_grid = {
-            'selection__k': range(1, xs.shape[1] + 1),
-        }
+        param_grid = {'selection__k': range(1, xs.shape[1] + 1), }
 
         feature_selection = SelectKBest(f_regression)
 
@@ -198,13 +188,9 @@ class Linear:
         pipeline = Pipeline(
             steps=[('selection', feature_selection), ('regressor', regressor)])
 
-        self._cv = GridSearchCV(
-            pipeline,
-            param_grid,
-            cv=3,
-            fit_params={'regressor__sample_weight': weights})
+        self._cv = GridSearchCV(pipeline, param_grid, cv=3)
 
-        self._cv.fit(xs, ys)
+        self._cv.fit(xs, ys, regressor__sample_weight=weights)
 
     def pipeline(self):
         return self._cv.best_estimator_
@@ -218,6 +204,7 @@ class Linear:
                 self.pipeline(),
                 xs,
                 ys,
+                cv=3,
                 fit_params={'regressor__sample_weight': weights}))
 
     def fit(self, xs, ys, weights):
@@ -227,8 +214,10 @@ class Linear:
         out.write("Best Parameters: {}\n".format(self._cv.best_params_))
         out.write("Feature Scores: {}\n".format(
             np.round_(self.pipeline().named_steps['selection'].scores_), 3))
-        out.write("Coefficients: {}\n".format(self.pipeline().named_steps['regressor'].coef_))
-        out.write("Intercept: {}\n".format(self.pipeline().named_steps['regressor'].intercept_))
+        out.write("Coefficients: {}\n".format(self.pipeline().named_steps[
+            'regressor'].coef_))
+        out.write("Intercept: {}\n".format(self.pipeline().named_steps[
+            'regressor'].intercept_))
         out.write("Feature Mask: {}\n".format(self.pipeline().named_steps[
             'selection']._get_support_mask()))
 
@@ -263,10 +252,12 @@ def train(model):
             xs, ys, weights) > iso.cross_val_score(xs, ys, weights):
         best = rf
 
-    if h.cross_val_score(xs, ys, weights) > best.cross_val_score(xs, ys, weights):
+    if h.cross_val_score(xs, ys, weights) > best.cross_val_score(xs, ys,
+                                                                 weights):
         best = h
 
-    if l.cross_val_score(xs, ys, weights) > best.cross_val_score(xs, ys, weights):
+    if l.cross_val_score(xs, ys, weights) > best.cross_val_score(xs, ys,
+                                                                 weights):
         best = l
 
     best.fit(xs, ys, weights)
@@ -278,7 +269,8 @@ def train(model):
 
     sys.stdout.write("Selected: {}\n".format(best.__class__.__name__))
 
-    estimators = [(e.cross_val_score(xs, ys, weights), e) for e in [rf, iso, h, l]]
+    estimators = [(e.cross_val_score(xs, ys, weights), e)
+                  for e in [rf, iso, h, l]]
 
     sys.stdout.write("Scores: {}\n".format(estimators))
 
