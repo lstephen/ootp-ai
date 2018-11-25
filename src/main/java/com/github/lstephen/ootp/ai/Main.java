@@ -120,7 +120,7 @@ public class Main {
 
   private static final SiteDefinition LBB =
       SiteDefinitionFactory.ootp5(
-          "LBB", "http://www.hoffbl.com/lbb/leaguesite/", Id.<Team>valueOf(3), "AL", 20);
+          "LBB", "http://longballer2.x10host.com/LBB.lg/leaguesite/", Id.<Team>valueOf(3), "AL", 20);
 
   private static final SiteDefinition GABL =
       SiteDefinitionFactory.ootp5(
