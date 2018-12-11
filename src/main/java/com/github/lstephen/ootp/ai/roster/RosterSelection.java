@@ -283,17 +283,17 @@ public final class RosterSelection {
         Ordering.natural().reverse().onResultOf(p -> predictor.predictBatting(p).overall());
     Ordering<Player> byPitching =
         Ordering.natural().reverse().onResultOf(p -> predictor.predictPitching(p).overall());
+    Ordering<Player> byAgeAndExperience =
+        Ordering.natural().reverse().onResultOf(p -> p.getAge() + p.getYearsOfProService().or(0) * 4);
 
     Collection<Player> selected = new HashSet<>();
     selected.addAll(
-        Player.byAge()
-            .reverse()
+        byAgeAndExperience
             .compound(byBatting)
             .immutableSortedCopy(Selections.onlyHitters(ps))
             .subList(0, hitterSize));
     selected.addAll(
-        Player.byAge()
-            .reverse()
+        byAgeAndExperience
             .compound(byPitching)
             .immutableSortedCopy(Selections.onlyPitchers(ps))
             .subList(0, pitcherSize));
