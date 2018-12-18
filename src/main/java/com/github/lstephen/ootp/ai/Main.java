@@ -21,6 +21,7 @@ import com.github.lstephen.ootp.ai.report.SalaryReport;
 import com.github.lstephen.ootp.ai.report.TeamPositionReport;
 import com.github.lstephen.ootp.ai.report.TeamReport;
 import com.github.lstephen.ootp.ai.roster.Changes;
+import com.github.lstephen.ootp.ai.roster.Changes.ChangeType;
 import com.github.lstephen.ootp.ai.roster.FourtyManRoster;
 import com.github.lstephen.ootp.ai.roster.Moves;
 import com.github.lstephen.ootp.ai.roster.Roster;
@@ -378,6 +379,20 @@ public class Main {
 
       Printables.print(fourtyMan).to(out);
 
+      generic.setTitle("+40");
+      generic.setPlayers(
+          ImmutableSet.<Player>builder()
+              .addAll(fourtyMan.getPlayersToAdd())
+              .addAll(
+                  FluentIterable.from(changes.get(ChangeType.FOURTY_MAN))
+                      .filter(Predicates.in(newRoster.getAllPlayers())))
+              .build());
+      generic.print(out);
+
+      generic.setTitle("-40");
+      generic.setPlayers(fourtyMan.getPlayersToRemove());
+      generic.print(out);
+
       generic.setTitle("Waive");
       generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
@@ -396,6 +411,18 @@ public class Main {
         LOG.info("Winter ball...");
         generic.setTitle("Winter ball");
         generic.setPlayers(Iterables.filter(newRoster.getAllPlayers(), Player::isWinterEligible));
+        generic.print(out);
+
+        LOG.info("Rule 5...");
+        generic.setTitle("Rule 5");
+        generic.setPlayers(
+            Iterables.filter(
+                site.getRuleFiveDraft(),
+                new Predicate<Player>() {
+                  public boolean apply(Player p) {
+                    return JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong() >= 0;
+                  }
+                }));
         generic.print(out);
       }
 
