@@ -1,6 +1,6 @@
-FROM ubuntu:xenial
+FROM maven:3-jdk-8
 
-RUN apt-get update && apt-get install -y curl git maven openjdk-8-jdk python3 python3-pip
+RUN apt-get update && apt-get install -y git python3 python3-pip
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python \
  && ln -s /usr/bin/pip3 /usr/local/bin/pip
