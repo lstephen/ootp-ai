@@ -284,7 +284,9 @@ public final class RosterSelection {
     Ordering<Player> byPitching =
         Ordering.natural().reverse().onResultOf(p -> predictor.predictPitching(p).overall());
     Ordering<Player> byAgeAndExperience =
-        Ordering.natural().reverse().onResultOf(p -> p.getAge() + p.getYearsOfProService().or(0) * 4);
+        Ordering.natural()
+            .reverse()
+            .onResultOf(p -> p.getAge() + p.getYearsOfProService().or(0) * 4);
 
     Collection<Player> selected = new HashSet<>();
     selected.addAll(

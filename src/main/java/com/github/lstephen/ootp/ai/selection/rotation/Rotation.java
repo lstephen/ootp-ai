@@ -4,6 +4,7 @@ package com.github.lstephen.ootp.ai.selection.rotation;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
+import com.github.lstephen.ootp.ai.regression.BattingPrediction;
 import com.github.lstephen.ootp.ai.regression.PitchingPrediction;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.site.SiteHolder;
@@ -278,6 +279,10 @@ public final class Rotation implements Printable {
 
   public ImmutableList<Player> getNonStarters() {
     return get(Role.LR, Role.MR, Role.SU, Role.CL, Role.NONE);
+  }
+
+  public BattingPrediction getPitcherHitting(Predictor predictor) {
+    return getStarters().stream().map(predictor::predictBatting).reduce((l, r) -> l.add(r)).get();
   }
 
   public void print(PrintWriter w) {

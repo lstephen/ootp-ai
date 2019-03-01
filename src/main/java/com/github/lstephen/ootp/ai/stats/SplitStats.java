@@ -21,6 +21,10 @@ public class SplitStats<S extends Stats<S>> extends Splits<S> {
     SplitStats.percentages = percentages;
   }
 
+  public SplitStats<S> add(SplitStats<S> rhs) {
+    return new SplitStats(getVsLeft().add(rhs.getVsLeft()), getVsRight().add(rhs.getVsRight()));
+  }
+
   @JsonCreator
   public static <S extends Stats<S>> SplitStats<S> create(
       @JsonProperty("vsLeft") S vsLeft, @JsonProperty("vsRight") S vsRight) {

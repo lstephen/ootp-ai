@@ -91,10 +91,12 @@ object Predictor {
 
 }
 
-class BattingPrediction(stats: SplitStats[BattingStats]) {
+class BattingPrediction(val stats: SplitStats[BattingStats]) {
   val overall = Score(stats.getOverall.getWobaPlus)
   val vsLeft = stats.getVsLeft
   val vsRight = stats.getVsRight
+
+  def add(rhs: BattingPrediction) = new BattingPrediction(stats.add(rhs.stats))
 }
 
 class PitchingPrediction(stats: SplitStats[PitchingStats]) {
