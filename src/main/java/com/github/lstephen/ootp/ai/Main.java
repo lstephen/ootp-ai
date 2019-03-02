@@ -7,6 +7,7 @@ import com.github.lstephen.ootp.ai.io.Printables;
 import com.github.lstephen.ootp.ai.ootp5.report.SpringTraining;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.PlayerRatings;
+import com.github.lstephen.ootp.ai.regression.BattingPrediction;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.regression.Predictor$;
 import com.github.lstephen.ootp.ai.report.DevelopmentReport;
@@ -121,7 +122,11 @@ public class Main {
 
   private static final SiteDefinition LBB =
       SiteDefinitionFactory.ootp5(
-          "LBB", "http://longballer2.x10host.com/LBB.lg/leaguesite/", Id.<Team>valueOf(3), "AL", 20);
+          "LBB",
+          "http://longballer2.x10host.com/LBB.lg/leaguesite/",
+          Id.<Team>valueOf(3),
+          "AL",
+          20);
 
   private static final SiteDefinition GABL =
       SiteDefinitionFactory.ootp5(
@@ -331,6 +336,15 @@ public class Main {
     Printables.print(new PitchingStrategyReport(rotation, predictor)).to(out);
 
     LOG.log(Level.INFO, "Choosing lineups...");
+
+    BattingPrediction pitcherHitting = rotation.getPitcherHitting(predictor);
+
+    LOG.log(
+        Level.INFO,
+        "Pitcher Hitting: vsL:"
+            + pitcherHitting.vsLeft().getSlashLine()
+            + " vsR:"
+            + pitcherHitting.vsRight().getSlashLine());
 
     AllLineups lineups =
         new LineupSelection(predictor)
