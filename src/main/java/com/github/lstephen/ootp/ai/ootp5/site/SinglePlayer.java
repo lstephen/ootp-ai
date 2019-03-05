@@ -195,6 +195,8 @@ public class SinglePlayer implements PlayerSource {
       player.setYearsOfMlbService(getYearsOfMlbService(page));
     }
 
+    player.setYearsOfMinorLeagues(getYearsOfMinorLeagues(doc));
+
     Optional<Integer> teamTopProspectPosition = site.getTeamTopProspectPosition(id);
 
     if (teamTopProspectPosition.isPresent()) {
@@ -252,6 +254,16 @@ public class SinglePlayer implements PlayerSource {
 
   private String extractContractText(PlayerPage page, String title) {
     return page.extractLabelledText("Contract", title);
+  }
+
+  private Integer getYearsOfMinorLeagues(Document doc) {
+    return (int)
+        doc.select("table.s0 td:contains(, A)")
+            .stream()
+            .map(Element::text)
+            .map(s -> StringUtils.substringBefore(s, ","))
+            .distinct()
+            .count();
   }
 
   private DefensiveRatings extractDefensiveRatings(Document doc) {
