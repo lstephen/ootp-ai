@@ -286,7 +286,13 @@ public final class RosterSelection {
     Ordering<Player> byAgeAndExperience =
         Ordering.natural()
             .reverse()
-            .onResultOf(p -> p.getAge() + Math.max(p.getYearsOfProService().or(p.getYearsOfMinorLeagues().or(0) - 1), 0) * 4);
+            .onResultOf(
+                p ->
+                    p.getAge()
+                        + Math.max(
+                                p.getYearsOfProService().or(p.getYearsOfMinorLeagues().or(0) - 1),
+                                0)
+                            * 4);
 
     Collection<Player> selected = new HashSet<>();
     selected.addAll(
