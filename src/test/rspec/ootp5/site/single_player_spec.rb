@@ -90,6 +90,7 @@ RSpec.describe SinglePlayer do
 
         its(:bunt_for_hit_rating) { is_expected.to eq(Rating.new('E', AToE.new)) }
         its(:stealing_rating) { is_expected.to eq(Rating.new('D', AToE.new)) }
+        its('years_of_minor_leagues.get') { is_expected.to eq(2) }
 
         context '#batting_ratings', :property => :batting_ratings do
           its(:vs_left) { is_expected.to be_batting_ratings 5, 4, 7, 8, 3 }

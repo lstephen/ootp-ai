@@ -239,6 +239,14 @@ public final class Player {
     rosterStatus.setYearsOfProService(years);
   }
 
+  public Optional<Integer> getYearsOfMinorLeagues() {
+    return rosterStatus.getYearsOfMinorLeagues();
+  }
+
+  public void setYearsOfMinorLeagues(Integer years) {
+    rosterStatus.setYearsOfMinorLeagues(years);
+  }
+
   public Optional<Integer> getYearsOfMlbService() {
     return rosterStatus.getYearsOfMlbService();
   }
