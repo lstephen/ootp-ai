@@ -633,7 +633,7 @@ public class Main {
     if (def.getName().equals("BTHUSTLE")) {
       LOG.info("SP to MR...");
       generic.setTitle("SP to MR");
-      generic.setPlayers(Iterables.filter(all, Player::isSpToMrEligible));
+      generic.setPlayers(Iterables.filter(Iterables.concat(all, site.getFreeAgents()), Player::isSpToMrEligible));
       generic.print(out);
     }
 
