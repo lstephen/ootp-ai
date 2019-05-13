@@ -456,10 +456,6 @@ public class Main {
                         ? 0
                         : JavaAdapter.futureValue(p, predictor).vsReplacement().get().toLong();
 
-                if (current > 0) {
-                  return true;
-                }
-
                 if (p.getAge() <= 25 && future > 0) {
                   return true;
                 }
