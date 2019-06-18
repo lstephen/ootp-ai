@@ -36,7 +36,7 @@ public class LeagueBattingReport implements Printable {
 
     double bPrime = (stats.getRuns() - d) * c / (a - stats.getRuns() + d);
     
-    bsrFactory = bPrime / b;
+    bsrFactor = bPrime / b;
   }
 
   @Override
