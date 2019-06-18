@@ -20,9 +20,9 @@ public class LeagueBattingReport implements Printable {
   private LeagueBattingReport(BattingStats stats) {
     this.stats = stats;
 
-    Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
+    double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
 
-    Double b =
+    double b =
         BaseRuns.COEFFICIENT_SINGLE * stats.getSingles()
             + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
             + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
@@ -31,12 +31,12 @@ public class LeagueBattingReport implements Printable {
             + BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
             + BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
 
-    Double c = (double) stats.getOuts();
+    double c = (double) stats.getOuts();
+    double d = (double) stats.getHomeRuns();
 
-    Double d = (double) stats.getHomeRuns();
-
-    Double z = (stats.getRuns() - d) / a;
-    bsrFactor = (z * c / (1 - z)) / b;
+    double bPrime = (stats.getRuns() - d) * c / (a - stats.getRuns() + d);
+    
+    bsrFactor = bPrime / b;
   }
 
   @Override
