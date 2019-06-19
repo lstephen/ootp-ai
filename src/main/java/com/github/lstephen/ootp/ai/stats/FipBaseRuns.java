@@ -30,9 +30,7 @@ public class FipBaseRuns implements BaseRuns {
                 + COEFFICIENT_DOUBLE * doubles
                 + COEFFICIENT_TRIPLE * triples
                 + COEFFICIENT_HOME_RUN * stats.getHomeRuns()
-                + COEFFICIENT_WALK * stats.getWalks()
-                + COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
-                + COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts()));
+                + COEFFICIENT_WALK * stats.getWalks());
 
     Double c = (double) stats.getOuts();
 
