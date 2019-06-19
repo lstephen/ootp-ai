@@ -27,15 +27,13 @@ public class LeagueBattingReport implements Printable {
             + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
             + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
             + BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns()
-            + BaseRuns.COEFFICIENT_WALK * stats.getWalks()
-            + BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
-            + BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
+            + BaseRuns.COEFFICIENT_WALK * stats.getWalks();
 
     double c = (double) stats.getOuts();
     double d = (double) stats.getHomeRuns();
 
     double bPrime = (stats.getRuns() - d) * c / (a - stats.getRuns() + d);
-    
+
     bsrFactor = bPrime / b;
   }
 
@@ -167,9 +165,7 @@ public class LeagueBattingReport implements Printable {
             + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
             + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
             + BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns()
-            + BaseRuns.COEFFICIENT_WALK * stats.getWalks()
-            + BaseRuns.COEFFICIENT_STRIKEOUT * stats.getStrikeouts()
-            + BaseRuns.COEFFICIENT_OUT * (stats.getOuts() - stats.getStrikeouts());
+            + BaseRuns.COEFFICIENT_WALK * stats.getWalks();
 
     Double c = (double) stats.getOuts();
 

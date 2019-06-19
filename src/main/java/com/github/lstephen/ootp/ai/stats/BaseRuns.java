@@ -3,13 +3,11 @@ package com.github.lstephen.ootp.ai.stats;
 /** @author lstephen */
 public interface BaseRuns {
 
-  Double COEFFICIENT_SINGLE = 0.726;
-  Double COEFFICIENT_DOUBLE = 1.948;
-  Double COEFFICIENT_TRIPLE = 3.134;
-  Double COEFFICIENT_HOME_RUN = 1.694;
-  Double COEFFICIENT_WALK = 0.052;
-  Double COEFFICIENT_STRIKEOUT = -0.057;
-  Double COEFFICIENT_OUT = -0.004;
+  double COEFFICIENT_SINGLE = 0.8;
+  double COEFFICIENT_DOUBLE = 2.1;
+  double COEFFICIENT_TRIPLE = 3.4;
+  double COEFFICIENT_HOME_RUN = 1.8;
+  double COEFFICIENT_WALK = 0.1;
 
   Double calculate(PitchingStats stats);
 }
