@@ -8,7 +8,7 @@ public interface BaseRuns {
   double COEFFICIENT_DOUBLE = 2.34;
   double COEFFICIENT_TRIPLE = 3.9;
   double COEFFICIENT_HOME_RUN = 2.34;
-  double COEFFICIENT_WALK = 0.39;
+  double COEFFICIENT_WALK = 0.039;
 
   Double calculate(PitchingStats stats);
 }
