@@ -12,6 +12,8 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.IntStream;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -43,6 +45,8 @@ public class LeagueBatting {
     this.page = site.getPage("leagueb.html");
     this.league = league;
     this.site = site;
+
+    loadHistorical();
   }
 
   private File getHistoricalFile() {
@@ -79,6 +83,16 @@ public class LeagueBatting {
         DateTimeFormat.forPattern("MM/dd/YYYY"));
   }
 
+  public Optional<BattingStats> extractYearsAgo(int yearsAgo) {
+    int seasonToLoad = extractDate().getYear() - yearsAgo;
+
+    if (historical.containsKey(seasonToLoad) && historical.get(seasonToLoad).getRuns() != null) {
+      return Optional.of(historical.get(seasonToLoad));
+    }
+
+    return Optional.empty();
+  }
+
   public BattingStats extractTotal() {
     Elements total = extractTotalLine();
 
@@ -94,17 +108,14 @@ public class LeagueBatting {
 
     int currentSeason = extractDate().getYear();
 
-    loadHistorical();
-
     historical.put(currentSeason, batting);
 
-    for (int i = 1; i < 5; i++) {
-      if (historical.containsKey(currentSeason - i)) {
-        if (historical.get(currentSeason - i).getRuns() != null) {
-          batting = batting.add(historical.get(currentSeason - i));
-        }
-      }
-    }
+    batting =
+        IntStream.range(1, 6)
+            .mapToObj(this::extractYearsAgo)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .reduce(batting, BattingStats::add);
 
     try {
       Jackson.getMapper(site).writeValue(getHistoricalFile(), this);
