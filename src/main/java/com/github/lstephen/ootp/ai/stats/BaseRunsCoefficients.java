@@ -42,7 +42,7 @@ public class BaseRunsCoefficients {
       Preconditions.checkState(coefficients.length == 5, "Coefficients has length of " + coefficients.length);
       Preconditions.checkState(stats.length == 5, "Stats has length of " + stats.length);
 
-      return IntStream.range(0, 6)
+      return IntStream.range(0, 5)
         .mapToDouble(i -> coefficients[i] * stats[i])
         .sum();
     }
