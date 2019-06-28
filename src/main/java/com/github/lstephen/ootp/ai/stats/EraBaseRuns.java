@@ -17,13 +17,7 @@ public class EraBaseRuns implements BaseRuns {
 
     Double a = hits + stats.getWalks() - stats.getHomeRuns();
 
-    Double b =
-        factor
-            * (COEFFICIENT_SINGLE * stats.getSingles()
-                + COEFFICIENT_DOUBLE * doubles
-                + COEFFICIENT_TRIPLE * triples
-                + COEFFICIENT_HOME_RUN * stats.getHomeRuns()
-                + COEFFICIENT_WALK * stats.getWalks());
+    Double b = factor * BaseRunsCoefficients.apply(stats.getSingles(), doubles, triples, stats.getHomeRuns(), stats.getWalks());
 
     Double c = (double) stats.getOuts();
     Double d = (double) stats.getHomeRuns();

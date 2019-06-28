@@ -3,6 +3,7 @@ package com.github.lstephen.ootp.ai.report;
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.stats.BaseRuns;
+import com.github.lstephen.ootp.ai.stats.BaseRunsCoefficients;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.EraBaseRuns;
 import com.github.lstephen.ootp.ai.stats.FipBaseRuns;
@@ -22,12 +23,7 @@ public class LeagueBattingReport implements Printable {
 
     double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
 
-    double b =
-        BaseRuns.COEFFICIENT_SINGLE * stats.getSingles()
-            + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
-            + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
-            + BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns()
-            + BaseRuns.COEFFICIENT_WALK * stats.getWalks();
+    double b = BaseRunsCoefficients.apply(stats);
 
     double c = (double) stats.getOuts();
     double d = (double) stats.getHomeRuns();
@@ -160,12 +156,7 @@ public class LeagueBattingReport implements Printable {
 
     Double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
 
-    Double b =
-        BaseRuns.COEFFICIENT_SINGLE * stats.getSingles()
-            + BaseRuns.COEFFICIENT_DOUBLE * stats.getDoubles()
-            + BaseRuns.COEFFICIENT_TRIPLE * stats.getTriples()
-            + BaseRuns.COEFFICIENT_HOME_RUN * stats.getHomeRuns()
-            + BaseRuns.COEFFICIENT_WALK * stats.getWalks();
+    Double b = BaseRunsCoefficients.apply(stats);
 
     Double c = (double) stats.getOuts();
 
