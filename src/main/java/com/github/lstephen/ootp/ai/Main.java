@@ -44,6 +44,7 @@ import com.github.lstephen.ootp.ai.site.Site;
 import com.github.lstephen.ootp.ai.site.SiteDefinition;
 import com.github.lstephen.ootp.ai.site.SiteHolder;
 import com.github.lstephen.ootp.ai.site.impl.SiteDefinitionFactory;
+import com.github.lstephen.ootp.ai.stats.BaseRunsCoefficients;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.github.lstephen.ootp.ai.stats.SplitPercentagesHolder;
 import com.github.lstephen.ootp.ai.stats.SplitStats;
@@ -214,6 +215,8 @@ public class Main {
     LOG.log(Level.INFO, "Warming player cache...");
     site.getAllPlayers();
 
+    BaseRunsCoefficients.calculate(site);
+    Printables.print(BaseRunsCoefficients.report()).to(out);
     Printables.print(LeagueBattingReport.create(site)).to(out);
 
     LOG.log(Level.INFO, "Extracting current roster and team...");

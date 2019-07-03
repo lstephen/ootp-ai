@@ -4,8 +4,6 @@ package com.github.lstephen.ootp.ai.stats;
 public class EraBaseRuns implements BaseRuns {
   private static final EraBaseRuns INSTANCE = new EraBaseRuns();
 
-  private Double factor;
-
   private BattingStats context;
 
   private EraBaseRuns() {}
@@ -17,7 +15,7 @@ public class EraBaseRuns implements BaseRuns {
 
     Double a = hits + stats.getWalks() - stats.getHomeRuns();
 
-    Double b = factor * BaseRunsCoefficients.apply(stats.getSingles(), doubles, triples, stats.getHomeRuns(), stats.getWalks());
+    Double b = BaseRunsCoefficients.apply(stats.getSingles(), doubles, triples, stats.getHomeRuns(), stats.getWalks());
 
     Double c = (double) stats.getOuts();
     Double d = (double) stats.getHomeRuns();
@@ -29,10 +27,6 @@ public class EraBaseRuns implements BaseRuns {
 
   public static EraBaseRuns get() {
     return INSTANCE;
-  }
-
-  public static void setFactor(Double factor) {
-    get().factor = factor;
   }
 
   public static void setLeagueContext(BattingStats stats) {
