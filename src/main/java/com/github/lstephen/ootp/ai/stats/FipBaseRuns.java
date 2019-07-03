@@ -5,8 +5,6 @@ public class FipBaseRuns implements BaseRuns {
 
   private static final FipBaseRuns INSTANCE = new FipBaseRuns();
 
-  private Double factor;
-
   private BattingStats context;
 
   private FipBaseRuns() {}
@@ -24,7 +22,7 @@ public class FipBaseRuns implements BaseRuns {
 
     Double a = hits + stats.getWalks() - stats.getHomeRuns();
 
-    Double b = factor * BaseRunsCoefficients.apply(singles, doubles, triples, stats.getHomeRuns(), stats.getWalks());
+    Double b = BaseRunsCoefficients.apply(singles, doubles, triples, stats.getHomeRuns(), stats.getWalks());
 
     Double c = (double) stats.getOuts();
 
@@ -37,10 +35,6 @@ public class FipBaseRuns implements BaseRuns {
 
   public static FipBaseRuns get() {
     return INSTANCE;
-  }
-
-  public static void setFactor(Double factor) {
-    get().factor = factor;
   }
 
   public static void setLeagueContext(BattingStats stats) {

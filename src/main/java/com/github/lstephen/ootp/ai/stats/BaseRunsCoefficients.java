@@ -1,5 +1,7 @@
 package com.github.lstephen.ootp.ai.stats;
 
+import com.github.lstephen.ootp.ai.site.Site;
+import com.github.lstephen.ootp.ai.io.Printable;
 import com.google.common.base.Preconditions;
 import java.util.stream.IntStream;
 import java.util.Arrays;
@@ -11,9 +13,9 @@ public class BaseRunsCoefficients {
 
   private static final Coefficients SIMPLE = new StaticCoefficients(0.8, 2.1, 3.4, 1.8, 0.1);
 
-  private static final Coefficients TANGO = new StaticCoefficients(0.726, 1.948, 3.134, 1.694, 0.052);
+  private static final StaticCoefficients TANGO = new StaticCoefficients(0.726, 1.948, 3.134, 1.694, 0.052);
 
-  private static Coefficients current = TANGO;
+  private static StaticCoefficients current = TANGO;
 
   public static double apply(double... stats) {
     return current.apply(stats);
@@ -21,6 +23,30 @@ public class BaseRunsCoefficients {
 
   public static double apply(BattingStats stats) {
     return current.apply(stats);
+  }
+
+  public static void calculate(Site site) {
+    BattingStats stats = site.getLeagueBatting();
+
+    double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
+
+    double b = BaseRunsCoefficients.apply(stats);
+
+    double c = (double) stats.getOuts();
+    double d = (double) stats.getHomeRuns();
+
+    double bPrime = (stats.getRuns() - d) * c / (a - stats.getRuns() + d);
+
+    current = current.withFactor(bPrime / b);
+  }
+
+  public static Printable report() {
+    return w -> {
+      w.format("  GOSU: %s%n", GOSU);
+      w.format("SIMPLE: %s%n", SIMPLE);
+      w.format(" TANGO: %s%n", TANGO);
+      w.format("CURENT: %s%n", current);
+    };
   }
 
   private static interface Coefficients {
@@ -32,9 +58,15 @@ public class BaseRunsCoefficients {
   }
 
   private static class StaticCoefficients implements Coefficients {
+    private final double factor;
     private final double[] coefficients;
 
     public StaticCoefficients(double... coefficients) {
+      this(1.0, coefficients);
+    }
+
+    private StaticCoefficients(double factor, double[] coefficients) {
+      this.factor = factor;
       this.coefficients = coefficients;
     }
 
@@ -42,13 +74,16 @@ public class BaseRunsCoefficients {
       Preconditions.checkState(coefficients.length == 5, "Coefficients has length of " + coefficients.length);
       Preconditions.checkState(stats.length == 5, "Stats has length of " + stats.length);
 
-      return IntStream.range(0, 5)
+      return factor * IntStream.range(0, 5)
         .mapToDouble(i -> coefficients[i] * stats[i])
         .sum();
     }
 
+    public StaticCoefficients withFactor(double factor) {
+      return new StaticCoefficients(factor, coefficients);
+    }
     public String toString() {
-      return String.format("StaticCoefficients(%s)", Arrays.toString(coefficients));
+      return String.format("StaticCoefficients(%.2f, %s)", factor, Arrays.toString(coefficients));
     }
 
   }

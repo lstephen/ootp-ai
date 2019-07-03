@@ -16,27 +16,12 @@ public class LeagueBattingReport implements Printable {
 
   private final BattingStats stats;
 
-  private final Double bsrFactor;
-
   private LeagueBattingReport(BattingStats stats) {
     this.stats = stats;
-
-    double a = (double) stats.getHits() + stats.getWalks() - stats.getHomeRuns();
-
-    double b = BaseRunsCoefficients.apply(stats);
-
-    double c = (double) stats.getOuts();
-    double d = (double) stats.getHomeRuns();
-
-    double bPrime = (stats.getRuns() - d) * c / (a - stats.getRuns() + d);
-
-    bsrFactor = bPrime / b;
   }
 
   @Override
   public void print(PrintWriter w) {
-
-    w.format("bsf: %.2f%n", bsrFactor);
     w.format("act: %d%n", stats.getRuns());
     w.println();
 
@@ -104,9 +89,7 @@ public class LeagueBattingReport implements Printable {
 
     w.println();
 
-    FipBaseRuns.setFactor(bsrFactor);
     FipBaseRuns.setLeagueContext(stats);
-    EraBaseRuns.setFactor(bsrFactor);
     EraBaseRuns.setLeagueContext(stats);
   }
 
@@ -161,8 +144,6 @@ public class LeagueBattingReport implements Printable {
     Double c = (double) stats.getOuts();
 
     Double d = (double) stats.getHomeRuns();
-
-    b = bsrFactor * b;
 
     return a * b / (b + c) + d;
   }
