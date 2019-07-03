@@ -2,7 +2,6 @@ package com.github.lstephen.ootp.ai.report;
 
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.github.lstephen.ootp.ai.stats.BaseRuns;
 import com.github.lstephen.ootp.ai.stats.BaseRunsCoefficients;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
 import com.github.lstephen.ootp.ai.stats.EraBaseRuns;
