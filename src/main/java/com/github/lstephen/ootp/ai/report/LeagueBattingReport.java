@@ -96,7 +96,7 @@ public class LeagueBattingReport implements Printable {
     BattingStats plusOne = new BattingStats();
     plusOne.setWalks(1);
 
-    return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    return baseRuns(stats.add(plusOne)) - baseRuns(stats);
   }
 
   private Double getRunValue1B() {
@@ -104,7 +104,7 @@ public class LeagueBattingReport implements Printable {
     plusOne.setHits(1);
     plusOne.setAtBats(1);
 
-    return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    return baseRuns(stats.add(plusOne)) - baseRuns(stats);
   }
 
   private Double getRunValue2B() {
@@ -113,7 +113,7 @@ public class LeagueBattingReport implements Printable {
     plusOne.setAtBats(1);
     plusOne.setDoubles(1);
 
-    return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    return baseRuns(stats.add(plusOne)) - baseRuns(stats);
   }
 
   private Double getRunValue3B() {
@@ -122,7 +122,7 @@ public class LeagueBattingReport implements Printable {
     plusOne.setAtBats(1);
     plusOne.setTriples(1);
 
-    return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    return baseRuns(stats.add(plusOne)) - baseRuns(stats);
   }
 
   private Double getRunValueHR() {
@@ -131,7 +131,7 @@ public class LeagueBattingReport implements Printable {
     plusOne.setAtBats(1);
     plusOne.setHomeRuns(1);
 
-    return baseRuns(stats.add(plusOne)) - stats.getRuns();
+    return baseRuns(stats.add(plusOne)) - baseRuns(stats);
   }
 
   private Double baseRuns(BattingStats stats) {
