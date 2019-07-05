@@ -97,7 +97,7 @@ public class BaseRunsCoefficients {
 
     HillClimbing<double[]> hc =
         HillClimbing.<double[]>builder()
-            .validator(ds -> ds.length == 3 && Arrays.stream(ds).allMatch(d -> d > 0.0 && d < 10.0))
+            .validator(ds -> ds.length == 3 && Arrays.stream(ds).allMatch(d -> d > -10.0 && d < 10.0))
             .heuristic(Ordering.natural().onResultOf(rsme).reverse())
             .actionGenerator(
                 ds -> {
