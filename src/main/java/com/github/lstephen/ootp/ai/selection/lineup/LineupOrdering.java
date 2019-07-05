@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ public class LineupOrdering {
     Iterables.addAll(available, ps);
 
     // select top 5 for top 5 lineup spots
-    List<Player> best5 = byWoba.greatestOf(available, 5);
+    List<Player> best5 = Lists.newArrayList(byWoba.greatestOf(available, 5));
     Iterables.removeAll(available, best5);
 
     // best hitter at 4
