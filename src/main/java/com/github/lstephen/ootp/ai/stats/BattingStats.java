@@ -173,6 +173,10 @@ public class BattingStats implements Stats<BattingStats> {
     return atBats == 0 ? 0 : (double) (hits + doubles + 2 * triples + 3 * homeRuns) / atBats;
   }
 
+  public double getIsoPower() {
+    return getSluggingPercentage() - getAverage();
+  }
+
   public double getBabip() {
     if (atBats - ks - homeRuns == 0) {
       return 0;
