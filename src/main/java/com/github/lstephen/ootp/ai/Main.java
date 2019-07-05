@@ -81,7 +81,7 @@ public class Main {
       SiteDefinitionFactory.ootp6(
           "TWML",
           "http://www.darowski.com/twml/OOTP6Reports/",
-          Id.<Team>valueOf(15),
+          Id.<Team>valueOf(14),
           "Splendid Splinter",
           16);
 
