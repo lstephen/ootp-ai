@@ -20,12 +20,24 @@ public class PlayerValue {
     this.predictor = predictor;
   }
 
-  public Function<Player, Integer> getNowValue() {
-    return new Function<Player, Integer>() {
-      public Integer apply(Player p) {
-        return getNowValue(p);
+  public Function<Player, Integer> getNowValueNoDefense() {
+    return p -> {
+      Double endurance = 1.0;
+      if (Selections.isPitcher(p)) {
+        Integer end = p.getPitchingRatings().getVsRight().getEndurance();
+        endurance = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
       }
+
+      if (endurance < MR_CONSTANT) {
+        endurance = MR_CONSTANT;
+      }
+
+      return (int) Math.round(endurance * getNowAbility(p));
     };
+  }
+
+  public Function<Player, Integer> getNowValue() {
+    return this::getNowValue;
   }
 
   public Integer getNowValue(Player p) {

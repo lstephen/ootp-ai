@@ -585,7 +585,8 @@ public class Main {
     }
 
     TeamReport now =
-        TeamReport.create("Now", predictor, site, new PlayerValue(predictor).getNowValue());
+        TeamReport.create(
+            "Now", predictor, site, new PlayerValue(predictor).getNowValueNoDefense());
 
     LOG.info("Team Now Report...");
 
