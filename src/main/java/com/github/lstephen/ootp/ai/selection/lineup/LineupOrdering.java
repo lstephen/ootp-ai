@@ -10,10 +10,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LineupOrdering {
 
@@ -58,7 +60,8 @@ public class LineupOrdering {
       lineup[pos++] = select(byWoba::max, available);
     }
 
-    return ImmutableList.copyOf(lineup);
+    return ImmutableList.copyOf(
+        Arrays.stream(lineup).filter(l -> l != null).collect(Collectors.toList()));
   }
 
   private Player select(Function<Iterable<Player>, Player> f, Collection<Player> ps) {
