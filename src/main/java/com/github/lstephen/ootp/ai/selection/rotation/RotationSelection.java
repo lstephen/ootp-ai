@@ -66,24 +66,20 @@ public final class RotationSelection implements Selection {
     System.out.println("Forced:" + Iterables.size(forced));
     System.out.println("Available:" + Iterables.size(available));
 
-    RotationDefinition definition =
-        Iterables.size(forced) + Iterables.size(available) < 10
-            ? RotationDefinition.playoffs()
-            : this.definition;
-
     HillClimbing<Rotation> hc =
         HillClimbing.<Rotation>builder()
             .validator(
                 r ->
                     r.isValid()
-                        && r.get(Role.SP).size() == definition.getRotationSize()
+                        && r.get(Role.SP).size() <= definition.getRotationSize()
+                        && r.get(Role.SP).size() >= 3
                         && (useAllAvailable || r.getAll().size() <= slots.size()))
             .heuristic(heuristic())
             .actionGenerator(actionGenerator(forced, available))
             .build();
 
     Rotation r =
-        new RepeatedHillClimbing<Rotation>(initialStateGenerator(forced, available, definition), hc).search();
+        new RepeatedHillClimbing<Rotation>(initialStateGenerator(forced, available), hc).search();
 
     for (Player p : Player.byShortName().sortedCopy(r.getAll())) {
       System.out.print(p.getShortName() + "/");
@@ -100,9 +96,7 @@ public final class RotationSelection implements Selection {
   }
 
   private Supplier<Rotation> initialStateGenerator(
-      final Iterable<Player> forced,
-      final Iterable<Player> available,
-      RotationDefinition definition) {
+      final Iterable<Player> forced, final Iterable<Player> available) {
     return new Supplier<Rotation>() {
       @Override
       public Rotation get() {
