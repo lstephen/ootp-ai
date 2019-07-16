@@ -157,6 +157,10 @@ public final class Roster implements Printable {
     this.targetMaximum = max;
   }
 
+  public boolean isExtraLarge() {
+    return size() > targetMaximum * 1.2;
+  }
+
   public boolean isLarge() {
     return size() > targetMaximum;
   }
