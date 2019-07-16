@@ -44,7 +44,7 @@ public final class Rotation implements Printable {
 
   private double scoreRotation(Predictor predictor) {
     double score = 0.0;
-    int spFactor = 10;
+    int spFactor = 7;
 
     for (Player p : get(Role.SP)) {
       int end = p.getPitchingRatings().getVsRight().getEndurance();
