@@ -21,10 +21,15 @@ class PitchingStrategyReport(rotation: Rotation)(implicit predictor: Predictor)
       .map(_ *: predictor.predictPitching(_).overall)
       .average
 
+  val bullpenEndurance =
+    rotation.get(Role.LR).map(_.getPitchingRatings.getVsRight.getEndurance * 1.0).sum +
+    rotation.get(Role.MR).map(_.getPitchingRatings.getVsRight.getEndurance * 0.5).sum
+
   def print(w: PrintWriter): Unit = {
     w.println
 
     w println f"BP Ability: ${bullpenNowAbility.toLong}%d"
+    w println f"BP Endrnce: ${bullpenEndurance}%s"
 
     w.println
 
