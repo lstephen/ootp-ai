@@ -87,7 +87,7 @@ public final class Rotation implements Printable {
     double vsL = 0.0;
     double vsR = 0.0;
 
-    int factor = 5;
+    int factor = 6;
 
     for (Player p : players) {
       PitchingPrediction stats = predictor.predictPitching(p);
