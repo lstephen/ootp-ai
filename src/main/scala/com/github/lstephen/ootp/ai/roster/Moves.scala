@@ -35,7 +35,7 @@ class Moves(roster: Roster, changes: Changes)(implicit predictor: Predictor) {
       .filter(if (roster.isPitcherHeavy) _.isPitcher else _.isHitter)
       .filter(roster.getStatus(_) != Roster.Status.ML)
       .sortBy(OverallValue(_))
-      .take(1)
+      .take(if (roster.isExtraLarge) 5 else 1)
   }
 
   def getSign: java.util.List[Player] = sign.asJava
