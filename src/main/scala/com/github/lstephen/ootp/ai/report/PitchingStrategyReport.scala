@@ -14,7 +14,7 @@ import collection.JavaConversions._
 
 class PitchingStrategyReport(rotation: Rotation)(implicit predictor: Predictor)
     extends Printable {
-  val chainValues = List(1.8, 1.3, 1.0, 0.9, 0.8, 0.8, 0.6)
+  val chainValues = List(1.8, 1.3, 1.0, 0.9)
 
   val bullpenNowAbility =
     (chainValues, rotation.get(Role.CL, Role.SU, Role.MR)).zipped
