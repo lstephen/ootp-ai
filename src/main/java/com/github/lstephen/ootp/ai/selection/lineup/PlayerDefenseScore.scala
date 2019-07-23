@@ -4,7 +4,7 @@ import com.github.lstephen.ootp.ai.Context
 import com.github.lstephen.ootp.ai.player.Player
 import com.github.lstephen.ootp.ai.player.ratings.{DefensiveRatings, Position}
 import com.github.lstephen.ootp.ai.score._
-
+import scala.collection.mutable.Map
 import collection.JavaConversions._
 
 class PlayerDefenseScore(defensiveRatings: DefensiveRatings,
@@ -29,8 +29,8 @@ object PlayerDefenseScore {
       .map(new PlayerDefenseScore(p.getDefensiveRatings, _, useBaseline))
       .max
 
-  var oldRosterBaseline: Map[Position, Score] = Map()
-  var newRosterBaseline: Map[Position, Score] = Map()
+  val oldRosterBaseline: Map[Position, Score] = Map()
+  val newRosterBaseline: Map[Position, Score] = Map()
 
   def baseline(pos: Position): Score = {
     newRosterBaseline.get(pos).getOrElse {
