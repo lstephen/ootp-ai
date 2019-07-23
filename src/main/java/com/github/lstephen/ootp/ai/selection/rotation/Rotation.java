@@ -70,10 +70,12 @@ public final class Rotation implements Printable {
     Double sus = score(get(Role.SU), predictor, EnumSet.noneOf(BullpenOption.class));
     Double cls = score(get(Role.CL), predictor, EnumSet.of(BullpenOption.CLUTCH));
 
-    ToDoubleFunction<Player> getEndurance = p -> p.getPitchingRatings().getVsRight().getEndurance().doubleValue();
+    ToDoubleFunction<Player> getEndurance =
+        p -> p.getPitchingRatings().getVsRight().getEndurance().doubleValue();
 
-    double end = get(Role.LR).stream().mapToDouble(getEndurance).sum()
-      + get(Role.MR).stream().mapToDouble(getEndurance).map(d -> d * 0.5).sum();
+    double end =
+        get(Role.LR).stream().mapToDouble(getEndurance).sum()
+            + get(Role.MR).stream().mapToDouble(getEndurance).map(d -> d * 0.5).sum();
 
     double endFactor = (1000.0 - Math.pow(10 - Math.min(end, 10.0), 3)) / 1000.0;
 
