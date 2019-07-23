@@ -8,7 +8,7 @@ import com.github.lstephen.ootp.ai.score._
 import collection.JavaConversions._
 
 class PlayerDefenseScore(defensiveRatings: DefensiveRatings,
-                         position: Position,
+                         val position: Position,
                          useBaseline: Boolean = true)
     extends Scoreable {
 
@@ -17,7 +17,7 @@ class PlayerDefenseScore(defensiveRatings: DefensiveRatings,
   val positionFactor = Defense.getPositionFactor(position)
   val positionScore = defensiveRatings getPositionScore position
 
-  val baseline = if (useBaseline) PlayerDefenseScore.baseline else Score.zero
+  val baseline = if (useBaseline) PlayerDefenseScore.baseline(position) else Score.zero
 
   val score = Score(positionFactor * positionScore) - baseline
 }
@@ -29,21 +29,21 @@ object PlayerDefenseScore {
       .map(new PlayerDefenseScore(p.getDefensiveRatings, _, useBaseline))
       .max
 
-  var oldRosterBaseline: Option[Score] = None
-  var newRosterBaseline: Option[Score] = None
+  var oldRosterBaseline: Map[Position, Score] = Map()
+  var newRosterBaseline: Map[Position, Score] = Map()
 
-  def baseline: Score = {
-    newRosterBaseline.getOrElse {
+  def baseline(pos: Position): Score = {
+    newRosterBaseline.get(pos).getOrElse {
       Context.newRoster match {
         case Some(r) =>
-          newRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
-          newRosterBaseline.getOrElse(throw new IllegalStateException)
+          newRosterBaseline.put(pos, calculateBaseline(r.getAllPlayers, pos))
+          newRosterBaseline.get(pos).getOrElse(throw new IllegalStateException)
         case None =>
-          oldRosterBaseline.getOrElse {
+          oldRosterBaseline.get(pos).getOrElse {
             Context.oldRoster match {
               case Some(r) =>
-                oldRosterBaseline = Some(calculateBaseline(r.getAllPlayers))
-                oldRosterBaseline.getOrElse(throw new IllegalStateException)
+                oldRosterBaseline.put(pos, calculateBaseline(r.getAllPlayers, pos))
+                oldRosterBaseline.get(pos).getOrElse(throw new IllegalStateException)
               case None => throw new RuntimeException("No rosters set")
             }
           }
@@ -51,7 +51,7 @@ object PlayerDefenseScore {
     }
   }
 
-  def calculateBaseline(ps: Traversable[Player]): Score = {
-    ps.filter(_.isHitter).map(atBestPosition(_, false).score).average
+  def calculateBaseline(ps: Traversable[Player], pos: Position): Score = {
+    ps.filter(_.isHitter).map(atBestPosition(_, false)).filter(_.position == pos).map(_.score).average
   }
 }
