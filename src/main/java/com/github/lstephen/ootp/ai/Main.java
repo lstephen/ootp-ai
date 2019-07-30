@@ -51,6 +51,7 @@ import com.github.lstephen.ootp.ai.stats.SplitStats;
 import com.github.lstephen.ootp.ai.value.JavaAdapter;
 import com.github.lstephen.ootp.ai.value.PlayerValue;
 import com.github.lstephen.ootp.ai.value.ReplacementLevels$;
+import com.github.lstephen.ootp.ai.value.SkillByAge;
 import com.github.lstephen.ootp.extract.html.Page;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
@@ -489,6 +490,9 @@ public class Main {
     }
 
     Printables.print(ReplacementLevels$.MODULE$.getForIdeal(predictor)).to(out);
+
+    LOG.info("Skills by Age...");
+    Printables.print(SkillByAge.create(site, new PlayerValue(predictor))).to(out);
 
     LOG.info("Development Report...");
     Printables.print(new DevelopmentReport(site, predictor)).to(out);
