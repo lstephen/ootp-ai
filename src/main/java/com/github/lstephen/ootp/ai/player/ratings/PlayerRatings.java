@@ -13,7 +13,6 @@ import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.splits.Splits;
 import com.github.lstephen.ootp.ai.stats.SplitPercentages;
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -102,165 +101,12 @@ public final class PlayerRatings {
     return pitchingPotential;
   }
 
-  public Splits<BattingRatings<Integer>> getBattingPotential(int age) {
-
-    BattingRatings<Integer> ovr = getOverallBatting(getBatting());
-
-    BattingRatings<Integer> capped =
-        BattingRatings.builder(new OneToOneHundred())
-            .contact(capBattingPotential(age, ovr.getContact(), battingPotential.getContact()))
-            .gap(capBattingPotential(age, ovr.getGap(), battingPotential.getGap()))
-            .triplesOptionalRating(
-                capBattingPotential(age, ovr.getTriples(), battingPotential.getTriples()))
-            .power(capBattingPotential(age, ovr.getPower(), battingPotential.getPower()))
-            .eye(capBattingPotential(age, ovr.getEye(), battingPotential.getEye()))
-            .k(capBattingPotential(age, ovr.getK(), battingPotential.getK()))
-            .build();
-
-    BattingRatings<?> curVsLeft = getBatting().getVsLeft();
-
-    BattingRatings<Integer> potVsLeft =
-        BattingRatings.builder(new OneToOneHundred())
-            .contact(capBatting(age, curVsLeft.getContact(), capped.getContact(), ovr.getContact()))
-            .gap(capBatting(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
-            .triples(capBatting(age, curVsLeft.getTriples(), capped.getTriples(), ovr.getTriples()))
-            .power(capBatting(age, curVsLeft.getPower(), capped.getPower(), ovr.getPower()))
-            .eye(capBatting(age, curVsLeft.getEye(), capped.getEye(), ovr.getEye()))
-            .k(capBatting(age, curVsLeft.getK(), capped.getK(), ovr.getK()))
-            .runningSpeed(curVsLeft.getRunningSpeed())
-            .build();
-
-    BattingRatings<?> curVsRight = getBatting().getVsRight();
-
-    BattingRatings<Integer> potVsRight =
-        BattingRatings.builder(new OneToOneHundred())
-            .contact(
-                capBatting(age, curVsRight.getContact(), capped.getContact(), ovr.getContact()))
-            .gap(capBatting(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
-            .triples(
-                capBatting(age, curVsRight.getTriples(), capped.getTriples(), ovr.getTriples()))
-            .power(capBatting(age, curVsRight.getPower(), capped.getPower(), ovr.getPower()))
-            .eye(capBatting(age, curVsRight.getEye(), capped.getEye(), ovr.getEye()))
-            .k(capBatting(age, curVsRight.getK(), capped.getK(), ovr.getK()))
-            .runningSpeed(curVsRight.getRunningSpeed())
-            .build();
-
-    return Splits.create(potVsLeft, potVsRight);
+  public Splits<BattingRatings<?>> getBattingPotential(int age) {
+    return Splits.create(getRawBattingPotential(), getRawBattingPotential());
   }
 
-  public Splits<PitchingRatings<Integer>> getPitchingPotential(int age) {
-    PitchingRatings<?> ovr = getOverallPitching(getPitching());
-
-    PitchingRatings<Integer> capped =
-        PitchingRatings.builder(new OneToOneHundred())
-            .stuff(capPitchingPotential(age, ovr.getStuff(), pitchingPotential.getStuff()))
-            .control(capPitchingPotential(age, ovr.getControl(), pitchingPotential.getControl()))
-            .movement(capPitchingPotential(age, ovr.getMovement(), pitchingPotential.getMovement()))
-            .hits(capPitchingPotential(age, ovr.getHits(), pitchingPotential.getHits()))
-            .gap(capPitchingPotential(age, ovr.getGap(), pitchingPotential.getGap()))
-            .build();
-
-    PitchingRatings<?> curVsLeft = getPitching().getVsLeft();
-
-    PitchingRatings<Integer> potVsLeft =
-        PitchingRatings.builder(new OneToOneHundred())
-            .stuff(capPitching(age, curVsLeft.getStuff(), capped.getStuff(), ovr.getStuff()))
-            .control(
-                capPitching(age, curVsLeft.getControl(), capped.getControl(), ovr.getControl()))
-            .movement(
-                capPitching(age, curVsLeft.getMovement(), capped.getMovement(), ovr.getMovement()))
-            .hits(capPitching(age, curVsLeft.getHits(), capped.getHits(), ovr.getHits()))
-            .gap(capPitching(age, curVsLeft.getGap(), capped.getGap(), ovr.getGap()))
-            .groundBallPct(curVsLeft.getGroundBallPct())
-            .endurance(ovr.getEndurance())
-            .runs(Optional.absent())
-            .build();
-
-    PitchingRatings<?> curVsRight = getPitching().getVsRight();
-
-    PitchingRatings<Integer> potVsRight =
-        PitchingRatings.builder(new OneToOneHundred())
-            .stuff(capPitching(age, curVsRight.getStuff(), capped.getStuff(), ovr.getStuff()))
-            .control(
-                capPitching(age, curVsRight.getControl(), capped.getControl(), ovr.getControl()))
-            .movement(
-                capPitching(age, curVsRight.getMovement(), capped.getMovement(), ovr.getMovement()))
-            .hits(capPitching(age, curVsRight.getHits(), capped.getHits(), ovr.getHits()))
-            .gap(capPitching(age, curVsRight.getGap(), capped.getGap(), ovr.getGap()))
-            .groundBallPct(curVsRight.getGroundBallPct())
-            .endurance(ovr.getEndurance())
-            .runs(Optional.absent())
-            .build();
-
-    return Splits.create(potVsLeft, potVsRight);
-  }
-
-  private Rating<Integer, OneToOneHundred> capBatting(
-      int age, Optional<Integer> current, Optional<Integer> capped, Optional<Integer> overall) {
-
-    if (!Stream.of(current, capped, overall).allMatch(Optional::isPresent)) {
-      return null;
-    }
-
-    return capBatting(age, current.get(), capped.get(), overall.get());
-  }
-
-  private Rating<Integer, OneToOneHundred> capBatting(
-      int age, int current, int capped, int overall) {
-    return capBattingPotential(age, current, capped + (current - overall));
-  }
-
-  private Optional<Rating<Integer, OneToOneHundred>> capBattingPotential(
-      int age, Optional<Integer> current, Optional<Integer> potential) {
-    if (!current.isPresent() || !potential.isPresent()) {
-      return Optional.absent();
-    }
-
-    return Optional.of(capBattingPotential(age, current.get(), potential.get()));
-  }
-
-  private Rating<Integer, OneToOneHundred> capBattingPotential(
-      int age, int current, int potential) {
-
-    if (definition.isFreezeOneRatings() && current < 10) {
-      return OneToOneHundred.valueOf(current);
-    }
-
-    if (current == 0) {
-      return OneToOneHundred.valueOf(current);
-    }
-
-    // Double factor = definition.getYearlyRatingsIncrease();
-    Integer factor = 8;
-
-    Integer value =
-        Math.max(current, Math.min(potential, current + factor * Math.max(PEAK_AGE - age, 0)));
-
-    return OneToOneHundred.valueOf(value);
-  }
-
-  private Rating<Integer, OneToOneHundred> capPitching(
-      int age, int current, int capped, int overall) {
-    return capPitchingPotential(age, current, capped + (current - overall));
-  }
-
-  private Rating<Integer, OneToOneHundred> capPitchingPotential(
-      int age, int current, int potential) {
-
-    if (definition.isFreezeOneRatings() && current < 10) {
-      return OneToOneHundred.valueOf(current);
-    }
-
-    if (current == 0) {
-      OneToOneHundred.valueOf(current);
-    }
-
-    Integer factor = 8;
-
-    Integer value =
-        Math.max(current, Math.min(potential, current + factor * Math.max(PEAK_AGE - age, 0)));
-
-    return OneToOneHundred.valueOf(value);
+  public Splits<PitchingRatings<?>> getPitchingPotential(int age) {
+    return Splits.create(getRawPitchingPotential(), getRawPitchingPotential());
   }
 
   public void setBattingPotential(BattingRatings ratings) {

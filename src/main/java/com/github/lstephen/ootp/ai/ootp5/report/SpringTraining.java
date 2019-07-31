@@ -60,7 +60,7 @@ public final class SpringTraining implements Printable {
     Set<HitterSkills> skills = Sets.newHashSet(HitterSkills.values());
 
     Splits<BattingRatings<?>> now = p.getBattingRatings();
-    Splits<BattingRatings<Integer>> pot = p.getBattingPotentialRatings();
+    Splits<BattingRatings<?>> pot = p.getBattingPotentialRatings();
 
     if (now.getVsLeft().getContact() < HITTING_THRESHOLD
         && now.getVsRight().getContact() < HITTING_THRESHOLD

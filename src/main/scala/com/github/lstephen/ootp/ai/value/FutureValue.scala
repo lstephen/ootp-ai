@@ -64,7 +64,29 @@ class FutureValue(val player: Player, val position: Position)(
     } else
       None
 
-  def components = ability.components :+ vsReplacement :+ vsMax
+  val vsAge: Option[Score] =
+    if (player.getAge < 27) {
+      if (player.isHitter && position.isHitting) {
+        NowAbility(player, position).batting.map { s =>
+          s - Score(
+            SkillByAge.getInstance.getHitting
+              .getThreeYearAverage(player.getAge)
+              .getAsDouble)
+        }
+      } else if (player.isPitcher && position.isPitching) {
+        NowAbility(player, position).pitching.map { s =>
+          s - Score(
+            SkillByAge.getInstance.getPitching
+              .getThreeYearAverage(player.getAge)
+              .getAsDouble)
+        }
+      } else {
+        None
+      }
+    } else
+      None
+
+  def components = ability.components :+ vsAge :+ vsReplacement :+ vsMax
 
   def format: String = {
     val p = if (score.isPositive) position.getAbbreviation else ""

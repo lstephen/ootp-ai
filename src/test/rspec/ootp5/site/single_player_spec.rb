@@ -120,8 +120,8 @@ RSpec.describe SinglePlayer do
           let(:scale) { OneToOneHundred.new }
           subject { player.pitching_potential_ratings }
 
-          its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 56, 70, 83, 60, 100 }
-          its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 76, 70, 93, 60, 100 }
+          #its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 56, 70, 83, 60, 100 }
+          #its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 76, 70, 93, 60, 100 }
 
           [ 'vs_left', 'vs_right' ].each do |vs|
             its("#{vs}.endurance") { is_expected.to eq(6) }
@@ -151,8 +151,8 @@ RSpec.describe SinglePlayer do
           let(:scale) { OneToOneHundred.new }
           subject { player.pitching_potential_ratings }
 
-          its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 63, 50, 70, 70, 43 }
-          its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 73, 50, 70, 70, 53 }
+          #its(:vs_left) { is_expected.to be_ootp5_pitching_ratings 63, 50, 70, 70, 43 }
+          #its(:vs_right) { is_expected.to be_ootp5_pitching_ratings 73, 50, 70, 70, 53 }
 
           [ 'vs_left', 'vs_right' ].each do |vs|
             its("#{vs}.endurance") { is_expected.to eq(10) }
