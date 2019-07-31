@@ -2,11 +2,13 @@ package com.github.lstephen.ootp.ai.value;
 
 import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
+import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.selection.Selections;
 import com.github.lstephen.ootp.ai.site.Site;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.OptionalDouble;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -22,6 +24,10 @@ public class SkillByAge implements Printable {
 
   private SkillByAge(PlayerValue value) {
     this.value = value;
+  }
+
+  private void add(Player p) {
+    add(Arrays.asList(p));
   }
 
   private void add(Iterable<Player> ps) {
@@ -61,10 +67,19 @@ public class SkillByAge implements Printable {
     }
 
     public OptionalDouble getThreeYearAverage(int age) {
-      return Stream.of(-1, 0, 1)
-          .flatMap(y -> values.get(age + y).stream())
-          .mapToInt(Integer::intValue)
-          .average();
+      OptionalDouble avg =
+          Stream.of(-1, 0, 1)
+              .flatMap(y -> values.get(age + y).stream())
+              .mapToInt(Integer::intValue)
+              .average();
+
+      OptionalDouble fiveYearAvg =
+          Stream.of(-2, -1, 0, 1, 2)
+              .flatMap(y -> values.get(age + y).stream())
+              .mapToInt(Integer::intValue)
+              .average();
+
+      return avg.isPresent() ? avg : fiveYearAvg;
     }
 
     public void print(PrintWriter w) {
@@ -98,9 +113,22 @@ public class SkillByAge implements Printable {
     }
   }
 
-  public static void init(Site site, PlayerValue value) {
-    instance = new SkillByAge(value);
-    instance.add(site.getAllPlayers());
+  public static void init(Site site, Predictor predictor) {
+    instance = new SkillByAge(new PlayerValue(predictor));
+
+    site.getAllPlayers()
+        .stream()
+        .filter(
+            p ->
+                ReplacementLevels$.MODULE$
+                            .getForIdeal(predictor)
+                            .getTrendingTowardsAverage(JavaAdapter.futureAbility(p, predictor))
+                        > 0.0
+                    || ReplacementLevels$.MODULE$
+                            .getForIdeal(predictor)
+                            .getTrendingTowardsAverage(JavaAdapter.nowAbility(p, predictor))
+                        > 0.0)
+        .forEach(instance::add);
   }
 
   public static SkillByAge getInstance() {

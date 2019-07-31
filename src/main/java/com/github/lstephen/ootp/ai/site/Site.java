@@ -13,6 +13,7 @@ import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.github.lstephen.ootp.extract.html.Page;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.List;
 import org.joda.time.LocalDate;
@@ -30,7 +31,7 @@ public interface Site {
 
   SiteDefinition getDefinition();
 
-  Iterable<Player> getAllPlayers();
+  ImmutableSet<Player> getAllPlayers();
 
   Collection<Player> getDraft();
 

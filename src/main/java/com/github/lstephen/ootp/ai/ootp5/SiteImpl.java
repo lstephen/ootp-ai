@@ -148,7 +148,7 @@ public final class SiteImpl implements Site, SalarySource {
   }
 
   @Override
-  public synchronized Iterable<Player> getAllPlayers() {
+  public synchronized ImmutableSet<Player> getAllPlayers() {
     if (allPlayers == null) {
       allPlayers =
           ImmutableSet.copyOf(
