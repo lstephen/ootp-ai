@@ -239,7 +239,6 @@ public class Main {
     Printables.print(predictor.correlationReport()).to(out);
 
     Context$.MODULE$.currentPredictor_$eq(predictor);
-    SkillByAge.init(site, new PlayerValue(predictor));
 
     LOG.info("Loading manual changes...");
     Changes changes = Changes.load(site);
@@ -274,6 +273,9 @@ public class Main {
     LOG.log(Level.INFO, "Selecting ideal roster...");
 
     Context$.MODULE$.idealRoster_$eq(selection.select(Mode.IDEAL));
+
+    LOG.info("Calculating skills by age...");
+    SkillByAge.init(site, predictor);
 
     LOG.info("Calculating top FA targets...");
     Iterable<Player> topFaTargets = fas.getTopTargets(mode);
@@ -495,13 +497,6 @@ public class Main {
 
     LOG.info("Development Report...");
     Printables.print(new DevelopmentReport(site, predictor)).to(out);
-
-    /*LOG.info("Historial Development Report...");
-    Printables.print(new HistorialDevelopmentReport(site, predictor)).to(out);
-
-    LOG.info("Potential vs actual Report...");
-    Printables.print(new PotentialVsActualReport(site)).to(out);
-    */
 
     LOG.info("Draft...");
     ImmutableSet<Player> drafted = ImmutableSet.copyOf(changes.get(Changes.ChangeType.PICKED));

@@ -32,6 +32,9 @@ class ReplacementLevels(levels: Map[Position, Score])(implicit ps: Predictor)
     else
       a.score - level
 
+  def getTrendingTowardsAverage(a: Ability) =
+    List(get(a), getVsAverage(a)).average
+
   def print(w: PrintWriter): Unit = {
     def printLevel(p: Position): Unit =
       w.println(

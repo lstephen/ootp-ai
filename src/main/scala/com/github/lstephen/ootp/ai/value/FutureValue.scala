@@ -36,6 +36,9 @@ object FutureAbility {
     }
     new Ability(p, pos)
   }
+
+  def apply(p: Player)(implicit ps: Predictor): Ability =
+    (Position.hitting ++ Position.pitching).map(FutureAbility(p, _)).max
 }
 
 class FutureValue(val player: Player, val position: Position)(
