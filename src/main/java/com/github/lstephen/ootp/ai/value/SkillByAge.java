@@ -83,7 +83,7 @@ public class SkillByAge implements Printable {
     }
 
     public void print(PrintWriter w) {
-      agesStream().forEach(a -> w.format("%3d", a));
+      agesStream().forEach(a -> w.format("%4d", a));
 
       w.println();
 
@@ -92,8 +92,8 @@ public class SkillByAge implements Printable {
           .forEach(
               avg ->
                   w.format(
-                      "%3s",
-                      avg.isPresent() ? String.format("%3d", Math.round(avg.getAsDouble())) : ""));
+                      "%4s",
+                      avg.isPresent() ? String.format("%4d", Math.round(avg.getAsDouble())) : ""));
 
       w.println();
 
@@ -102,8 +102,8 @@ public class SkillByAge implements Printable {
           .forEach(
               avg ->
                   w.format(
-                      "%3s",
-                      avg.isPresent() ? String.format("%3d", Math.round(avg.getAsDouble())) : ""));
+                      "%4s",
+                      avg.isPresent() ? String.format("%4d", Math.round(avg.getAsDouble())) : ""));
 
       w.println();
     }
