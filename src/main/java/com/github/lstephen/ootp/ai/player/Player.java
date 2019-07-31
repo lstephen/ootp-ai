@@ -364,7 +364,7 @@ public final class Player {
     return ratings.getBatting();
   }
 
-  public Splits<BattingRatings<Integer>> getBattingPotentialRatings() {
+  public Splits<BattingRatings<?>> getBattingPotentialRatings() {
     return ratings.getBattingPotential(age);
   }
 
@@ -388,7 +388,7 @@ public final class Player {
     return ratings.getPitching();
   }
 
-  public Splits<PitchingRatings<Integer>> getPitchingPotentialRatings() {
+  public Splits<PitchingRatings<?>> getPitchingPotentialRatings() {
     return ratings.getPitchingPotential(age);
   }
 

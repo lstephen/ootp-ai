@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 public class SkillByAge implements Printable {
 
+  private static SkillByAge instance;
+
   private final PlayerValue value;
 
   private final ByAge hitting = new ByAge();
@@ -29,6 +31,14 @@ public class SkillByAge implements Printable {
         .forEach(p -> pitching.add(p.getAge(), value.getNowValueNoDefense().apply(p)));
   }
 
+  public ByAge getHitting() {
+    return hitting;
+  }
+
+  public ByAge getPitching() {
+    return pitching;
+  }
+
   public void print(PrintWriter w) {
     w.println("Hitting");
     hitting.print(w);
@@ -38,7 +48,7 @@ public class SkillByAge implements Printable {
     w.println();
   }
 
-  private static class ByAge implements Printable {
+  public static class ByAge implements Printable {
 
     private final Multimap<Integer, Integer> values = LinkedHashMultimap.create();
 
@@ -50,7 +60,7 @@ public class SkillByAge implements Printable {
       return values.get(age).stream().mapToInt(Integer::intValue).average();
     }
 
-    private OptionalDouble getThreeYearAverage(int age) {
+    public OptionalDouble getThreeYearAverage(int age) {
       return Stream.of(-1, 0, 1)
           .flatMap(y -> values.get(age + y).stream())
           .mapToInt(Integer::intValue)
@@ -88,11 +98,12 @@ public class SkillByAge implements Printable {
     }
   }
 
-  public static SkillByAge create(Site site, PlayerValue value) {
-    SkillByAge sba = new SkillByAge(value);
+  public static void init(Site site, PlayerValue value) {
+    instance = new SkillByAge(value);
+    instance.add(site.getAllPlayers());
+  }
 
-    sba.add(site.getAllPlayers());
-
-    return sba;
+  public static SkillByAge getInstance() {
+    return instance;
   }
 }
