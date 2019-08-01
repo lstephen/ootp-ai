@@ -27,7 +27,7 @@ trait PitcherFutureAbility { this: Ability =>
 
 object FutureAbility {
   def apply(p: Player, pos: Position)(implicit ps: Predictor): Ability = {
-    if (p.getAge < 27) {
+    if (p.getAge <= 28) {
       if (p.isHitter && pos.isHitting) {
         return new Ability(p, pos) with BatterFutureAbility
       } else if (p.isPitcher && pos.isPitching) {
@@ -48,7 +48,7 @@ class FutureValue(val player: Player, val position: Position)(
   val ability = FutureAbility(player, position)
 
   val vsReplacement =
-    if (player.getAge < 27) {
+    if (player.getAge <= 28) {
       val vsCurrent = ReplacementLevels.getForIdeal.get(ability)
       val vsAverage = ReplacementLevels.getForIdeal.getVsAverage(ability)
 
@@ -57,7 +57,7 @@ class FutureValue(val player: Player, val position: Position)(
       None
 
   val vsMax =
-    if (player.getAge < 27) {
+    if (player.getAge <= 28) {
       val vsCurrent = MaxLevels.getVsIdeal(ability)
       val vsAverage = MaxLevels.getVsAverage(ability)
 
@@ -68,7 +68,7 @@ class FutureValue(val player: Player, val position: Position)(
       None
 
   val vsAge: Option[Score] =
-    if (player.getAge < 27) {
+    if (player.getAge <= 28) {
       if (player.isHitter && position.isHitting) {
         NowAbility(player, position).batting.map { s =>
           s - Score(

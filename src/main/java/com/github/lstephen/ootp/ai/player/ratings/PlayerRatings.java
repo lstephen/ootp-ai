@@ -19,8 +19,6 @@ import java.util.stream.Stream;
 /** @author lstephen */
 public final class PlayerRatings {
 
-  private static final Integer PEAK_AGE = 27;
-
   private final Splits<BattingRatings<?>> batting;
 
   private final DefensiveRatings defensive;
