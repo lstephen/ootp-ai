@@ -18,7 +18,7 @@ public final class UrlLoadingPage implements Page {
 
   @Override
   public Document load() {
-    return loader.load(url).blockingGet();
+    return loader.load(url).retry(3).blockingGet();
   }
 
   @Override
