@@ -29,6 +29,7 @@ public class JsoupLoader implements PageLoader {
                 return CharStreams.toString(new InputStreamReader(in, Charsets.ISO_8859_1));
               }
             })
+        .retry(3)
         .doOnError(t -> LOG.warn("Unable to load page.", t))
         .map(Jsoup::parse);
   }
