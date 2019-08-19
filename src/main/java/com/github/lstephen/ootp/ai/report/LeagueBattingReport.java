@@ -88,6 +88,13 @@ public class LeagueBattingReport implements Printable {
 
     w.println();
 
+    double bipPercentage =
+        (double) (stats.getAtBats() - stats.getHomeRuns() - stats.getStrikeouts())
+            / (stats.getPlateAppearances());
+
+    w.format("bip%%: %.3f%n", bipPercentage);
+    w.println();
+
     FipBaseRuns.setLeagueContext(stats);
     EraBaseRuns.setLeagueContext(stats);
   }
