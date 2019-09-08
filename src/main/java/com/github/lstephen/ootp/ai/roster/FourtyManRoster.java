@@ -155,9 +155,13 @@ public class FourtyManRoster implements Printable {
   }
 
   public Iterable<Player> getPlayersToWaive() {
+    return getPlayersToWaive(Selections.onlyOn40Man(roster.getAllPlayers()));
+  }
+
+  public Iterable<Player> getPlayersToWaive(Iterable<Player> players) {
     Set<Player> toWaive = Sets.newHashSet();
 
-    for (Player p : Selections.onlyOn40Man(roster.getAllPlayers())) {
+    for (Player p : players) {
       Long current = JavaAdapter.nowValue(p, predictor).vsReplacement().get().toLong();
       Long future =
           JavaAdapter.futureValue(p, predictor).vsReplacement().isEmpty()
