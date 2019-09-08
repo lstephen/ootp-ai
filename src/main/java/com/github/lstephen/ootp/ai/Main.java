@@ -130,14 +130,22 @@ public class Main {
 
   private static final SiteDefinition GABL =
       SiteDefinitionFactory.ootp5(
+          "VIV",
+          "http://www.bayksball.com/league/",
+          Id.<Team>valueOf(3),
+          "AL",
+          18);
+
+  private static final SiteDefinition TFMS =
+      SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
+
+  private static final SiteDefinition VIV =
+      SiteDefinitionFactory.ootp6(
           "GABL",
           "http://www.goldenageofbaseball.com/commish/Leaguesite/",
           Id.<Team>valueOf(22),
           "National",
           30);
-
-  private static final SiteDefinition TFMS =
-      SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
 
   private static final ImmutableMap<String, SiteDefinition> SITES =
       ImmutableMap.<String, SiteDefinition>builder()
@@ -150,6 +158,7 @@ public class Main {
           .put("LBB", LBB)
           .put("SAVOY", SAVOY)
           .put("GABL", GABL)
+          .put("VIV", VIV)
           .build();
 
   private static ImmutableSet<SiteDefinition> LOOK_TO_NEXT_SEASON = ImmutableSet.of();
