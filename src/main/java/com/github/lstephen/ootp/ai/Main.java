@@ -372,7 +372,7 @@ public class Main {
             .collect(Collectors.toSet()));
     generic.print(out);
 
-    if (def.getName().equals("BTHUSTLE")) {
+    if (def.getName().equals("BTHUSTLE") || def.getName().equals("VIV")) {
       LOG.info("40 man roster reports...");
 
       FourtyManRoster fourtyMan = new FourtyManRoster(team, newRoster, predictor);
