@@ -92,22 +92,6 @@ public class Main {
       SiteDefinitionFactory.ootp5(
           "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(8), "American", 32);
 
-  private static final SiteDefinition OLD_BTH_CHC =
-      SiteDefinitionFactory.ootp6(
-          "BTH",
-          "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/",
-          Id.<Team>valueOf(20),
-          "National",
-          30);
-
-  private static final SiteDefinition OLD_BTH_NYY =
-      SiteDefinitionFactory.ootp6(
-          "OLD_BTH_NYY",
-          "http://bthbaseball.allsimbaseball10.com/game/oldbth/lgreports/",
-          Id.<Team>valueOf(3),
-          "American",
-          30);
-
   private static final SiteDefinition BTHUSTLE =
       SiteDefinitionFactory.ootp6(
           "BTHUSTLE",
@@ -128,13 +112,13 @@ public class Main {
           "AL",
           20);
 
-  private static final SiteDefinition GABL =
+  private static final SiteDefinition VIV =
       SiteDefinitionFactory.ootp5(
-          "GABL",
-          "http://www.goldenageofbaseball.com/commish/Leaguesite/",
-          Id.<Team>valueOf(22),
-          "National",
-          30);
+          "VIV",
+          "http://www.bayksball.com/league/",
+          Id.<Team>valueOf(3),
+          "AL",
+          18);
 
   private static final SiteDefinition TFMS =
       SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
@@ -144,12 +128,10 @@ public class Main {
           .put("TWML", TWML)
           .put("CBL", CBL)
           .put("HFTC", HFTC)
-          .put("OLD_BTH_CHC", OLD_BTH_CHC)
-          .put("OLD_BTH_NYY", OLD_BTH_NYY)
           .put("BTHUSTLE", BTHUSTLE)
           .put("LBB", LBB)
           .put("SAVOY", SAVOY)
-          .put("GABL", GABL)
+          .put("VIV", VIV)
           .build();
 
   private static ImmutableSet<SiteDefinition> LOOK_TO_NEXT_SEASON = ImmutableSet.of();
