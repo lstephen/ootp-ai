@@ -95,7 +95,6 @@ public final class SiteDefinitionImpl implements SiteDefinition {
       return new OneToTen();
     }
 
-
     throw new IllegalArgumentException();
   }
 

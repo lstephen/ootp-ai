@@ -114,11 +114,7 @@ public class Main {
 
   private static final SiteDefinition VIV =
       SiteDefinitionFactory.ootp6(
-          "VIV",
-          "http://www.bayksball.com/league/",
-          Id.<Team>valueOf(3),
-          "AL",
-          18);
+          "VIV", "http://www.bayksball.com/league/", Id.<Team>valueOf(3), "AL", 18);
 
   private static final SiteDefinition TFMS =
       SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
@@ -372,7 +368,26 @@ public class Main {
             .collect(Collectors.toSet()));
     generic.print(out);
 
-    if (def.getName().equals("BTHUSTLE") || def.getName().equals("VIV")) {
+    if (def.getName().equals("VIV")) {
+      LOG.info("40 man roster reports...");
+
+      FourtyManRoster fourtyMan = new FourtyManRoster(team, newRoster, predictor);
+      fourtyMan.setChanges(changes);
+
+      generic.setTitle("Waive");
+      generic.setPlayers(
+          isExpandedRosters
+              ? ImmutableSet.of()
+              : fourtyMan.getPlayersToWaive(newRoster.getPlayers(Status.ML)));
+      generic.print(out);
+
+      LOG.info("Waviers report...");
+      generic.setTitle("Waivers");
+      generic.setPlayers(site.getWaiverWire());
+      generic.print(out);
+    }
+
+    if (def.getName().equals("BTHUSTLE")) {
       LOG.info("40 man roster reports...");
 
       FourtyManRoster fourtyMan = new FourtyManRoster(team, newRoster, predictor);
