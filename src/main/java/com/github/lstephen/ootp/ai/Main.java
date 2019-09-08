@@ -113,7 +113,7 @@ public class Main {
           20);
 
   private static final SiteDefinition VIV =
-      SiteDefinitionFactory.ootp5(
+      SiteDefinitionFactory.ootp6(
           "VIV",
           "http://www.bayksball.com/league/",
           Id.<Team>valueOf(3),
