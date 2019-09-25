@@ -107,7 +107,7 @@ public class Main {
   private static final SiteDefinition LBB =
       SiteDefinitionFactory.ootp5(
           "LBB",
-          "http://longballer2.x10host.com/LBB.lg/leaguesite/",
+          "http://bbsblsix.x10host.com/site/",
           Id.<Team>valueOf(3),
           "AL",
           20);
