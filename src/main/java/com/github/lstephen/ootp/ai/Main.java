@@ -395,7 +395,7 @@ public class Main {
       generic.setPlayers(
           isExpandedRosters
               ? ImmutableSet.of()
-              : fourtyMan.getPlayersToWaive(newRoster.getPlayers(Status.ML)));
+              : fourtyMan.getPlayersToWaive());
       generic.print(out);
 
       LOG.info("Waviers report...");
