@@ -173,6 +173,8 @@ public class SinglePlayer implements PlayerSource {
 
     if (doc.html().contains("Rule 5 Draft Eligibility")) {
       player.setOn40Man(doc.html().contains("on 40 Man Roster"));
+    } else if (doc.html().contains("Years on 40-Man Roster :")) {
+      player.setOn40Man(has40ManYears(page));
     }
 
     if (doc.html().contains("Minor League Option Years")) {
@@ -238,6 +240,10 @@ public class SinglePlayer implements PlayerSource {
 
   private Boolean isRuleFiveEligible(PlayerPage page) {
     return extractContractText(page, "Rule 5 Draft Eligibility :").contains("Eligible");
+  }
+
+  private Boolean has40ManYears(PlayerPage page) {
+    return !extractContractText(page, "Years on 40-Man Roster :").contains("(0 total Days)");
   }
 
   private Integer getYearsOfMlbService(PlayerPage page) {
