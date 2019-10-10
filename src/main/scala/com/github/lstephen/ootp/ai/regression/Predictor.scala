@@ -99,7 +99,7 @@ class BattingPrediction(val stats: SplitStats[BattingStats]) {
   def add(rhs: BattingPrediction) = new BattingPrediction(stats.add(rhs.stats))
 }
 
-class PitchingPrediction(stats: SplitStats[PitchingStats]) {
+class PitchingPrediction(val stats: SplitStats[PitchingStats]) {
   val overall = Score(stats.getOverall.getBaseRunsPlus)
   val vsBoth = stats.getOverall
   val vsLeft = stats.getVsLeft

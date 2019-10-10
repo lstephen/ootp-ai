@@ -5,9 +5,11 @@ import com.github.lstephen.ootp.ai.io.Printable;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.Slot;
 import com.github.lstephen.ootp.ai.regression.BattingPrediction;
-import com.github.lstephen.ootp.ai.regression.PitchingPrediction;
 import com.github.lstephen.ootp.ai.regression.Predictor;
 import com.github.lstephen.ootp.ai.site.SiteHolder;
+import com.github.lstephen.ootp.ai.stats.PitchingStats;
+import com.github.lstephen.ootp.ai.stats.SplitStats;
+import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -51,7 +53,7 @@ public final class Rotation implements Printable {
 
       double endFactor = (1000.0 - Math.pow(10 - end, 3)) / 1000.0;
 
-      score += spFactor * endFactor * predictor.predictPitching(p).overall();
+      score += spFactor * endFactor * getPitchingStats(predictor, p).getOverall().getBaseRunsPlus();
 
       spFactor--;
     }
@@ -92,7 +94,7 @@ public final class Rotation implements Printable {
     int factor = 5;
 
     for (Player p : players) {
-      PitchingPrediction stats = predictor.predictPitching(p);
+      SplitStats<PitchingStats> stats = getPitchingStats(predictor, p);
 
       double clutchFactor = 0.0;
 
@@ -122,9 +124,9 @@ public final class Rotation implements Printable {
 
       double f = factor + clutchFactor + (enduranceFactor - 0.865);
 
-      score += f * stats.overall();
-      vsL += f * stats.vsLeft().getBaseRunsPlus();
-      vsR += f * stats.vsRight().getBaseRunsPlus();
+      score += f * stats.getOverall().getBaseRunsPlus();
+      vsL += f * stats.getVsLeft().getBaseRunsPlus();
+      vsR += f * stats.getVsRight().getBaseRunsPlus();
 
       if (factor > 1) {
         factor--;
@@ -293,6 +295,39 @@ public final class Rotation implements Printable {
 
   public BattingPrediction getPitcherHitting(Predictor predictor) {
     return getStarters().stream().map(predictor::predictBatting).reduce((l, r) -> l.add(r)).get();
+  }
+
+  private SplitStats<PitchingStats> getPitchingStats(Predictor pred, Player p) {
+    SplitStats<PitchingStats> prediction = pred.predictPitching(p).stats();
+
+    TeamStats<PitchingStats> team = SiteHolder.get().getTeamPitching();
+
+    if (!team.contains(p)) {
+      return prediction;
+    }
+
+    SplitStats<PitchingStats> current = team.getSplits(p);
+
+    double factor =
+        p.getConsistency()
+            .transform(
+                c -> {
+                  switch (c) {
+                    case GOOD:
+                      return 0.5;
+                    case AVERAGE:
+                      return 1.0;
+                    case VERY_INCONSISTENT:
+                      return 2.0;
+                    default:
+                      throw new IllegalStateException("Unknown consistency:" + c);
+                  }
+                })
+            .or(1.0);
+
+    current = current.multiply(prediction.getOverall().getPlateAppearances() / 700.0);
+
+    return prediction.add(current.multiply(factor));
   }
 
   public void print(PrintWriter w) {
