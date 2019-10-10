@@ -71,6 +71,8 @@ public final class SiteImpl implements Site, SalarySource {
 
   private TeamStats.Batting teamBatting;
 
+  private TeamStats<PitchingStats> teamPitching;
+
   private Single<PageLoader> loader =
       Single.fromCallable(
               () ->
@@ -288,14 +290,18 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public TeamStats<PitchingStats> getTeamPitching() {
-    Collection<Player> players = new ArrayList<>();
-    for (Player p : extractTeam()) {
-      if (p.isPitcher()) {
-        players.add(p);
+    if (teamPitching == null) {
+      Collection<Player> players = new ArrayList<>();
+      for (Player p : extractTeam()) {
+        if (p.isPitcher()) {
+          players.add(p);
+        }
       }
-    }
 
-    return new TeamPitchingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
+      teamPitching =
+          new TeamPitchingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
+    }
+    return teamPitching;
   }
 
   public TopProspects getTopProspects(Integer teamId) {

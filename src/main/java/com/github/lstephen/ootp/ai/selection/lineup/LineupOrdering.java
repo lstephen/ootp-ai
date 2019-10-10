@@ -65,6 +65,14 @@ public class LineupOrdering {
       lineup[pos++] = select(byWoba::max, available);
     }
 
+    for (int i = 0; i < lineup.length; i++) {
+      if (lineup[i] != null) {
+        System.out.printf(
+            "%s-%d/", lineup[i].getShortName(), getBattingStats(lineup[i], vs).getWobaPlus());
+      }
+    }
+    System.out.println();
+
     return ImmutableList.copyOf(
         Arrays.stream(lineup).filter(l -> l != null).collect(Collectors.toList()));
   }
@@ -99,8 +107,10 @@ public class LineupOrdering {
                       throw new IllegalStateException("Unknown consistency:" + c);
                   }
                 })
-            .or(1.0);
+            .or(0.0);
 
-    return prediction.multiply(factor).add(current.multiply(factor));
+    current = current.multiply(prediction.getPlateAppearances() / 700.0);
+
+    return prediction.add(current.multiply(factor));
   }
 }

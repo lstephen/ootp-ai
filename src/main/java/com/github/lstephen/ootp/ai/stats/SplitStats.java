@@ -25,6 +25,10 @@ public class SplitStats<S extends Stats<S>> extends Splits<S> {
     return new SplitStats(getVsLeft().add(rhs.getVsLeft()), getVsRight().add(rhs.getVsRight()));
   }
 
+  public SplitStats<S> multiply(double factor) {
+    return new SplitStats(getVsLeft().multiply(factor), getVsRight().multiply(factor));
+  }
+
   @JsonCreator
   public static <S extends Stats<S>> SplitStats<S> create(
       @JsonProperty("vsLeft") S vsLeft, @JsonProperty("vsRight") S vsRight) {
