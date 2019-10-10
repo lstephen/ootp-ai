@@ -2,7 +2,9 @@ package com.github.lstephen.ootp.ai.selection.lineup;
 
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.regression.Predictor;
+import com.github.lstephen.ootp.ai.site.SiteHolder;
 import com.github.lstephen.ootp.ai.stats.BattingStats;
+import com.github.lstephen.ootp.ai.stats.TeamStats;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -21,8 +23,11 @@ public class LineupOrdering {
 
   private final Predictor predictor;
 
+  private final TeamStats<BattingStats> teamBatting;
+
   public LineupOrdering(Predictor predictor) {
     this.predictor = predictor;
+    this.teamBatting = SiteHolder.get().getTeamBatting();
   }
 
   public ImmutableList<Player> order(Lineup.VsHand vs, Iterable<Player> ps) {
@@ -30,7 +35,7 @@ public class LineupOrdering {
     Preconditions.checkArgument(Iterables.size(ps) == ImmutableSet.copyOf(ps).size());
 
     Function<Function<BattingStats, Double>, Ordering<Player>> byStat =
-        f -> Ordering.natural().onResultOf(p -> f.apply(vs.getStats(predictor, p)));
+        f -> Ordering.natural().onResultOf(p -> f.apply(getBattingStats(p, vs)));
 
     Ordering<Player> byWoba = byStat.apply(BattingStats::getWoba);
     Ordering<Player> byObp = byStat.apply(BattingStats::getOnBasePercentage);
@@ -68,5 +73,29 @@ public class LineupOrdering {
     Player selected = f.apply(ps);
     ps.remove(selected);
     return selected;
+  }
+
+  private BattingStats getBattingStats(Player p, Lineup.VsHand vs) {
+    BattingStats prediction = vs.getStats(predictor, p);
+
+    if (!teamBatting.contains(p)) {
+      return prediction;
+    }
+
+    BattingStats current = vs.getStats(teamBatting, p);
+
+    double factor = p.getConsistency().transform(c -> {
+      switch (c) {
+        case GOOD: return 0.5;
+        case AVERAGE:
+                   return 1.0;
+        case VERY_INCONSISTENT:
+                   return 2.0;
+            default:
+                   throw new IllegalStateException("Unknown consistency:" + c);
+      }
+    }).or(1.0);
+
+    return prediction.multiply(factor).add(current.multiply(factor));
   }
 }

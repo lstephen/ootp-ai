@@ -69,6 +69,8 @@ public final class SiteImpl implements Site, SalarySource {
 
   private ImmutableSet<Player> allPlayers;
 
+  private TeamStats.Batting teamBatting;
+
   private Single<PageLoader> loader =
       Single.fromCallable(
               () ->
@@ -270,14 +272,17 @@ public final class SiteImpl implements Site, SalarySource {
 
   @Override
   public TeamStats.Batting getTeamBatting() {
-    Collection<Player> players = new ArrayList<>();
-    for (Player p : extractTeam()) {
-      if (p.isHitter()) {
-        players.add(p);
+    if (teamBatting == null) {
+      Collection<Player> players = new ArrayList<>();
+      for (Player p : extractTeam()) {
+        if (p.isHitter()) {
+          players.add(p);
+        }
       }
-    }
 
-    return new TeamBattingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
+      teamBatting = new TeamBattingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
+    }
+    return teamBatting;
   }
 
   @Override
