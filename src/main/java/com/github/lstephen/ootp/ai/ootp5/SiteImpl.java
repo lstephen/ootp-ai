@@ -280,7 +280,8 @@ public final class SiteImpl implements Site, SalarySource {
         }
       }
 
-      teamBatting = new TeamBattingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
+      teamBatting =
+          new TeamBattingImpl(this, definition.getTeam()).extract().withRatingsOnly(players);
     }
     return teamBatting;
   }

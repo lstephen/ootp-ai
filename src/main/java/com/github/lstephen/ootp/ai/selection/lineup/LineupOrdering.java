@@ -84,17 +84,22 @@ public class LineupOrdering {
 
     BattingStats current = vs.getStats(teamBatting, p);
 
-    double factor = p.getConsistency().transform(c -> {
-      switch (c) {
-        case GOOD: return 0.5;
-        case AVERAGE:
-                   return 1.0;
-        case VERY_INCONSISTENT:
-                   return 2.0;
-            default:
-                   throw new IllegalStateException("Unknown consistency:" + c);
-      }
-    }).or(1.0);
+    double factor =
+        p.getConsistency()
+            .transform(
+                c -> {
+                  switch (c) {
+                    case GOOD:
+                      return 0.5;
+                    case AVERAGE:
+                      return 1.0;
+                    case VERY_INCONSISTENT:
+                      return 2.0;
+                    default:
+                      throw new IllegalStateException("Unknown consistency:" + c);
+                  }
+                })
+            .or(1.0);
 
     return prediction.multiply(factor).add(current.multiply(factor));
   }

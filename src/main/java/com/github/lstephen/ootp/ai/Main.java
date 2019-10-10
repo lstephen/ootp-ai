@@ -106,11 +106,7 @@ public class Main {
 
   private static final SiteDefinition LBB =
       SiteDefinitionFactory.ootp5(
-          "LBB",
-          "http://bbsblsix.x10host.com/site/",
-          Id.<Team>valueOf(3),
-          "AL",
-          20);
+          "LBB", "http://bbsblsix.x10host.com/site/", Id.<Team>valueOf(3), "AL", 20);
 
   private static final SiteDefinition VIV =
       SiteDefinitionFactory.ootp6(
@@ -390,12 +386,8 @@ public class Main {
       generic.setPlayers(fourtyMan.getPlayersToRemove());
       generic.print(out);
 
-
       generic.setTitle("Waive");
-      generic.setPlayers(
-          isExpandedRosters
-              ? ImmutableSet.of()
-              : fourtyMan.getPlayersToWaive());
+      generic.setPlayers(isExpandedRosters ? ImmutableSet.of() : fourtyMan.getPlayersToWaive());
       generic.print(out);
 
       LOG.info("Waviers report...");
