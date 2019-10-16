@@ -84,7 +84,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
       return new Potential();
     }
 
-    if (name.contains("BTH")) {
+    if (name.contains("BTH") || name.equals("WOB")) {
       return new OneToTen();
     }
 
@@ -104,7 +104,7 @@ public final class SiteDefinitionImpl implements SiteDefinition {
       return new ZeroToTen();
     }
 
-    if (name.contains("BTH")) {
+    if (name.contains("BTH") || name.equals("WOB")) {
       return new OneToOneHundred();
     }
 

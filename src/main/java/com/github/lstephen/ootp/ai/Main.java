@@ -84,10 +84,6 @@ public class Main {
           "Splendid Splinter",
           16);
 
-  private static final SiteDefinition CBL =
-      SiteDefinitionFactory.ootp5(
-          "CBL", "http://www.thecblonline.com/files/", Id.<Team>valueOf(20), "National", 20);
-
   private static final SiteDefinition HFTC =
       SiteDefinitionFactory.ootp5(
           "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(8), "American", 32);
@@ -100,10 +96,6 @@ public class Main {
           "National",
           16);
 
-  private static final SiteDefinition SAVOY =
-      SiteDefinitionFactory.ootp5(
-          "SAVOY", "http://www.thecblonline.com/savoy/", Id.<Team>valueOf(26), "UBA", 26);
-
   private static final SiteDefinition LBB =
       SiteDefinitionFactory.ootp5(
           "LBB", "http://bbsblsix.x10host.com/site/", Id.<Team>valueOf(3), "AL", 20);
@@ -112,17 +104,21 @@ public class Main {
       SiteDefinitionFactory.ootp6(
           "VIV", "http://www.bayksball.com/league/", Id.<Team>valueOf(3), "AL", 18);
 
-  private static final SiteDefinition TFMS =
-      SiteDefinitionFactory.ootp5("TFMS", "tfms5-2004/", Id.<Team>valueOf(3), "League 2", 16);
+  private static final SiteDefinition WOB =
+      SiteDefinitionFactory.ootp6(
+          "WOB",
+          "http://bthbaseball.allsimbaseball10.com/game/woblgreports/",
+          Id.<Team>valueOf(12),
+          "National",
+          12);
 
   private static final ImmutableMap<String, SiteDefinition> SITES =
       ImmutableMap.<String, SiteDefinition>builder()
           .put("TWML", TWML)
-          .put("CBL", CBL)
           .put("HFTC", HFTC)
           .put("BTHUSTLE", BTHUSTLE)
           .put("LBB", LBB)
-          .put("SAVOY", SAVOY)
+          .put("WOB", WOB)
           .put("VIV", VIV)
           .build();
 
@@ -396,7 +392,7 @@ public class Main {
       generic.print(out);
     }
 
-    if (def.getName().equals("BTHUSTLE")) {
+    if (def.getName().equals("BTHUSTLE") || def.getName().equals("WOB")) {
       LOG.info("40 man roster reports...");
 
       FourtyManRoster fourtyMan = new FourtyManRoster(team, newRoster, predictor);
