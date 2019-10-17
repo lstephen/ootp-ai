@@ -43,7 +43,7 @@ jobs:
         - OOTPAI_SITE=HFTC
       script: construi run
     - env:
-        - OOTPAI_SITE=WOL
+        - OOTPAI_SITE=WOB
       script: construi run
     - env:
         - OOTPAI_SITE=VIV
