@@ -1,6 +1,7 @@
 package com.github.lstephen.ootp.ai.selection.lineup;
 
 import com.github.lstephen.ootp.ai.io.Printable;
+import com.github.lstephen.ootp.ai.player.BattingHand;
 import com.github.lstephen.ootp.ai.player.Player;
 import com.github.lstephen.ootp.ai.player.ratings.BattingRatings;
 import com.github.lstephen.ootp.ai.player.ratings.Position;

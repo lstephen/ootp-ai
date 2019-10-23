@@ -2,8 +2,10 @@ package com.github.lstephen.ootp.ai.player.ratings;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.github.lstephen.ootp.ai.player.BattingHand;
 import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
@@ -35,6 +37,9 @@ public final class BattingRatings<T> {
   private final Rating<?, ?> runningSpeed;
 
   private final Rating<?, ?> stealingAbility;
+
+  @JsonIgnore
+  private BattingHand battingHand;
 
   private BattingRatings(Builder<T> builder) {
     Preconditions.checkNotNull(builder.scale);
@@ -88,6 +93,14 @@ public final class BattingRatings<T> {
     return stealingAbility == null
         ? Optional.<Integer>absent()
         : Optional.of(stealingAbility.normalize().get());
+  }
+
+  public Optional<BattingHand> getBattingHand() {
+    return Optional.fromNullable(battingHand);
+  }
+
+  public void setBattingHand(BattingHand battingHand) {
+    this.battingHand = battingHand;
   }
 
   public BattingRatings<T> build() {

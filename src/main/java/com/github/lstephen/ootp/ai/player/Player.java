@@ -361,11 +361,39 @@ public final class Player {
   }
 
   public Splits<BattingRatings<?>> getBattingRatings() {
-    return ratings.getBatting();
+    Splits<BattingRatings<?>> brs = ratings.getBatting();
+
+    switch (getBattingHand()) {
+      case LEFT:
+      case RIGHT:
+        brs.getVsLeft().setBattingHand(getBattingHand());
+        brs.getVsRight().setBattingHand(getBattingHand());
+        break;
+      case SWITCH:
+        brs.getVsLeft().setBattingHand(BattingHand.RIGHT);
+        brs.getVsRight().setBattingHand(BattingHand.LEFT);
+        break;
+    }
+
+    return brs;
   }
 
   public Splits<BattingRatings<?>> getBattingPotentialRatings() {
-    return ratings.getBattingPotential(age);
+    Splits<BattingRatings<?>> brs = ratings.getBattingPotential(age);
+
+    switch (getBattingHand()) {
+      case LEFT:
+      case RIGHT:
+        brs.getVsLeft().setBattingHand(getBattingHand());
+        brs.getVsRight().setBattingHand(getBattingHand());
+        break;
+      case SWITCH:
+        brs.getVsLeft().setBattingHand(BattingHand.RIGHT);
+        brs.getVsRight().setBattingHand(BattingHand.LEFT);
+        break;
+    }
+
+    return brs;
   }
 
   public BattingRatings<?> getRawBattingPotential() {

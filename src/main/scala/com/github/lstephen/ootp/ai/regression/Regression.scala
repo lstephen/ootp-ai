@@ -2,6 +2,7 @@ package com.github.lstephen.ootp.ai.regression
 
 import collection.JavaConversions._
 
+import com.github.lstephen.ootp.ai.player.BattingHand
 import com.github.lstephen.ootp.ai.player.ratings.{
   BattingRatings,
   PitchingRatings
@@ -36,14 +37,18 @@ object Regressable {
               s(r.getPower),
               s(r.getEye),
               o(r.getK),
-              o(r.getRunningSpeed))
+              o(r.getRunningSpeed),
+              s(if (r.getBattingHand.get == BattingHand.LEFT) 1 else 0),
+              s(if (r.getBattingHand.get == BattingHand.RIGHT) 1 else 0))
       case Version.OOTP6 =>
         Input(s(r.getContact),
               s(r.getGap),
               s(r.getPower),
               s(r.getEye),
               o(r.getK),
-              o(r.getRunningSpeed))
+              o(r.getRunningSpeed),
+              s(if (r.getBattingHand.get == BattingHand.LEFT) 1 else 0),
+              s(if (r.getBattingHand.get == BattingHand.RIGHT) 1 else 0))
     }
 
     val features = version match {
@@ -54,9 +59,9 @@ object Regressable {
             "Homeruns",
             "Walks",
             "Strikeouts",
-            "Running Speed")
+            "Running Speed", "LHB", "RHB")
       case Version.OOTP6 =>
-        Seq("Contact", "Gap", "Power", "Eye", "Avoid K's", "Running Speed")
+        Seq("Contact", "Gap", "Power", "Eye", "Avoid K's", "Running Speed", "LHB", "RHB")
     }
   }
 
