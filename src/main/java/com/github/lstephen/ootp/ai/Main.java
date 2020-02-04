@@ -84,10 +84,6 @@ public class Main {
           "Splendid Splinter",
           16);
 
-  private static final SiteDefinition HFTC =
-      SiteDefinitionFactory.ootp5(
-          "HFTC", "http://www.hitforthecycle.com/hftc-ootp/", Id.<Team>valueOf(8), "American", 32);
-
   private static final SiteDefinition BTHUSTLE =
       SiteDefinitionFactory.ootp6(
           "BTHUSTLE",
@@ -115,7 +111,6 @@ public class Main {
   private static final ImmutableMap<String, SiteDefinition> SITES =
       ImmutableMap.<String, SiteDefinition>builder()
           .put("TWML", TWML)
-          .put("HFTC", HFTC)
           .put("BTHUSTLE", BTHUSTLE)
           .put("LBB", LBB)
           .put("WOB", WOB)
