@@ -14,6 +14,8 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 /** @author lstephen */
@@ -33,6 +35,10 @@ public class DepthChart {
     return starters.get(position);
   }
 
+  public Set<Player> getPlayerSet() {
+    return backups.stream().map(Backup::getPlayer).collect(Collectors.toSet());
+  }
+
   public void setDefensiveReplacement(Position position, Player player) {
     defenders.put(position, player);
   }
@@ -45,7 +51,7 @@ public class DepthChart {
     backups.add(Backup.create(position, player, pct.intValue()));
   }
 
-  public Iterable<Backup> getBackups(Position position) {
+  public List<Backup> getBackups(Position position) {
     List<Backup> result = Lists.newArrayList();
 
     for (Backup bu : backups) {

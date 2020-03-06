@@ -57,6 +57,20 @@ class DepthChartSelection(implicit predictor: Predictor) {
       addBackups(dc, entry.getPositionEnum(), bench, vs)
     }
 
+    val leftOver = available -- lineup.playerSet -- dc.getPlayerSet
+
+    for (ply <- leftOver if ply.isHitter) {
+      val bestPos = lineup
+        .map(_.getPositionEnum)
+        .filter(_ != Position.PITCHER)
+        .toSeq
+        .filter(dc.getBackups(_).size < 3)
+        .sortBy(pos => InLineupScore(dc.getBackups(pos).head.getPlayer, pos, vs).score - InLineupScore(ply, pos, vs).score)
+        .head
+
+      dc.addBackup(bestPos, ply, 1)
+    }
+
     dc
   }
 
