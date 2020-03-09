@@ -27,7 +27,7 @@ class BenchScorer(implicit predictor: Predictor) {
 
     lineup
       .filter(_.getPositionEnum != Position.PITCHER)
-      .flatMap(bu => dc.getBackups(bu.getPositionEnum))
+      .flatMap(bu => dc.getBackups(bu.getPositionEnum).take(1))
       .map(score(_, vs))
       .total
   }
