@@ -42,8 +42,5 @@ jobs:
     - env:
         - OOTPAI_SITE=WOB
       script: construi run
-    - env:
-        - OOTPAI_SITE=VIV
-      script: construi run
 
 
