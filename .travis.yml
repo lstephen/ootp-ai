@@ -34,13 +34,5 @@ jobs:
         - OOTPAI_SITE=BTHUSTLE
       script: construi run
     - env:
-        - OOTPAI_SITE=TWML
-      script: construi run
-    - env:
         - OOTPAI_SITE=LBB
       script: construi run
-    - env:
-        - OOTPAI_SITE=WOB
-      script: construi run
-
-

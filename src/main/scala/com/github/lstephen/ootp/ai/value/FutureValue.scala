@@ -69,8 +69,10 @@ class FutureValue(val player: Player, val position: Position)(
 
   val vsAge: Option[Score] =
     if (player.getAge <= 28) {
-      val sbaHitting = SkillByAge.getInstance.getHitting.getThreeYearAverage(player.getAge)
-      val sbaPitching = SkillByAge.getInstance.getPitching.getThreeYearAverage(player.getAge)
+      val sbaHitting =
+        SkillByAge.getInstance.getHitting.getThreeYearAverage(player.getAge)
+      val sbaPitching =
+        SkillByAge.getInstance.getPitching.getThreeYearAverage(player.getAge)
       if (player.isHitter && position.isHitting && sbaHitting.isPresent) {
         NowAbility(player, position).batting.map { s =>
           s - Score(sbaHitting.getAsDouble)

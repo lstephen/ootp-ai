@@ -65,7 +65,12 @@ class DepthChartSelection(implicit predictor: Predictor) {
         .filter(_ != Position.PITCHER)
         .toSeq
         .filter(dc.getBackups(_).size < 3)
-        .sortBy(pos => InLineupScore(dc.getBackups(pos).head.getPlayer, pos, vs).score - InLineupScore(ply, pos, vs).score)
+        .sortBy(
+          pos =>
+            InLineupScore(dc.getBackups(pos).head.getPlayer, pos, vs).score - InLineupScore(
+              ply,
+              pos,
+              vs).score)
         .head
 
       dc.addBackup(bestPos, ply, 1)

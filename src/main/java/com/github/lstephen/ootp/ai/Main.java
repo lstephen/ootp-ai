@@ -76,14 +76,6 @@ public class Main {
 
   private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
-  private static final SiteDefinition TWML =
-      SiteDefinitionFactory.ootp6(
-          "TWML",
-          "http://www.darowski.com/twml/OOTP6Reports/",
-          Id.<Team>valueOf(14),
-          "Splendid Splinter",
-          16);
-
   private static final SiteDefinition BTHUSTLE =
       SiteDefinitionFactory.ootp6(
           "BTHUSTLE",
@@ -96,25 +88,10 @@ public class Main {
       SiteDefinitionFactory.ootp5(
           "LBB", "http://rsmbl.x10host.com/leaguesite/", Id.<Team>valueOf(3), "AL", 20);
 
-  private static final SiteDefinition VIV =
-      SiteDefinitionFactory.ootp6(
-          "VIV", "http://www.bayksball.com/league/", Id.<Team>valueOf(3), "AL", 18);
-
-  private static final SiteDefinition WOB =
-      SiteDefinitionFactory.ootp6(
-          "WOB",
-          "http://bthbaseball.allsimbaseball10.com/game/woblgreports/",
-          Id.<Team>valueOf(12),
-          "National",
-          12);
-
   private static final ImmutableMap<String, SiteDefinition> SITES =
       ImmutableMap.<String, SiteDefinition>builder()
-          .put("TWML", TWML)
           .put("BTHUSTLE", BTHUSTLE)
           .put("LBB", LBB)
-          .put("WOB", WOB)
-          .put("VIV", VIV)
           .build();
 
   private static ImmutableSet<SiteDefinition> LOOK_TO_NEXT_SEASON = ImmutableSet.of();
