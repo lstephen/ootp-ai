@@ -25,5 +25,7 @@ jobs:
         path: ~/.m2/repository
         key: maven-${{ hashFiles('pom.xml') }}
         restore-keys: maven-
+    - uses: satackey/action-docker-layer-caching@v0.0.8
+      continue-on-error: true
     - name: Build
       run: construi build
