@@ -40,8 +40,9 @@ public class SingleTeamImpl implements SingleTeam {
   public String getName() {
     Document doc = page.load();
 
-    return CharMatcher.WHITESPACE.trimAndCollapseFrom(
-        StringUtils.substringBefore(doc.select("title").text(), "Clubhouse"), ' ');
+    return CharMatcher.whitespace()
+        .trimAndCollapseFrom(
+            StringUtils.substringBefore(doc.select("title").text(), "Clubhouse"), ' ');
   }
 
   @Override

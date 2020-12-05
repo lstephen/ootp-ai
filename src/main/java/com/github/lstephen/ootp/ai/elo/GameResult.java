@@ -2,8 +2,8 @@ package com.github.lstephen.ootp.ai.elo;
 
 import com.github.lstephen.ootp.ai.data.Id;
 import com.github.lstephen.ootp.ai.roster.Team;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /** @author lstephen */
 public final class GameResult {
@@ -46,11 +46,11 @@ public final class GameResult {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-        .add("visitor", visitor)
-        .add("visitorScore", visitorScore)
-        .add("home", home)
-        .add("homeScore", homeScore)
+    return new ToStringBuilder(this)
+        .append("visitor", visitor)
+        .append("visitorScore", visitorScore)
+        .append("home", home)
+        .append("homeScore", homeScore)
         .toString();
   }
 

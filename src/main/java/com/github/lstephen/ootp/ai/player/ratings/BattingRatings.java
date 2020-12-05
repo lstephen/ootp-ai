@@ -8,11 +8,11 @@ import com.github.lstephen.ootp.ai.rating.OneToOneHundred;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /** @author lstephen */
 public final class BattingRatings<T> {
@@ -96,12 +96,12 @@ public final class BattingRatings<T> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-        .add("scale", scale)
-        .add("contact", contact)
-        .add("gap", gap)
-        .add("power", power)
-        .add("eye", eye)
+    return new ToStringBuilder(this)
+        .append("scale", scale)
+        .append("contact", contact)
+        .append("gap", gap)
+        .append("power", power)
+        .append("eye", eye)
         .toString();
   }
 
