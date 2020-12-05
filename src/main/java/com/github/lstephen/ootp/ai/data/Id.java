@@ -2,6 +2,7 @@ package com.github.lstephen.ootp.ai.data;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /** @author lstephen */
 public final class Id<T> {
@@ -42,7 +43,7 @@ public final class Id<T> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("id", id).toString();
+    return new ToStringBuilder(this).append("id", id).toString();
   }
 
   public static <T> Id<T> valueOf(String id) {

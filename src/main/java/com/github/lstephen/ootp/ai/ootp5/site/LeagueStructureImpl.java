@@ -38,7 +38,7 @@ public class LeagueStructureImpl implements LeagueStructure {
         continue;
       }
       final String name =
-          CharMatcher.WHITESPACE.trimFrom(StringUtils.substringBeforeLast(e.text(), "Standings"));
+          CharMatcher.whitespace().trimFrom(StringUtils.substringBeforeLast(e.text(), "Standings"));
       leagues.add(
           new League() {
             public String getName() {
@@ -64,7 +64,7 @@ public class LeagueStructureImpl implements LeagueStructure {
     Element divEl = leagueEl.nextElementSibling();
 
     while (divEl.select("td.s5:containsOwn(Standings)").isEmpty()) {
-      final String name = CharMatcher.WHITESPACE.trimFrom(divEl.select("td.s5").text());
+      final String name = CharMatcher.whitespace().trimFrom(divEl.select("td.s5").text());
 
       if (Strings.isNullOrEmpty(name)) {
         break;

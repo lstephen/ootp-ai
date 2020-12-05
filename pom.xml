@@ -43,7 +43,7 @@
     <lib.commons-lang3.version>3.3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.4.1</lib.commons-math3.version>
     <lib.findbugs.version>2.0.1</lib.findbugs.version>
-    <lib.guava.version>18.0</lib.guava.version>
+    <lib.guava.version>30.0-jre</lib.guava.version>
     <lib.humanize-slim.version>1.2.2</lib.humanize-slim.version>
     <lib.jackson.version>2.8.11</lib.jackson.version>
     <lib.joda-time.version>2.9.2</lib.joda-time.version>

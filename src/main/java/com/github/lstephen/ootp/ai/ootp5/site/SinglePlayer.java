@@ -106,9 +106,10 @@ public class SinglePlayer implements PlayerSource {
     Elements title = doc.select("title");
 
     String team =
-        CharMatcher.WHITESPACE.trimAndCollapseFrom(
-            StringUtils.substringBefore(StringUtils.substringAfterLast(title.text(), ","), "-"),
-            ' ');
+        CharMatcher.whitespace()
+            .trimAndCollapseFrom(
+                StringUtils.substringBefore(StringUtils.substringAfterLast(title.text(), ","), "-"),
+                ' ');
 
     Elements info = doc.select("td.s4:has(b:contains(Name)) + td.s4");
 
@@ -211,7 +212,7 @@ public class SinglePlayer implements PlayerSource {
   }
 
   private String getListedPosition(String src) {
-    String p = CharMatcher.WHITESPACE.trimFrom(src);
+    String p = CharMatcher.whitespace().trimFrom(src);
 
     ImmutableMap<String, String> ps =
         ImmutableMap.<String, String>builder()

@@ -9,9 +9,9 @@ import com.github.lstephen.ootp.ai.rating.OneToTen;
 import com.github.lstephen.ootp.ai.rating.Rating;
 import com.github.lstephen.ootp.ai.rating.Scale;
 import com.github.lstephen.ootp.ai.site.Site;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /** @author lstephen */
 public class PitchingRatings<T> {
@@ -90,12 +90,12 @@ public class PitchingRatings<T> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-        .add("stuff", stuff)
-        .add("control", control)
-        .add("movement", movement)
-        .add("hits", hits)
-        .add("gap", gap)
+    return new ToStringBuilder(this)
+        .append("stuff", stuff)
+        .append("control", control)
+        .append("movement", movement)
+        .append("hits", hits)
+        .append("gap", gap)
         .toString();
   }
 

@@ -3,8 +3,8 @@ package com.github.lstephen.ootp.ai.player.ratings;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /** @author lstephen */
 public class FieldingRatings {
@@ -40,12 +40,12 @@ public class FieldingRatings {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this)
-        .add("range", range)
-        .add("errors", errors)
-        .add("arm", arm)
-        .add("dp", dp)
-        .add("ability", ability)
+    return new ToStringBuilder(this)
+        .append("range", range)
+        .append("errors", errors)
+        .append("arm", arm)
+        .append("dp", dp)
+        .append("ability", ability)
         .toString();
   }
 
@@ -183,12 +183,12 @@ public class FieldingRatings {
 
     @Override
     public String toString() {
-      return Objects.toStringHelper(this)
-          .add("range", range)
-          .add("errors", errors)
-          .add("arm", arm)
-          .add("dp", dp)
-          .add("ability", ability)
+      return new ToStringBuilder(this)
+          .append("range", range)
+          .append("errors", errors)
+          .append("arm", arm)
+          .append("dp", dp)
+          .append("ability", ability)
           .toString();
     }
 

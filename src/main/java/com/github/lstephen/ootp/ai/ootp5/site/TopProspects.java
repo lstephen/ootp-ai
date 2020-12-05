@@ -28,8 +28,8 @@ public final class TopProspects {
     if (els != null && !els.isEmpty()) {
       return Optional.of(
           Integer.parseInt(
-              CharMatcher.WHITESPACE.trimFrom(
-                  StringUtils.substringBefore(els.get(0).text(), " "))));
+              CharMatcher.whitespace()
+                  .trimFrom(StringUtils.substringBefore(els.get(0).text(), " "))));
     }
 
     return Optional.absent();
