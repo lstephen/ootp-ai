@@ -98,7 +98,7 @@ public class BaseRunsCoefficients {
     HillClimbing<double[]> hc =
         HillClimbing.<double[]>builder()
             .validator(
-                ds -> ds.length == 3 && Arrays.stream(ds).allMatch(d -> d > -10.0 && d < 10.0))
+                ds -> ds.length == 3 && Arrays.stream(ds).allMatch(d -> d >= 0.0 && d < 10.0))
             .heuristic(Ordering.natural().onResultOf(rsme).reverse())
             .actionGenerator(
                 ds -> {
@@ -123,7 +123,7 @@ public class BaseRunsCoefficients {
     double[] result = hc.search(new double[] {1.0, 1.694, 0.052});
 
     return new Coefficients(
-        result[0] * 0.726, result[0] * 1.947, result[0] * 3.134, result[1], result[2]);
+        result[0] * 0.726, result[0] * 1.948, result[0] * 3.134, result[1], result[2]);
   }
 
   private static Collection<Action<double[]>> addToAllIndexes(double toAdd, int length) {
