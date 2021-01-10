@@ -102,10 +102,10 @@ public class BaseRunsCoefficients {
                     ds.length == 3
                         && Arrays.stream(ds).allMatch(d -> d >= 0.0 && d < 10.0)
                         // for bringing runs in:
-                        // * a hr is at least as effective as a hit
-                        && ds[1] >= ds[0]
-                        // * a hit is at least as effective as a walk
-                        && ds[0] >= ds[2])
+                        // * a hr is at least as effective as a single
+                        && ds[1] >= ds[0] * 0.726
+                        // * a single is at least as effective as a walk
+                        && ds[0] * 0.726 >= ds[2])
             .heuristic(Ordering.natural().onResultOf(rsme).reverse())
             .actionGenerator(
                 ds -> {
