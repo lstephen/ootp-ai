@@ -39,7 +39,7 @@
     <lib.ai-search.version>1.2</lib.ai-search.version>
     <lib.argonaut.version>6.1</lib.argonaut.version>
     <lib.caffeine.version>2.6.2</lib.caffeine.version>
-    <lib.commons-io.version>2.4</lib.commons-io.version>
+    <lib.commons-io.version>2.7</lib.commons-io.version>
     <lib.commons-lang3.version>3.3.1</lib.commons-lang3.version>
     <lib.commons-math3.version>3.4.1</lib.commons-math3.version>
     <lib.findbugs.version>2.0.1</lib.findbugs.version>
