@@ -56,7 +56,7 @@
     <lib.slf4j.version>1.7.25</lib.slf4j.version>
 
     <!-- Upgrading JSoup 1.7.x -> 1.8.x is a breaking change -->
-    <lib.jsoup.version>1.7.3</lib.jsoup.version>
+    <lib.jsoup.version>1.15.3</lib.jsoup.version>
 
     <gem.rspec-its.version>1.2.0</gem.rspec-its.version>
 
